@@ -1,0 +1,158 @@
+{
+  "bar": {
+    "position": "top",
+    "height": 30,
+    "opacity": 1,
+    "left": [
+      {
+        "id": "wts9pcl",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wbaamdv",
+        "type": "menu",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wcb6jw9",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "w2367t2",
+        "type": "workspaces",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wsep-layout",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wlayout",
+        "type": "layout",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "w1aimky",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "was7m6x",
+        "type": "windowTitle",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "nerd"
+      }
+    ],
+    "center": [
+      {
+        "id": "wfbwk31",
+        "type": "clock",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "none"
+      }
+    ],
+    "right": [
+      {
+        "id": "w0ddkdl",
+        "type": "audio",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "nerd"
+      },
+      {
+        "id": "wie3apd",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wjwz5vd",
+        "type": "themeSwitcher",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wnq117p",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wtde2sb",
+        "type": "systemTray",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "w1u0u5o",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "wrzryuy",
+        "type": "notifications",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "nerd"
+      },
+      {
+        "id": "wtzgk5o",
+        "type": "separator",
+        "style": "none",
+        "color": "auto",
+        "iconSet": "emoji"
+      },
+      {
+        "id": "w6qn8jk",
+        "type": "power",
+        "style": "underline",
+        "color": "auto",
+        "iconSet": "emoji"
+      }
+    ],
+    "floating": false,
+    "gap": 20,
+    "radius": 0
+  },
+  "general": {
+    "fontFamily": "Cascadia Code NF",
+    "fontSize": 16
+  },
+  "defaultApps": {
+    "terminal": "kitty"
+  },
+  "notifications": {
+    "maxVisible": 5,
+    "autoDismissSeconds": 10
+  },
+  "weather": {
+    "city": "",
+    "country": "",
+    "units": "metric"
+  }
+}

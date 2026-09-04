@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Solarized Dark",
+    "slug": "solarized-dark",
+    "dark": true
+  },
+  "palette": {
+    "bg": "002b36",
+    "blue": "268bd2",
+    "comment": "586e75",
+    "cyan": "2aa198",
+    "fg": "839496",
+    "green": "859900",
+    "lavender": "6c71c4",
+    "maroon": "dc322f",
+    "mauve": "d33682",
+    "orange": "cb4b16",
+    "red": "dc322f",
+    "selection": "073642",
+    "teal": "2aa198",
+    "yellow": "b58900"
+  },
+  "wallpaper": {
+    "path": "wallpapers/solarized-dark.png",
+    "mode": "fill"
+  }
+}

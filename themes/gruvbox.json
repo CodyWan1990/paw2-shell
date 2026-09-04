@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Gruvbox",
+    "slug": "gruvbox",
+    "dark": true
+  },
+  "palette": {
+    "bg": "282828",
+    "blue": "83a598",
+    "comment": "928374",
+    "cyan": "8ec07c",
+    "fg": "ebdbb2",
+    "green": "b8bb26",
+    "lavender": "b16286",
+    "maroon": "cc241d",
+    "mauve": "d3869b",
+    "orange": "fe8019",
+    "red": "fb4934",
+    "selection": "3c3836",
+    "teal": "689d6a",
+    "yellow": "fabd2f"
+  },
+  "wallpaper": {
+    "path": "wallpapers/gruvbox.jpg",
+    "mode": "fill"
+  }
+}

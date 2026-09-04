@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "One Dark",
+    "slug": "onedark",
+    "dark": true
+  },
+  "palette": {
+    "bg": "282c34",
+    "blue": "61afef",
+    "comment": "5c6370",
+    "cyan": "56b6c2",
+    "fg": "abb2bf",
+    "green": "98c379",
+    "lavender": "c678dd",
+    "maroon": "be5046",
+    "mauve": "c678dd",
+    "orange": "d19a66",
+    "red": "e06c75",
+    "selection": "3e4452",
+    "teal": "56b6c2",
+    "yellow": "e5c07b"
+  },
+  "wallpaper": {
+    "path": "wallpapers/onedark.png",
+    "mode": "fill"
+  }
+}

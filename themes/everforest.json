@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Everforest",
+    "slug": "everforest",
+    "dark": true
+  },
+  "palette": {
+    "bg": "2d353b",
+    "blue": "7fbbb3",
+    "comment": "859289",
+    "cyan": "83c092",
+    "fg": "d3c6aa",
+    "green": "a7c080",
+    "lavender": "d699b6",
+    "maroon": "e67e80",
+    "mauve": "d699b6",
+    "orange": "e69875",
+    "red": "e67e80",
+    "selection": "3d484d",
+    "teal": "83c092",
+    "yellow": "dbbc7f"
+  },
+  "wallpaper": {
+    "path": "wallpapers/everforest.png",
+    "mode": "fill"
+  }
+}

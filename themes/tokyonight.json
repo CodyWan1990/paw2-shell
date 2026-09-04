@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Tokyo Night",
+    "slug": "tokyonight",
+    "dark": true
+  },
+  "palette": {
+    "bg": "1a1b26",
+    "blue": "7aa2f7",
+    "comment": "565f89",
+    "cyan": "73daca",
+    "fg": "c0caf5",
+    "green": "9ece6a",
+    "lavender": "c0caf5",
+    "maroon": "db4b4b",
+    "mauve": "bb9af7",
+    "orange": "ff9e64",
+    "red": "f7768e",
+    "selection": "292e42",
+    "teal": "2ac3de",
+    "yellow": "e0af68"
+  },
+  "wallpaper": {
+    "path": "wallpapers/tokyonight.png",
+    "mode": "fill"
+  }
+}

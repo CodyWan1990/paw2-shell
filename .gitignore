@@ -1,0 +1,14 @@
+# Holds the OpenWeatherMap API key (OWM_API_KEY=...). Never commit it —
+# this dir IS the stow source, so a tracked weather.conf would leak the key.
+weather.conf
+
+# Machine-specific QML tooling state.
+.qmlls.ini
+
+# Local wallpapers. Not covered by the project licence and not distributed;
+# the shipped themes reference them by name and fall back to colour alone.
+wallpapers/
+
+# AI files
+/CLAUDE.md
+/AGENTS.md

@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Kanagawa",
+    "slug": "kanagawa",
+    "dark": true
+  },
+  "palette": {
+    "bg": "1f1f28",
+    "blue": "7e9cd8",
+    "comment": "727169",
+    "cyan": "7aa89f",
+    "fg": "dcd7ba",
+    "green": "98bb6c",
+    "lavender": "9cabca",
+    "maroon": "c34043",
+    "mauve": "957fb8",
+    "orange": "ffa066",
+    "red": "c34043",
+    "selection": "2a2a37",
+    "teal": "6a9589",
+    "yellow": "e6c384"
+  },
+  "wallpaper": {
+    "path": "wallpapers/kanagawa.jpg",
+    "mode": "fill"
+  }
+}

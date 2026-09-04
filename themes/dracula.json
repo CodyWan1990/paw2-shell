@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Dracula",
+    "slug": "dracula",
+    "dark": true
+  },
+  "palette": {
+    "bg": "282a36",
+    "blue": "bd93f9",
+    "comment": "6272a4",
+    "cyan": "8be9fd",
+    "fg": "f8f8f2",
+    "green": "50fa7b",
+    "lavender": "ff79c6",
+    "maroon": "ff5555",
+    "mauve": "bd93f9",
+    "orange": "ffb86c",
+    "red": "ff5555",
+    "selection": "44475a",
+    "teal": "8be9fd",
+    "yellow": "f1fa8c"
+  },
+  "wallpaper": {
+    "path": "wallpapers/dracula.png",
+    "mode": "fill"
+  }
+}

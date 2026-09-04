@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Nord",
+    "slug": "nord",
+    "dark": true
+  },
+  "palette": {
+    "bg": "2e3440",
+    "blue": "81a1c1",
+    "comment": "4c566a",
+    "cyan": "88c0d0",
+    "fg": "eceff4",
+    "green": "a3be8c",
+    "lavender": "b48ead",
+    "maroon": "bf616a",
+    "mauve": "b48ead",
+    "orange": "d08770",
+    "red": "bf616a",
+    "selection": "3b4252",
+    "teal": "8fbcbb",
+    "yellow": "ebcb8b"
+  },
+  "wallpaper": {
+    "path": "wallpapers/nord.png",
+    "mode": "fill"
+  }
+}

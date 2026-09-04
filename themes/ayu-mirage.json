@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Ayu Mirage",
+    "slug": "ayu-mirage",
+    "dark": true
+  },
+  "palette": {
+    "bg": "1f2430",
+    "blue": "73d0ff",
+    "comment": "5c6773",
+    "cyan": "95e6cb",
+    "fg": "cbccc6",
+    "green": "bae67e",
+    "lavender": "c3a6ff",
+    "maroon": "ff6666",
+    "mauve": "d4bfff",
+    "orange": "ffa759",
+    "red": "f28779",
+    "selection": "34455a",
+    "teal": "90e1c6",
+    "yellow": "ffd580"
+  },
+  "wallpaper": {
+    "path": "wallpapers/ayu-mirage.png",
+    "mode": "fill"
+  }
+}

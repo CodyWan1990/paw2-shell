@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Rose Pine",
+    "slug": "rose-pine",
+    "dark": true
+  },
+  "palette": {
+    "bg": "191724",
+    "blue": "31748f",
+    "comment": "6e6a86",
+    "cyan": "9ccfd8",
+    "fg": "e0def4",
+    "green": "9ccfd8",
+    "lavender": "c4a7e7",
+    "maroon": "eb6f92",
+    "mauve": "c4a7e7",
+    "orange": "ebbcba",
+    "red": "eb6f92",
+    "selection": "26233a",
+    "teal": "31748f",
+    "yellow": "f6c177"
+  },
+  "wallpaper": {
+    "path": "wallpapers/rosepine.png",
+    "mode": "fill"
+  }
+}

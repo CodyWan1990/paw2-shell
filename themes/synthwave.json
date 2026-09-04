@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Synthwave 84",
+    "slug": "synthwave",
+    "dark": true
+  },
+  "palette": {
+    "bg": "262335",
+    "blue": "03edf9",
+    "comment": "848bbd",
+    "cyan": "36f9f6",
+    "fg": "f8f8f2",
+    "green": "72f1b8",
+    "lavender": "c792ea",
+    "maroon": "f97e72",
+    "mauve": "ff7edb",
+    "orange": "ff8b39",
+    "red": "fe4450",
+    "selection": "39335a",
+    "teal": "72f1b8",
+    "yellow": "fede5d"
+  },
+  "wallpaper": {
+    "path": "wallpapers/synthwave.jpg",
+    "mode": "fill"
+  }
+}

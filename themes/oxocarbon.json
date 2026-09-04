@@ -1,0 +1,27 @@
+{
+  "meta": {
+    "name": "Oxocarbon",
+    "slug": "oxocarbon",
+    "dark": true
+  },
+  "palette": {
+    "bg": "161616",
+    "blue": "33b1ff",
+    "comment": "525252",
+    "cyan": "3ddbd9",
+    "fg": "f2f4f8",
+    "green": "42be65",
+    "lavender": "78a9ff",
+    "maroon": "ee5396",
+    "mauve": "be95ff",
+    "orange": "ffb386",
+    "red": "ff7eb6",
+    "selection": "393939",
+    "teal": "08bdba",
+    "yellow": "ffe97b"
+  },
+  "wallpaper": {
+    "path": "wallpapers/oxocarbon.png",
+    "mode": "fill"
+  }
+}

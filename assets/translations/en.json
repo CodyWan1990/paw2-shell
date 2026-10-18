@@ -1863,6 +1863,7 @@
             "theme-next": "Next theme",
             "theme-previous": "Previous theme",
             "theme-wallpaper-next": "Next wallpaper in the theme",
+            "theme-wallpaper-previous": "Previous wallpaper in the theme",
             "theme-wallpaper-random": "Random wallpaper from the theme",
             "themes-open": "Open themes"
           },
@@ -5346,9 +5347,9 @@
       "use-wallpaper": "Use wallpaper"
     },
     "panel": {
-      "edit": "Edit theme",
+      "edit": "Edit",
       "from-wallpaper": "Colours from the wallpaper",
-      "hint": "←/→ choose   Enter apply   Tab switch view   Esc close",
+      "hint": "←/→ choose   Enter apply   Right-click edit   Tab switch view   Esc close",
       "new": "New theme",
       "no-wallpapers": "The applied theme has no wallpapers.",
       "none-applied": "No theme applied yet.",

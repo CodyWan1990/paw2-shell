@@ -360,6 +360,9 @@ namespace noctalia::theme {
     ipc.bind(noctalia::cli::msg::themeWallpaperNext, [this](const std::string&) -> std::string {
       return cycleWallpaper(1) ? ok() : "error: the applied theme has no wallpapers\n";
     });
+    ipc.bind(noctalia::cli::msg::themeWallpaperPrevious, [this](const std::string&) -> std::string {
+      return cycleWallpaper(-1) ? ok() : "error: the applied theme has no wallpapers\n";
+    });
     ipc.bind(noctalia::cli::msg::themeWallpaperRandom, [this](const std::string&) -> std::string {
       return randomWallpaper() ? ok() : "error: the applied theme has no wallpapers\n";
     });

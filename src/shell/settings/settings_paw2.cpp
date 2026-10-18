@@ -53,6 +53,7 @@ namespace settings {
         {"theme-previous", "theme-previous", "paw2-keys-themes"},
         {"themes-open", "panel-toggle themes", "paw2-keys-themes"},
         {"theme-wallpaper-next", "theme-wallpaper-next", "paw2-keys-themes"},
+        {"theme-wallpaper-previous", "theme-wallpaper-previous", "paw2-keys-themes"},
         {"theme-wallpaper-random", "theme-wallpaper-random", "paw2-keys-themes"},
     });
 

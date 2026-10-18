@@ -88,8 +88,12 @@ namespace noctalia::bar {
     constexpr std::array<GestureBinding, 1> kSysmon{{{Gesture::Left, "panel-toggle control-center system"}}};
     constexpr std::array<GestureBinding, 1> kWallpaper{{{Gesture::Left, "panel-toggle wallpaper"}}};
     constexpr std::array<GestureBinding, 1> kThemeMode{{{Gesture::Left, "theme-mode-toggle"}}};
-    constexpr std::array<GestureBinding, 2> kThemes{
-        {{Gesture::Left, "panel-toggle themes"}, {Gesture::Right, "panel-toggle themes wallpapers"}}
+    // Scrolling steps through the applied theme's wallpapers, leaving its palette alone.
+    constexpr std::array<GestureBinding, 4> kThemes{
+        {{Gesture::Left, "panel-toggle themes"},
+         {Gesture::Right, "panel-toggle themes wallpapers"},
+         {Gesture::ScrollUp, "theme-wallpaper-previous"},
+         {Gesture::ScrollDown, "theme-wallpaper-next"}}
     };
     constexpr std::array<GestureBinding, 4> kVolumeOutput{
         {{Gesture::Left, "panel-toggle control-center audio"},

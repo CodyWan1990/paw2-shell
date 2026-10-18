@@ -723,6 +723,9 @@ namespace noctalia::cli {
     inline constexpr Command themeWallpaperNext{
         "theme-wallpaper-next", "Show the applied theme's next wallpaper", {}, {}, {}, {}, {}, false
     };
+    inline constexpr Command themeWallpaperPrevious{
+        "theme-wallpaper-previous", "Show the applied theme's previous wallpaper", {}, {}, {}, {}, {}, false
+    };
     inline constexpr Command themeWallpaperRandom{
         "theme-wallpaper-random", "Show a random wallpaper from the applied theme", {}, {}, {}, {}, {}, false
     };
@@ -963,6 +966,7 @@ namespace noctalia::cli {
       msg::themeNext,
       msg::themePrevious,
       msg::themeWallpaperNext,
+      msg::themeWallpaperPrevious,
       msg::themeWallpaperRandom,
       msg::volumeDown,
       msg::volumeMute,

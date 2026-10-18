@@ -137,7 +137,7 @@ void ThemesPanel::openEditor(std::string_view id) {
 
 std::unique_ptr<Node> ThemesPanel::makeCard(
     std::string_view imagePath, bool current, bool selected, std::unique_ptr<Node> caption,
-    std::function<void()> onClick
+    std::function<void()> onClick, std::function<void()> onEdit
 ) {
   const float scale = contentScale();
   Image* image = nullptr;
@@ -149,6 +149,7 @@ std::unique_ptr<Node> ThemesPanel::makeCard(
       .radius = Style::scaledRadiusLg(scale),
       .width = kCardWidth * scale,
       .onClick = std::move(onClick),
+      .onRightClick = onEdit,
       .configure =
           [](Button& control) {
             control.setDirection(FlexDirection::Vertical);
@@ -168,7 +169,21 @@ std::unique_ptr<Node> ThemesPanel::makeCard(
   }
   card->addChild(std::move(caption));
   m_cards.push_back(card.get());
-  return card;
+  if (!onEdit) {
+    return card;
+  }
+  // The edit button sits under the card rather than in it: the card is a button
+  // itself, and would take the click.
+  return ui::column(
+      {.align = FlexAlign::Stretch, .gap = Style::spaceXs * scale},
+      std::move(card),
+      ui::button({
+          .text = i18n::tr("themes.panel.edit"),
+          .glyph = "pencil",
+          .variant = ButtonVariant::Ghost,
+          .onClick = std::move(onEdit),
+      })
+  );
 }
 
 void ThemesPanel::rebuildCards() {
@@ -206,24 +221,14 @@ void ThemesPanel::addThemeCards() {
   for (const auto& preset : m_presets->presets()) {
     const std::size_t index = m_cards.size();
     auto caption = ui::column({.align = FlexAlign::Stretch, .gap = Style::spaceXs * scale});
-    caption->addChild(ui::row(
-        {.align = FlexAlign::Center, .gap = Style::spaceXs * scale, .fillWidth = true},
-        ui::label({
-            .text = preset.title,
-            .fontSize = Style::fontSizeBody * scale,
-            .fontWeight = FontWeight::Bold,
-            .color = colorSpecFromRole(ColorRole::OnSurface),
-            .maxLines = 1,
-            .ellipsize = TextEllipsize::End,
-            .flexGrow = 1.0F,
-        }),
-        ui::button({
-            .glyph = "pencil",
-            .variant = ButtonVariant::Ghost,
-            .tooltip = i18n::tr("themes.panel.edit"),
-            .onClick = [id = preset.id]() { openEditor(id); },
-        })
-    ));
+    caption->addChild(ui::label({
+        .text = preset.title,
+        .fontSize = Style::fontSizeBody * scale,
+        .fontWeight = FontWeight::Bold,
+        .color = colorSpecFromRole(ColorRole::OnSurface),
+        .maxLines = 1,
+        .ellipsize = TextEllipsize::End,
+    }));
     if (const auto preview = themes::presetPreview(preset, mode); !preview.empty()) {
       auto swatches = std::make_unique<ColorSwatchPreviewStrip>();
       swatches->setMetricsFromFontSize(Style::fontSizeCaption * scale);
@@ -239,7 +244,7 @@ void ThemesPanel::addThemeCards() {
     const std::string picture = !preset.screenshotPath.empty() ? preset.screenshotPath : preset.currentWallpaper();
     strip->addChild(makeCard(
         picture, preset.id == m_presets->lastAppliedId(), index == m_selected, std::move(caption),
-        [this, index]() { activate(index); }
+        [this, index]() { activate(index); }, [id = preset.id]() { openEditor(id); }
     ));
   }
 

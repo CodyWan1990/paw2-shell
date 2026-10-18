@@ -57,7 +57,7 @@ private:
   void addWallpaperCards();
   std::unique_ptr<Node> makeCard(
       std::string_view imagePath, bool current, bool selected, std::unique_ptr<Node> caption,
-      std::function<void()> onClick
+      std::function<void()> onClick, std::function<void()> onEdit = nullptr
   );
   void activate(std::size_t index);
   void select(std::size_t index);

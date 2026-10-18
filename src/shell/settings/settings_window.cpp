@@ -549,16 +549,23 @@ bool SettingsWindow::openToPlugin(std::string pluginId) {
   return true;
 }
 
-// paw2 sends a snapshot on every window change but its config only when that changes; the paw2
-// pages are rebuilt for the latter, and when the connection comes or goes.
+// paw2 sends a snapshot on every window change, but the paw2 pages only change with its config,
+// with the monitors plugged in, and when the connection comes or goes.
 void SettingsWindow::onPaw2Changed() {
   const auto& runtime = m_platform->paw2Runtime();
   const bool connected = runtime.trusted() && runtime.configGeneration() > 0;
-  if (connected == m_paw2Connected && runtime.configGeneration() == m_paw2ConfigGeneration) {
+  std::vector<std::pair<std::string, std::vector<compositors::paw2::Paw2OutputMode>>> displays;
+  for (const auto& output : runtime.snapshot().outputs) {
+    displays.emplace_back(output.name, output.modes);
+  }
+  if (connected == m_paw2Connected
+      && runtime.configGeneration() == m_paw2ConfigGeneration
+      && displays == m_paw2Displays) {
     return;
   }
   m_paw2Connected = connected;
   m_paw2ConfigGeneration = runtime.configGeneration();
+  m_paw2Displays = std::move(displays);
   if (isOpen()) {
     requestContentRebuild(true, true, false);
   }

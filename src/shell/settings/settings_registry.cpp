@@ -482,6 +482,115 @@ namespace settings {
       }
     }
 
+    // A mode as a person reads it: "2560 × 1440 @ 165.08 Hz".
+    [[nodiscard]] std::string paw2ModeLabel(std::int64_t width, std::int64_t height, double refresh) {
+      std::string hz = std::format("{:.2f}", refresh);
+      while (hz.ends_with('0')) {
+        hz.pop_back();
+      }
+      if (hz.ends_with('.')) {
+        hz.pop_back();
+      }
+      return std::format("{} × {} @ {} Hz", width, height, hz);
+    }
+
+    // The monitor's mode choice: paw2's preferred mode, then each advertised mode once, plus the
+    // configured mode if the display no longer offers it.
+    [[nodiscard]] SelectSetting
+    paw2ModeSelect(const compositors::paw2::Paw2Output& output, const nlohmann::json& configured) {
+      SelectSetting select;
+      select.options.push_back(
+          SelectOption{.value = std::string(kPaw2AutoMode), .label = i18n::tr("settings.schema.paw2.monitor.mode.auto")}
+      );
+      select.selectedValue = std::string(kPaw2AutoMode);
+      for (const auto& mode : output.modes) {
+        const std::string value = paw2ModeValue(mode.width, mode.height, mode.refresh);
+        if (std::ranges::contains(select.options, value, &SelectOption::value)) {
+          continue;
+        }
+        select.options.push_back(
+            SelectOption{
+                .value = value,
+                .label = paw2ModeLabel(mode.width, mode.height, mode.refresh),
+                .description = mode.current ? i18n::tr("settings.schema.paw2.monitor.mode.current") : std::string{},
+            }
+        );
+      }
+
+      const auto resolution = configured.find("resolution");
+      if (resolution == configured.end() || !resolution->is_array() || resolution->size() != 2) {
+        return select;
+      }
+      const std::int64_t width = (*resolution)[0].get<std::int64_t>();
+      const std::int64_t height = (*resolution)[1].get<std::int64_t>();
+      // Without a refresh paw2 takes the fastest mode at that size, which the list has first.
+      const double wanted = configured.value("refresh", 0.0);
+      for (const auto& mode : output.modes) {
+        if (mode.width == width && mode.height == height && (wanted == 0.0 || std::abs(mode.refresh - wanted) < 0.01)) {
+          select.selectedValue = paw2ModeValue(mode.width, mode.height, mode.refresh);
+          return select;
+        }
+      }
+      select.selectedValue = paw2ModeValue(width, height, wanted);
+      select.options.push_back(
+          SelectOption{.value = select.selectedValue, .label = paw2ModeLabel(width, height, wanted)}
+      );
+      return select;
+    }
+
+    void appendPaw2DisplayEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
+      constexpr auto section = SettingsSection::Paw2Displays;
+      const nlohmann::json monitors = env.paw2Value("monitors").value_or(nlohmann::json::array());
+      constexpr std::array<std::string_view, 8> kTransforms{"normal",  "90",         "180",         "270",
+                                                            "flipped", "flipped-90", "flipped-180", "flipped-270"};
+      constexpr std::array<std::string_view, 3> kVrrPolicies{"automatic", "always", "never"};
+
+      for (const auto& output : env.paw2Outputs) {
+        nlohmann::json configured = nlohmann::json::object();
+        for (const auto& monitor : monitors) {
+          if (monitor.is_object() && monitor.value("connector", std::string{}) == output.name) {
+            configured = monitor;
+          }
+        }
+        // The Displays page labels each group with its connector (see groupLabel in settings_content.cpp).
+        const std::string group = "paw2-output:" + output.name;
+        const auto add = [&](std::string_view key, SettingControl control, std::string tags, bool advanced = false) {
+          const std::string text = "settings.schema.paw2.monitor." + i18n::keySegment(key);
+          entries.push_back(makeEntry(
+              section, group, i18n::tr(text + ".label"), i18n::tr(text + ".description"),
+              {"paw2", "monitors", output.name, std::string(key)}, std::move(control),
+              "paw2 display monitor output " + output.name + " " + tags, advanced
+          ));
+        };
+
+        std::string position;
+        if (const auto it = configured.find("position"); it != configured.end() && it->is_array() && it->size() == 2) {
+          position = std::format("{}, {}", (*it)[0].get<std::int64_t>(), (*it)[1].get<std::int64_t>());
+        }
+        add("mode", paw2ModeSelect(output, configured), "mode resolution refresh rate hz");
+        add("scale", SliderSetting{configured.value("scale", 1.0), 0.5, 3.0, 0.05, false}, "scale scaling hidpi");
+        add("transform",
+            paw2Select(
+                "settings.schema.paw2.monitor.transform.options", kTransforms,
+                configured.value("transform", std::string("normal"))
+            ),
+            "transform rotate rotation flip");
+        add("vrr",
+            paw2Select(
+                "settings.schema.paw2.monitor.vrr.options", kVrrPolicies,
+                configured.value("vrr", std::string("automatic"))
+            ),
+            "vrr variable refresh adaptive sync freesync gsync");
+        add("position",
+            TextSetting{
+                .value = position, .placeholder = i18n::tr("settings.schema.paw2.monitor.position.placeholder")
+            },
+            "position layout arrangement", true);
+        add("focus_at_startup", ToggleSetting{configured.value("focus_at_startup", false)}, "focus startup primary",
+            true);
+      }
+    }
+
     void
     appendPaw2CompositorEntries(std::vector<SettingEntry>& entries, const Config& cfg, const RegistryEnvironment& env) {
       constexpr auto section = SettingsSection::Paw2;
@@ -4437,6 +4546,7 @@ namespace settings {
 
     if (env.paw2Value) {
       appendPaw2CompositorEntries(entries, cfg, env);
+      appendPaw2DisplayEntries(entries, env);
     } else {
       appendPaw2Unavailable(entries, env);
     }

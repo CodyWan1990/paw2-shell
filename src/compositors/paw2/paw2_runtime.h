@@ -29,12 +29,23 @@ namespace compositors::paw2 {
     bool operator==(const Paw2Window&) const = default;
   };
 
+  // A mode a display advertises.
+  struct Paw2OutputMode {
+    std::int32_t width = 0;
+    std::int32_t height = 0;
+    double refresh = 0.0; // Hz
+    bool current = false;
+
+    bool operator==(const Paw2OutputMode&) const = default;
+  };
+
   struct Paw2Output {
     std::string name;
     bool focused = false;
     std::uint32_t activeWorkspace = 0;
     std::vector<bool> occupied;
     std::string layout;
+    std::vector<Paw2OutputMode> modes;
 
     bool operator==(const Paw2Output&) const = default;
   };

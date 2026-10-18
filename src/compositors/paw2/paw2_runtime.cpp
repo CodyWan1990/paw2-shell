@@ -67,6 +67,21 @@ namespace compositors::paw2 {
             output.occupied.push_back(flag.is_boolean() && flag.get<bool>());
           }
         }
+        if (const auto modes = entry.find("modes"); modes != entry.end() && modes->is_array()) {
+          for (const auto& mode : *modes) {
+            if (!mode.is_object()) {
+              continue;
+            }
+            output.modes.push_back(
+                Paw2OutputMode{
+                    .width = mode.value("width", 0),
+                    .height = mode.value("height", 0),
+                    .refresh = mode.value("refresh", 0.0),
+                    .current = jsonBool(mode, "current"),
+                }
+            );
+          }
+        }
         if (!output.name.empty()) {
           snapshot.outputs.push_back(std::move(output));
         }

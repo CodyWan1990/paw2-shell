@@ -238,10 +238,15 @@ void SettingsWindow::writePaw2Settings(
     return;
   }
   auto& writer = m_platform->paw2ConfigWriter();
+  bool understood = true;
   for (const auto& [path, value] : overrides) {
     if (settings::isPaw2SettingPath(path)) {
-      settings::applyPaw2Setting(writer, path, value);
+      understood = settings::applyPaw2Setting(writer, path, value) && understood;
     }
+  }
+  if (!understood) {
+    markSettingsWriteError(i18n::tr("settings.schema.paw2.invalid-value"));
+    return;
   }
   finishSettingsWrite(true, false, false, false);
 }

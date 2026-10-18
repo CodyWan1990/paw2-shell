@@ -1,5 +1,6 @@
 #pragma once
 
+#include "compositors/paw2/paw2_runtime.h"
 #include "core/timer_manager.h"
 #include "render/animation/animation_manager.h"
 #include "render/scene/input_dispatcher.h"
@@ -258,6 +259,8 @@ private:
   // paw2's config generation the open pages were built from.
   std::uint64_t m_paw2ConfigGeneration = 0;
   bool m_paw2Connected = false;
+  // Connector and modes of each monitor the Displays page shows.
+  std::vector<std::pair<std::string, std::vector<compositors::paw2::Paw2OutputMode>>> m_paw2Displays;
   IdleManager* m_idleManager = nullptr;
   ConfigService* m_config = nullptr;
   scripting::PluginManager* m_pluginManager = nullptr;

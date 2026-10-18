@@ -146,6 +146,10 @@ namespace settings {
     const auto sectionLabel = [](SettingsSection section) { return i18n::tr(settingsSectionLabelKey(section)); };
 
     const auto groupLabel = [](std::string_view group) -> std::string {
+      // The Displays page has a group per monitor, named after its connector.
+      if (constexpr std::string_view kOutputGroup = "paw2-output:"; group.starts_with(kOutputGroup)) {
+        return std::string(group.substr(kOutputGroup.size()));
+      }
       return i18n::tr("settings.navigation.groups." + std::string(group));
     };
 

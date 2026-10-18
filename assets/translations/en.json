@@ -1831,6 +1831,51 @@
           "open-folder": "Open config folder"
         },
         "rejected": "paw2 rejected the last change, so it was undone: {errors}",
+        "invalid-value": "paw2 can't take that value. A position is two numbers, like \"1920, 0\".",
+        "monitor": {
+          "mode": {
+            "label": "Resolution and refresh rate",
+            "description": "Modes the display advertises.",
+            "auto": "Preferred",
+            "current": "In use"
+          },
+          "scale": {
+            "label": "Scale",
+            "description": "Size of everything on this monitor."
+          },
+          "transform": {
+            "label": "Rotation",
+            "description": "Turn or mirror the picture.",
+            "options": {
+              "normal": "None",
+              "90": "90°",
+              "180": "180°",
+              "270": "270°",
+              "flipped": "Mirrored",
+              "flipped-90": "Mirrored, 90°",
+              "flipped-180": "Mirrored, 180°",
+              "flipped-270": "Mirrored, 270°"
+            }
+          },
+          "vrr": {
+            "label": "Variable refresh rate",
+            "description": "Automatic turns it on while a fullscreen window, such as a game, owns the monitor.",
+            "options": {
+              "automatic": "Automatic",
+              "always": "Always",
+              "never": "Never"
+            }
+          },
+          "position": {
+            "label": "Position",
+            "description": "Top-left corner in logical pixels, as \"x, y\". Blank places monitors left to right.",
+            "placeholder": "Automatic"
+          },
+          "focus-at-startup": {
+            "label": "Focus at startup",
+            "description": "Start the session with the keyboard focus on this monitor. Only one monitor can."
+          }
+        },
         "theme-colors": {
           "label": "Follow shell colors",
           "description": "The focus ring takes the palette's primary color and the overview backdrop its surface, and both follow palette changes."

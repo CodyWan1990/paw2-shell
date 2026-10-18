@@ -2,8 +2,11 @@
 
 #include "compositors/paw2/paw2_config_writer.h"
 
+#include <algorithm>
+#include <cstdio>
 #include <cstdlib>
 #include <filesystem>
+#include <format>
 #include <nlohmann/json.hpp>
 #include <optional>
 #include <set>
@@ -52,6 +55,69 @@ namespace settings {
           },
           value
       );
+    }
+
+    // "1920, 0", "1920,0" or "1920 0"
+    [[nodiscard]] std::optional<nlohmann::json> parsePosition(const std::string& text) {
+      std::string spaced = text;
+      std::ranges::replace(spaced, ',', ' ');
+      std::istringstream in(spaced);
+      std::int64_t x = 0;
+      std::int64_t y = 0;
+      std::string rest;
+      if (!(in >> x >> y) || (in >> rest)) {
+        return std::nullopt;
+      }
+      return nlohmann::json::array({x, y});
+    }
+
+    // One monitor's row. Most map straight onto a [[monitors]] key; the mode is two keys, and a
+    // blank position means paw2 places the monitor itself.
+    [[nodiscard]] bool setMonitorRow(
+        compositors::paw2::Paw2ConfigWriter& writer, const std::string& connector, const std::string& key,
+        nlohmann::json value
+    ) {
+      if (key == "mode" && value.is_string()) {
+        const std::string mode = value.get<std::string>();
+        if (mode == kPaw2AutoMode) {
+          writer.setMonitor(connector, "resolution", nullptr);
+          writer.setMonitor(connector, "refresh", nullptr);
+          return true;
+        }
+        int width = 0;
+        int height = 0;
+        double refresh = 0.0;
+        if (std::sscanf(mode.c_str(), "%dx%d@%lf", &width, &height, &refresh) != 3) {
+          return false;
+        }
+        writer.setMonitor(connector, "resolution", nlohmann::json::array({width, height}));
+        writer.setMonitor(connector, "refresh", refresh);
+        return true;
+      }
+      if (key == "position" && value.is_string()) {
+        const std::string text = value.get<std::string>();
+        if (text.find_first_not_of(" \t") == std::string::npos) {
+          writer.setMonitor(connector, "position", nullptr);
+          return true;
+        }
+        const auto position = parsePosition(text);
+        if (!position.has_value()) {
+          return false;
+        }
+        writer.setMonitor(connector, "position", *position);
+        return true;
+      }
+      // paw2 lets only one monitor take the focus at startup; choosing one un-chooses the others.
+      if (key == "focus_at_startup" && value == true) {
+        for (const auto& monitor : writer.get("monitors").value_or(nlohmann::json::array())) {
+          const std::string other = monitor.value("connector", std::string{});
+          if (other != connector && monitor.value("focus_at_startup", false)) {
+            writer.setMonitor(other, "focus_at_startup", false);
+          }
+        }
+      }
+      writer.setMonitor(connector, key, std::move(value));
+      return true;
     }
 
     [[nodiscard]] std::optional<std::int64_t>
@@ -107,27 +173,30 @@ namespace settings {
 
   bool isPaw2SettingPath(const std::vector<std::string>& path) { return path.size() >= 2 && path.front() == "paw2"; }
 
-  void applyPaw2Setting(
+  std::string paw2ModeValue(std::int64_t width, std::int64_t height, double refresh) {
+    return std::format("{}x{}@{:.3f}", width, height, refresh);
+  }
+
+  bool applyPaw2Setting(
       compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& path,
       const ConfigOverrideValue& value
   ) {
     nlohmann::json json = toJson(value);
     if (json.is_null()) {
-      return;
+      return false;
     }
     if (isMonitorPath(path)) {
-      writer.setMonitor(path[2], path[3], std::move(json));
-      return;
+      return setMonitorRow(writer, path[2], path[3], std::move(json));
     }
     if (isBindingPath(path)) {
       writer.setBinding(dottedPaw2Path(path, 2), std::move(json));
-      return;
+      return true;
     }
     const std::string dotted = dottedPaw2Path(path);
     // paw2 rejects blank strings ("theme.font cannot be empty"); a cleared field means "not set".
     if (json.is_string() && json.get<std::string>().empty()) {
       writer.unset(dotted);
-      return;
+      return true;
     }
     // The focus ring sits inside the gap, and paw2 rejects a ring wider than it. Move the other
     // value along rather than refuse the edit.
@@ -142,6 +211,7 @@ namespace settings {
       }
     }
     writer.set(dotted, std::move(json));
+    return true;
   }
 
   void resetPaw2Setting(compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& path) {

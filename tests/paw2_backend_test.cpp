@@ -27,7 +27,8 @@ namespace {
   constexpr const char* kConfig = R"({"type":"config","values":{"layout":{"gaps":8}},"ok":true,"errors":[]})";
   constexpr const char* kSnapshot =
       R"({"type":"snapshot","outputs":[)"
-      R"({"name":"DP-1","focused":true,"active":1,"occupied":[true,true,false],"layout":"dwindle","modes":[]},)"
+      R"({"name":"DP-1","focused":true,"active":1,"occupied":[true,true,false],"layout":"dwindle",)"
+      R"("modes":[{"width":2560,"height":1440,"refresh":165.08,"current":true},{"width":1920,"height":1080,"refresh":60.0,"current":false}]},)"
       R"({"name":"HDMI-A-1","focused":false,"active":0,"occupied":[true,false,false],"layout":"scrolling","modes":[]}],)"
       R"("windows":[)"
       R"({"id":3,"identifier":"aaa","title":"term","app_id":"kitty","output":"DP-1","workspace":0,"focused":false},)"
@@ -60,6 +61,13 @@ int main() {
   ok &= check(parsed.layouts.size() == 4 && parsed.layouts[1] == "dwindle", "layout list");
   ok &= check(parsed.scratchpads.size() == 1 && parsed.scratchpads[0].output.empty(), "null scratchpad output");
   ok &= check(parsed.outputs[0].activeWorkspace == 1 && parsed.outputs[0].layout == "dwindle", "output fields");
+  ok &= check(
+      parsed.outputs[0].modes.size() == 2
+          && parsed.outputs[0].modes[0].current
+          && parsed.outputs[0].modes[0].refresh == 165.08
+          && parsed.outputs[0].modes[1].width == 1920,
+      "output modes"
+  );
   ok &= check(compositors::paw2::workspaceIdFor("DP-1", 0) == "DP-1:1", "ext-workspace id is 1-based");
 
   // Live socket: paw2 pushes config + snapshot on connect, then reads commands.

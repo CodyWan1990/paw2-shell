@@ -778,6 +778,7 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
     env.paw2ConfigDir = writer.shellDropIn().parent_path().parent_path().string();
     if (runtime.trusted() && runtime.configGeneration() > 0) {
       env.paw2Value = [&writer](std::string_view path) { return writer.get(path); };
+      env.paw2Outputs = runtime.snapshot().outputs;
     }
   }
   if (m_config != nullptr) {

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "compositors/paw2/paw2_runtime.h"
 #include "config/config_types.h"
 #include "core/input/key_chord.h"
 #include "ui/controls/button.h"
@@ -323,6 +324,7 @@ namespace settings {
     // with this shell (not running, or this binary is not installed where paw2 trusts it).
     std::function<std::optional<nlohmann::json>(std::string_view)> paw2Value;
     std::string paw2ConfigDir; // holds config.toml and config.d/
+    std::vector<compositors::paw2::Paw2Output> paw2Outputs; // connected monitors, for the Displays page
   };
 
   [[nodiscard]] const BarConfig* findBar(const Config& cfg, std::string_view name);

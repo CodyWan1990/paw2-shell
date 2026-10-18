@@ -1372,6 +1372,12 @@ namespace settings {
               makeOfflineModeNotice(scale, offlineModeNoticeMessage(entry.section), showDisableHint)
           );
         }
+        const bool paw2Section = entry.section == SettingsSection::Paw2
+            || entry.section == SettingsSection::Paw2Displays
+            || entry.section == SettingsSection::Paw2Shortcuts;
+        if (paw2Section && !ctx.paw2Notice.empty()) {
+          activeSection->addChild(makeOfflineModeNotice(scale, ctx.paw2Notice, false));
+        }
       }
       if (activeSection != nullptr && activeGroupBody != nullptr) {
         if (entry.group != activeGroupKey) {

@@ -194,6 +194,10 @@ compositors::paw2::Paw2ConfigWriter& CompositorPlatform::paw2ConfigWriter() noex
   return m_runtimeRegistry->paw2Config();
 }
 
+const compositors::paw2::Paw2ConfigWriter& CompositorPlatform::paw2ConfigWriter() const noexcept {
+  return m_runtimeRegistry->paw2Config();
+}
+
 bool CompositorPlatform::hasXdgShell() const noexcept { return m_wayland.hasXdgShell(); }
 
 bool CompositorPlatform::hasXdgActivation() const noexcept { return m_wayland.hasXdgActivation(); }

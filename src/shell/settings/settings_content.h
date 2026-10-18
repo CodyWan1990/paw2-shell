@@ -48,6 +48,9 @@ namespace settings {
     bool showAdvanced = false;
     bool showOverriddenOnly = false;
     std::vector<SelectOption> batteryDeviceOptions;
+    // Shown at the top of the paw2 pages: paw2 rejecting the last change, or failing to load its
+    // config. Empty when all is well.
+    std::string paw2Notice;
 
     std::string& editingWidgetName;
     std::string& editingCapsuleGroupId;

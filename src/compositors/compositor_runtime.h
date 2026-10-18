@@ -20,6 +20,7 @@ namespace compositors {
     [[nodiscard]] paw2::Paw2Runtime& paw2() noexcept;
     [[nodiscard]] const paw2::Paw2Runtime& paw2() const noexcept;
     [[nodiscard]] paw2::Paw2ConfigWriter& paw2Config() noexcept;
+    [[nodiscard]] const paw2::Paw2ConfigWriter& paw2Config() const noexcept;
 
   private:
     std::unique_ptr<paw2::Paw2Runtime> m_paw2;

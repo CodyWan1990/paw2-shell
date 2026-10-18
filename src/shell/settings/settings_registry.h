@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
+#include <nlohmann/json.hpp>
 #include <numeric>
 #include <optional>
 #include <span>
@@ -45,6 +46,8 @@ namespace settings {
     Power,
     Hooks,
     Paw2,
+    Paw2Displays,
+    Paw2Shortcuts,
     Bar,
     Plugins,
   };
@@ -315,6 +318,11 @@ namespace settings {
     std::vector<SelectOption> fontFamilies;
     std::string shellAvatarPath;
     std::vector<std::string> keyboardLayoutNames;
+    // paw2's own settings, for its pages: the value at a dotted path such as "appearance.gaps",
+    // with edits paw2 has not answered yet on top. Empty while paw2 is not sharing its config
+    // with this shell (not running, or this binary is not installed where paw2 trusts it).
+    std::function<std::optional<nlohmann::json>(std::string_view)> paw2Value;
+    std::string paw2ConfigDir; // holds config.toml and config.d/
   };
 
   [[nodiscard]] const BarConfig* findBar(const Config& cfg, std::string_view name);

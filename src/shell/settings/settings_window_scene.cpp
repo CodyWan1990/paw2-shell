@@ -1,6 +1,8 @@
 #include "calendar/calendar_service.h"
 #include "compositors/compositor_detect.h"
 #include "compositors/compositor_platform.h"
+#include "compositors/paw2/paw2_config_writer.h"
+#include "compositors/paw2/paw2_runtime.h"
 #include "config/config_service.h"
 #include "config/schema/config_schema.h"
 #include "config/schema/engine.h"
@@ -746,8 +748,38 @@ void SettingsWindow::scrollFocusedAreaIntoView(InputArea* area) {
   }
 }
 
+std::string SettingsWindow::paw2Notice() const {
+  if (m_platform == nullptr) {
+    return {};
+  }
+  const auto join = [](const std::vector<std::string>& errors) {
+    std::string joined;
+    for (const auto& error : errors) {
+      joined += (joined.empty() ? "" : "; ") + error;
+    }
+    return joined;
+  };
+  const auto& writer = m_platform->paw2ConfigWriter();
+  if (!writer.rejectedErrors().empty()) {
+    return i18n::tr("settings.schema.paw2.rejected", "errors", join(writer.rejectedErrors()));
+  }
+  const auto& runtime = m_platform->paw2Runtime();
+  if (runtime.trusted() && !runtime.configOk()) {
+    return i18n::tr("settings.schema.paw2.config-error", "errors", join(runtime.configErrors()));
+  }
+  return {};
+}
+
 settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
   settings::RegistryEnvironment env;
+  if (m_platform != nullptr) {
+    const auto& runtime = m_platform->paw2Runtime();
+    const auto& writer = m_platform->paw2ConfigWriter();
+    env.paw2ConfigDir = writer.shellDropIn().parent_path().parent_path().string();
+    if (runtime.trusted() && runtime.configGeneration() > 0) {
+      env.paw2Value = [&writer](std::string_view path) { return writer.get(path); };
+    }
+  }
   if (m_config != nullptr) {
     env.shellAvatarPath = shell::resolvedAvatarPath(m_accounts, m_config->config());
   }
@@ -924,6 +956,7 @@ settings::SettingsContentContext SettingsWindow::makeContentContext(
       .showAdvanced = m_showAdvanced,
       .showOverriddenOnly = m_showOverriddenOnly,
       .batteryDeviceOptions = batteryDeviceOptions(),
+      .paw2Notice = paw2Notice(),
       .editingWidgetName = m_editingWidgetName,
       .editingCapsuleGroupId = m_editingCapsuleGroupId,
       .selectedLaneWidgets = m_selectedLaneWidgets,

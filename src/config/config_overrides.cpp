@@ -1292,10 +1292,16 @@ bool ConfigService::hasOverride(const std::vector<std::string>& path) const {
   if (path.empty()) {
     return false;
   }
+  if (path.front() == "paw2") {
+    return m_paw2OverrideQuery && m_paw2OverrideQuery(path);
+  }
   return findOverrideNode(m_overridesTable, path) != nullptr;
 }
 
 bool ConfigService::hasEffectiveOverride(const std::vector<std::string>& path) const {
+  if (!path.empty() && path.front() == "paw2") {
+    return hasOverride(path);
+  }
   if (path.empty() || findOverrideNode(m_overridesTable, path) == nullptr) {
     return false;
   }

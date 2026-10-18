@@ -145,6 +145,10 @@ public:
   void markSettingsWriteSuccess(bool requestRebuild = true);
   void markSettingsWriteError(std::string message);
   void warnOnUnusableCustomSchedule(const std::vector<std::string>& path);
+  void writePaw2Settings(std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides);
+  void resetPaw2Settings(std::vector<std::vector<std::string>> paths);
+  void onPaw2Changed();
+  [[nodiscard]] std::string paw2Notice() const;
   void showTransientStatus(std::string message, bool isError = false);
 
 private:
@@ -250,6 +254,10 @@ private:
 
   WaylandConnection* m_wayland = nullptr;
   CompositorPlatform* m_platform = nullptr;
+  std::size_t m_paw2ListenerToken = 0;
+  // paw2's config generation the open pages were built from.
+  std::uint64_t m_paw2ConfigGeneration = 0;
+  bool m_paw2Connected = false;
   IdleManager* m_idleManager = nullptr;
   ConfigService* m_config = nullptr;
   scripting::PluginManager* m_pluginManager = nullptr;

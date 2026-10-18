@@ -143,6 +143,11 @@ public:
   bool markSetupWizardCompleted();
   [[nodiscard]] bool hasOverride(const std::vector<std::string>& path) const;
   [[nodiscard]] bool hasEffectiveOverride(const std::vector<std::string>& path) const;
+  // Paths under "paw2" are paw2's own settings, kept in its config.d/ drop-ins rather than in
+  // settings.toml; this answers hasOverride() for them, so their reset buttons still work.
+  void setPaw2OverrideQuery(std::function<bool(const std::vector<std::string>&)> query) {
+    m_paw2OverrideQuery = std::move(query);
+  }
   // Lane content as the settings GUI presents it: the widget list plus the capsule groups it
   // references, so moving a widget into a lane's group still reports the lane as overridden.
   [[nodiscard]] bool hasEffectiveBarLaneOverride(const std::vector<std::string>& lanePath) const;
@@ -270,6 +275,7 @@ private:
   std::unordered_map<std::string, std::string> m_monitorWallpaperPaths;
   std::vector<WallpaperFavorite> m_wallpaperFavorites;
   mutable std::unordered_map<std::string, bool> m_effectiveOverrideCache;
+  std::function<bool(const std::vector<std::string>&)> m_paw2OverrideQuery;
 
   ConfigProblem m_overridesParseError;
   ConfigProblem m_pendingError;             // parse error from initial load, notified once the manager is wired up

@@ -1342,6 +1342,15 @@
     },
     "navigation": {
       "groups": {
+        "paw2-animations": "Animations",
+        "paw2-appearance": "Windows",
+        "paw2-blur": "Transparency & Blur",
+        "paw2-input": "Input",
+        "paw2-overview": "Overview",
+        "paw2-shadows": "Shadows",
+        "paw2-status": "paw2",
+        "paw2-theme": "Desktop Theme",
+        "paw2-tiling": "Tiling",
         "accessibility": "Accessibility",
         "audio": "Audio",
         "authentication": "Authentication",
@@ -1433,7 +1442,9 @@
         "keybinds": "Keybinds",
         "launcher": "Launcher",
         "location": "Location",
-        "paw2": "paw2",
+        "paw2": "Compositor",
+        "paw2-displays": "Displays",
+        "paw2-shortcuts": "Shortcuts",
         "notifications": "Notifications",
         "osd": "OSD",
         "panels": "Panels",
@@ -1813,6 +1824,165 @@
       }
     },
     "schema": {
+      "paw2": {
+        "unavailable": {
+          "label": "paw2 isn't sharing its settings",
+          "description": "paw2 only shows its settings to a shell it trusts: one installed as root in a system directory, like /usr/bin/paw2-shell. A build run from its source tree, or a session that isn't paw2, gets nothing here.",
+          "open-folder": "Open config folder"
+        },
+        "rejected": "paw2 rejected the last change, so it was undone: {errors}",
+        "config-error": "paw2 couldn't load its config, and is running on the last one that loaded: {errors}",
+        "layout": {
+          "enabled-layouts": {
+            "label": "Layouts",
+            "description": "Layouts available when cycling, in cycle order."
+          },
+          "column-width": {
+            "label": "Column width",
+            "description": "Share of the screen width a new column takes in the scrolling layout."
+          },
+          "center-focused-column": {
+            "label": "Center focused column",
+            "description": "Keep the focused column in the middle, instead of scrolling only far enough to show it."
+          },
+          "tab-grouping": {
+            "label": "Tab groups",
+            "description": "Group tiled windows behind a clickable tab bar."
+          },
+          "names": {
+            "scrolling": "Scrolling",
+            "dwindle": "Dwindle",
+            "master-stack": "Master and stack",
+            "monocle": "Monocle"
+          }
+        },
+        "appearance": {
+          "gaps": {
+            "label": "Gaps",
+            "description": "Space between windows and around the screen edges, in logical pixels."
+          },
+          "focus-ring-width": {
+            "label": "Focus ring width",
+            "description": "Border around the focused window. It sits inside the gap, so gaps grow to fit it."
+          },
+          "focus-ring-color": {
+            "label": "Focus ring color",
+            "description": "As #rrggbb."
+          },
+          "corner-radius": {
+            "label": "Corner radius",
+            "description": "Rounded window corners. Zero keeps windows on the fast path."
+          },
+          "shadow-radius": {
+            "label": "Shadow size",
+            "description": "How far the shadow reaches past the window. Zero turns shadows off."
+          },
+          "shadow-color": {
+            "label": "Shadow color",
+            "description": "As #rrggbb."
+          },
+          "shadow-opacity": {
+            "label": "Shadow opacity",
+            "description": "How dark the shadow is."
+          },
+          "shadow-offset-x": {
+            "label": "Shadow offset X",
+            "description": "Moves the shadow right, or left when negative."
+          },
+          "shadow-offset-y": {
+            "label": "Shadow offset Y",
+            "description": "Moves the shadow down, or up when negative."
+          },
+          "transparency": {
+            "label": "Transparent windows",
+            "description": "Let paw2 set window opacity. Bars and wallpapers are never affected."
+          },
+          "opacity": {
+            "label": "Window opacity",
+            "description": "Applies to every window while transparent windows is on."
+          },
+          "blur": {
+            "label": "Blur",
+            "description": "Blur what shows through translucent windows."
+          },
+          "blur-radius": {
+            "label": "Blur strength",
+            "description": "Zero turns blur off."
+          }
+        },
+        "animations": {
+          "enabled": {
+            "label": "Animations",
+            "description": "Animate window movement and resizing."
+          },
+          "duration-ms": {
+            "label": "Duration",
+            "description": "In milliseconds."
+          },
+          "slowdown": {
+            "label": "Slow motion",
+            "description": "Multiplier for watching animations slowly; 3 runs them three times slower."
+          }
+        },
+        "overview": {
+          "zoom": {
+            "label": "Zoom",
+            "description": "How far the workspaces shrink when the overview opens."
+          },
+          "backdrop-color": {
+            "label": "Backdrop color",
+            "description": "Behind the workspace cards, as #rrggbb."
+          },
+          "scratchpad-position": {
+            "label": "Scratchpad strip",
+            "description": "Where scratchpads sit in the overview.",
+            "options": {
+              "centered": "Centered",
+              "top": "Top",
+              "bottom": "Bottom",
+              "left": "Left",
+              "right": "Right"
+            }
+          }
+        },
+        "input": {
+          "focus-follows-mouse": {
+            "label": "Focus follows mouse",
+            "description": "Focus windows as the pointer enters them."
+          },
+          "middle-click-paste": {
+            "label": "Middle-click paste",
+            "description": "Paste the primary selection with the middle button. Some apps notice only after a restart."
+          }
+        },
+        "theme": {
+          "system-default": "System default",
+          "cursor-theme": {
+            "label": "Cursor theme",
+            "description": "Applies right away."
+          },
+          "cursor-size": {
+            "label": "Cursor size",
+            "description": "In pixels. Applies right away."
+          },
+          "icon-theme": {
+            "label": "Icon theme",
+            "description": "Applies right away."
+          },
+          "gtk-theme": {
+            "label": "GTK theme",
+            "description": "Applies right away."
+          },
+          "qt-style": {
+            "label": "Qt style",
+            "description": "Applies to apps started after the next login."
+          },
+          "font": {
+            "label": "Interface font",
+            "description": "Family and size, like \"Inter 11\". Applies after the next login."
+          }
+        }
+      },
       "accessibility": {
         "high-contrast": {
           "description": "Increase contrast by pushing surface and background colors towards extreme values",

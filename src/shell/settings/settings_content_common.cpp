@@ -342,6 +342,8 @@ namespace settings {
     case SettingsSection::Power:
     case SettingsSection::Hooks:
     case SettingsSection::Paw2:
+    case SettingsSection::Paw2Displays:
+    case SettingsSection::Paw2Shortcuts:
     case SettingsSection::Bar:
     case SettingsSection::Plugins:
       return false;
@@ -378,6 +380,8 @@ namespace settings {
     case SettingsSection::Power:
     case SettingsSection::Hooks:
     case SettingsSection::Paw2:
+    case SettingsSection::Paw2Displays:
+    case SettingsSection::Paw2Shortcuts:
     case SettingsSection::Bar:
     case SettingsSection::Plugins:
       return {};

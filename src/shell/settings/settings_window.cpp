@@ -1,6 +1,7 @@
 #include "shell/settings/settings_window.h"
 
 #include "compositors/compositor_platform.h"
+#include "compositors/paw2/paw2_runtime.h"
 #include "config/config_service.h"
 #include "config/config_types.h"
 #include "core/deferred_call.h"
@@ -18,6 +19,7 @@
 #include "scripting/plugin_registry.h"
 #include "shell/settings/settings_content_plugins.h"
 #include "shell/settings/settings_dialog_presenter.h"
+#include "shell/settings/settings_paw2.h"
 #include "shell/tooltip/tooltip_manager.h"
 #include "system/dependency_service.h"
 #include "ui/controls/box.h"
@@ -167,7 +169,15 @@ namespace {
 
 SettingsWindow::SettingsWindow() = default;
 
-SettingsWindow::~SettingsWindow() { destroyWindow(); }
+SettingsWindow::~SettingsWindow() {
+  destroyWindow();
+  if (m_platform != nullptr) {
+    m_platform->paw2Runtime().removeListener(m_paw2ListenerToken);
+  }
+  if (m_config != nullptr) {
+    m_config->setPaw2OverrideQuery({});
+  }
+}
 
 void SettingsWindow::initialize(
     WaylandConnection& wayland, ConfigService* config, RenderContext* renderContext, DependencyService* dependencies,
@@ -182,6 +192,14 @@ void SettingsWindow::initialize(
   m_upower = upower;
   m_accounts = accounts;
   m_showAdvanced = m_config != nullptr ? m_config->config().shell.settingsShowAdvanced : false;
+  if (m_platform != nullptr) {
+    m_paw2ListenerToken = m_platform->paw2Runtime().addListener([this]() { onPaw2Changed(); });
+    if (m_config != nullptr) {
+      m_config->setPaw2OverrideQuery([this](const std::vector<std::string>& path) {
+        return settings::paw2SettingOverridden(m_platform->paw2ConfigWriter(), path);
+      });
+    }
+  }
   m_modalHost.initialize(
       m_inputDispatcher,
       [this]() {
@@ -529,6 +547,21 @@ bool SettingsWindow::openToPlugin(std::string pluginId) {
     requestSceneRebuild();
   }
   return true;
+}
+
+// paw2 sends a snapshot on every window change but its config only when that changes; the paw2
+// pages are rebuilt for the latter, and when the connection comes or goes.
+void SettingsWindow::onPaw2Changed() {
+  const auto& runtime = m_platform->paw2Runtime();
+  const bool connected = runtime.trusted() && runtime.configGeneration() > 0;
+  if (connected == m_paw2Connected && runtime.configGeneration() == m_paw2ConfigGeneration) {
+    return;
+  }
+  m_paw2Connected = connected;
+  m_paw2ConfigGeneration = runtime.configGeneration();
+  if (isOpen()) {
+    requestContentRebuild(true, true, false);
+  }
 }
 
 void SettingsWindow::close() {

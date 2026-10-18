@@ -17,5 +17,6 @@ namespace compositors {
   const paw2::Paw2Runtime& CompositorRuntimeRegistry::paw2() const noexcept { return *m_paw2; }
 
   paw2::Paw2ConfigWriter& CompositorRuntimeRegistry::paw2Config() noexcept { return *m_paw2Config; }
+  const paw2::Paw2ConfigWriter& CompositorRuntimeRegistry::paw2Config() const noexcept { return *m_paw2Config; }
 
 } // namespace compositors

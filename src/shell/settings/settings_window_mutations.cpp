@@ -1,8 +1,11 @@
+#include "compositors/compositor_platform.h"
+#include "compositors/paw2/paw2_config_writer.h"
 #include "config/config_service.h"
 #include "core/deferred_call.h"
 #include "i18n/i18n.h"
 #include "render/text/font_weight_catalog.h"
 #include "shell/profile/avatar_path.h"
+#include "shell/settings/settings_paw2.h"
 #include "shell/settings/settings_window.h"
 #include "system/day_night_schedule.h"
 
@@ -110,6 +113,10 @@ void SettingsWindow::setSettingOverride(std::vector<std::string> path, ConfigOve
     if (m_config == nullptr) {
       return;
     }
+    if (settings::isPaw2SettingPath(path)) {
+      writePaw2Settings({{std::move(path), std::move(value)}});
+      return;
+    }
     if (isAvatarPath) {
       const auto* avatarPath = std::get_if<std::string>(&value);
       if (avatarPath == nullptr) {
@@ -149,6 +156,10 @@ void SettingsWindow::setSettingOverrides(
       markSettingsWriteSuccess(!m_statusMessage.empty());
       return;
     }
+    if (std::ranges::any_of(overrides, [](const auto& entry) { return settings::isPaw2SettingPath(entry.first); })) {
+      writePaw2Settings(std::move(overrides));
+      return;
+    }
     bool changed = false;
     const bool needsSceneRebuild = std::ranges::any_of(overrides, [](const auto& overrideEntry) {
       return settingPathNeedsSceneRebuild(overrideEntry.first);
@@ -167,6 +178,10 @@ void SettingsWindow::setSettingOverrides(
 void SettingsWindow::clearSettingOverride(std::vector<std::string> path) {
   DeferredCall::callLater([this, path = std::move(path)]() mutable {
     if (m_config == nullptr) {
+      return;
+    }
+    if (settings::isPaw2SettingPath(path)) {
+      resetPaw2Settings({std::move(path)});
       return;
     }
     bool changed = false;
@@ -190,6 +205,12 @@ void SettingsWindow::clearSettingOverrides(std::vector<std::vector<std::string>>
     if (m_config == nullptr || paths.empty()) {
       return;
     }
+    // A page reset lists only that page's paths, so paw2's never mix with the shell's.
+    if (std::ranges::any_of(paths, [](const auto& path) { return settings::isPaw2SettingPath(path); })) {
+      m_pendingResetPageScope.clear();
+      resetPaw2Settings(std::move(paths));
+      return;
+    }
 
     bool changed = false;
     const bool needsSceneRebuild = settingPathsNeedSceneRebuild(paths);
@@ -206,6 +227,36 @@ void SettingsWindow::clearSettingOverrides(std::vector<std::vector<std::string>>
         changed, needsSceneRebuild, previousResetPaths != currentPageResetPaths(), registryPatched, true
     );
   });
+}
+
+// paw2's settings are paw2's, not settings.toml's: they go to its config.d/ drop-ins, and paw2 has
+// the last word on them. A rejection comes back later as a config message, which rebuilds the page.
+void SettingsWindow::writePaw2Settings(
+    std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides
+) {
+  if (m_platform == nullptr) {
+    return;
+  }
+  auto& writer = m_platform->paw2ConfigWriter();
+  for (const auto& [path, value] : overrides) {
+    if (settings::isPaw2SettingPath(path)) {
+      settings::applyPaw2Setting(writer, path, value);
+    }
+  }
+  finishSettingsWrite(true, false, false, false);
+}
+
+void SettingsWindow::resetPaw2Settings(std::vector<std::vector<std::string>> paths) {
+  if (m_platform == nullptr) {
+    return;
+  }
+  auto& writer = m_platform->paw2ConfigWriter();
+  for (const auto& path : paths) {
+    if (settings::isPaw2SettingPath(path)) {
+      settings::resetPaw2Setting(writer, path);
+    }
+  }
+  finishSettingsWrite(true, false, true, false, true);
 }
 
 void SettingsWindow::resetBarLane(std::vector<std::string> lanePath) {

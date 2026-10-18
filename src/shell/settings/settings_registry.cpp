@@ -15,6 +15,7 @@
 #include "shell/control_center/shortcut_registry.h"
 #include "shell/settings/color_spec_picker.h"
 #include "shell/settings/font_weight_catalog.h"
+#include "shell/settings/settings_paw2.h"
 #include "shell/wallpaper/wallpaper_paths.h"
 #include "system/sysmon_threshold_profile.h"
 #include "theme/builtin_palettes.h"
@@ -86,7 +87,7 @@ namespace settings {
       return defaultKeybindSet(action);
     }
 
-    constexpr std::array<SettingsSectionDescriptor, 23> kSettingsSections{{
+    constexpr std::array<SettingsSectionDescriptor, 25> kSettingsSections{{
         {SettingsSection::Appearance, "appearance", "adjustments-horizontal"},
         {SettingsSection::Wallpaper, "wallpaper", "paint"},
         {SettingsSection::Templates, "templates", "color-swatch"},
@@ -108,6 +109,8 @@ namespace settings {
         {SettingsSection::Power, "power", "bolt"},
         {SettingsSection::Hooks, "hooks", "link"},
         {SettingsSection::Paw2, "paw2", "paw"},
+        {SettingsSection::Paw2Displays, "paw2-displays", "device-desktop"},
+        {SettingsSection::Paw2Shortcuts, "paw2-shortcuts", "keyboard"},
         {SettingsSection::Bar, "bar", "crop-3-2", false},
         {SettingsSection::Plugins, "plugins", "puzzle", true, true},
     }};
@@ -373,6 +376,279 @@ namespace settings {
           .advanced = advanced,
           .searchText = StringUtils::toLower(searchText),
       };
+    }
+
+    // paw2's settings as its pages show them. paw2's config message carries only what its config
+    // files set, so anything missing reads as the default paw2 compiles in (its src/config.rs).
+    class Paw2Values {
+    public:
+      explicit Paw2Values(const RegistryEnvironment& env) : m_env(env) {}
+
+      [[nodiscard]] double number(std::string_view path, double fallback) const {
+        const auto value = m_env.paw2Value(path);
+        return value.has_value() && value->is_number() ? value->get<double>() : fallback;
+      }
+      [[nodiscard]] bool boolean(std::string_view path, bool fallback) const {
+        const auto value = m_env.paw2Value(path);
+        return value.has_value() && value->is_boolean() ? value->get<bool>() : fallback;
+      }
+      [[nodiscard]] std::string text(std::string_view path, std::string fallback = {}) const {
+        const auto value = m_env.paw2Value(path);
+        return value.has_value() && value->is_string() ? value->get<std::string>() : std::move(fallback);
+      }
+      [[nodiscard]] std::vector<std::string> list(std::string_view path, std::vector<std::string> fallback) const {
+        const auto value = m_env.paw2Value(path);
+        if (!value.has_value() || !value->is_array()) {
+          return fallback;
+        }
+        std::vector<std::string> items;
+        for (const auto& item : *value) {
+          if (item.is_string()) {
+            items.push_back(item.get<std::string>());
+          }
+        }
+        return items;
+      }
+
+    private:
+      const RegistryEnvironment& m_env;
+    };
+
+    // One row of a paw2 page. Its path is {"paw2", <paw2's dotted path, split>}, and its text lives
+    // under settings.schema.paw2.<dotted path>.
+    SettingEntry makePaw2Entry(
+        SettingsSection section, std::string group, std::string_view dottedPath, SettingControl control,
+        std::string tags = {}, bool advanced = false
+    ) {
+      std::vector<std::string> path{"paw2"};
+      std::string key = "settings.schema.paw2";
+      std::size_t start = 0;
+      while (start <= dottedPath.size()) {
+        const auto dot = dottedPath.find('.', start);
+        const auto part =
+            dottedPath.substr(start, dot == std::string_view::npos ? std::string_view::npos : dot - start);
+        path.emplace_back(part);
+        key += "." + i18n::keySegment(part);
+        if (dot == std::string_view::npos) {
+          break;
+        }
+        start = dot + 1;
+      }
+      return makeEntry(
+          section, std::move(group), i18n::tr(key + ".label"), i18n::tr(key + ".description"), std::move(path),
+          std::move(control), "paw2 compositor " + tags, advanced
+      );
+    }
+
+    [[nodiscard]] SelectSetting
+    paw2Select(std::string_view baseKey, std::span<const std::string_view> values, std::string selected) {
+      SelectSetting select;
+      for (const auto value : values) {
+        select.options.push_back(
+            SelectOption{
+                .value = std::string(value), .label = i18n::tr(std::string(baseKey) + "." + i18n::keySegment(value))
+            }
+        );
+      }
+      select.selectedValue = std::move(selected);
+      return select;
+    }
+
+    [[nodiscard]] SearchPickerSetting paw2ThemePicker(DesktopThemeKind kind, std::string selected) {
+      SearchPickerSetting picker;
+      for (auto& name : installedDesktopThemes(kind)) {
+        picker.options.push_back(SelectOption{.value = name, .label = name});
+      }
+      picker.selectedValue = std::move(selected);
+      picker.placeholder = i18n::tr("settings.schema.paw2.theme.system-default");
+      return picker;
+    }
+
+    // Without paw2's config there is nothing to show; each page says why, and offers the files.
+    void appendPaw2Unavailable(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
+      for (const auto section :
+           {SettingsSection::Paw2, SettingsSection::Paw2Displays, SettingsSection::Paw2Shortcuts}) {
+        entries.push_back(makeEntry(
+            section, "paw2-status", i18n::tr("settings.schema.paw2.unavailable.label"),
+            i18n::tr("settings.schema.paw2.unavailable.description"), {},
+            ButtonSetting{
+                .label = i18n::tr("settings.schema.paw2.unavailable.open-folder"),
+                .action =
+                    [dir = env.paw2ConfigDir]() { (void)process::runAsync(std::vector<std::string>{"xdg-open", dir}); },
+                .glyph = "folder",
+            },
+            "paw2 compositor"
+        ));
+      }
+    }
+
+    void appendPaw2CompositorEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
+      constexpr auto section = SettingsSection::Paw2;
+      const Paw2Values paw2(env);
+      const auto add = [&entries](SettingEntry entry, bool visible = true) {
+        if (!visible) {
+          entry.visibleWhen = [](const Config&) { return false; };
+        }
+        entries.push_back(std::move(entry));
+      };
+
+      constexpr std::array<std::string_view, 4> kLayouts{"scrolling", "dwindle", "master_stack", "monocle"};
+      ListSetting layouts{.items = paw2.list("layout.enabled_layouts", {kLayouts.begin(), kLayouts.end()})};
+      for (const auto layout : kLayouts) {
+        layouts.suggestedOptions.push_back(
+            SelectOption{
+                .value = std::string(layout),
+                .label = i18n::tr("settings.schema.paw2.layout.names." + i18n::keySegment(layout))
+            }
+        );
+      }
+      add(makePaw2Entry(section, "paw2-tiling", "layout.enabled_layouts", std::move(layouts), "cycle layouts"));
+      add(makePaw2Entry(
+          section, "paw2-tiling", "layout.column_width",
+          SliderSetting{paw2.number("layout.column_width", 0.6), 0.1, 1.0, 0.05, false}, "column width scrolling"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-tiling", "layout.center_focused_column",
+          ToggleSetting{paw2.boolean("layout.center_focused_column", false)}, "center viewport scrolling"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-tiling", "layout.tab_grouping", ToggleSetting{paw2.boolean("layout.tab_grouping", false)},
+          "tabs tab bar group"
+      ));
+
+      add(makePaw2Entry(
+          section, "paw2-appearance", "appearance.gaps",
+          SliderSetting{paw2.number("appearance.gaps", 0), 0, 64, 1, true}, "gaps spacing margin"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-appearance", "appearance.focus_ring_width",
+          SliderSetting{paw2.number("appearance.focus_ring_width", 0), 0, 16, 1, true}, "focus ring border width"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-appearance", "appearance.focus_ring_color",
+          TextSetting{.value = paw2.text("appearance.focus_ring_color", "#0b3d91"), .placeholder = "#rrggbb"},
+          "focus ring border colour color"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-appearance", "appearance.corner_radius",
+          SliderSetting{paw2.number("appearance.corner_radius", 0), 0, 64, 1, true}, "rounded corners radius"
+      ));
+
+      const bool shadowOn = paw2.number("appearance.shadow_radius", 0) > 0;
+      add(makePaw2Entry(
+          section, "paw2-shadows", "appearance.shadow_radius",
+          SliderSetting{paw2.number("appearance.shadow_radius", 0), 0, 64, 1, true}, "shadow drop size"
+      ));
+      add(makePaw2Entry(
+              section, "paw2-shadows", "appearance.shadow_color",
+              TextSetting{.value = paw2.text("appearance.shadow_color", "#000000"), .placeholder = "#rrggbb"},
+              "shadow colour color"
+          ),
+          shadowOn);
+      add(makePaw2Entry(
+              section, "paw2-shadows", "appearance.shadow_opacity",
+              SliderSetting{paw2.number("appearance.shadow_opacity", 0.45), 0.0, 1.0, 0.05, false},
+              "shadow opacity alpha"
+          ),
+          shadowOn);
+      add(makePaw2Entry(
+              section, "paw2-shadows", "appearance.shadow_offset_x",
+              SliderSetting{paw2.number("appearance.shadow_offset_x", 0), -64, 64, 1, true}, "shadow offset horizontal",
+              true
+          ),
+          shadowOn);
+      add(makePaw2Entry(
+              section, "paw2-shadows", "appearance.shadow_offset_y",
+              SliderSetting{paw2.number("appearance.shadow_offset_y", 4), -64, 64, 1, true}, "shadow offset vertical",
+              true
+          ),
+          shadowOn);
+
+      const bool transparencyOn = paw2.boolean("appearance.transparency", false);
+      const bool blurOn = paw2.boolean("appearance.blur", false);
+      add(makePaw2Entry(
+          section, "paw2-blur", "appearance.transparency", ToggleSetting{transparencyOn}, "transparency translucent"
+      ));
+      add(makePaw2Entry(
+              section, "paw2-blur", "appearance.opacity",
+              SliderSetting{paw2.number("appearance.opacity", 1.0), 0.1, 1.0, 0.05, false}, "window opacity alpha"
+          ),
+          transparencyOn);
+      add(makePaw2Entry(section, "paw2-blur", "appearance.blur", ToggleSetting{blurOn}, "blur backdrop"));
+      add(makePaw2Entry(
+              section, "paw2-blur", "appearance.blur_radius",
+              SliderSetting{paw2.number("appearance.blur_radius", 0), 0, 64, 1, true}, "blur radius strength"
+          ),
+          blurOn);
+
+      const bool animationsOn = paw2.boolean("animations.enabled", false);
+      add(makePaw2Entry(
+          section, "paw2-animations", "animations.enabled", ToggleSetting{animationsOn}, "animations motion"
+      ));
+      add(makePaw2Entry(
+              section, "paw2-animations", "animations.duration_ms",
+              SliderSetting{paw2.number("animations.duration_ms", 150), 0, 1000, 10, true}, "animation duration speed"
+          ),
+          animationsOn);
+      add(makePaw2Entry(
+              section, "paw2-animations", "animations.slowdown",
+              SliderSetting{paw2.number("animations.slowdown", 1.0), 0.1, 10.0, 0.1, false}, "animation slow motion",
+              true
+          ),
+          animationsOn);
+
+      add(makePaw2Entry(
+          section, "paw2-overview", "overview.zoom",
+          SliderSetting{paw2.number("overview.zoom", 0.5), 0.2, 0.75, 0.05, false}, "overview zoom size"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-overview", "overview.backdrop_color",
+          TextSetting{.value = paw2.text("overview.backdrop_color", "#1c1c1c"), .placeholder = "#rrggbb"},
+          "overview backdrop background colour color"
+      ));
+      constexpr std::array<std::string_view, 5> kScratchpadPositions{"centered", "top", "bottom", "left", "right"};
+      add(makePaw2Entry(
+          section, "paw2-overview", "overview.scratchpad_position",
+          paw2Select(
+              "settings.schema.paw2.overview.scratchpad-position.options", kScratchpadPositions,
+              paw2.text("overview.scratchpad_position", "centered")
+          ),
+          "overview scratchpad strip position"
+      ));
+
+      add(makePaw2Entry(
+          section, "paw2-input", "input.focus_follows_mouse",
+          ToggleSetting{paw2.boolean("input.focus_follows_mouse", false)}, "focus follows mouse pointer hover"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-input", "input.middle_click_paste",
+          ToggleSetting{paw2.boolean("input.middle_click_paste", true)}, "middle click paste primary selection"
+      ));
+
+      add(makePaw2Entry(
+          section, "paw2-theme", "theme.cursor_theme",
+          paw2ThemePicker(DesktopThemeKind::Cursor, paw2.text("theme.cursor_theme")), "cursor pointer theme"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-theme", "theme.cursor_size",
+          SliderSetting{paw2.number("theme.cursor_size", 24), 8, 96, 1, true}, "cursor pointer size"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-theme", "theme.icon_theme",
+          paw2ThemePicker(DesktopThemeKind::Icon, paw2.text("theme.icon_theme")), "icon theme"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-theme", "theme.gtk_theme",
+          paw2ThemePicker(DesktopThemeKind::Gtk, paw2.text("theme.gtk_theme")), "gtk theme"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-theme", "theme.qt_style",
+          TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"}, "qt style kvantum"
+      ));
+      add(makePaw2Entry(
+          section, "paw2-theme", "theme.font", TextSetting{.value = paw2.text("theme.font"), .placeholder = "Inter 11"},
+          "font interface"
+      ));
     }
 
   } // namespace
@@ -4146,6 +4422,12 @@ namespace settings {
       }
     }
 
+    if (env.paw2Value) {
+      appendPaw2CompositorEntries(entries, env);
+    } else {
+      appendPaw2Unavailable(entries, env);
+    }
+
     // Integrity guard: every override path must resolve to a real schema key, else
     // the entry silently reads/writes a dead override. Build-determined, so checked
     // once per process; warn-only. (Visibility predicates are compiler-checked.)
@@ -4164,7 +4446,8 @@ namespace settings {
           }
         };
         for (const auto& entry : entries) {
-          if (!std::holds_alternative<ButtonSetting>(entry.control)) {
+          // paw2's rows are paw2's settings, which the shell's schema does not describe.
+          if (!std::holds_alternative<ButtonSetting>(entry.control) && !isPaw2SettingPath(entry.path)) {
             verify(entry.path, "override");
           }
         }

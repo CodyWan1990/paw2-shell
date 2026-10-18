@@ -7,6 +7,7 @@
 #include "config/config_service.h"
 #include "i18n/i18n_service.h"
 #include "notification/notification_manager.h"
+#include "util/app_dir_name.h"
 
 #include <chrono>
 #include <cstdlib>
@@ -56,7 +57,7 @@ int main() {
   const auto configHome = root / "config";
   const auto stateHome = root / "state";
   const auto cacheHome = root / "cache";
-  const auto configDir = configHome / "noctalia";
+  const auto configDir = configHome / FileUtils::kAppDirName;
 
   std::filesystem::remove_all(root);
   std::filesystem::create_directories(configDir);

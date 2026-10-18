@@ -391,7 +391,7 @@ namespace noctalia::theme {
 
   int runCli(int argc, char* argv[]) {
     auto parsed = cli::parseOrReport(
-        cli::kThemeCmd, "noctalia theme", std::span<char* const>{argv + 2, static_cast<std::size_t>(argc - 2)}
+        cli::kThemeCmd, "paw2-shell theme", std::span<char* const>{argv + 2, static_cast<std::size_t>(argc - 2)}
     );
     if (!parsed)
       return 1;

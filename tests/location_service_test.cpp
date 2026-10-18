@@ -2,6 +2,7 @@
 #include "i18n/i18n_service.h"
 #include "net/http_client.h"
 #include "system/location_service.h"
+#include "util/app_dir_name.h"
 
 #include <cmath>
 #include <cstdlib>
@@ -38,7 +39,7 @@ int main() {
   const auto configHome = root / "config";
   const auto stateHome = root / "state";
   const auto cacheHome = root / "cache";
-  const auto configDir = configHome / "noctalia";
+  const auto configDir = configHome / FileUtils::kAppDirName;
   const auto configPath = configDir / "config.toml";
 
   std::filesystem::remove_all(root);

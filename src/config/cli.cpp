@@ -76,7 +76,7 @@ namespace noctalia::config {
 
     int runSettingsCount(int argc, char* argv[]) {
       auto parsed = cli::parseOrReport(
-          cli::kConfigSettingsCountCmd, "noctalia config settings-count",
+          cli::kConfigSettingsCountCmd, "paw2-shell config settings-count",
           std::span<char* const>{argv + 3, static_cast<std::size_t>(argc - 3)}
       );
       if (!parsed)
@@ -327,7 +327,7 @@ namespace noctalia::config {
 
     int runValidate(int argc, char* argv[]) {
       auto parsed = cli::parseOrReport(
-          cli::kConfigValidateCmd, "noctalia config validate",
+          cli::kConfigValidateCmd, "paw2-shell config validate",
           std::span<char* const>{argv + 3, static_cast<std::size_t>(argc - 3)}
       );
       if (!parsed)
@@ -403,7 +403,7 @@ namespace noctalia::config {
 
     int runExport(int argc, char* argv[]) {
       auto parsed = cli::parseOrReport(
-          cli::kConfigExportCmd, "noctalia config export",
+          cli::kConfigExportCmd, "paw2-shell config export",
           std::span<char* const>{argv + 3, static_cast<std::size_t>(argc - 3)}
       );
       if (!parsed)
@@ -443,7 +443,7 @@ namespace noctalia::config {
 
   int runCli(int argc, char* argv[]) {
     if (argc < 3 || std::strcmp(argv[2], "--help") == 0 || std::strcmp(argv[2], "-h") == 0) {
-      std::print("{}", cli::renderHelp(cli::kConfigCmd, "noctalia config"));
+      std::print("{}", cli::renderHelp(cli::kConfigCmd, "paw2-shell config"));
       return argc < 3 ? 1 : 0;
     }
 
@@ -455,7 +455,7 @@ namespace noctalia::config {
       return runSettingsCount(argc, argv);
     if (std::strcmp(argv[2], "replay-report") == 0) {
       auto parsed = cli::parseOrReport(
-          cli::kConfigReplayReportCmd, "noctalia config replay-report",
+          cli::kConfigReplayReportCmd, "paw2-shell config replay-report",
           std::span<char* const>{argv + 3, static_cast<std::size_t>(argc - 3)}
       );
       if (!parsed)

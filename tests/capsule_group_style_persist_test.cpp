@@ -5,6 +5,7 @@
 #include "config/color_spec.h"
 #include "config/config_service.h"
 #include "config/config_types.h"
+#include "util/app_dir_name.h"
 
 #include <algorithm>
 #include <filesystem>
@@ -37,7 +38,7 @@ int main() {
   const std::filesystem::path root =
       std::filesystem::temp_directory_path() / ("noctalia-group-style-persist-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
-  writeFile(root / "config" / "noctalia" / "config.toml", R"(
+  writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", R"(
 [bar.default]
 start = [ "clock", "weather" ]
 )");

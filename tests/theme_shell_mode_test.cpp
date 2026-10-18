@@ -7,6 +7,7 @@
 #include "net/http_client.h"
 #include "tests/test_check.h"
 #include "theme/theme_service.h"
+#include "util/app_dir_name.h"
 
 #include <cstdlib>
 #include <filesystem>
@@ -55,8 +56,8 @@ int main() {
   const std::filesystem::path root =
       std::filesystem::temp_directory_path() / ("noctalia-theme-shell-mode-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
-  std::filesystem::create_directories(root / "config" / "noctalia");
-  std::filesystem::create_directories(root / "state" / "noctalia");
+  std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
+  std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "data");
   ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
   ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
@@ -64,7 +65,7 @@ int main() {
 
   // ConfigService reads its persisted overrides from <state dir>/settings.toml, the same file
   // the settings GUI writes.
-  const std::filesystem::path overrides = root / "state" / "noctalia" / "settings.toml";
+  const std::filesystem::path overrides = root / "state" / FileUtils::kAppDirName / "settings.toml";
   // follow: one mode drives Noctalia and apps together.
   {
     const Resolution r = resolve(overrides, "[theme]\nmode = \"light\"\nshell_mode = \"follow\"\n");

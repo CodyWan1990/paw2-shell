@@ -2,6 +2,7 @@
 
 #include "cli/help.h"
 #include "core/log.h"
+#include "util/app_dir_name.h"
 
 #include <algorithm>
 #include <cerrno>
@@ -322,5 +323,5 @@ std::string IpcService::resolveSocketPath() {
   if (display == nullptr || display[0] == '\0') {
     display = "wayland-0";
   }
-  return std::string(runtime) + "/noctalia-" + display + ".sock";
+  return std::string(runtime) + "/" + FileUtils::kAppDirName + "-" + display + ".sock";
 }

@@ -1,5 +1,6 @@
 #include "ipc/ipc_service.h"
 #include "tests/test_check.h"
+#include "util/app_dir_name.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -184,7 +185,7 @@ int main() {
   TEST_CHECK(updatedHelp.contains("Toggle a panel by id"));
 
   TEST_CHECK(ipc.start());
-  const auto socketPath = runtimeDir / ("noctalia-" + std::string(kWaylandDisplay) + ".sock");
+  const auto socketPath = runtimeDir / (std::string(FileUtils::kAppDirName) + "-" + std::string(kWaylandDisplay) + ".sock");
   TEST_CHECK(sendRaw(ipc, socketPath, "status line1\nline2\nline3") == "status:line1\nline2\nline3\n");
   return 0;
 }

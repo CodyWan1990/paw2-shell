@@ -1,0 +1,15 @@
+[Desktop Entry]
+Type=Application
+Name=paw2-shell
+Comment=Desktop shell for the paw2 Wayland compositor, built on Noctalia.
+Exec=paw2-shell --daemon
+Icon=noctalia
+Terminal=false
+Categories=Settings;DesktopSettings;
+StartupNotify=false
+Actions=Settings;
+Keywords=desktop;shell;wayland;paw2;
+
+[Desktop Action Settings]
+Name=Open Settings
+Exec=sh -c "paw2-shell msg settings-open || { paw2-shell --daemon && paw2-shell msg settings-open; }"

@@ -1,5 +1,6 @@
 #include "calendar/calendar_cache.h"
 #include "security/secure_buffer.h"
+#include "util/app_dir_name.h"
 
 #include <array>
 #include <chrono>
@@ -51,7 +52,7 @@ int main() {
 
   const auto serial = std::chrono::steady_clock::now().time_since_epoch().count();
   const fs::path root = fs::temp_directory_path() / ("noctalia-calendar-cache-test-" + std::to_string(serial));
-  const fs::path cacheDir = root / "noctalia/calendar";
+  const fs::path cacheDir = root / FileUtils::kAppDirName / "calendar";
   const fs::path legacyPath = cacheDir / "events.json";
   const fs::path encryptedPath = cacheDir / "events.enc";
   constexpr std::string_view plaintext = R"({"events":[{"title":"private appointment"}]})";

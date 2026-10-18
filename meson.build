@@ -1092,7 +1092,7 @@ noctalia_core_dep = declare_dependency(
   sources: _protocol_headers,
 )
 
-noctalia_exe = executable('noctalia',
+noctalia_exe = executable('paw2-shell',
   sources: files('src/main.cpp') + _protocol_headers,
   dependencies: _noctalia_dependencies,
   include_directories: _noctalia_inc,
@@ -1102,12 +1102,12 @@ noctalia_exe = executable('noctalia',
 )
 
 install_subdir('assets',
-  install_dir: get_option('datadir') / 'noctalia',
-  exclude_files: ['dev.noctalia.Noctalia.desktop'],
+  install_dir: get_option('datadir') / 'paw2-shell',
+  exclude_files: ['paw2-shell.desktop'],
 )
 
 install_data(
-  'assets/dev.noctalia.Noctalia.desktop',
+  'assets/paw2-shell.desktop',
   install_dir: get_option('datadir') / 'applications',
 )
 

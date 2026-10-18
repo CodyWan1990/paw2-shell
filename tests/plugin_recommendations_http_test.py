@@ -25,8 +25,8 @@ def run(binary):
         root = Path(directory)
         api = int(subprocess.check_output([str(Path(binary).resolve()), "--api"]))
         names = ["CasePlugin", "Hidden", "Lost", "Conflict", "Limited", "Unavailable", "Proxy", "Uninstalled", "Deprecated", "Delisted"]
-        state_root = root / "state/noctalia"
-        config_dir = root / "config/noctalia"
+        state_root = root / "state/paw2-shell"
+        config_dir = root / "config/paw2-shell"
         config_dir.mkdir(parents=True)
         (config_dir / "config.toml").write_text("[shell]\nsetup_wizard_enabled = false\n")
         for source in ["official", "community"]:

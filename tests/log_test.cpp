@@ -1,4 +1,5 @@
 #include "core/log.h"
+#include "util/app_dir_name.h"
 
 #include <cstdlib>
 #include <filesystem>
@@ -70,7 +71,7 @@ namespace {
     initLogFile();
     logWarn("{}", std::string(10'000, 'x'));
 
-    const auto logPath = cacheRoot / "noctalia" / "noctalia.log";
+    const auto logPath = cacheRoot / FileUtils::kAppDirName / (std::string(FileUtils::kAppDirName) + ".log");
     std::error_code ec;
     const auto size = std::filesystem::file_size(logPath, ec);
     bool ok = expect(!ec, "failed to stat capped log file");
@@ -89,10 +90,10 @@ namespace {
       return false;
     }
 
-    const auto logDir = cacheRoot / "noctalia";
+    const auto logDir = cacheRoot / FileUtils::kAppDirName;
     std::filesystem::create_directories(logDir);
 
-    const auto logPath = logDir / "noctalia.log";
+    const auto logPath = logDir / (std::string(FileUtils::kAppDirName) + ".log");
     const std::size_t initialSize = kMaxLogBytes - 8;
     {
       std::ofstream out(logPath, std::ios::binary);
@@ -109,7 +110,7 @@ namespace {
     initLogFile();
     logWarn("rotate-now");
 
-    const auto backupPath = logDir / "noctalia.log.1";
+    const auto backupPath = logDir / (std::string(FileUtils::kAppDirName) + ".log.1");
     std::error_code ec;
     const auto backupSize = std::filesystem::file_size(backupPath, ec);
     bool ok = expect(!ec, "missing rotated backup");

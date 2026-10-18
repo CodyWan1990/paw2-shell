@@ -1,4 +1,5 @@
 #include "core/log.h"
+#include "util/app_dir_name.h"
 
 #include <algorithm>
 #include <chrono>
@@ -278,7 +279,7 @@ void initLogFile() {
 
   std::string dir;
   if (cacheHome != nullptr && cacheHome[0] != '\0') {
-    dir = std::string(cacheHome) + "/noctalia";
+    dir = std::string(cacheHome) + "/" + FileUtils::kAppDirName;
   } else if (home != nullptr && home[0] != '\0') {
     dir = std::string(home) + "/.cache/noctalia";
   } else {
@@ -291,8 +292,8 @@ void initLogFile() {
     return;
   }
 
-  const std::string logPath = dir + "/noctalia.log";
-  const std::string backupPath = dir + "/noctalia.log.1";
+  const std::string logPath = dir + "/" + FileUtils::kAppDirName + ".log";
+  const std::string backupPath = dir + "/" + FileUtils::kAppDirName + ".log.1";
 
   std::scoped_lock lock(gLogMutex);
   closeLogFileUnlocked();

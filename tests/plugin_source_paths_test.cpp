@@ -1,5 +1,6 @@
 #include "config/config_types.h"
 #include "scripting/plugin_source_paths.h"
+#include "util/app_dir_name.h"
 
 #include <cstdio>
 #include <cstdlib>
@@ -44,10 +45,10 @@ int main() {
       .location = "~/dev/noctalia-plugins",
   };
 
-  const std::filesystem::path stateRoot = "/tmp/noctalia-path-test-state/noctalia";
+  const std::filesystem::path stateRoot = std::filesystem::path("/tmp/noctalia-path-test-state") / FileUtils::kAppDirName;
   bool ok = true;
   ok = expectPath(
-           scripting::plugin_paths::localSourceRoot(), "/tmp/noctalia-path-test-data/noctalia/plugins",
+           scripting::plugin_paths::localSourceRoot(), (std::filesystem::path("/tmp/noctalia-path-test-data") / FileUtils::kAppDirName / "plugins").string(),
            "local source root"
        )
       && ok;

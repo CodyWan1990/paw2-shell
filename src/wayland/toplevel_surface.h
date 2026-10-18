@@ -17,7 +17,7 @@ struct ToplevelSurfaceConfig {
   std::uint32_t minWidth = 0;
   std::uint32_t minHeight = 0;
   std::string title = "Noctalia";
-  const char* appId = "dev.noctalia.Noctalia";
+  const char* appId = "paw2-shell";
 };
 
 class ToplevelSurface : public Surface {

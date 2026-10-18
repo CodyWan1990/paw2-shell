@@ -196,7 +196,7 @@ namespace noctalia::theme {
         return self;
       }
 #ifdef NOCTALIA_INSTALL_PREFIX
-      const auto installed = std::filesystem::path(NOCTALIA_INSTALL_PREFIX) / "bin" / "noctalia";
+      const auto installed = std::filesystem::path(NOCTALIA_INSTALL_PREFIX) / "bin" / "paw2-shell";
       std::error_code ec;
       if (std::filesystem::is_regular_file(installed, ec)) {
         return installed;
@@ -242,7 +242,7 @@ namespace noctalia::theme {
       const auto host = resolveNoctaliaExecutable();
       if (host.empty()) {
         if (error != nullptr) {
-          *error = "noctalia executable not found";
+          *error = "paw2-shell executable not found";
         }
         return false;
       }
@@ -705,7 +705,7 @@ namespace noctalia::theme {
 
   int runFirefoxThemeCli(int argc, char* argv[]) {
     auto parsed = cli::parseOrReport(
-        cli::kFirefoxThemeCmd, "noctalia firefox-theme",
+        cli::kFirefoxThemeCmd, "paw2-shell firefox-theme",
         std::span<char* const>{argv + 2, static_cast<std::size_t>(argc - 2)}
     );
     if (!parsed)
@@ -714,7 +714,7 @@ namespace noctalia::theme {
       return 0;
     const std::string_view action = parsed->positionals.front();
     if (action == "help") {
-      std::print("{}", cli::renderHelp(cli::kFirefoxThemeCmd, "noctalia firefox-theme"));
+      std::print("{}", cli::renderHelp(cli::kFirefoxThemeCmd, "paw2-shell firefox-theme"));
       return 0;
     }
     if (action == "host" || action == "start") {

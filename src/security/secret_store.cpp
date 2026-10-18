@@ -1,6 +1,7 @@
 #include "security/secret_store.h"
 
 #include "core/log.h"
+#include "util/app_dir_name.h"
 
 #include <cerrno>
 #include <chrono>
@@ -524,7 +525,7 @@ namespace security {
 
   SecretStoreAttributes secretStoreAttributes(const SecretId& id) {
     return {
-        .application = "noctalia",
+        .application = FileUtils::kAppDirName,
         .scope = id.scope,
         .owner = id.owner,
         .name = id.name,

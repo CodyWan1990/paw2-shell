@@ -4,6 +4,7 @@
 
 #include "config/config_service.h"
 #include "config/config_types.h"
+#include "util/app_dir_name.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -38,7 +39,7 @@ int main() {
   const std::filesystem::path root =
       std::filesystem::temp_directory_path() / ("noctalia-lane-override-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
-  writeFile(root / "config" / "noctalia" / "config.toml", R"(
+  writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", R"(
 [bar.default]
 start = [ "clock", "weather" ]
 )");
@@ -81,7 +82,7 @@ start = [ "clock", "weather" ]
   // Same edit, but the group already exists in the config file: moving the added widget into it
   // returns the lane list to its file value while the group's membership stays overridden.
   {
-    writeFile(root / "config" / "noctalia" / "config.toml", R"(
+    writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", R"(
 [bar.default]
 start = [ "clock", "group:g1" ]
 
@@ -89,7 +90,7 @@ start = [ "clock", "group:g1" ]
 id = "g1"
 members = [ "network", "bluetooth" ]
 )");
-    std::filesystem::remove(root / "state" / "noctalia" / "settings.toml");
+    std::filesystem::remove(root / "state" / FileUtils::kAppDirName / "settings.toml");
     ConfigService config;
 
     expect(
@@ -120,7 +121,7 @@ members = [ "network", "bluetooth" ]
   // Resetting a lane reverts its list and the groups it holds, leaving another lane's group edit
   // alone even though both live in the same scope-wide capsule_group array.
   {
-    writeFile(root / "config" / "noctalia" / "config.toml", R"(
+    writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", R"(
 [bar.default]
 start = [ "clock", "group:g1" ]
 end = [ "group:g2" ]
@@ -133,7 +134,7 @@ members = [ "network", "bluetooth" ]
 id = "g2"
 members = [ "battery", "clock" ]
 )");
-    std::filesystem::remove(root / "state" / "noctalia" / "settings.toml");
+    std::filesystem::remove(root / "state" / FileUtils::kAppDirName / "settings.toml");
     ConfigService config;
 
     BarCapsuleGroupStyle first;

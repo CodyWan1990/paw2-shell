@@ -1,6 +1,7 @@
 #include "core/files/resource_paths.h"
 
 #include "core/log.h"
+#include "util/app_dir_name.h"
 
 #include <algorithm>
 #include <array>
@@ -20,9 +21,9 @@ namespace paths {
     std::filesystem::path installedAssetsRoot() {
       const std::filesystem::path datadir(NOCTALIA_INSTALL_DATADIR);
       if (datadir.is_absolute()) {
-        return datadir / "noctalia" / "assets";
+        return datadir / FileUtils::kAppDirName / "assets";
       }
-      return std::filesystem::path(NOCTALIA_INSTALL_PREFIX) / datadir / "noctalia" / "assets";
+      return std::filesystem::path(NOCTALIA_INSTALL_PREFIX) / datadir / FileUtils::kAppDirName / "assets";
     }
 
     bool isAssetRoot(const std::filesystem::path& root) {
@@ -76,9 +77,9 @@ namespace paths {
 
         const std::filesystem::path datadir(NOCTALIA_INSTALL_DATADIR);
         if (!datadir.empty() && !datadir.is_absolute()) {
-          appendUnique(candidates, exeDir.parent_path() / datadir / "noctalia" / "assets");
+          appendUnique(candidates, exeDir.parent_path() / datadir / FileUtils::kAppDirName / "assets");
         }
-        appendUnique(candidates, exeDir.parent_path() / "share" / "noctalia" / "assets");
+        appendUnique(candidates, exeDir.parent_path() / "share" / FileUtils::kAppDirName / "assets");
       }
 
       appendUnique(candidates, installedAssetsRoot());

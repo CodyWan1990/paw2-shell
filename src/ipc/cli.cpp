@@ -20,12 +20,12 @@ namespace noctalia::ipc {
 
     const std::string_view command = argv[2];
     if (command == "--help" || command == "-h") {
-      std::print("{}", cli::renderHelp(cli::kMsgCmd, "noctalia msg"));
+      std::print("{}", cli::renderHelp(cli::kMsgCmd, "paw2-shell msg"));
       return 0;
     }
     if (argc >= 4 && (std::string_view(argv[argc - 1]) == "--help" || std::string_view(argv[argc - 1]) == "-h")) {
       if (const cli::Command* spec = cli::findMsgCommand(command); spec != nullptr) {
-        std::string path = "noctalia msg ";
+        std::string path = "paw2-shell msg ";
         path.append(command);
         std::print("{}", cli::renderHelp(*spec, path));
         return 0;

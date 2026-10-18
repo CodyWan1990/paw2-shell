@@ -21,8 +21,8 @@ namespace noctalia::cli {
       "Generate shell completion scripts",
       "Generate a completion script from the live CLI schema.\n\n"
       "Examples:\n"
-      "  source <(noctalia completions bash)\n"
-      "  noctalia completions fish > ~/.config/fish/completions/noctalia.fish",
+      "  source <(paw2-shell completions bash)\n"
+      "  paw2-shell completions fish > ~/.config/fish/completions/paw2-shell.fish",
       {},
       {},
       kCompletionsPositionals,
@@ -40,10 +40,10 @@ namespace noctalia::cli {
   };
 
   inline constexpr Command kRootCmd{
-      "noctalia",
-      "A sleek, customizable desktop shell crafted for Wayland",
+      "paw2-shell",
+      "Desktop shell for the paw2 Wayland compositor, built on Noctalia",
       {},
-      "For more information and documentation, visit:\n  https://noctalia.dev",
+      "Noctalia documentation (most of it applies):\n  https://noctalia.dev",
       kRootFlags,
       {},
       kRootSubcommands,

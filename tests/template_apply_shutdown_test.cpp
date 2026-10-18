@@ -6,6 +6,7 @@
 #include "tests/test_check.h"
 #include "theme/palette.h"
 #include "theme/template_apply_service.h"
+#include "util/app_dir_name.h"
 
 #include <cerrno>
 #include <chrono>
@@ -65,7 +66,7 @@ namespace {
       const std::filesystem::path& root, const std::string& templates,
       const std::vector<std::filesystem::path>& pidFiles, std::vector<pid_t>& pids
   ) {
-    writeFile(root / "config" / "noctalia" / "config.toml", templates);
+    writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", templates);
 
     auto config = std::make_unique<ConfigService>();
     auto service = std::make_unique<TemplateApplyService>(*config, kGrace);
@@ -159,7 +160,7 @@ namespace {
         root / "assets" / "templates" / "builtin.toml",
         "[templates.stuck]\nundo_hook = \"" + hangCommand(pidFile) + "\"\n"
     );
-    writeFile(root / "state" / "noctalia" / "state.toml", "[theme_templates]\napplied_builtin_ids = \"stuck\"\n");
+    writeFile(root / "state" / FileUtils::kAppDirName / "state.toml", "[theme_templates]\napplied_builtin_ids = \"stuck\"\n");
 
     std::vector<pid_t> pids;
     const double elapsed = applyThenDestroy(root, "", {pidFile}, pids);
@@ -175,8 +176,8 @@ int main() {
   const std::filesystem::path root =
       std::filesystem::temp_directory_path() / ("noctalia-template-shutdown-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
-  std::filesystem::create_directories(root / "config" / "noctalia");
-  std::filesystem::create_directories(root / "state" / "noctalia");
+  std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
+  std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "data");
   ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
   ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);

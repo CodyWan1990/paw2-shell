@@ -1,5 +1,6 @@
 #pragma once
 
+#include "util/app_dir_name.h"
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -375,15 +376,15 @@ namespace FileUtils {
   [[nodiscard]] inline std::string configDir() {
     const char* noctalia = std::getenv("NOCTALIA_CONFIG_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
-      return std::string(noctalia) + "/noctalia";
+      return std::string(noctalia) + "/" + kAppDirName;
     }
     const char* xdg = std::getenv("XDG_CONFIG_HOME");
     if (xdg != nullptr && xdg[0] != '\0') {
-      return std::string(xdg) + "/noctalia";
+      return std::string(xdg) + "/" + kAppDirName;
     }
     const char* home = std::getenv("HOME");
     if (home != nullptr && home[0] != '\0') {
-      return std::string(home) + "/.config/noctalia";
+      return std::string(home) + "/.config/" + kAppDirName;
     }
     return {};
   }
@@ -391,15 +392,15 @@ namespace FileUtils {
   [[nodiscard]] inline std::string stateDir() {
     const char* noctalia = std::getenv("NOCTALIA_STATE_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
-      return std::string(noctalia) + "/noctalia";
+      return std::string(noctalia) + "/" + kAppDirName;
     }
     const char* xdg = std::getenv("XDG_STATE_HOME");
     if (xdg != nullptr && xdg[0] != '\0') {
-      return std::string(xdg) + "/noctalia";
+      return std::string(xdg) + "/" + kAppDirName;
     }
     const char* home = std::getenv("HOME");
     if (home != nullptr && home[0] != '\0') {
-      return std::string(home) + "/.local/state/noctalia";
+      return std::string(home) + "/.local/state/" + kAppDirName;
     }
     return {};
   }
@@ -407,15 +408,15 @@ namespace FileUtils {
   [[nodiscard]] inline std::string dataDir() {
     const char* noctalia = std::getenv("NOCTALIA_DATA_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
-      return std::string(noctalia) + "/noctalia";
+      return std::string(noctalia) + "/" + kAppDirName;
     }
     const char* xdg = std::getenv("XDG_DATA_HOME");
     if (xdg != nullptr && xdg[0] != '\0') {
-      return std::string(xdg) + "/noctalia";
+      return std::string(xdg) + "/" + kAppDirName;
     }
     const char* home = std::getenv("HOME");
     if (home != nullptr && home[0] != '\0') {
-      return std::string(home) + "/.local/share/noctalia";
+      return std::string(home) + "/.local/share/" + kAppDirName;
     }
     return {};
   }

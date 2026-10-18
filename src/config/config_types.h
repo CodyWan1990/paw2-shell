@@ -706,7 +706,7 @@ struct DockConfig {
   bool enabled = true;
   DockEdge position = DockEdge::Bottom;
   bool activeMonitorOnly = false;    // render only on preferred active output
-  std::int32_t iconSize = 38;        // icon size in pixels (before ui_scale)
+  std::int32_t iconSize = 32;        // icon size in pixels (before ui_scale)
   std::int32_t mainAxisPadding = 0;  // inner padding along the icon row (main axis)
   std::int32_t crossAxisPadding = 0; // inner padding perpendicular to the icon row
   std::int32_t itemSpacing = 0;      // gap between items

@@ -429,7 +429,7 @@ end    = ["media", "volume", "spacer", "wallpaper", "clipboard", "notifications"
 [dock]
 enabled             = true
 position            = "bottom"      # top | bottom | left | right
-icon_size           = 38
+icon_size           = 32
 main_axis_padding   = 0
 cross_axis_padding  = 0
 item_spacing        = 0

@@ -1939,12 +1939,12 @@
           },
           "position": {
             "label": "Position",
-            "description": "Top-left corner in logical pixels, as \"x, y\". Blank places monitors left to right.",
+            "description": "Top-left corner in logical pixels, as \"x, y\"; a monitor left blank takes the first free space from the left. paw2 applies it the next time it starts.",
             "placeholder": "Automatic"
           },
           "focus-at-startup": {
             "label": "Focus at startup",
-            "description": "Start the session with the keyboard focus on this monitor. Only one monitor can."
+            "description": "Start the session with the keyboard focus on this monitor. Only one monitor can. paw2 applies it the next time it starts."
           }
         },
         "theme-colors": {

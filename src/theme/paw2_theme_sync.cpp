@@ -30,6 +30,16 @@ namespace noctalia::theme {
   }
 
   void Paw2ThemeSync::refresh() {
+    // Titlebar text follows the shell's font whether or not the colours do.
+    // Unchanged values are no-ops in the writer, so a reload that touched nothing writes nothing.
+    auto& writer = m_platform.paw2ConfigWriter();
+    // paw2 rejects a blank family, and unset falls back to its own default.
+    if (const std::string& family = m_config.config().shell.fontFamily; family.empty()) {
+      writer.unset("theme.titlebar_font");
+    } else {
+      writer.set("theme.titlebar_font", family);
+    }
+
     if (!m_config.config().shell.paw2ThemeColors
         || !m_focusRing.has_value()
         || !m_titlebar.has_value()
@@ -37,8 +47,6 @@ namespace noctalia::theme {
         || !m_backdrop.has_value()) {
       return;
     }
-    // Unchanged values are no-ops in the writer, so a reload that touched nothing writes nothing.
-    auto& writer = m_platform.paw2ConfigWriter();
     writer.set("appearance.focus_ring_color", formatRgbHex(*m_focusRing));
     writer.set("appearance.shadow_color", formatRgbHex(*m_shadow));
     writer.set("appearance.titlebar_color", formatRgbHex(*m_titlebar));

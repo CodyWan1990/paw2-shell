@@ -106,6 +106,12 @@ int main() {
   Paw2Runtime runtime;
   Paw2ConfigWriter writer(runtime, configDir);
   paw2.accept();
+
+  // An edit before paw2's config arrives has nothing to seed its table from; it waits.
+  writer.set("input.focus_follows_mouse", true);
+  writer.flush();
+  ok &= check(!std::filesystem::exists(configDir / "config.d" / "shell.toml"), "no write before paw2's config");
+
   paw2.sendConfig(config);
   pump(runtime);
   ok &= check(runtime.trusted() && runtime.configGeneration() == 1, "config received");
@@ -119,12 +125,23 @@ int main() {
   ok &= check(shell["appearance"]["blur"] == true && shell["appearance"]["opacity"] == 0.95, "table claimed whole");
   ok &= check(!shell.contains("animations"), "untouched tables are not claimed");
   ok &= check(!shell.contains("bindings"), "shell.toml never names [bindings]");
+  ok &= check(shell["input"]["focus_follows_mouse"] == true, "the early edit is written once config is in");
+
+  // An edit made while paw2 is still answering the last write (a slider still moving).
+  writer.set("appearance.corner_radius", 8);
 
   // paw2 accepts: its config now carries the value.
   config["appearance"]["gaps"] = 20;
+  config["input"]["focus_follows_mouse"] = true;
   paw2.sendConfig(config);
   pump(runtime);
   ok &= check(writer.rejectedErrors().empty() && writer.owns("appearance.gaps"), "accepted write is kept");
+  ok &= check(writer.get("appearance.corner_radius") == nlohmann::json(8), "the newer edit survives the verdict");
+  writer.flush();
+  ok &= check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["corner_radius"] == 8, "and is written");
+  config["appearance"]["corner_radius"] = 8;
+  paw2.sendConfig(config);
+  pump(runtime);
 
   // paw2 rejects the next write: the file goes back to what it last accepted.
   writer.set("appearance.gaps", 999);

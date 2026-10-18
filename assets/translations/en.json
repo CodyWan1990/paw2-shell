@@ -1831,6 +1831,10 @@
           "open-folder": "Open config folder"
         },
         "rejected": "paw2 rejected the last change, so it was undone: {errors}",
+        "theme-colors": {
+          "label": "Follow shell colors",
+          "description": "The focus ring takes the palette's primary color and the overview backdrop its surface, and both follow palette changes."
+        },
         "config-error": "paw2 couldn't load its config, and is running on the last one that loaded: {errors}",
         "layout": {
           "enabled-layouts": {

@@ -108,6 +108,8 @@ namespace compositors::paw2 {
     bool m_shellDirty = false;
     bool m_keybindsDirty = false;
     bool m_awaitingVerdict = false;
+    // A save came before paw2's config did, and runs once it arrives.
+    bool m_waitingForConfig = false;
     std::uint64_t m_writtenAtGeneration = 0;
     std::optional<std::string> m_keybindsLastGood;
     std::vector<std::string> m_rejectedErrors;

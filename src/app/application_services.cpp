@@ -87,6 +87,7 @@
 #include "system/easyeffects_service.h"
 #include "system/keyboard_backlight_service.h"
 #include "system/system_monitor_service.h"
+#include "theme/fixed_palette.h"
 #include "ui/app_icon_colorization.h"
 #include "ui/controls/input.h"
 #include "ui/dialogs/color_picker_dialog.h"
@@ -573,6 +574,7 @@ void Application::initStyleThemeAndWayland() {
   m_configService.addReloadCallback(applyStyleConfig);
   m_configService.addReloadCallback(applyPasswordMaskStyle);
   m_configService.addReloadCallback(applyInputConfig);
+  m_configService.addReloadCallback([this]() { m_paw2ThemeSync.refresh(); });
   m_configService.addReloadCallback([this]() {
     m_httpClient.setOfflineMode(m_configService.config().shell.offlineMode);
     m_scriptApi.setConfigSnapshot(
@@ -725,6 +727,9 @@ void Application::initStyleThemeAndWayland() {
     const bool colorsChanged = !lastGeneratedPalette.has_value() || *lastGeneratedPalette != generated;
     lastGeneratedPalette = generated;
     m_settingsWindow.setResolvedPalette(generated, mode);
+    const ::Palette palette =
+        noctalia::theme::mapGeneratedPaletteMode(mode == "light" ? generated.light : generated.dark);
+    m_paw2ThemeSync.setColors(palette.primary, palette.surface);
     m_templateApplyService.apply(generated, mode, /*force=*/false, /*paletteChanged=*/colorsChanged);
     if (previousMode.has_value() && *previousMode != resolvedMode) {
       m_hookManager.fire(

@@ -419,6 +419,12 @@ namespace compositors::paw2 {
     if (!m_shellDirty && !m_keybindsDirty) {
       return;
     }
+    // Claiming a table seeds it from paw2's config; written before that arrives, the drop-in would
+    // own the table with nothing but the edit in it, and paw2 would drop the rest of config.toml's.
+    if (!m_runtime.trusted() || m_runtime.configGeneration() == 0) {
+      m_waitingForConfig = true;
+      return;
+    }
     if (m_shellDirty) {
       for (const auto& [path, value] : m_pending) {
         claim(topTable(path));
@@ -446,6 +452,10 @@ namespace compositors::paw2 {
   }
 
   void Paw2ConfigWriter::onRuntimeChanged() {
+    if (m_waitingForConfig && m_runtime.trusted() && m_runtime.configGeneration() > 0) {
+      m_waitingForConfig = false;
+      scheduleSave();
+    }
     if (!m_awaitingVerdict || m_runtime.configGeneration() <= m_writtenAtGeneration) {
       return;
     }
@@ -474,10 +484,16 @@ namespace compositors::paw2 {
       }
     }
     // paw2's config now carries (or has refused) the edits; it is the source of truth again.
-    m_pending.clear();
-    m_unsetPending.clear();
-    m_pendingMonitors.clear();
-    m_pendingBindings.clear();
+    // Edits made since the write are still to be written, unless the write they build on was refused.
+    const bool newerEdits = m_runtime.configOk() && (m_shellDirty || m_keybindsDirty);
+    if (!newerEdits) {
+      m_pending.clear();
+      m_unsetPending.clear();
+      m_pendingMonitors.clear();
+      m_pendingBindings.clear();
+      m_shellDirty = false;
+      m_keybindsDirty = false;
+    }
     notify();
   }
 

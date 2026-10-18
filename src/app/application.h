@@ -75,6 +75,7 @@
 #include "system/weather_service.h"
 #include "theme/community_palettes.h"
 #include "theme/community_templates.h"
+#include "theme/paw2_theme_sync.h"
 #include "theme/template_apply_service.h"
 #include "theme/theme_service.h"
 #include "time/time_poll_source.h"
@@ -246,6 +247,7 @@ private:
   noctalia::theme::CommunityTemplateService m_communityTemplateService{m_httpClient};
   noctalia::theme::ThemeService m_themeService{m_configService, m_httpClient};
   noctalia::theme::TemplateApplyService m_templateApplyService{m_configService};
+  noctalia::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform, m_configService};
   scripting::ScriptApiContext m_scriptApi;
   std::function<void()> m_syncScriptApiOutputs;
   scripting::PluginManager m_pluginManager{m_configService};

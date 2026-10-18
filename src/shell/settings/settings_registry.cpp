@@ -482,7 +482,8 @@ namespace settings {
       }
     }
 
-    void appendPaw2CompositorEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
+    void
+    appendPaw2CompositorEntries(std::vector<SettingEntry>& entries, const Config& cfg, const RegistryEnvironment& env) {
       constexpr auto section = SettingsSection::Paw2;
       const Paw2Values paw2(env);
       const auto add = [&entries](SettingEntry entry, bool visible = true) {
@@ -524,11 +525,21 @@ namespace settings {
           section, "paw2-appearance", "appearance.focus_ring_width",
           SliderSetting{paw2.number("appearance.focus_ring_width", 0), 0, 16, 1, true}, "focus ring border width"
       ));
-      add(makePaw2Entry(
+      // While the theme owns the colours, their rows would only be overwritten on the next palette change.
+      const SettingVisibility themeColorsOff = [](const Config& config) { return !config.shell.paw2ThemeColors; };
+      add(makeEntry(
+          section, "paw2-appearance", i18n::tr("settings.schema.paw2.theme-colors.label"),
+          i18n::tr("settings.schema.paw2.theme-colors.description"), {"shell", "paw2_theme_colors"},
+          ToggleSetting{cfg.shell.paw2ThemeColors},
+          "paw2 compositor focus ring overview backdrop colour color palette theme"
+      ));
+      SettingEntry focusRingColor = makePaw2Entry(
           section, "paw2-appearance", "appearance.focus_ring_color",
           TextSetting{.value = paw2.text("appearance.focus_ring_color", "#0b3d91"), .placeholder = "#rrggbb"},
           "focus ring border colour color"
-      ));
+      );
+      focusRingColor.visibleWhen = themeColorsOff;
+      add(std::move(focusRingColor));
       add(makePaw2Entry(
           section, "paw2-appearance", "appearance.corner_radius",
           SliderSetting{paw2.number("appearance.corner_radius", 0), 0, 64, 1, true}, "rounded corners radius"
@@ -601,11 +612,13 @@ namespace settings {
           section, "paw2-overview", "overview.zoom",
           SliderSetting{paw2.number("overview.zoom", 0.5), 0.2, 0.75, 0.05, false}, "overview zoom size"
       ));
-      add(makePaw2Entry(
+      SettingEntry backdropColor = makePaw2Entry(
           section, "paw2-overview", "overview.backdrop_color",
           TextSetting{.value = paw2.text("overview.backdrop_color", "#1c1c1c"), .placeholder = "#rrggbb"},
           "overview backdrop background colour color"
-      ));
+      );
+      backdropColor.visibleWhen = themeColorsOff;
+      add(std::move(backdropColor));
       constexpr std::array<std::string_view, 5> kScratchpadPositions{"centered", "top", "bottom", "left", "right"};
       add(makePaw2Entry(
           section, "paw2-overview", "overview.scratchpad_position",
@@ -4423,7 +4436,7 @@ namespace settings {
     }
 
     if (env.paw2Value) {
-      appendPaw2CompositorEntries(entries, env);
+      appendPaw2CompositorEntries(entries, cfg, env);
     } else {
       appendPaw2Unavailable(entries, env);
     }

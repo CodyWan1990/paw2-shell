@@ -3,6 +3,7 @@
 #include "config/config_types.h"
 
 #include <cstdint>
+#include <span>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -33,6 +34,21 @@ namespace settings {
   // keys, resolution and refresh. A mode's value is "2560x1440@165.080"; "auto" is the preferred one.
   inline constexpr std::string_view kPaw2AutoMode = "auto";
   [[nodiscard]] std::string paw2ModeValue(std::int64_t width, std::int64_t height, double refresh);
+
+  // A compositor action the Shortcuts page binds, as paw2's DEFAULT_BINDINGS (src/config.rs) lists
+  // it: its [bindings] key, the page group it sits in, and the keys paw2 uses when the key is
+  // absent. paw2 does not send its defaults, so they are mirrored here.
+  struct Paw2BindingAction {
+    std::string_view key;      // "close_window", or "workspace.previous" for [bindings.workspace]
+    std::string_view group;    // e.g. "paw2-keys-windows"
+    std::string_view defaults; // space-separated chords; empty means unbound
+  };
+  [[nodiscard]] std::span<const Paw2BindingAction> paw2BindingActions();
+
+  // A command binding's argv as one line, and back: split on spaces, with "double" or 'single'
+  // quotes keeping an argument whole and a backslash escaping the next character.
+  [[nodiscard]] std::string joinCommandLine(const std::vector<std::string>& argv);
+  [[nodiscard]] std::vector<std::string> splitCommandLine(std::string_view line);
 
   enum class DesktopThemeKind : std::uint8_t {
     Cursor,

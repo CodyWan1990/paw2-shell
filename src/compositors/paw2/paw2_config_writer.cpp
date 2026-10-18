@@ -497,6 +497,20 @@ namespace compositors::paw2 {
     notify();
   }
 
+  bool Paw2ConfigWriter::ownsBindings() const {
+    std::error_code ec;
+    return std::filesystem::exists(keybindsDropIn(), ec);
+  }
+
+  void Paw2ConfigWriter::releaseBindings() {
+    m_pendingBindings.clear();
+    m_keybindsDirty = false;
+    m_keybindsLastGood.reset();
+    std::error_code ec;
+    std::filesystem::remove(keybindsDropIn(), ec);
+    notify();
+  }
+
   std::size_t Paw2ConfigWriter::addListener(Listener listener) {
     const std::size_t token = m_nextListenerToken++;
     m_listeners.emplace_back(token, std::move(listener));

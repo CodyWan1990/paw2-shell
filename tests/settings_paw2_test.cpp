@@ -50,6 +50,7 @@ int main() {
       {"appearance", {{"gaps", 15}, {"focus_ring_width", 1}}},
       {"layout", {{"enabled_layouts", {"scrolling", "dwindle"}}}},
       {"monitors", {{{"connector", "DP-1"}, {"resolution", {2560, 1440}}, {"scale", 1.25}}}},
+      {"bindings", {{"close_window", {"Super+w"}}, {"commands", {{"Super+Return", {"kitty", "--single-instance"}}}}}},
   };
   settings::RegistryEnvironment env;
   env.paw2Value = [&paw2Config](std::string_view path) -> std::optional<nlohmann::json> {
@@ -109,6 +110,30 @@ int main() {
   const auto* scale = findEntry(entries, {"paw2", "monitors", "DP-1", "scale"});
   ok &= check(scale != nullptr && std::get<settings::SliderSetting>(scale->control).value == 1.25, "monitor scale");
 
+  // Shortcuts: what paw2's config sets, else paw2's defaults; commands as one line each.
+  const auto* close = findEntry(entries, {"paw2", "bindings", "close_window"});
+  ok &= check(
+      close != nullptr && std::get<settings::ListSetting>(close->control).items == std::vector<std::string>{"Super+w"},
+      "configured shortcut"
+  );
+  const auto* focusLeft = findEntry(entries, {"paw2", "bindings", "focus_left"});
+  ok &= check(
+      focusLeft != nullptr && std::get<settings::ListSetting>(focusLeft->control).items.size() == 2,
+      "unset shortcut shows paw2's default keys"
+  );
+  const auto* commands = findEntry(entries, {"paw2", "bindings", "commands"});
+  ok &= check(
+      commands != nullptr
+          && std::get<settings::StringMapSetting>(commands->control).entries.at("Super+Return")
+              == "kitty --single-instance",
+      "command bindings"
+  );
+  ok &= check(findEntry(entries, {"paw2", "bindings", "workspace", "next"}) != nullptr, "workspace shortcuts");
+
+  const auto argv = settings::splitCommandLine(R"(sh -c "echo \"hi\"" 'a b' x\ y)");
+  ok &= check(argv == std::vector<std::string>{"sh", "-c", "echo \"hi\"", "a b", "x y"}, "command line split");
+  ok &= check(settings::splitCommandLine(settings::joinCommandLine(argv)) == argv, "join and split round-trip");
+
   // Without paw2's config every paw2 page shows why, instead of controls.
   const auto offline = settings::buildSettingsRegistry(cfg, nullptr, nullptr, {});
   std::size_t statusRows = 0;
@@ -159,8 +184,31 @@ int main() {
     (void)settings::applyPaw2Setting(writer, {"paw2", "monitors", "DP-1", "focus_at_startup"}, true);
     (void)settings::applyPaw2Setting(writer, {"paw2", "monitors", "HDMI-A-1", "focus_at_startup"}, true);
     ok &= check(writer.get("monitors")->at(0).at("focus_at_startup") == false, "only one monitor takes focus");
+
     (void)settings::applyPaw2Setting(writer, {"paw2", "bindings", "close_window"}, std::vector<std::string>{"Super+q"});
     ok &= check(writer.get("bindings.close_window") == nlohmann::json::array({"Super+q"}), "shortcut rows");
+    ok &= check(
+        settings::applyPaw2Setting(
+            writer, {"paw2", "bindings", "commands", "Super+e"}, std::string("dolphin --new-window")
+        ),
+        "command accepted"
+    );
+    ok &= check(
+        writer.get("bindings.commands.Super+e") == nlohmann::json::array({"dolphin", "--new-window"}),
+        "a command line is written as argv"
+    );
+    ok &= check(
+        !settings::applyPaw2Setting(writer, {"paw2", "bindings", "commands", "Super+e"}, std::string("  ")),
+        "a blank command is refused"
+    );
+    ok &= check(settings::paw2SettingOverridden(writer, {"paw2", "bindings", "close_window"}), "set shortcut resets");
+    ok &= check(
+        !settings::paw2SettingOverridden(writer, {"paw2", "bindings", "focus_left"}), "default shortcut does not"
+    );
+    settings::resetPaw2Setting(writer, {"paw2", "bindings", "close_window"});
+    ok &= check(
+        !settings::paw2SettingOverridden(writer, {"paw2", "bindings", "close_window"}), "reset to paw2's default"
+    );
   }
   std::filesystem::remove_all(configDir);
 

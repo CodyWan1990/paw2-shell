@@ -1343,6 +1343,14 @@
     "navigation": {
       "groups": {
         "paw2-animations": "Animations",
+        "paw2-keys-commands": "Commands",
+        "paw2-keys-file": "Shortcuts",
+        "paw2-keys-layout": "Layout",
+        "paw2-keys-monitors": "Monitors",
+        "paw2-keys-session": "Overview & Session",
+        "paw2-keys-tabs": "Tabs",
+        "paw2-keys-windows": "Windows",
+        "paw2-keys-workspaces": "Workspaces",
         "paw2-appearance": "Windows",
         "paw2-blur": "Transparency & Blur",
         "paw2-input": "Input",
@@ -1829,6 +1837,70 @@
           "label": "paw2 isn't sharing its settings",
           "description": "paw2 only shows its settings to a shell it trusts: one installed as root in a system directory, like /usr/bin/paw2-shell. A build run from its source tree, or a session that isn't paw2, gets nothing here.",
           "open-folder": "Open config folder"
+        },
+        "bindings": {
+          "file": {
+            "config": {
+              "label": "Shortcuts come from config.toml",
+              "description": "Changing one here moves all of [bindings] into config.d/keybinds.toml, and paw2 reads them from there instead."
+            },
+            "owned": {
+              "label": "Shortcuts come from config.d/keybinds.toml",
+              "description": "[bindings] in config.toml no longer applies. Using it again deletes keybinds.toml and the changes made here.",
+              "release": "Use config.toml"
+            }
+          },
+          "commands": {
+            "label": "Commands",
+            "description": "Keys that start a program. The command line splits on spaces; quote an argument to keep spaces in it."
+          },
+          "default": "Default: {keys}",
+          "no-default": "Unbound by default",
+          "actions": {
+            "focus-left": "Focus left",
+            "focus-right": "Focus right",
+            "focus-up": "Focus up",
+            "focus-down": "Focus down",
+            "swap-left": "Move window left",
+            "swap-right": "Move window right",
+            "swap-up": "Move window up",
+            "swap-down": "Move window down",
+            "close-window": "Close window",
+            "toggle-floating": "Float or tile window",
+            "toggle-fullscreen": "Fullscreen",
+            "consume-or-expel-left": "Join or leave column on the left",
+            "consume-or-expel-right": "Join or leave column on the right",
+            "cycle-layout": "Next layout",
+            "switch-layout-scrolling": "Scrolling layout",
+            "switch-layout-dwindle": "Dwindle layout",
+            "switch-layout-master-stack": "Master and stack layout",
+            "switch-layout-monocle": "Monocle layout",
+            "cycle-column-width": "Cycle column width",
+            "decrease-column-width": "Narrower column",
+            "increase-column-width": "Wider column",
+            "decrease-row-height": "Shorter row",
+            "increase-row-height": "Taller row",
+            "tab-group-left": "Into tab group on the left",
+            "tab-group-right": "Into tab group on the right",
+            "previous-tab": "Previous tab",
+            "next-tab": "Next tab",
+            "tab-group-drag": "Drag tab group",
+            "workspace-previous": "Previous workspace",
+            "workspace-next": "Next workspace",
+            "workspace-move-previous": "Move window to previous workspace",
+            "workspace-move-next": "Move window to next workspace",
+            "focus-monitor-left": "Focus monitor on the left",
+            "focus-monitor-right": "Focus monitor on the right",
+            "focus-monitor-up": "Focus monitor above",
+            "focus-monitor-down": "Focus monitor below",
+            "move-to-monitor-left": "Move window to monitor on the left",
+            "move-to-monitor-right": "Move window to monitor on the right",
+            "move-to-monitor-up": "Move window to monitor above",
+            "move-to-monitor-down": "Move window to monitor below",
+            "toggle-overview": "Overview",
+            "toggle-scratchpad-overview": "Scratchpad overview",
+            "quit": "Log out"
+          }
         },
         "rejected": "paw2 rejected the last change, so it was undone: {errors}",
         "invalid-value": "paw2 can't take that value. A position is two numbers, like \"1920, 0\".",

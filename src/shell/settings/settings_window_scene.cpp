@@ -779,6 +779,8 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
     if (runtime.trusted() && runtime.configGeneration() > 0) {
       env.paw2Value = [&writer](std::string_view path) { return writer.get(path); };
       env.paw2Outputs = runtime.snapshot().outputs;
+      env.paw2OwnsShortcuts = writer.ownsBindings();
+      env.paw2ReleaseShortcuts = [platform = m_platform]() { platform->paw2ConfigWriter().releaseBindings(); };
     }
   }
   if (m_config != nullptr) {

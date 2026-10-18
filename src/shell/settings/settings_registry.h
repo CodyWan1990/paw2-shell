@@ -325,6 +325,8 @@ namespace settings {
     std::function<std::optional<nlohmann::json>(std::string_view)> paw2Value;
     std::string paw2ConfigDir; // holds config.toml and config.d/
     std::vector<compositors::paw2::Paw2Output> paw2Outputs; // connected monitors, for the Displays page
+    bool paw2OwnsShortcuts = false;                         // config.d/keybinds.toml exists
+    std::function<void()> paw2ReleaseShortcuts;             // deletes it
   };
 
   [[nodiscard]] const BarConfig* findBar(const Config& cfg, std::string_view name);

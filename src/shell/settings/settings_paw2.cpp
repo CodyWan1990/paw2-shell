@@ -11,6 +11,7 @@
 #include <optional>
 #include <set>
 #include <sstream>
+#include <utility>
 #include <variant>
 
 namespace settings {
@@ -35,6 +36,57 @@ namespace settings {
     [[nodiscard]] bool isBindingPath(const std::vector<std::string>& path) {
       return path.size() >= 3 && path[1] == "bindings";
     }
+
+    // {"paw2", "bindings", "commands", "Super+Return"}
+    [[nodiscard]] bool isCommandBindingPath(const std::vector<std::string>& path) {
+      return path.size() == 4 && path[1] == "bindings" && path[2] == "commands";
+    }
+
+    constexpr auto kBindingActions = std::to_array<Paw2BindingAction>({
+        {"focus_left", "paw2-keys-windows", "Super+h Super+Left"},
+        {"focus_right", "paw2-keys-windows", "Super+l Super+Right"},
+        {"focus_up", "paw2-keys-windows", "Super+k Super+Up"},
+        {"focus_down", "paw2-keys-windows", "Super+j Super+Down"},
+        {"swap_left", "paw2-keys-windows", "Super+Shift+h Super+Shift+Left"},
+        {"swap_right", "paw2-keys-windows", "Super+Shift+l Super+Shift+Right"},
+        {"swap_up", "paw2-keys-windows", "Super+Shift+k Super+Shift+Up"},
+        {"swap_down", "paw2-keys-windows", "Super+Shift+j Super+Shift+Down"},
+        {"close_window", "paw2-keys-windows", "Super+q Super+BackSpace"},
+        {"toggle_floating", "paw2-keys-windows", ""},
+        {"toggle_fullscreen", "paw2-keys-windows", ""},
+        {"consume_or_expel_left", "paw2-keys-windows", ""},
+        {"consume_or_expel_right", "paw2-keys-windows", ""},
+        {"cycle_layout", "paw2-keys-layout", ""},
+        {"switch_layout_scrolling", "paw2-keys-layout", ""},
+        {"switch_layout_dwindle", "paw2-keys-layout", ""},
+        {"switch_layout_master_stack", "paw2-keys-layout", ""},
+        {"switch_layout_monocle", "paw2-keys-layout", ""},
+        {"cycle_column_width", "paw2-keys-layout", ""},
+        {"decrease_column_width", "paw2-keys-layout", ""},
+        {"increase_column_width", "paw2-keys-layout", ""},
+        {"decrease_row_height", "paw2-keys-layout", ""},
+        {"increase_row_height", "paw2-keys-layout", ""},
+        {"tab_group_left", "paw2-keys-tabs", ""},
+        {"tab_group_right", "paw2-keys-tabs", ""},
+        {"previous_tab", "paw2-keys-tabs", ""},
+        {"next_tab", "paw2-keys-tabs", ""},
+        {"tab_group_drag", "paw2-keys-tabs", ""},
+        {"workspace.previous", "paw2-keys-workspaces", ""},
+        {"workspace.next", "paw2-keys-workspaces", ""},
+        {"workspace.move_previous", "paw2-keys-workspaces", ""},
+        {"workspace.move_next", "paw2-keys-workspaces", ""},
+        {"focus_monitor_left", "paw2-keys-monitors", ""},
+        {"focus_monitor_right", "paw2-keys-monitors", ""},
+        {"focus_monitor_up", "paw2-keys-monitors", ""},
+        {"focus_monitor_down", "paw2-keys-monitors", ""},
+        {"move_to_monitor_left", "paw2-keys-monitors", ""},
+        {"move_to_monitor_right", "paw2-keys-monitors", ""},
+        {"move_to_monitor_up", "paw2-keys-monitors", ""},
+        {"move_to_monitor_down", "paw2-keys-monitors", ""},
+        {"toggle_overview", "paw2-keys-session", ""},
+        {"toggle_scratchpad_overview", "paw2-keys-session", ""},
+        {"quit", "paw2-keys-session", "Super+Shift+Escape"},
+    });
 
     [[nodiscard]] nlohmann::json toJson(const ConfigOverrideValue& value) {
       return std::visit(
@@ -188,6 +240,14 @@ namespace settings {
     if (isMonitorPath(path)) {
       return setMonitorRow(writer, path[2], path[3], std::move(json));
     }
+    if (isCommandBindingPath(path) && json.is_string()) {
+      const auto argv = splitCommandLine(json.get<std::string>());
+      if (argv.empty()) {
+        return false;
+      }
+      writer.setBinding("commands." + path[3], argv);
+      return true;
+    }
     if (isBindingPath(path)) {
       writer.setBinding(dottedPaw2Path(path, 2), std::move(json));
       return true;
@@ -225,11 +285,79 @@ namespace settings {
   }
 
   bool paw2SettingOverridden(const compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& path) {
-    // Monitors and shortcuts are written whole, so no single key of theirs has a default to go back to.
-    if (isMonitorPath(path) || isBindingPath(path)) {
+    // A monitor entry is written whole, so no single key of it has a default to go back to.
+    if (isMonitorPath(path)) {
       return false;
     }
+    // A shortcut set anywhere replaces paw2's default for that action; the commands map has none.
+    if (isBindingPath(path)) {
+      if (path.size() == 3 && path[2] == "commands") {
+        return false;
+      }
+      const auto value = writer.get("bindings." + dottedPaw2Path(path, 2));
+      return value.has_value() && !value->is_null();
+    }
     return writer.owns(dottedPaw2Path(path));
+  }
+
+  std::span<const Paw2BindingAction> paw2BindingActions() { return kBindingActions; }
+
+  std::string joinCommandLine(const std::vector<std::string>& argv) {
+    std::string line;
+    for (const auto& arg : argv) {
+      if (!line.empty()) {
+        line.push_back(' ');
+      }
+      const bool plain = !arg.empty() && arg.find_first_of(" \t\"'\\") == std::string::npos;
+      if (plain) {
+        line += arg;
+        continue;
+      }
+      line.push_back('"');
+      for (const char ch : arg) {
+        if (ch == '"' || ch == '\\') {
+          line.push_back('\\');
+        }
+        line.push_back(ch);
+      }
+      line.push_back('"');
+    }
+    return line;
+  }
+
+  std::vector<std::string> splitCommandLine(std::string_view line) {
+    std::vector<std::string> argv;
+    std::string current;
+    bool inArgument = false;
+    char quote = 0;
+    for (std::size_t i = 0; i < line.size(); ++i) {
+      const char ch = line[i];
+      if (ch == '\\' && i + 1 < line.size() && quote != '\'') {
+        current.push_back(line[++i]);
+        inArgument = true;
+      } else if (quote != 0) {
+        if (ch == quote) {
+          quote = 0;
+        } else {
+          current.push_back(ch);
+        }
+      } else if (ch == '"' || ch == '\'') {
+        quote = ch;
+        inArgument = true;
+      } else if (ch == ' ' || ch == '\t') {
+        if (inArgument) {
+          argv.push_back(std::exchange(current, {}));
+          inArgument = false;
+        }
+      } else {
+        current.push_back(ch);
+        inArgument = true;
+      }
+    }
+    if (inArgument) {
+      argv.push_back(std::move(current));
+    }
+    return argv;
   }
 
   std::vector<std::string> installedDesktopThemes(DesktopThemeKind kind) {

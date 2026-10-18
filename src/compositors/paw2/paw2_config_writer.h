@@ -67,6 +67,11 @@ namespace compositors::paw2 {
     // Write now instead of after the debounce (e.g. when Settings closes).
     void flush();
 
+    // Whether keybinds.toml exists, and so owns [bindings] instead of config.toml.
+    [[nodiscard]] bool ownsBindings() const;
+    // Delete keybinds.toml, handing [bindings] back to config.toml.
+    void releaseBindings();
+
     std::size_t addListener(Listener listener);
     void removeListener(std::size_t token);
 

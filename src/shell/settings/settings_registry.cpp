@@ -1,5 +1,6 @@
 #include "shell/settings/settings_registry.h"
 
+#include "compositors/paw2/paw2_config_writer.h"
 #include "config/config_types.h"
 #include "config/schema/config_schema.h"
 #include "config/schema/ranges.h"
@@ -536,6 +537,93 @@ namespace settings {
           SelectOption{.value = select.selectedValue, .label = paw2ModeLabel(width, height, wanted)}
       );
       return select;
+    }
+
+    // "Super+h Super+Left" -> {"Super+h", "Super+Left"}
+    [[nodiscard]] std::vector<std::string> paw2Chords(std::string_view chords) {
+      std::vector<std::string> list;
+      for (const auto chord : StringUtils::split(chords, ' ')) {
+        if (!chord.empty()) {
+          list.emplace_back(chord);
+        }
+      }
+      return list;
+    }
+
+    void appendPaw2ShortcutEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
+      constexpr auto section = SettingsSection::Paw2Shortcuts;
+      const std::string text = "settings.schema.paw2.bindings";
+
+      // Where the shortcuts live, since editing one here moves all of them out of config.toml.
+      if (env.paw2OwnsShortcuts) {
+        entries.push_back(makeEntry(
+            section, "paw2-keys-file", i18n::tr(text + ".file.owned.label"), i18n::tr(text + ".file.owned.description"),
+            {},
+            ButtonSetting{
+                .label = i18n::tr(text + ".file.owned.release"),
+                .action = env.paw2ReleaseShortcuts,
+                .glyph = "arrow-back-up",
+                .variant = ButtonVariant::Destructive,
+            },
+            "paw2 shortcuts keybinds config.toml keybinds.toml"
+        ));
+      } else {
+        entries.push_back(makeEntry(
+            section, "paw2-keys-file", i18n::tr(text + ".file.config.label"),
+            i18n::tr(text + ".file.config.description"), {},
+            ButtonSetting{
+                .label = i18n::tr("settings.schema.paw2.unavailable.open-folder"),
+                .action =
+                    [dir = env.paw2ConfigDir]() { (void)process::runAsync(std::vector<std::string>{"xdg-open", dir}); },
+                .glyph = "folder",
+            },
+            "paw2 shortcuts keybinds config.toml keybinds.toml"
+        ));
+      }
+
+      StringMapSetting commands{
+          .entries = {},
+          .suggestedKeys = {},
+          .keyPlaceholder = "Super+Return",
+          .valuePlaceholder = "kitty --single-instance",
+      };
+      if (const auto map = env.paw2Value("bindings.commands"); map.has_value() && map->is_object()) {
+        for (const auto& [trigger, argv] : map->items()) {
+          if (argv.is_array()) {
+            commands.entries.emplace(trigger, joinCommandLine(argv.get<std::vector<std::string>>()));
+          }
+        }
+      }
+      entries.push_back(makeEntry(
+          section, "paw2-keys-commands", i18n::tr(text + ".commands.label"), i18n::tr(text + ".commands.description"),
+          {"paw2", "bindings", "commands"}, std::move(commands), "paw2 shortcuts keybinds launch run command app"
+      ));
+
+      for (const auto& action : paw2BindingActions()) {
+        std::vector<std::string> path{"paw2", "bindings"};
+        for (auto& part : compositors::paw2::splitPath(action.key)) {
+          path.push_back(std::move(part));
+        }
+        std::string key(action.key);
+        std::ranges::replace(key, '.', '-');
+        key = text + ".actions." + i18n::keySegment(key);
+
+        // Unset, paw2 uses its default keys for the action.
+        std::vector<std::string> keys;
+        if (const auto value = env.paw2Value("bindings." + std::string(action.key));
+            value.has_value() && value->is_array()) {
+          keys = value->get<std::vector<std::string>>();
+        } else {
+          keys = paw2Chords(action.defaults);
+        }
+        const std::string defaults = action.defaults.empty()
+            ? i18n::tr(text + ".no-default")
+            : i18n::tr(text + ".default", "keys", StringUtils::join(paw2Chords(action.defaults), ", "));
+        entries.push_back(makeEntry(
+            section, std::string(action.group), i18n::tr(key), defaults, std::move(path),
+            ListSetting{.items = std::move(keys)}, "paw2 shortcuts keybinds " + std::string(action.key)
+        ));
+      }
     }
 
     void appendPaw2DisplayEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
@@ -4547,6 +4635,7 @@ namespace settings {
     if (env.paw2Value) {
       appendPaw2CompositorEntries(entries, cfg, env);
       appendPaw2DisplayEntries(entries, env);
+      appendPaw2ShortcutEntries(entries, env);
     } else {
       appendPaw2Unavailable(entries, env);
     }

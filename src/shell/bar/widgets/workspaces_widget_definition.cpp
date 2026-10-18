@@ -13,7 +13,7 @@ namespace {
     settings::WidgetSettingVisibility visibility;
     visibility.all = {
         {"show_labels", {"true"}},
-        {"style", {"regular", "minimal"}},
+        {"style", {"regular", "minimal", "underline"}},
     };
     return visibility;
   }
@@ -21,6 +21,12 @@ namespace {
   settings::WidgetSettingVisibility regularStyleOnly() {
     settings::WidgetSettingVisibility visibility;
     visibility.all = {{"style", {"regular"}}};
+    return visibility;
+  }
+
+  settings::WidgetSettingVisibility underlineStyleOnly() {
+    settings::WidgetSettingVisibility visibility;
+    visibility.all = {{"style", {"underline"}}};
     return visibility;
   }
 
@@ -108,6 +114,14 @@ const noctalia::bar::WidgetDefinition<WorkspacesWidget::Options>& workspacesWidg
                           .visibleWhen = labelsShown(),
                       },
               }),
+              field<&Options::labelOverrides>({
+                  .key = "label_overrides",
+                  .presentation =
+                      settings::WidgetSettingPresentation{
+                          .descriptionKey = "settings.widgets.settings.label-overrides.workspaces-description",
+                          .group = "workspaces.list",
+                      },
+              }),
               field<&Options::showIcons>({
                   .key = "show_icons",
                   .presentation =
@@ -123,12 +137,17 @@ const noctalia::bar::WidgetDefinition<WorkspacesWidget::Options>& workspacesWidg
                           {
                               .value = WorkspacesStyle::Regular,
                               .configValue = "regular",
-                              .labelKey = "settings.widgets.options.regular",
+                              .labelKey = "settings.widgets.options.pills",
                           },
                           {
                               .value = WorkspacesStyle::Minimal,
                               .configValue = "minimal",
                               .labelKey = "settings.widgets.options.minimal",
+                          },
+                          {
+                              .value = WorkspacesStyle::Underline,
+                              .configValue = "underline",
+                              .labelKey = "settings.widgets.options.style-underline",
                           },
                           {
                               .value = WorkspacesStyle::FocusHint,
@@ -141,6 +160,17 @@ const noctalia::bar::WidgetDefinition<WorkspacesWidget::Options>& workspacesWidg
                           .descriptionKey = "settings.widgets.settings.style.workspaces-description",
                           .group = "workspaces.pills",
                           .segmented = true,
+                      },
+              }),
+              field<&Options::underlineWidth>({
+                  .key = "underline_width",
+                  .minValue = 0.0,
+                  .maxValue = 8.0,
+                  .step = 0.5,
+                  .presentation =
+                      settings::WidgetSettingPresentation{
+                          .group = "workspaces.pills",
+                          .visibleWhen = underlineStyleOnly(),
                       },
               }),
               field<&Options::pillScale>({

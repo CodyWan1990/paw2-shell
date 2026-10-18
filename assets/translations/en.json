@@ -4201,6 +4201,8 @@
         "temp": "Temperature"
       },
       "map-placeholders": {
+        "workspace": "Workspace (number or name)",
+        "workspace-label": "Show as",
         "effects-profile-name": "Profile name",
         "glyph-name": "Glyph name",
         "key": "Key",
@@ -4209,6 +4211,7 @@
         "value": "Value"
       },
       "options": {
+        "pills": "Pills",
         "after": "After",
         "always": "Always",
         "auto": "Auto",
@@ -4274,6 +4277,10 @@
         "workspace-label-inside": "Inside Pill"
       },
       "settings": {
+        "label-overrides": {
+          "label": "Workspace Names",
+          "workspaces-description": "Show your own text or icon for a workspace: the key is its number or name, the value is what the bar shows instead"
+        },
         "actions": {
           "description": "What each mouse gesture does on this widget; pick a command, run a shell command, or disable it",
           "label": "Gesture Actions"

@@ -1708,17 +1708,26 @@ namespace settings {
           } else if (const auto* defaults = std::get_if<WidgetSettingStringMap>(&spec.schema.defaultValue)) {
             entries = *defaults;
           }
+          const bool workspaceNames = spec.schema.key == "label_overrides";
+          std::vector<std::string> suggestedKeys;
+          if (workspaceNames) {
+            for (int workspace = 1; workspace <= 9; ++workspace) {
+              suggestedKeys.push_back(std::to_string(workspace));
+            }
+          }
           ctx.makeStringMapBlock(
               *panel, entry,
               StringMapSetting{
                   .entries = std::move(entries),
-                  .suggestedKeys = {},
+                  .suggestedKeys = std::move(suggestedKeys),
                   .keyPlaceholder = i18n::tr(
                       effectsProfileGlyphs ? "settings.widgets.map-placeholders.effects-profile-name"
+                          : workspaceNames ? "settings.widgets.map-placeholders.workspace"
                                            : "settings.widgets.map-placeholders.key"
                   ),
                   .valuePlaceholder = i18n::tr(
                       effectsProfileGlyphs ? "settings.widgets.map-placeholders.glyph-name"
+                          : workspaceNames ? "settings.widgets.map-placeholders.workspace-label"
                                            : "settings.widgets.map-placeholders.value"
                   ),
               }

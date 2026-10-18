@@ -22,9 +22,10 @@ class Label;
 class WorkspacesWidgetTestAccess;
 
 enum class WorkspacesStyle : std::uint8_t {
-  Regular,
+  Regular, // "Pills" in the settings
   Minimal,
   FocusHint,
+  Underline, // Minimal, plus a line under the focused workspace
 };
 
 enum class WorkspacesLabelSource : std::uint8_t {
@@ -52,6 +53,9 @@ public:
     float activePillSize = 2.2F;
     float inactivePillSize = 1.0F;
     bool focusedOutputOnly = false;
+    float underlineWidth = 2.0F;
+    // Workspace number or name -> what to show for it on the bar.
+    std::unordered_map<std::string, std::string> labelOverrides;
   };
 
   WorkspacesWidget(CompositorPlatform& platform, ConfigService& config, wl_output* output, Options options);
@@ -84,6 +88,9 @@ private:
 
   [[nodiscard]] static std::optional<std::size_t> numericWorkspaceId(const Workspace& workspace);
   [[nodiscard]] std::string workspaceLabel(const Workspace& workspace, std::size_t displayIndex) const;
+  // The user's label for `workspace`, looked up by number, then name, then id.
+  [[nodiscard]] static std::optional<std::string>
+  labelOverrideFor(const Workspace& workspace, const std::unordered_map<std::string, std::string>& overrides);
   // The workspace name, unless the pill already shows it in full. Empty means no tooltip.
   [[nodiscard]] static std::string
   workspaceTooltipText(const Workspace& workspace, const std::string& label, bool showLabel);
@@ -98,6 +105,9 @@ private:
   void syncActiveWindowIcon(Renderer& renderer, Item& item);
   [[nodiscard]] bool shouldShowWorkspaceLabel(const Workspace& workspace, std::string_view label) const noexcept;
   [[nodiscard]] bool isMinimal() const noexcept { return m_style == WorkspacesStyle::Minimal; }
+  [[nodiscard]] bool isUnderline() const noexcept { return m_style == WorkspacesStyle::Underline; }
+  // Styles that draw labels without pill backgrounds, and so share Minimal's sizing and colours.
+  [[nodiscard]] bool isTextStyle() const noexcept { return isMinimal() || isUnderline(); }
   [[nodiscard]] bool isFocusHint() const noexcept { return m_style == WorkspacesStyle::FocusHint; }
   // FocusHint is the only style that draws the focused app icon.
   [[nodiscard]] bool showsActiveIcon() const noexcept { return isFocusHint() && m_showIcons; }
@@ -179,6 +189,8 @@ private:
   float m_inactivePillSize = 1.0F;
   WorkspacesStyle m_style = WorkspacesStyle::Regular;
   bool m_focusedOutputOnly = false;
+  float m_underlineWidth = 2.0F;
+  std::unordered_map<std::string, std::string> m_labelOverrides;
   bool m_changeColorOnHover = true;
   wl_output* m_lastFocusedOutput = nullptr;
   std::string m_cachedActiveWindowAppId;

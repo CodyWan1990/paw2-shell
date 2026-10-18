@@ -77,7 +77,8 @@ WorkspacesWidget::WorkspacesWidget(
       m_hideWhenEmpty(options.hideWhenEmpty), m_showAllOutputs(options.showAllOutputs), m_pillScale(options.pillScale),
       m_activePillSize(std::clamp(options.activePillSize, 0.25F, 8.0F)),
       m_inactivePillSize(std::clamp(options.inactivePillSize, 0.25F, 8.0F)), m_style(options.style),
-      m_focusedOutputOnly(options.focusedOutputOnly), m_changeColorOnHover(options.changeColorOnHover),
+      m_focusedOutputOnly(options.focusedOutputOnly), m_underlineWidth(options.underlineWidth),
+      m_labelOverrides(std::move(options.labelOverrides)), m_changeColorOnHover(options.changeColorOnHover),
       m_focusedColor(options.focusedColor), m_occupiedColor(options.occupiedColor), m_emptyColor(options.emptyColor),
       m_urgentColor(options.urgentColor) {
   buildDesktopIconIndex();
@@ -337,7 +338,7 @@ void WorkspacesWidget::doUpdate(Renderer& renderer) {
 
 void WorkspacesWidget::rebuild(Renderer& renderer) {
   uiAssertNotRendering("WorkspacesWidget::rebuild");
-  const bool animateFromSnapshot = !isMinimal() && !m_rebuildSnapshot.empty();
+  const bool animateFromSnapshot = !isTextStyle() && !m_rebuildSnapshot.empty();
   cancelAnimation();
   if (m_animations != nullptr) {
     m_animations->cancelForOwner(&m_hoverProgress);
@@ -445,7 +446,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
   }
 
   const float gap = kWorkspaceGap * m_contentScale;
-  const float labelFontSize = workspaceLabelFontSize(isMinimal()) * fontScale();
+  const float labelFontSize = workspaceLabelFontSize(isTextStyle()) * fontScale();
   const float pillHeight = std::round(kWorkspacePillDefaultHeight * m_contentScale * m_pillScale);
   // Active and inactive labels share the configured weight: a heavier weight selects a different
   // face whose digits sit at a different height.
@@ -475,7 +476,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
   }
 
   const float baseSize = std::round(pillHeight);
-  const float padding = isMinimal() ? (Style::spaceXs * m_contentScale) : (baseSize * 0.6F);
+  const float padding = isTextStyle() ? (Style::spaceXs * m_contentScale) : (baseSize * 0.6F);
   float maxLabelHeight = labelFontSize;
 
   for (std::size_t i = 0; i < entries.size(); ++i) {
@@ -488,7 +489,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
       continue;
     }
 
-    if (isMinimal()) {
+    if (isTextStyle()) {
       const float minWidth = baseSize;
       if (!entry.showLabel) {
         slot.inactiveWidth = minWidth;
@@ -535,7 +536,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
   }
 
   m_gap = gap;
-  m_indicatorHeight = isMinimal() ? std::round(maxLabelHeight + padding) : pillHeight;
+  m_indicatorHeight = isTextStyle() ? std::round(maxLabelHeight + padding) : pillHeight;
 
   for (std::size_t i = 0; i < entries.size(); ++i) {
     const auto& entry = entries[i];
@@ -569,7 +570,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
     }
 
     // Minimal draws labels and nothing else; an unlabeled entry keeps its layout
-    // slot as empty space.
+    // slot as empty space. Underline keeps the indicator as its focus line.
     if (!isMinimal()) {
       const float indicatorW = m_isVertical ? m_indicatorHeight : w;
       const float indicatorH = m_isVertical ? w : m_indicatorHeight;
@@ -731,7 +732,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
   }
 
   // Only minimal style draws the translucent per-item hover overlay.
-  if (m_changeColorOnHover && isMinimal() && barCapsuleSpec().hoverHighlight) {
+  if (m_changeColorOnHover && isTextStyle() && barCapsuleSpec().hoverHighlight) {
     ColorSpec hoverFill = widgetForegroundOr(colorSpecFromRole(ColorRole::OnSurface));
     hoverFill.alpha = 0.0F;
     m_hoverOverlay = static_cast<Box*>(m_container->addChild(
@@ -824,7 +825,7 @@ void WorkspacesWidget::ensureItemLabel(Renderer& renderer, Item& item, const Wor
     return;
   }
 
-  const float labelFontSize = workspaceLabelFontSize(isMinimal()) * fontScale();
+  const float labelFontSize = workspaceLabelFontSize(isTextStyle()) * fontScale();
   item.text = static_cast<Label*>(item.area->addChild(
       ui::label({
           .text = item.label,
@@ -842,10 +843,10 @@ void WorkspacesWidget::recalculateItemMetrics(
     Renderer& renderer, Item& item, const Workspace& workspace, std::size_t displayIndex
 ) {
   const std::string label = workspaceLabel(workspace, displayIndex);
-  const float labelFontSize = workspaceLabelFontSize(isMinimal()) * fontScale();
+  const float labelFontSize = workspaceLabelFontSize(isTextStyle()) * fontScale();
   const float pillHeight = std::round(kWorkspacePillDefaultHeight * m_contentScale * m_pillScale);
   const float baseSize = std::round(pillHeight);
-  const float padding = isMinimal() ? (Style::spaceXs * m_contentScale) : (baseSize * 0.6F);
+  const float padding = isTextStyle() ? (Style::spaceXs * m_contentScale) : (baseSize * 0.6F);
   const FontWeight configuredFontWeight = labelFontWeight();
 
   item.label = label;
@@ -870,7 +871,7 @@ void WorkspacesWidget::recalculateItemMetrics(
     textHeight = tm.bottom - tm.top;
   }
 
-  if (isMinimal()) {
+  if (isTextStyle()) {
     const float minWidth = baseSize;
     if (!item.showLabel) {
       item.inactiveWidth = minWidth;
@@ -964,7 +965,7 @@ void WorkspacesWidget::retarget(Renderer& renderer) {
     applyItemVisualStyle(item);
   }
 
-  if (isMinimal()) {
+  if (isTextStyle()) {
     computeTargets();
     for (auto& it : m_items) {
       it.currentX = it.targetX;
@@ -1061,7 +1062,7 @@ void WorkspacesWidget::finishAnimation() {
 
 void WorkspacesWidget::snapshotItemsForRebuild() {
   m_rebuildSnapshot.clear();
-  if (isMinimal() || m_items.empty()) {
+  if (isTextStyle() || m_items.empty()) {
     return;
   }
 
@@ -1116,7 +1117,20 @@ void WorkspacesWidget::applyItemLayout(Item& it) {
 
   it.area->setPosition(m_isVertical ? 0.0F : position, m_isVertical ? position : 0.0F);
   it.area->setFrameSize(itemW, itemH);
-  if (it.indicator != nullptr) {
+  if (it.indicator != nullptr && isUnderline()) {
+    // Only the focused workspace is underlined: a strip along the bottom edge on a horizontal
+    // bar, along the right edge on a vertical one.
+    const float thickness = std::min(m_underlineWidth * m_contentScale, m_isVertical ? itemW : itemH);
+    it.indicator->setVisible(it.workspace.active && thickness > 0.0F);
+    if (m_isVertical) {
+      it.indicator->setPosition(itemW - thickness, 0.0F);
+      it.indicator->setFrameSize(thickness, itemH);
+    } else {
+      it.indicator->setPosition(0.0F, itemH - thickness);
+      it.indicator->setFrameSize(itemW, thickness);
+    }
+    it.indicator->setRadius(thickness * 0.5F);
+  } else if (it.indicator != nullptr) {
     if (isFocusHint() && !it.workspace.active) {
       const float dotSize = focusedPillDotSize();
       const float dotX = (itemW - dotSize) * 0.5F;
@@ -1212,11 +1226,11 @@ void WorkspacesWidget::updateHoverOverlay() {
 
   for (auto& item : m_items) {
     if (&item == &hoveredItem) {
-      if (item.indicator != nullptr) {
+      if (item.indicator != nullptr && !isUnderline()) {
         item.indicator->setFill(colorSpecFromRole(ColorRole::Hover));
       }
       if (item.text != nullptr) {
-        item.text->setColor(colorSpecFromRole(isMinimal() ? ColorRole::Hover : ColorRole::OnHover));
+        item.text->setColor(colorSpecFromRole(isTextStyle() ? ColorRole::Hover : ColorRole::OnHover));
       }
     } else {
       applyItemVisualStyle(item);
@@ -1411,7 +1425,31 @@ void WorkspacesWidget::syncActiveWindowIcon(Renderer& renderer, Item& item) {
   }
 }
 
+std::optional<std::string> WorkspacesWidget::labelOverrideFor(
+    const Workspace& workspace, const std::unordered_map<std::string, std::string>& overrides
+) {
+  if (overrides.empty()) {
+    return std::nullopt;
+  }
+  for (const std::string& key :
+       {workspace.index > 0 ? std::to_string(workspace.index) : std::string{}, workspace.name, workspace.id}) {
+    if (key.empty()) {
+      continue;
+    }
+    if (const auto it = overrides.find(key); it != overrides.end() && !it->second.empty()) {
+      return it->second;
+    }
+  }
+  return std::nullopt;
+}
+
 std::string WorkspacesWidget::workspaceLabel(const Workspace& workspace, std::size_t displayIndex) const {
+  // A user override wins and is shown exactly as typed: max_label_chars (default 1) exists to
+  // shorten names, not characters the user chose.
+  if (auto label = labelOverrideFor(workspace, m_labelOverrides)) {
+    return *std::move(label);
+  }
+
   std::string label;
   if (m_labelSource == WorkspacesLabelSource::Id) {
     if (workspace.index > 0) {
@@ -1508,9 +1546,9 @@ ColorSpec WorkspacesWidget::workspaceFillColor(const Workspace& workspace, wl_ou
 
 ColorSpec WorkspacesWidget::workspaceTextColor(const Workspace& workspace, wl_output* output) const {
   if (workspace.urgent) {
-    return isMinimal() ? m_urgentColor : readableColorForFill(m_urgentColor);
+    return isTextStyle() ? m_urgentColor : readableColorForFill(m_urgentColor);
   }
-  if (!isMinimal()) {
+  if (!isTextStyle()) {
     return readableColorForFill(workspaceFillColor(workspace, output));
   }
   if (workspace.active) {

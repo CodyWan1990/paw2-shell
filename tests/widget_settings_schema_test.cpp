@@ -125,6 +125,21 @@ int main() {
     const auto specs = settings::widgetSettingSpecs("workspaces", nullptr, "sans-serif", false);
     const auto styles = std::ranges::count_if(specs, [](const auto& spec) { return spec.schema.key == "style"; });
     ok = expect(styles == 1, "workspaces has exactly one style setting") && ok;
+    const auto style = std::ranges::find_if(specs, [](const auto& spec) { return spec.schema.key == "style"; });
+    std::vector<std::string> values;
+    if (style != specs.end()) {
+      for (const auto& option : style->options) {
+        values.push_back(option.value);
+      }
+    }
+    ok = expect(
+             values == std::vector<std::string>{"regular", "minimal", "underline", "focus_hint"},
+             "workspaces styles: pills (regular), minimal, underline, focus hint"
+         )
+        && ok;
+    const auto overrides =
+        std::ranges::find_if(specs, [](const auto& spec) { return spec.schema.key == "label_overrides"; });
+    ok = expect(overrides != specs.end() && !overrides->advanced, "workspace names are a basic setting") && ok;
   }
 
   std::filesystem::remove_all(root);

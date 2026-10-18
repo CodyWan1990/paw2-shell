@@ -20,8 +20,10 @@ namespace noctalia::theme {
 
   Paw2ThemeSync::~Paw2ThemeSync() { m_platform.paw2Runtime().removeListener(m_runtimeListener); }
 
-  void Paw2ThemeSync::setColors(const Color& focusRing, const Color& shadow, const Color& backdrop) {
+  void
+  Paw2ThemeSync::setColors(const Color& focusRing, const Color& titlebar, const Color& shadow, const Color& backdrop) {
     m_focusRing = focusRing;
+    m_titlebar = titlebar;
     m_shadow = shadow;
     m_backdrop = backdrop;
     refresh();
@@ -30,6 +32,7 @@ namespace noctalia::theme {
   void Paw2ThemeSync::refresh() {
     if (!m_config.config().shell.paw2ThemeColors
         || !m_focusRing.has_value()
+        || !m_titlebar.has_value()
         || !m_shadow.has_value()
         || !m_backdrop.has_value()) {
       return;
@@ -38,6 +41,7 @@ namespace noctalia::theme {
     auto& writer = m_platform.paw2ConfigWriter();
     writer.set("appearance.focus_ring_color", formatRgbHex(*m_focusRing));
     writer.set("appearance.shadow_color", formatRgbHex(*m_shadow));
+    writer.set("appearance.titlebar_color", formatRgbHex(*m_titlebar));
     writer.set("overview.backdrop_color", formatRgbHex(*m_backdrop));
   }
 

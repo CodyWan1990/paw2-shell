@@ -729,7 +729,7 @@ void Application::initStyleThemeAndWayland() {
     m_settingsWindow.setResolvedPalette(generated, mode);
     const ::Palette palette =
         noctalia::theme::mapGeneratedPaletteMode(mode == "light" ? generated.light : generated.dark);
-    m_paw2ThemeSync.setColors(palette.primary, palette.shadow, palette.surface);
+    m_paw2ThemeSync.setColors(palette.primary, palette.surfaceVariant, palette.shadow, palette.surface);
     m_templateApplyService.apply(generated, mode, /*force=*/false, /*paletteChanged=*/colorsChanged);
     if (previousMode.has_value() && *previousMode != resolvedMode) {
       m_hookManager.fire(

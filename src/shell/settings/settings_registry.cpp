@@ -736,6 +736,32 @@ namespace settings {
               SliderSetting{paw2.number("appearance.corner_radius", 0), 0, 64, 1, true}, "rounded corners radius", true
           )
       );
+
+      // paw2 draws these for apps that let it; GTK apps keep their own header bars.
+      const bool titlebarsOn = paw2.boolean("appearance.titlebars", false);
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "windows", "appearance.titlebars", ToggleSetting{titlebarsOn},
+              "titlebar title bar decorations close button float server side"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "windows", "appearance.titlebar_height",
+              SliderSetting{paw2.number("appearance.titlebar_height", 24), 16, 48, 1, true}, "titlebar height size",
+              true
+          ),
+          titlebarsOn
+      );
+      SettingEntry titlebarColor = makePaw2Entry(
+          section, "windows", "appearance.titlebar_color",
+          TextSetting{.value = paw2.text("appearance.titlebar_color", "#1f1f24"), .placeholder = "#rrggbb"},
+          "titlebar colour color background"
+      );
+      titlebarColor.visibleWhen = paw2ThemeColorsOff();
+      pushPaw2Entry(entries, std::move(titlebarColor), titlebarsOn);
     }
 
     void appendPaw2ShadowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {

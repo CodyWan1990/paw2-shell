@@ -114,6 +114,14 @@ int main() {
       "Animations reads off while window animations are off"
   );
 
+  const auto* titlebars = findEntry(entries, {"paw2", "appearance", "titlebars"});
+  ok &= check(titlebars != nullptr && titlebars->group == "windows", "titlebars switch with the window rows");
+  const auto* titlebarHeight = findEntry(entries, {"paw2", "appearance", "titlebar_height"});
+  ok &= check(
+      titlebarHeight != nullptr && titlebarHeight->visibleWhen && !titlebarHeight->visibleWhen(cfg),
+      "titlebar height hidden while titlebars are off"
+  );
+
   const auto* gaps = findEntry(entries, {"paw2", "appearance", "gaps"});
   ok &= check(gaps != nullptr && std::get<settings::SliderSetting>(gaps->control).value == 15.0, "gaps from paw2");
   const auto* corners = findEntry(entries, {"paw2", "appearance", "corner_radius"});

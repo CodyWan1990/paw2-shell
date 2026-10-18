@@ -1949,7 +1949,7 @@
         },
         "theme-colors": {
           "label": "Follow shell colors",
-          "description": "Window focus ring, shadows and the overview backdrop take their colors from the palette, and follow it when it changes."
+          "description": "Window focus ring, titlebars, shadows and the overview backdrop take their colors from the palette, and follow it when it changes."
         },
         "config-error": "paw2 couldn't load its config, and is running on the last one that loaded: {errors}",
         "layout": {
@@ -1988,6 +1988,18 @@
           "focus-ring-color": {
             "label": "Focus ring color",
             "description": "As #rrggbb."
+          },
+          "titlebars": {
+            "label": "Titlebars",
+            "description": "paw2 draws a titlebar with float and close buttons on each window that lets it. Drag it to move the window, double-click it to float or tile. Apps with their own header bar, like GTK ones, keep theirs."
+          },
+          "titlebar-height": {
+            "label": "Titlebar height",
+            "description": "In logical pixels."
+          },
+          "titlebar-color": {
+            "label": "Titlebar color",
+            "description": "Unfocused titlebars, as #rrggbb. The focused one takes the focus ring color."
           },
           "corner-radius": {
             "label": "Window corner radius",

@@ -1188,8 +1188,19 @@ wp_fractional_scale_manager_v1* WaylandConnection::fractionalScaleManager() cons
 
 wp_viewporter* WaylandConnection::viewporter() const noexcept { return m_viewporter; }
 
-void WaylandConnection::onBackgroundEffectCapabilities(std::uint32_t capabilities) noexcept {
-  m_backgroundEffectBlurSupported = (capabilities & kExtBackgroundEffectBlurCapabilityMask) != 0U;
+void WaylandConnection::onBackgroundEffectCapabilities(std::uint32_t capabilities) {
+  const bool supported = (capabilities & kExtBackgroundEffectBlurCapabilityMask) != 0U;
+  if (supported == m_backgroundEffectBlurSupported) {
+    return;
+  }
+  m_backgroundEffectBlurSupported = supported;
+  if (m_backgroundEffectChangeCallback) {
+    m_backgroundEffectChangeCallback();
+  }
+}
+
+void WaylandConnection::setBackgroundEffectChangeCallback(ChangeCallback callback) {
+  m_backgroundEffectChangeCallback = std::move(callback);
 }
 
 void WaylandConnection::onOutputManagerHead(zwlr_output_head_v1* head) { m_outputHeads.try_emplace(head); }

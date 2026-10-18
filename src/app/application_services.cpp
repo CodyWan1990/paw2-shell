@@ -729,7 +729,7 @@ void Application::initStyleThemeAndWayland() {
     m_settingsWindow.setResolvedPalette(generated, mode);
     const ::Palette palette =
         noctalia::theme::mapGeneratedPaletteMode(mode == "light" ? generated.light : generated.dark);
-    m_paw2ThemeSync.setColors(palette.primary, palette.surface);
+    m_paw2ThemeSync.setColors(palette.primary, palette.shadow, palette.surface);
     m_templateApplyService.apply(generated, mode, /*force=*/false, /*paletteChanged=*/colorsChanged);
     if (previousMode.has_value() && *previousMode != resolvedMode) {
       m_hookManager.fire(
@@ -859,6 +859,17 @@ void Application::initWaylandCallbacks() {
     m_gammaService.onOutputsChanged();
     m_pluginServiceHost.onOutputChange();
     reconcileOutputSurfaces();
+  });
+  // paw2 offers background blur once its own blur is turned on: send the blur regions again, and
+  // show the per-surface blur switches in Settings.
+  m_wayland.setBackgroundEffectChangeCallback([this]() {
+    kLog.info("compositor background blur {}", m_wayland.hasBackgroundEffectBlur() ? "available" : "gone");
+    m_bar.reload();
+    m_dock.reload();
+    m_panelManager.requestLayout();
+    m_notificationToast.requestLayout();
+    m_desktopWidgetsController.requestLayout();
+    m_settingsWindow.onCompositorCapabilitiesChanged();
   });
   m_clipboardService.setChangeCallback([this]() {
     m_scriptApi.setClipboardText(m_clipboardService.clipboardText());

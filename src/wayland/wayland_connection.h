@@ -161,6 +161,9 @@ public:
   void setLockKeysChangeCallback(WaylandSeat::LockKeysChangeCallback callback);
   /// Fired when both `ext_idle_notifier_v1` and `wl_seat` are bound (including late registry globals).
   void setIdleCapabilitiesReadyCallback(ChangeCallback callback);
+  // When background-effect blur becomes available. paw2 offers it only while its own blur is on,
+  // so it can arrive at any time; surfaces then need their blur regions sent again.
+  void setBackgroundEffectChangeCallback(ChangeCallback callback);
   void setClipboardService(ClipboardService* clipboardService);
   void setTextInputService(TextInputService* textInputService);
   void setVirtualKeyboardService(VirtualKeyboardService* virtualKeyboardService);
@@ -274,7 +277,7 @@ public:
   handleGlobal(void* data, wl_registry* registry, std::uint32_t name, const char* interface, std::uint32_t version);
   static void handleGlobalRemove(void* data, wl_registry* registry, std::uint32_t name);
 
-  void onBackgroundEffectCapabilities(std::uint32_t capabilities) noexcept;
+  void onBackgroundEffectCapabilities(std::uint32_t capabilities);
   void notifyIdleCapabilitiesReady();
 
   // wlr-output-management-unstable-v1 entrypoints
@@ -346,6 +349,7 @@ private:
   std::vector<WaylandOutput> m_outputs;
   ChangeCallback m_outputChangeCallback;
   ChangeCallback m_idleCapabilitiesReadyCallback;
+  ChangeCallback m_backgroundEffectChangeCallback;
   std::function<void(wl_output*)> m_outputAddedCallback;
   std::function<void(wl_output*)> m_outputRemovedCallback;
   std::function<void(ext_workspace_manager_v1*)> m_extWorkspaceManagerCallback;

@@ -571,6 +571,12 @@ void SettingsWindow::onPaw2Changed() {
   }
 }
 
+void SettingsWindow::onCompositorCapabilitiesChanged() {
+  if (isOpen()) {
+    requestContentRebuild(true, true, false);
+  }
+}
+
 void SettingsWindow::close() {
   if (!isOpen()) {
     return;

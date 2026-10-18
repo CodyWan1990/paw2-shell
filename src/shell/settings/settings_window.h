@@ -92,6 +92,8 @@ public:
   void closeForWidgetEditor();
   // Reopens the section saved by closeForWidgetEditor(), if any.
   void reopenAfterWidgetEditor();
+  // Rows that depend on what the compositor offers (e.g. blur switches) may have come or gone.
+  void onCompositorCapabilitiesChanged();
   [[nodiscard]] bool isOpen() const noexcept { return m_surface != nullptr && m_surface->isRunning(); }
   [[nodiscard]] wl_surface* wlSurface() const noexcept {
     return m_surface != nullptr ? m_surface->wlSurface() : nullptr;
@@ -148,6 +150,10 @@ public:
   void warnOnUnusableCustomSchedule(const std::vector<std::string>& path);
   void writePaw2Settings(std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides);
   void resetPaw2Settings(std::vector<std::vector<std::string>> paths);
+  [[nodiscard]] bool
+  applyPaw2Overrides(const std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>>& overrides);
+  void applyPaw2Resets(const std::vector<std::vector<std::string>>& paths);
+  void applyLinkedPaw2Settings(const std::vector<std::string>& path, const ConfigOverrideValue* value);
   void onPaw2Changed();
   [[nodiscard]] std::string paw2Notice() const;
   void showTransientStatus(std::string message, bool isError = false);

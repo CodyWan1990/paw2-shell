@@ -241,6 +241,33 @@ int main() {
         !settings::paw2SettingOverridden(writer, {"paw2", "bindings", "close_window"}), "reset to paw2's default"
     );
   }
+  // One control for both: shell settings carry over to paw2's matching ones.
+  {
+    compositors::paw2::Paw2Runtime runtime;
+    compositors::paw2::Paw2ConfigWriter writer(runtime, configDir);
+    using Edits = std::vector<std::pair<std::string, nlohmann::json>>;
+    const auto linked = [&writer](std::vector<std::string> path, std::optional<ConfigOverrideValue> value) {
+      return settings::linkedPaw2Edits(writer, path, value ? &*value : nullptr);
+    };
+    ok &= check(linked({"shell", "animation", "enabled"}, true) == Edits{{"animations.enabled", true}}, "animations");
+    ok &= check(linked({"shell", "animation", "speed"}, 2.0) == Edits{{"animations.slowdown", 0.5}}, "speed");
+    writer.set("theme.font", "Noto Sans 12");
+    ok &= check(
+        linked({"shell", "font_family"}, std::string("Inter")) == Edits{{"theme.font", "Inter 12"}},
+        "font keeps paw2's size"
+    );
+    ok &= check(
+        linked({"shell", "shadow", "direction"}, std::string("down_left"))
+            == Edits{{"appearance.shadow_offset_x", -4}, {"appearance.shadow_offset_y", 4}},
+        "shadow direction"
+    );
+    ok &= check(
+        linked({"shell", "shadow", "alpha"}, 0.3) == Edits{{"appearance.shadow_opacity", 0.3}}, "shadow strength"
+    );
+    ok &= check(linked({"shell", "corner_radius_scale"}, 1.0) == Edits{{"appearance.corner_radius", 9}}, "corners");
+    ok &= check(linked({"shell", "font_family"}, std::nullopt) == Edits{{"theme.font", nullptr}}, "reset unsets");
+    ok &= check(linked({"shell", "lang"}, std::string("de")).empty(), "unlinked settings stay the shell's");
+  }
   std::filesystem::remove_all(configDir);
 
   return ok ? 0 : 1;

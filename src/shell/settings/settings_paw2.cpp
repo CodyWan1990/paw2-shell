@@ -1,8 +1,11 @@
 #include "shell/settings/settings_paw2.h"
 
 #include "compositors/paw2/paw2_config_writer.h"
+#include "ui/style.h"
 
 #include <algorithm>
+#include <cctype>
+#include <cmath>
 #include <cstdio>
 #include <cstdlib>
 #include <filesystem>
@@ -298,6 +301,112 @@ namespace settings {
       return value.has_value() && !value->is_null();
     }
     return writer.owns(dottedPaw2Path(path));
+  }
+
+  std::vector<std::pair<std::string, nlohmann::json>> linkedPaw2Edits(
+      const compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& shellPath,
+      const ConfigOverrideValue* value
+  ) {
+    const auto number = [value]() -> std::optional<double> {
+      if (const auto* d = std::get_if<double>(value)) {
+        return *d;
+      }
+      if (const auto* i = std::get_if<std::int64_t>(value)) {
+        return static_cast<double>(*i);
+      }
+      return std::nullopt;
+    };
+    const auto text = [value]() -> std::optional<std::string> {
+      if (const auto* s = std::get_if<std::string>(value)) {
+        return *s;
+      }
+      return std::nullopt;
+    };
+    const auto& path = shellPath;
+    std::vector<std::pair<std::string, nlohmann::json>> edits;
+    const auto reset = [&edits](std::initializer_list<std::string_view> keys) {
+      for (const auto key : keys) {
+        edits.emplace_back(key, nullptr);
+      }
+      return edits;
+    };
+
+    if (path == std::vector<std::string>{"shell", "animation", "enabled"}) {
+      if (value == nullptr) {
+        return reset({"animations.enabled"});
+      }
+      if (const auto* on = std::get_if<bool>(value)) {
+        edits.emplace_back("animations.enabled", *on);
+      }
+    } else if (path == std::vector<std::string>{"shell", "animation", "speed"}) {
+      // The shell divides durations by its speed; paw2 multiplies them by its slowdown.
+      if (value == nullptr) {
+        return reset({"animations.slowdown"});
+      }
+      if (const auto speed = number(); speed && *speed > 0.0) {
+        edits.emplace_back("animations.slowdown", std::clamp(1.0 / *speed, 0.1, 100.0));
+      }
+    } else if (path == std::vector<std::string>{"shell", "font_family"}) {
+      // paw2 takes family and size in one string; the family changes, the size stays.
+      const auto family = value != nullptr ? text() : std::nullopt;
+      if (!family || family->empty()) {
+        return reset({"theme.font"});
+      }
+      std::string size = "11";
+      if (const auto current = writer.get("theme.font"); current && current->is_string()) {
+        const std::string font = current->get<std::string>();
+        const auto space = font.find_last_of(' ');
+        const std::string last = space == std::string::npos ? std::string{} : font.substr(space + 1);
+        if (!last.empty() && std::ranges::all_of(last, [](char ch) {
+              return std::isdigit(static_cast<unsigned char>(ch)) || ch == '.';
+            })) {
+          size = last;
+        }
+      }
+      edits.emplace_back("theme.font", *family + " " + size);
+    } else if (path == std::vector<std::string>{"shell", "shadow", "alpha"}) {
+      if (value == nullptr) {
+        return reset({"appearance.shadow_opacity"});
+      }
+      if (const auto alpha = number()) {
+        edits.emplace_back("appearance.shadow_opacity", std::clamp(*alpha, 0.0, 1.0));
+      }
+    } else if (path == std::vector<std::string>{"shell", "shadow", "direction"}) {
+      if (value == nullptr) {
+        return reset({"appearance.shadow_offset_x", "appearance.shadow_offset_y"});
+      }
+      if (const auto direction = text()) {
+        // "down_left" casts the shadow down and to the left, by paw2's default 4 px.
+        constexpr int kOffset = 4;
+        const auto has = [&direction](std::string_view word) { return direction->find(word) != std::string::npos; };
+        edits.emplace_back("appearance.shadow_offset_x", has("left") ? -kOffset : has("right") ? kOffset : 0);
+        edits.emplace_back("appearance.shadow_offset_y", has("up") ? -kOffset : has("down") ? kOffset : 0);
+      }
+    } else if (path == std::vector<std::string>{"shell", "corner_radius_scale"}) {
+      if (value == nullptr) {
+        return reset({"appearance.corner_radius"});
+      }
+      if (const auto scale = number()) {
+        // Windows round like the shell's large containers.
+        edits.emplace_back(
+            "appearance.corner_radius", std::clamp(static_cast<int>(std::lround(Style::radiusLg * *scale)), 0, 64)
+        );
+      }
+    }
+    return edits;
+  }
+
+  void applyLinkedPaw2Edits(
+      compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& shellPath,
+      const ConfigOverrideValue* value
+  ) {
+    for (auto& [path, json] : linkedPaw2Edits(writer, shellPath, value)) {
+      if (json.is_null()) {
+        writer.unset(path);
+      } else {
+        writer.set(std::move(path), std::move(json));
+      }
+    }
   }
 
   std::span<const Paw2BindingAction> paw2BindingActions() { return kBindingActions; }

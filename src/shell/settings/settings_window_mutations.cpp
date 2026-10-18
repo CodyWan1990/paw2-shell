@@ -136,6 +136,7 @@ void SettingsWindow::setSettingOverride(std::vector<std::string> path, ConfigOve
     const ConfigOverrideValue patchValue = value;
     const auto previousResetPaths = currentPageResetPaths();
     if (m_config->setOverride(path, std::move(value), &changed)) {
+      applyLinkedPaw2Settings(path, &patchValue);
       const bool registryPatched = changed && !needsSceneRebuild && tryPatchSettingsRegistryValue(path, patchValue);
       finishSettingsWrite(changed, needsSceneRebuild, previousResetPaths != currentPageResetPaths(), registryPatched);
       warnOnUnusableCustomSchedule(path);
@@ -156,8 +157,22 @@ void SettingsWindow::setSettingOverrides(
       markSettingsWriteSuccess(!m_statusMessage.empty());
       return;
     }
-    if (std::ranges::any_of(overrides, [](const auto& entry) { return settings::isPaw2SettingPath(entry.first); })) {
-      writePaw2Settings(std::move(overrides));
+    // The Appearance page mixes the shell's settings and paw2's; each goes its own way.
+    std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> paw2Overrides;
+    for (auto it = overrides.begin(); it != overrides.end();) {
+      if (settings::isPaw2SettingPath(it->first)) {
+        paw2Overrides.push_back(std::move(*it));
+        it = overrides.erase(it);
+      } else {
+        ++it;
+      }
+    }
+    if (overrides.empty()) {
+      writePaw2Settings(std::move(paw2Overrides));
+      return;
+    }
+    if (!applyPaw2Overrides(paw2Overrides)) {
+      markSettingsWriteError(i18n::tr("settings.schema.paw2.invalid-value"));
       return;
     }
     bool changed = false;
@@ -167,6 +182,9 @@ void SettingsWindow::setSettingOverrides(
     const auto patchOverrides = overrides;
     const auto previousResetPaths = currentPageResetPaths();
     if (m_config->setOverrides(std::move(overrides), &changed)) {
+      for (const auto& [path, value] : patchOverrides) {
+        applyLinkedPaw2Settings(path, &value);
+      }
       const bool registryPatched = changed && !needsSceneRebuild && tryPatchSettingsRegistryOverrides(patchOverrides);
       finishSettingsWrite(changed, needsSceneRebuild, previousResetPaths != currentPageResetPaths(), registryPatched);
       return;
@@ -191,6 +209,7 @@ void SettingsWindow::clearSettingOverride(std::vector<std::string> path) {
       markSettingsWriteError(i18n::tr("settings.errors.write"));
       return;
     }
+    applyLinkedPaw2Settings(path, nullptr);
 
     const std::vector<std::vector<std::string>> paths{path};
     const bool registryPatched = changed && !needsSceneRebuild && tryPatchSettingsRegistryResetValues(paths);
@@ -205,12 +224,21 @@ void SettingsWindow::clearSettingOverrides(std::vector<std::vector<std::string>>
     if (m_config == nullptr || paths.empty()) {
       return;
     }
-    // A page reset lists only that page's paths, so paw2's never mix with the shell's.
-    if (std::ranges::any_of(paths, [](const auto& path) { return settings::isPaw2SettingPath(path); })) {
+    // The Appearance page's reset covers the shell's settings and paw2's; each goes back its own way.
+    std::vector<std::vector<std::string>> paw2Paths;
+    std::erase_if(paths, [&paw2Paths](const auto& path) {
+      if (settings::isPaw2SettingPath(path)) {
+        paw2Paths.push_back(path);
+        return true;
+      }
+      return false;
+    });
+    if (paths.empty()) {
       m_pendingResetPageScope.clear();
-      resetPaw2Settings(std::move(paths));
+      resetPaw2Settings(std::move(paw2Paths));
       return;
     }
+    applyPaw2Resets(paw2Paths);
 
     bool changed = false;
     const bool needsSceneRebuild = settingPathsNeedSceneRebuild(paths);
@@ -220,6 +248,9 @@ void SettingsWindow::clearSettingOverrides(std::vector<std::vector<std::string>>
     if (!success) {
       markSettingsWriteError(i18n::tr("settings.errors.reset-page"));
       return;
+    }
+    for (const auto& path : paths) {
+      applyLinkedPaw2Settings(path, nullptr);
     }
 
     const bool registryPatched = changed && !needsSceneRebuild && tryPatchSettingsRegistryResetValues(paths);
@@ -234,17 +265,7 @@ void SettingsWindow::clearSettingOverrides(std::vector<std::vector<std::string>>
 void SettingsWindow::writePaw2Settings(
     std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides
 ) {
-  if (m_platform == nullptr) {
-    return;
-  }
-  auto& writer = m_platform->paw2ConfigWriter();
-  bool understood = true;
-  for (const auto& [path, value] : overrides) {
-    if (settings::isPaw2SettingPath(path)) {
-      understood = settings::applyPaw2Setting(writer, path, value) && understood;
-    }
-  }
-  if (!understood) {
+  if (!applyPaw2Overrides(overrides)) {
     markSettingsWriteError(i18n::tr("settings.schema.paw2.invalid-value"));
     return;
   }
@@ -252,16 +273,40 @@ void SettingsWindow::writePaw2Settings(
 }
 
 void SettingsWindow::resetPaw2Settings(std::vector<std::vector<std::string>> paths) {
+  applyPaw2Resets(paths);
+  finishSettingsWrite(true, false, true, false, true);
+}
+
+// False when one of the values made no sense in paw2's terms.
+bool SettingsWindow::applyPaw2Overrides(
+    const std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>>& overrides
+) {
+  if (m_platform == nullptr) {
+    return true;
+  }
+  auto& writer = m_platform->paw2ConfigWriter();
+  bool understood = true;
+  for (const auto& [path, value] : overrides) {
+    understood = settings::applyPaw2Setting(writer, path, value) && understood;
+  }
+  return understood;
+}
+
+void SettingsWindow::applyPaw2Resets(const std::vector<std::vector<std::string>>& paths) {
   if (m_platform == nullptr) {
     return;
   }
-  auto& writer = m_platform->paw2ConfigWriter();
   for (const auto& path : paths) {
-    if (settings::isPaw2SettingPath(path)) {
-      settings::resetPaw2Setting(writer, path);
-    }
+    settings::resetPaw2Setting(m_platform->paw2ConfigWriter(), path);
   }
-  finishSettingsWrite(true, false, true, false, true);
+}
+
+// Some shell settings set paw2's matching ones too (one Animations switch for both, and so on).
+// `value` is null when the shell setting was reset.
+void SettingsWindow::applyLinkedPaw2Settings(const std::vector<std::string>& path, const ConfigOverrideValue* value) {
+  if (m_platform != nullptr) {
+    settings::applyLinkedPaw2Edits(m_platform->paw2ConfigWriter(), path, value);
+  }
 }
 
 void SettingsWindow::resetBarLane(std::vector<std::string> lanePath) {

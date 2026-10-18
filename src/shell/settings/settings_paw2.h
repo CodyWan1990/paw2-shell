@@ -3,9 +3,11 @@
 #include "config/config_types.h"
 
 #include <cstdint>
+#include <nlohmann/json.hpp>
 #include <span>
 #include <string>
 #include <string_view>
+#include <utility>
 #include <vector>
 
 namespace compositors::paw2 {
@@ -34,6 +36,19 @@ namespace settings {
   // keys, resolution and refresh. A mode's value is "2560x1440@165.080"; "auto" is the preferred one.
   inline constexpr std::string_view kPaw2AutoMode = "auto";
   [[nodiscard]] std::string paw2ModeValue(std::int64_t width, std::int64_t height, double refresh);
+
+  // Shell settings that set paw2's matching ones too, so the Appearance page has one control per
+  // idea: Animations, animation speed, font, shadow strength and direction, corner roundness.
+  // Returns paw2's dotted paths and values for a shell edit (`value` null: the shell setting was
+  // reset, so the paw2 keys are unset too, shown as null), or nothing for an unlinked path.
+  [[nodiscard]] std::vector<std::pair<std::string, nlohmann::json>> linkedPaw2Edits(
+      const compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& shellPath,
+      const ConfigOverrideValue* value
+  );
+  void applyLinkedPaw2Edits(
+      compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& shellPath,
+      const ConfigOverrideValue* value
+  );
 
   // A compositor action the Shortcuts page binds, as paw2's DEFAULT_BINDINGS (src/config.rs) lists
   // it: its [bindings] key, the page group it sits in, and the keys paw2 uses when the key is

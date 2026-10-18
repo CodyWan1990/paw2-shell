@@ -679,17 +679,221 @@ namespace settings {
       }
     }
 
-    void
-    appendPaw2CompositorEntries(std::vector<SettingEntry>& entries, const Config& cfg, const RegistryEnvironment& env) {
-      constexpr auto section = SettingsSection::Paw2;
-      const Paw2Values paw2(env);
-      const auto add = [&entries](SettingEntry entry, bool visible = true) {
-        if (!visible) {
-          entry.visibleWhen = [](const Config&) { return false; };
-        }
-        entries.push_back(std::move(entry));
-      };
+    // Pushes a paw2 row; `visible` hides one that only matters while another value is on, e.g.
+    // blur strength while blur is off.
+    void pushPaw2Entry(std::vector<SettingEntry>& entries, SettingEntry entry, bool visible = true) {
+      if (!visible) {
+        entry.visibleWhen = [](const Config&) { return false; };
+      }
+      entries.push_back(std::move(entry));
+    }
 
+    // While the theme owns paw2's colours, their rows would only be overwritten on the next palette change.
+    [[nodiscard]] SettingVisibility paw2ThemeColorsOff() {
+      return [](const Config& config) { return !config.shell.paw2ThemeColors; };
+    }
+
+    // paw2's look sits on the Appearance page beside the shell's: each helper below fills one of
+    // that page's groups, and is called where the group sits.
+
+    void appendPaw2ThemeEntries(std::vector<SettingEntry>& entries, const Config& cfg) {
+      entries.push_back(makeEntry(
+          SettingsSection::Appearance, "theme", i18n::tr("settings.schema.paw2.theme-colors.label"),
+          i18n::tr("settings.schema.paw2.theme-colors.description"), {"shell", "paw2_theme_colors"},
+          ToggleSetting{cfg.shell.paw2ThemeColors},
+          "paw2 compositor focus ring overview backdrop shadow colour color palette theme windows"
+      ));
+    }
+
+    void appendPaw2WindowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
+      constexpr auto section = SettingsSection::Appearance;
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "windows", "appearance.gaps", SliderSetting{paw2.number("appearance.gaps", 0), 0, 64, 1, true},
+              "gaps spacing margin"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "windows", "appearance.focus_ring_width",
+              SliderSetting{paw2.number("appearance.focus_ring_width", 0), 0, 16, 1, true}, "focus ring border width"
+          )
+      );
+      SettingEntry focusRingColor = makePaw2Entry(
+          section, "windows", "appearance.focus_ring_color",
+          TextSetting{.value = paw2.text("appearance.focus_ring_color", "#0b3d91"), .placeholder = "#rrggbb"},
+          "focus ring border colour color"
+      );
+      focusRingColor.visibleWhen = paw2ThemeColorsOff();
+      pushPaw2Entry(entries, std::move(focusRingColor));
+      // Interface roundness sets it too; this is the fine-tuning.
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "windows", "appearance.corner_radius",
+              SliderSetting{paw2.number("appearance.corner_radius", 0), 0, 64, 1, true}, "rounded corners radius", true
+          )
+      );
+    }
+
+    void appendPaw2ShadowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
+      constexpr auto section = SettingsSection::Appearance;
+      const bool shadowOn = paw2.number("appearance.shadow_radius", 0) > 0;
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "shadows", "appearance.shadow_radius",
+              SliderSetting{paw2.number("appearance.shadow_radius", 0), 0, 64, 1, true}, "window shadow drop size"
+          )
+      );
+      SettingEntry shadowColor = makePaw2Entry(
+          section, "shadows", "appearance.shadow_color",
+          TextSetting{.value = paw2.text("appearance.shadow_color", "#000000"), .placeholder = "#rrggbb"},
+          "window shadow colour color", true
+      );
+      shadowColor.visibleWhen = paw2ThemeColorsOff();
+      pushPaw2Entry(entries, std::move(shadowColor), shadowOn);
+      // The shell's shadow strength and direction set these too; these are the fine-tuning.
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "shadows", "appearance.shadow_opacity",
+              SliderSetting{paw2.number("appearance.shadow_opacity", 0.45), 0.0, 1.0, 0.05, false},
+              "window shadow opacity alpha", true
+          ),
+          shadowOn
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "shadows", "appearance.shadow_offset_x",
+              SliderSetting{paw2.number("appearance.shadow_offset_x", 0), -64, 64, 1, true},
+              "window shadow offset horizontal", true
+          ),
+          shadowOn
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "shadows", "appearance.shadow_offset_y",
+              SliderSetting{paw2.number("appearance.shadow_offset_y", 4), -64, 64, 1, true},
+              "window shadow offset vertical", true
+          ),
+          shadowOn
+      );
+    }
+
+    void appendPaw2TransparencyEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
+      constexpr auto section = SettingsSection::Appearance;
+      const bool transparencyOn = paw2.boolean("appearance.transparency", false);
+      const bool blurOn = paw2.boolean("appearance.blur", false);
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "transparency", "appearance.transparency", ToggleSetting{transparencyOn},
+              "transparency translucent"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "transparency", "appearance.opacity",
+              SliderSetting{paw2.number("appearance.opacity", 1.0), 0.1, 1.0, 0.05, false}, "window opacity alpha"
+          ),
+          transparencyOn
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "transparency", "appearance.blur", ToggleSetting{blurOn}, "blur backdrop frosted bar dock panel"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "transparency", "appearance.blur_radius",
+              SliderSetting{paw2.number("appearance.blur_radius", 0), 0, 64, 1, true}, "blur radius strength"
+          ),
+          blurOn
+      );
+    }
+
+    void appendPaw2MotionEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
+      // The shell's Animations and speed rows switch and pace these too; these are the fine-tuning.
+      constexpr auto section = SettingsSection::Appearance;
+      const bool animationsOn = paw2.boolean("animations.enabled", false);
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "motion", "animations.duration_ms",
+              SliderSetting{paw2.number("animations.duration_ms", 150), 0, 1000, 10, true},
+              "window animation duration speed", true
+          ),
+          animationsOn
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "motion", "animations.slowdown",
+              SliderSetting{paw2.number("animations.slowdown", 1.0), 0.1, 10.0, 0.1, false},
+              "window animation slow motion", true
+          ),
+          animationsOn
+      );
+    }
+
+    void appendPaw2DesktopThemeEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
+      constexpr auto section = SettingsSection::Appearance;
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "desktop-theme", "theme.cursor_theme",
+              paw2ThemePicker(DesktopThemeKind::Cursor, paw2.text("theme.cursor_theme")), "cursor pointer theme"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "desktop-theme", "theme.cursor_size",
+              SliderSetting{paw2.number("theme.cursor_size", 24), 8, 96, 1, true}, "cursor pointer size"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "desktop-theme", "theme.icon_theme",
+              paw2ThemePicker(DesktopThemeKind::Icon, paw2.text("theme.icon_theme")), "icon theme"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "desktop-theme", "theme.gtk_theme",
+              paw2ThemePicker(DesktopThemeKind::Gtk, paw2.text("theme.gtk_theme")), "gtk theme"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "desktop-theme", "theme.qt_style",
+              TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"}, "qt style kvantum"
+          )
+      );
+      // Interface font sets it too, keeping the size; this is the fine-tuning.
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "desktop-theme", "theme.font",
+              TextSetting{.value = paw2.text("theme.font"), .placeholder = "Inter 11"}, "app font interface", true
+          )
+      );
+    }
+
+    // What stays on the paw2 page: how windows behave rather than how they look.
+    void appendPaw2BehaviourEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
+      constexpr auto section = SettingsSection::Paw2;
       constexpr std::array<std::string_view, 4> kLayouts{"scrolling", "dwindle", "master_stack", "monocle"};
       ListSetting layouts{.items = paw2.list("layout.enabled_layouts", {kLayouts.begin(), kLayouts.end()})};
       for (const auto layout : kLayouts) {
@@ -700,165 +904,72 @@ namespace settings {
             }
         );
       }
-      add(makePaw2Entry(section, "paw2-tiling", "layout.enabled_layouts", std::move(layouts), "cycle layouts"));
-      add(makePaw2Entry(
-          section, "paw2-tiling", "layout.column_width",
-          SliderSetting{paw2.number("layout.column_width", 0.6), 0.1, 1.0, 0.05, false}, "column width scrolling"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-tiling", "layout.center_focused_column",
-          ToggleSetting{paw2.boolean("layout.center_focused_column", false)}, "center viewport scrolling"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-tiling", "layout.tab_grouping", ToggleSetting{paw2.boolean("layout.tab_grouping", false)},
-          "tabs tab bar group"
-      ));
-
-      add(makePaw2Entry(
-          section, "paw2-appearance", "appearance.gaps",
-          SliderSetting{paw2.number("appearance.gaps", 0), 0, 64, 1, true}, "gaps spacing margin"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-appearance", "appearance.focus_ring_width",
-          SliderSetting{paw2.number("appearance.focus_ring_width", 0), 0, 16, 1, true}, "focus ring border width"
-      ));
-      // While the theme owns the colours, their rows would only be overwritten on the next palette change.
-      const SettingVisibility themeColorsOff = [](const Config& config) { return !config.shell.paw2ThemeColors; };
-      add(makeEntry(
-          section, "paw2-appearance", i18n::tr("settings.schema.paw2.theme-colors.label"),
-          i18n::tr("settings.schema.paw2.theme-colors.description"), {"shell", "paw2_theme_colors"},
-          ToggleSetting{cfg.shell.paw2ThemeColors},
-          "paw2 compositor focus ring overview backdrop colour color palette theme"
-      ));
-      SettingEntry focusRingColor = makePaw2Entry(
-          section, "paw2-appearance", "appearance.focus_ring_color",
-          TextSetting{.value = paw2.text("appearance.focus_ring_color", "#0b3d91"), .placeholder = "#rrggbb"},
-          "focus ring border colour color"
+      pushPaw2Entry(
+          entries, makePaw2Entry(section, "paw2-tiling", "layout.enabled_layouts", std::move(layouts), "cycle layouts")
       );
-      focusRingColor.visibleWhen = themeColorsOff;
-      add(std::move(focusRingColor));
-      add(makePaw2Entry(
-          section, "paw2-appearance", "appearance.corner_radius",
-          SliderSetting{paw2.number("appearance.corner_radius", 0), 0, 64, 1, true}, "rounded corners radius"
-      ));
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-tiling", "layout.column_width",
+              SliderSetting{paw2.number("layout.column_width", 0.6), 0.1, 1.0, 0.05, false}, "column width scrolling"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-tiling", "layout.center_focused_column",
+              ToggleSetting{paw2.boolean("layout.center_focused_column", false)}, "center viewport scrolling"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-tiling", "layout.tab_grouping", ToggleSetting{paw2.boolean("layout.tab_grouping", false)},
+              "tabs tab bar group"
+          )
+      );
 
-      const bool shadowOn = paw2.number("appearance.shadow_radius", 0) > 0;
-      add(makePaw2Entry(
-          section, "paw2-shadows", "appearance.shadow_radius",
-          SliderSetting{paw2.number("appearance.shadow_radius", 0), 0, 64, 1, true}, "shadow drop size"
-      ));
-      add(makePaw2Entry(
-              section, "paw2-shadows", "appearance.shadow_color",
-              TextSetting{.value = paw2.text("appearance.shadow_color", "#000000"), .placeholder = "#rrggbb"},
-              "shadow colour color"
-          ),
-          shadowOn);
-      add(makePaw2Entry(
-              section, "paw2-shadows", "appearance.shadow_opacity",
-              SliderSetting{paw2.number("appearance.shadow_opacity", 0.45), 0.0, 1.0, 0.05, false},
-              "shadow opacity alpha"
-          ),
-          shadowOn);
-      add(makePaw2Entry(
-              section, "paw2-shadows", "appearance.shadow_offset_x",
-              SliderSetting{paw2.number("appearance.shadow_offset_x", 0), -64, 64, 1, true}, "shadow offset horizontal",
-              true
-          ),
-          shadowOn);
-      add(makePaw2Entry(
-              section, "paw2-shadows", "appearance.shadow_offset_y",
-              SliderSetting{paw2.number("appearance.shadow_offset_y", 4), -64, 64, 1, true}, "shadow offset vertical",
-              true
-          ),
-          shadowOn);
-
-      const bool transparencyOn = paw2.boolean("appearance.transparency", false);
-      const bool blurOn = paw2.boolean("appearance.blur", false);
-      add(makePaw2Entry(
-          section, "paw2-blur", "appearance.transparency", ToggleSetting{transparencyOn}, "transparency translucent"
-      ));
-      add(makePaw2Entry(
-              section, "paw2-blur", "appearance.opacity",
-              SliderSetting{paw2.number("appearance.opacity", 1.0), 0.1, 1.0, 0.05, false}, "window opacity alpha"
-          ),
-          transparencyOn);
-      add(makePaw2Entry(section, "paw2-blur", "appearance.blur", ToggleSetting{blurOn}, "blur backdrop"));
-      add(makePaw2Entry(
-              section, "paw2-blur", "appearance.blur_radius",
-              SliderSetting{paw2.number("appearance.blur_radius", 0), 0, 64, 1, true}, "blur radius strength"
-          ),
-          blurOn);
-
-      const bool animationsOn = paw2.boolean("animations.enabled", false);
-      add(makePaw2Entry(
-          section, "paw2-animations", "animations.enabled", ToggleSetting{animationsOn}, "animations motion"
-      ));
-      add(makePaw2Entry(
-              section, "paw2-animations", "animations.duration_ms",
-              SliderSetting{paw2.number("animations.duration_ms", 150), 0, 1000, 10, true}, "animation duration speed"
-          ),
-          animationsOn);
-      add(makePaw2Entry(
-              section, "paw2-animations", "animations.slowdown",
-              SliderSetting{paw2.number("animations.slowdown", 1.0), 0.1, 10.0, 0.1, false}, "animation slow motion",
-              true
-          ),
-          animationsOn);
-
-      add(makePaw2Entry(
-          section, "paw2-overview", "overview.zoom",
-          SliderSetting{paw2.number("overview.zoom", 0.5), 0.2, 0.75, 0.05, false}, "overview zoom size"
-      ));
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-overview", "overview.zoom",
+              SliderSetting{paw2.number("overview.zoom", 0.5), 0.2, 0.75, 0.05, false}, "overview zoom size"
+          )
+      );
       SettingEntry backdropColor = makePaw2Entry(
           section, "paw2-overview", "overview.backdrop_color",
           TextSetting{.value = paw2.text("overview.backdrop_color", "#1c1c1c"), .placeholder = "#rrggbb"},
           "overview backdrop background colour color"
       );
-      backdropColor.visibleWhen = themeColorsOff;
-      add(std::move(backdropColor));
+      backdropColor.visibleWhen = paw2ThemeColorsOff();
+      pushPaw2Entry(entries, std::move(backdropColor));
       constexpr std::array<std::string_view, 5> kScratchpadPositions{"centered", "top", "bottom", "left", "right"};
-      add(makePaw2Entry(
-          section, "paw2-overview", "overview.scratchpad_position",
-          paw2Select(
-              "settings.schema.paw2.overview.scratchpad-position.options", kScratchpadPositions,
-              paw2.text("overview.scratchpad_position", "centered")
-          ),
-          "overview scratchpad strip position"
-      ));
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-overview", "overview.scratchpad_position",
+              paw2Select(
+                  "settings.schema.paw2.overview.scratchpad-position.options", kScratchpadPositions,
+                  paw2.text("overview.scratchpad_position", "centered")
+              ),
+              "overview scratchpad strip position"
+          )
+      );
 
-      add(makePaw2Entry(
-          section, "paw2-input", "input.focus_follows_mouse",
-          ToggleSetting{paw2.boolean("input.focus_follows_mouse", false)}, "focus follows mouse pointer hover"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-input", "input.middle_click_paste",
-          ToggleSetting{paw2.boolean("input.middle_click_paste", true)}, "middle click paste primary selection"
-      ));
-
-      add(makePaw2Entry(
-          section, "paw2-theme", "theme.cursor_theme",
-          paw2ThemePicker(DesktopThemeKind::Cursor, paw2.text("theme.cursor_theme")), "cursor pointer theme"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-theme", "theme.cursor_size",
-          SliderSetting{paw2.number("theme.cursor_size", 24), 8, 96, 1, true}, "cursor pointer size"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-theme", "theme.icon_theme",
-          paw2ThemePicker(DesktopThemeKind::Icon, paw2.text("theme.icon_theme")), "icon theme"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-theme", "theme.gtk_theme",
-          paw2ThemePicker(DesktopThemeKind::Gtk, paw2.text("theme.gtk_theme")), "gtk theme"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-theme", "theme.qt_style",
-          TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"}, "qt style kvantum"
-      ));
-      add(makePaw2Entry(
-          section, "paw2-theme", "theme.font", TextSetting{.value = paw2.text("theme.font"), .placeholder = "Inter 11"},
-          "font interface"
-      ));
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-input", "input.focus_follows_mouse",
+              ToggleSetting{paw2.boolean("input.focus_follows_mouse", false)}, "focus follows mouse pointer hover"
+          )
+      );
+      pushPaw2Entry(
+          entries,
+          makePaw2Entry(
+              section, "paw2-input", "input.middle_click_paste",
+              ToggleSetting{paw2.boolean("input.middle_click_paste", true)}, "middle click paste primary selection"
+          )
+      );
     }
 
   } // namespace
@@ -1081,6 +1192,11 @@ namespace settings {
         tr("settings.schema.appearance.sync-color-scheme.description"), {"theme", "sync_color_scheme"},
         ToggleSetting{cfg.theme.syncColorScheme}, "gnome gtk portal dark light prefer color scheme apps"
     ));
+    // paw2's look sits beside the shell's on this page, while paw2 shares its config with the shell.
+    const std::optional<Paw2Values> paw2 = env.paw2Value ? std::optional<Paw2Values>(std::in_place, env) : std::nullopt;
+    if (paw2) {
+      appendPaw2ThemeEntries(entries, cfg);
+    }
     {
       SettingControl fontFamilyControl =
           TextSetting{.value = cfg.shell.fontFamily, .placeholder = "sans-serif", .browseFileExtensions = {}};
@@ -1135,26 +1251,9 @@ namespace settings {
         ToggleSetting{cfg.shell.showCloseButtons},
         "close button cross dismiss hide panel notification toast popup dialog sheet settings window"
     ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "accessibility", tr("settings.schema.appearance.ui-scale.label"),
-        tr("settings.schema.appearance.ui-scale.description"), {"accessibility", "ui_scale"},
-        sliderFor(cfg.accessibility.uiScale, noctalia::config::schema::kScaleRange, false), "size scale text panels"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "accessibility", tr("settings.schema.accessibility.high-contrast.label"),
-        tr("settings.schema.accessibility.high-contrast.description"), {"accessibility", "high_contrast"},
-        ToggleSetting{cfg.accessibility.highContrast}, "accessibility high contrast visually impaired"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animations.label"),
-        tr("settings.schema.appearance.animations.description"), {"shell", "animation", "enabled"},
-        ToggleSetting{cfg.shell.animation.enabled}, "motion"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animation-speed.label"),
-        tr("settings.schema.appearance.animation-speed.description"), {"shell", "animation", "speed"},
-        sliderFor(cfg.shell.animation.speed, noctalia::config::schema::kAnimationSpeedRange, false), "motion"
-    ));
+    if (paw2) {
+      appendPaw2WindowEntries(entries, *paw2);
+    }
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "borders", tr("settings.schema.appearance.button-borders.label"),
         tr("settings.schema.appearance.button-borders.description"), {"shell", "button_borders"},
@@ -1176,19 +1275,51 @@ namespace settings {
         ToggleSetting{cfg.shell.cardBorders}, "card section outline border flat minimal"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::Appearance, "effects", tr("settings.schema.shared.shadow-direction.label"),
+        SettingsSection::Appearance, "shadows", tr("settings.schema.shared.shadow-direction.label"),
         tr("settings.schema.appearance.global-shadow-direction.description"), {"shell", "shadow", "direction"},
         enumSelect(kShadowDirections, cfg.shell.shadow.direction), "shadow direction"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::Appearance, "effects", tr("settings.schema.shared.shadow-alpha.label"),
+        SettingsSection::Appearance, "shadows", tr("settings.schema.shared.shadow-alpha.label"),
         tr("settings.schema.appearance.global-shadow-alpha.description"), {"shell", "shadow", "alpha"},
         sliderFor(cfg.shell.shadow.alpha, noctalia::config::schema::kUnitRange, false), "shadow opacity", true
     ));
     entries.push_back(makeEntry(
-        SettingsSection::Appearance, "effects", tr("settings.schema.appearance.popup-shadows.label"),
+        SettingsSection::Appearance, "shadows", tr("settings.schema.appearance.popup-shadows.label"),
         tr("settings.schema.appearance.popup-shadows.description"), {"shell", "popup_shadows"},
         ToggleSetting{cfg.shell.popupShadows}, "popup menu dropdown drop shadow depth"
+    ));
+    if (paw2) {
+      appendPaw2ShadowEntries(entries, *paw2);
+      appendPaw2TransparencyEntries(entries, *paw2);
+    }
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animations.label"),
+        tr("settings.schema.appearance.animations.description"), {"shell", "animation", "enabled"},
+        // It switches window animations too, so it reads on only while both are on.
+        ToggleSetting{cfg.shell.animation.enabled && (!paw2 || paw2->boolean("animations.enabled", false))},
+        "motion window"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "motion", tr("settings.schema.appearance.animation-speed.label"),
+        tr("settings.schema.appearance.animation-speed.description"), {"shell", "animation", "speed"},
+        sliderFor(cfg.shell.animation.speed, noctalia::config::schema::kAnimationSpeedRange, false), "motion"
+    ));
+    if (paw2) {
+      appendPaw2MotionEntries(entries, *paw2);
+    }
+    if (paw2) {
+      appendPaw2DesktopThemeEntries(entries, *paw2);
+    }
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "accessibility", tr("settings.schema.appearance.ui-scale.label"),
+        tr("settings.schema.appearance.ui-scale.description"), {"accessibility", "ui_scale"},
+        sliderFor(cfg.accessibility.uiScale, noctalia::config::schema::kScaleRange, false), "size scale text panels"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "accessibility", tr("settings.schema.accessibility.high-contrast.label"),
+        tr("settings.schema.accessibility.high-contrast.description"), {"accessibility", "high_contrast"},
+        ToggleSetting{cfg.accessibility.highContrast}, "accessibility high contrast visually impaired"
     ));
 
     // Wallpaper
@@ -4633,7 +4764,7 @@ namespace settings {
     }
 
     if (env.paw2Value) {
-      appendPaw2CompositorEntries(entries, cfg, env);
+      appendPaw2BehaviourEntries(entries, Paw2Values(env));
       appendPaw2DisplayEntries(entries, env);
       appendPaw2ShortcutEntries(entries, env);
     } else {

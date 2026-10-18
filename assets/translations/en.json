@@ -1342,7 +1342,6 @@
     },
     "navigation": {
       "groups": {
-        "paw2-animations": "Animations",
         "paw2-keys-commands": "Commands",
         "paw2-keys-file": "Shortcuts",
         "paw2-keys-layout": "Layout",
@@ -1351,13 +1350,9 @@
         "paw2-keys-tabs": "Tabs",
         "paw2-keys-windows": "Windows",
         "paw2-keys-workspaces": "Workspaces",
-        "paw2-appearance": "Windows",
-        "paw2-blur": "Transparency & Blur",
         "paw2-input": "Input",
         "paw2-overview": "Overview",
-        "paw2-shadows": "Shadows",
         "paw2-status": "paw2",
-        "paw2-theme": "Desktop Theme",
         "paw2-tiling": "Tiling",
         "accessibility": "Accessibility",
         "audio": "Audio",
@@ -1379,7 +1374,11 @@
         "dead-zone": "Dead Zone",
         "directories": "Directories",
         "display": "Display",
+        "desktop-theme": "Desktop Theme",
         "effects": "Effects",
+        "shadows": "Shadows",
+        "transparency": "Transparency & Blur",
+        "windows": "Windows",
         "filtering": "Filtering",
         "focus-styling": "Focus Styling",
         "formats": "Formats",
@@ -1450,7 +1449,7 @@
         "keybinds": "Keybinds",
         "launcher": "Launcher",
         "location": "Location",
-        "paw2": "Compositor",
+        "paw2": "Windows & Tiling",
         "paw2-displays": "Displays",
         "paw2-shortcuts": "Shortcuts",
         "notifications": "Notifications",
@@ -1950,7 +1949,7 @@
         },
         "theme-colors": {
           "label": "Follow shell colors",
-          "description": "The focus ring takes the palette's primary color and the overview backdrop its surface, and both follow palette changes."
+          "description": "Window focus ring, shadows and the overview backdrop take their colors from the palette, and follow it when it changes."
         },
         "config-error": "paw2 couldn't load its config, and is running on the last one that loaded: {errors}",
         "layout": {
@@ -1991,27 +1990,27 @@
             "description": "As #rrggbb."
           },
           "corner-radius": {
-            "label": "Corner radius",
-            "description": "Rounded window corners. Zero keeps windows on the fast path."
+            "label": "Window corner radius",
+            "description": "Rounded window corners. Zero keeps windows on the fast path. Corner roundness sets it too."
           },
           "shadow-radius": {
-            "label": "Shadow size",
-            "description": "How far the shadow reaches past the window. Zero turns shadows off."
+            "label": "Window shadow size",
+            "description": "How far the shadow reaches past each window. Zero turns window shadows off."
           },
           "shadow-color": {
-            "label": "Shadow color",
+            "label": "Window shadow color",
             "description": "As #rrggbb."
           },
           "shadow-opacity": {
-            "label": "Shadow opacity",
+            "label": "Window shadow opacity",
             "description": "How dark the shadow is."
           },
           "shadow-offset-x": {
-            "label": "Shadow offset X",
+            "label": "Window shadow offset X",
             "description": "Moves the shadow right, or left when negative."
           },
           "shadow-offset-y": {
-            "label": "Shadow offset Y",
+            "label": "Window shadow offset Y",
             "description": "Moves the shadow down, or up when negative."
           },
           "transparency": {
@@ -2024,7 +2023,7 @@
           },
           "blur": {
             "label": "Blur",
-            "description": "Blur what shows through translucent windows."
+            "description": "Blur what shows through translucent windows. It also lets the bar, dock and panels blur what is behind them; each has its own switch on its page."
           },
           "blur-radius": {
             "label": "Blur strength",
@@ -2032,16 +2031,12 @@
           }
         },
         "animations": {
-          "enabled": {
-            "label": "Animations",
-            "description": "Animate window movement and resizing."
-          },
           "duration-ms": {
-            "label": "Duration",
+            "label": "Window animation duration",
             "description": "In milliseconds."
           },
           "slowdown": {
-            "label": "Slow motion",
+            "label": "Window slow motion",
             "description": "Multiplier for watching animations slowly; 3 runs them three times slower."
           }
         },
@@ -2099,8 +2094,8 @@
             "description": "Applies to apps started after the next login."
           },
           "font": {
-            "label": "Interface font",
-            "description": "Family and size, like \"Inter 11\". Applies after the next login."
+            "label": "App font",
+            "description": "Family and size, like \"Inter 11\". The interface font sets the family. Applies after the next login."
           }
         }
       },
@@ -2112,11 +2107,11 @@
       },
       "appearance": {
         "animation-speed": {
-          "description": "Speed multiplier for all animations",
+          "description": "Speed multiplier for shell and window animations",
           "label": "Animation Speed"
         },
         "animations": {
-          "description": "Enable or disable UI animations",
+          "description": "Shell and window animations",
           "label": "Animations"
         },
         "app-icon-color": {
@@ -2145,7 +2140,7 @@
           "search-placeholder": "Search palettes…"
         },
         "corner-roundness": {
-          "description": "Scale corner radius across shell UI containers and controls",
+          "description": "Scale corner radius across the shell, and set window corners to match",
           "label": "Corner Roundness"
         },
         "custom-palette": {
@@ -2159,14 +2154,14 @@
           "label": "Export Wallpaper Palette"
         },
         "font-family": {
-          "description": "Font family for the shell interface",
+          "description": "Font family for the shell, and for apps through paw2 (keeping its size)",
           "label": "Font Family"
         },
         "global-shadow-alpha": {
-          "description": "Global surface shadow opacity"
+          "description": "Shadow opacity for surfaces and windows"
         },
         "global-shadow-direction": {
-          "description": "Direction the shadow is cast from surfaces"
+          "description": "Direction shadows are cast from surfaces and windows"
         },
         "input-borders": {
           "description": "Draw outlines around text fields and other inputs throughout the shell",

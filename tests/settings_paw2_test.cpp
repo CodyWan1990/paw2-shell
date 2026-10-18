@@ -5,6 +5,7 @@
 #include "shell/settings/settings_paw2.h"
 #include "shell/settings/settings_registry.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iostream>
@@ -82,6 +83,36 @@ int main() {
     ok &= check(!entry.title.starts_with("!!") && !entry.subtitle.starts_with("!!"), "text for " + entry.title);
   }
   ok &= check(paw2Rows > 20, "compositor page has its rows");
+
+  // One Appearance page: paw2's look sits among the shell's groups, each group one run of rows,
+  // and the paw2 page keeps only how windows behave.
+  std::vector<std::string> appearanceGroups;
+  for (const auto& entry : entries) {
+    if (entry.section == settings::SettingsSection::Appearance
+        && (appearanceGroups.empty() || appearanceGroups.back() != entry.group)) {
+      ok &= check(!std::ranges::contains(appearanceGroups, entry.group), "group shown twice: " + entry.group);
+      appearanceGroups.push_back(entry.group);
+    }
+    if (entry.section == settings::SettingsSection::Paw2) {
+      ok &= check(
+          entry.group == "paw2-tiling" || entry.group == "paw2-overview" || entry.group == "paw2-input",
+          "behaviour only on the paw2 page: " + entry.group
+      );
+    }
+  }
+  ok &= check(
+      appearanceGroups
+          == std::vector<
+              std::
+                  string>{"theme", "interface", "windows", "borders", "shadows", "transparency", "motion", "desktop-theme", "accessibility"},
+      "appearance group order"
+  );
+  ok &= check(findEntry(entries, {"paw2", "animations", "enabled"}) == nullptr, "one Animations switch");
+  const auto* animations = findEntry(entries, {"shell", "animation", "enabled"});
+  ok &= check(
+      animations != nullptr && !std::get<settings::ToggleSetting>(animations->control).checked,
+      "Animations reads off while window animations are off"
+  );
 
   const auto* gaps = findEntry(entries, {"paw2", "appearance", "gaps"});
   ok &= check(gaps != nullptr && std::get<settings::SliderSetting>(gaps->control).value == 15.0, "gaps from paw2");

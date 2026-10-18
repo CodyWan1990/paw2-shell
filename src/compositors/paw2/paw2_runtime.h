@@ -90,6 +90,9 @@ namespace compositors::paw2 {
     [[nodiscard]] const nlohmann::json& config() const noexcept { return m_config; }
     [[nodiscard]] bool configOk() const noexcept { return m_configOk; }
     [[nodiscard]] const std::vector<std::string>& configErrors() const noexcept { return m_configErrors; }
+    // Bumped on every `config` message - paw2 sends one after each reload, so a writer can tell
+    // the verdict on its own write from the config it already had.
+    [[nodiscard]] std::uint64_t configGeneration() const noexcept { return m_configGeneration; }
 
     [[nodiscard]] const Paw2Window* findWindowByIdentifier(std::string_view identifier) const;
     [[nodiscard]] const Paw2Window* focusedWindow() const;
@@ -141,6 +144,7 @@ namespace compositors::paw2 {
     nlohmann::json m_config = nlohmann::json::object();
     bool m_configOk = true;
     std::vector<std::string> m_configErrors;
+    std::uint64_t m_configGeneration = 0;
 
     std::vector<std::pair<std::size_t, Listener>> m_listeners;
     std::size_t m_nextListenerToken = 1;

@@ -27,6 +27,7 @@ namespace compositors {
   class FocusedOutputBackend;
   class OutputPowerBackend;
   namespace paw2 {
+    class Paw2ConfigWriter;
     class Paw2Runtime;
   }
 } // namespace compositors
@@ -166,6 +167,8 @@ public:
   // available()/connected() before relying on it.
   [[nodiscard]] compositors::paw2::Paw2Runtime& paw2Runtime() noexcept;
   [[nodiscard]] const compositors::paw2::Paw2Runtime& paw2Runtime() const noexcept;
+  // Writes paw2's settings into its config.d/ drop-ins (never config.toml).
+  [[nodiscard]] compositors::paw2::Paw2ConfigWriter& paw2ConfigWriter() noexcept;
 
 private:
   struct WorkspaceModelSnapshot {

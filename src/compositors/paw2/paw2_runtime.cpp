@@ -416,6 +416,7 @@ namespace compositors::paw2 {
           }
         }
       }
+      ++m_configGeneration;
       notify();
     }
   }

@@ -1939,7 +1939,7 @@
           },
           "position": {
             "label": "Position",
-            "description": "Top-left corner in logical pixels, as \"x, y\"; a monitor left blank takes the first free space from the left. paw2 applies it the next time it starts.",
+            "description": "Top-left corner in logical pixels, as \"x, y\"; a monitor left blank takes the first free space from the left.",
             "placeholder": "Automatic"
           },
           "focus-at-startup": {

@@ -108,6 +108,10 @@ public:
   // Actions on internally generated notifications are handled in-process: there is no D-Bus client
   // to receive ActionInvoked, so routing them to the external callback would signal into the void.
   void setInternalActionCallback(ActionInvokeCallback callback);
+  // Further handlers for internal notification actions, alongside the one above. Each owner
+  // ignores ids it did not post. Returns a token for removeInternalActionCallback.
+  int addInternalActionCallback(ActionInvokeCallback callback);
+  void removeInternalActionCallback(int token);
   void setCloseCallback(CloseCallback callback);
   void setReplyCallback(ReplyCallback callback);
   [[nodiscard]] bool hasPendingDBusClose(uint32_t id) const noexcept;
@@ -211,6 +215,8 @@ private:
   std::vector<std::pair<int, EventCallback>> m_eventCallbacks;
   ActionInvokeCallback m_actionInvokeCallback;
   ActionInvokeCallback m_internalActionCallback;
+  std::vector<std::pair<int, ActionInvokeCallback>> m_extraInternalActionCallbacks;
+  int m_nextInternalActionToken = 1;
   CloseCallback m_closeCallback;
   StateCallback m_stateCallback;
   ReplyCallback m_replyCallback;

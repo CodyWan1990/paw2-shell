@@ -1225,6 +1225,9 @@ struct ShellConfig {
   };
 
   struct ScreenshotConfig {
+    // paw2-shell's action panel: after a capture, ask Copy / Save / Both and a file name instead
+    // of applying save_to_file / copy_to_clipboard straight away.
+    bool askAction = true;
     bool saveToFile = true;
     bool copyToClipboard = true;
     bool freezeScreen = true;
@@ -1237,8 +1240,8 @@ struct ShellConfig {
     bool closeOnSave = true;
     bool pipeToCommand = false;
     std::string pipeCommand;
-    std::string directory;       // empty = XDG Pictures directory
-    std::string filenamePattern; // empty = screenshot_%Y%m%d_%H%M%S
+    std::string directory;       // empty = <XDG Pictures>/Screenshots
+    std::string filenamePattern; // empty = %B-%d-%Y-%I-%M-%S-%p (October-18-2026-11-05-03-AM)
     ScreenshotRegionModifier regionModifier = ScreenshotRegionModifier::None;
 
     bool operator==(const ScreenshotConfig&) const = default;

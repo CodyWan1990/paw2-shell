@@ -1501,6 +1501,7 @@ namespace noctalia::config::schema {
     // including it here fixes the export, mirroring the calendar gap-fix.
     const Schema<ShellConfig::ScreenshotConfig>& shellScreenshotSchema() {
       static const Schema<ShellConfig::ScreenshotConfig> s = {
+          field(&ShellConfig::ScreenshotConfig::askAction, "ask_action"),
           field(&ShellConfig::ScreenshotConfig::saveToFile, "save_to_file"),
           field(&ShellConfig::ScreenshotConfig::copyToClipboard, "copy_to_clipboard"),
           field(&ShellConfig::ScreenshotConfig::freezeScreen, "freeze_screen"),

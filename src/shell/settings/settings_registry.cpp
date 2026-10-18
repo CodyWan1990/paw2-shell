@@ -2152,6 +2152,11 @@ namespace settings {
     ));
 
     entries.push_back(makeEntry(
+        SettingsSection::Screenshot, "screenshot-output", tr("settings.schema.shell.screenshot-ask-action.label"),
+        tr("settings.schema.shell.screenshot-ask-action.description"), {"shell", "screenshot", "ask_action"},
+        ToggleSetting{cfg.shell.screenshot.askAction}, "screenshot capture ask prompt copy save both file name"
+    ));
+    entries.push_back(makeEntry(
         SettingsSection::Screenshot, "screenshot-output",
         tr("settings.schema.shell.screenshot-copy-to-clipboard.label"),
         tr("settings.schema.shell.screenshot-copy-to-clipboard.description"),
@@ -2185,7 +2190,7 @@ namespace settings {
           {"shell", "screenshot", "filename_pattern"},
           TextSetting{
               .value = cfg.shell.screenshot.filenamePattern,
-              .placeholder = "screenshot_%Y%m%d_%H%M%S",
+              .placeholder = "%B-%d-%Y-%I-%M-%S-%p",
               .browseFileExtensions = {}
           },
           "screenshot capture filename pattern strftime", true

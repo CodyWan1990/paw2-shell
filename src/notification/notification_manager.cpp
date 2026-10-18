@@ -496,6 +496,16 @@ void NotificationManager::setInternalActionCallback(ActionInvokeCallback callbac
   m_internalActionCallback = std::move(callback);
 }
 
+int NotificationManager::addInternalActionCallback(ActionInvokeCallback callback) {
+  const int token = m_nextInternalActionToken++;
+  m_extraInternalActionCallbacks.emplace_back(token, std::move(callback));
+  return token;
+}
+
+void NotificationManager::removeInternalActionCallback(int token) {
+  std::erase_if(m_extraInternalActionCallbacks, [token](const auto& entry) { return entry.first == token; });
+}
+
 void NotificationManager::setActionInvokeCallback(ActionInvokeCallback callback) {
   m_actionInvokeCallback = std::move(callback);
 }
@@ -556,6 +566,12 @@ bool NotificationManager::invokeAction(
   if (notification->origin == NotificationOrigin::Internal) {
     if (m_internalActionCallback) {
       m_internalActionCallback(id, actionKey, activationToken);
+    }
+    for (const auto& [token, callback] : std::vector(m_extraInternalActionCallbacks)) {
+      (void)token;
+      if (callback) {
+        callback(id, actionKey, activationToken);
+      }
     }
   } else if (m_actionInvokeCallback) {
     m_actionInvokeCallback(id, actionKey, activationToken);

@@ -9,6 +9,7 @@
 #include "core/input/key_modifiers.h"
 #include "core/input/keybind_matcher.h"
 #include "core/log.h"
+#include "core/process/process.h"
 #include "ipc/ipc_service.h"
 #include "notification/notification.h"
 #include "notification/notification_manager.h"
@@ -127,7 +128,8 @@ namespace {
     return LogicalRect{.x = x, .y = y, .width = width, .height = height};
   }
 
-  [[nodiscard]] std::string defaultFilenamePattern() { return "screenshot_%Y%m%d_%H%M%S"; }
+  // paw2-shell's names: October-18-2026-11-05-03-AM.
+  [[nodiscard]] std::string defaultFilenamePattern() { return "%B-%d-%Y-%I-%M-%S-%p"; }
   [[nodiscard]] std::string primaryKeybindLabel(const std::vector<KeyChord>& configured, KeybindAction action) {
     if (!configured.empty()) {
       return keyChordDisplayLabel(configured.front());
@@ -157,11 +159,30 @@ namespace {
   }
 
   [[nodiscard]] bool hasAnyOutput(const ScreenshotService::OutputOptions& options) {
-    return options.saveToFile || options.copyToClipboard || (options.pipeToCommand && !options.pipeCommand.empty());
+    return options.askAction
+        || options.saveToFile
+        || options.copyToClipboard
+        || (options.pipeToCommand && !options.pipeCommand.empty());
   }
 
+  // The action panel can choose Save, so it always needs a default path.
   [[nodiscard]] bool needsScreenshotPath(const ScreenshotService::OutputOptions& options) {
-    return options.saveToFile || (options.pipeToCommand && !options.pipeCommand.empty());
+    return options.askAction || options.saveToFile || (options.pipeToCommand && !options.pipeCommand.empty());
+  }
+
+  // A typed name is a file name, never a path: a slash would make directories outside the
+  // screenshot folder, and a leading "." would hide the file or climb out with "..".
+  [[nodiscard]] std::string sanitizeScreenshotName(std::string_view typed) {
+    std::string name = StringUtils::trim(typed);
+    std::ranges::replace(name, '/', '-');
+    std::ranges::replace(name, '\\', '-');
+    while (!name.empty() && name.front() == '.') {
+      name.erase(name.begin());
+    }
+    if (name.ends_with(".png")) {
+      name.resize(name.size() - 4);
+    }
+    return name;
   }
 
   // Decoded file pixels stand in for a capture: straight RGBA, no cursor variant.
@@ -634,9 +655,15 @@ ScreenshotService::ScreenshotService(
     NotificationManager& notifications, ClipboardService* clipboard
 )
     : m_wayland(wayland), m_platform(platform), m_notifications(notifications), m_configService(configService),
-      m_clipboard(clipboard), m_capture(wayland) {}
+      m_clipboard(clipboard), m_capture(wayland) {
+  m_notificationActionToken = m_notifications.addInternalActionCallback(
+      [this](std::uint32_t id, const std::string& actionKey, const std::string& /*activationToken*/) {
+        onNotificationAction(id, actionKey);
+      }
+  );
+}
 
-ScreenshotService::~ScreenshotService() = default;
+ScreenshotService::~ScreenshotService() { m_notifications.removeInternalActionCallback(m_notificationActionToken); }
 
 void ScreenshotService::rememberRegion(const LogicalRect& region) {
   if (region.width < 2 || region.height < 2) {
@@ -727,6 +754,7 @@ ScreenshotService::OutputOptions ScreenshotService::outputOptionsFromConfig(cons
   options.rememberLastRegion = screenshot.rememberLastRegion;
   options.showCursor = screenshot.showCursor;
   options.annotate = screenshot.annotate;
+  options.askAction = screenshot.askAction;
   options.pipeCommand = screenshot.pipeCommand;
   options.directory = screenshot.directory;
   options.filenamePattern = screenshot.filenamePattern;
@@ -1789,8 +1817,49 @@ void ScreenshotService::deliverCaptureResult(
     beginImageAnnotation(std::move(image), options, std::move(destPath));
     return;
   }
+  if (options.askAction && image.image.width > 0 && image.image.height > 0) {
+    // A second capture before the first was answered replaces it, as in the QML tool.
+    m_pendingPrompt = PendingPrompt{
+        .image = std::move(image.image),
+        .options = options,
+        .defaultPath = destPath.value_or(makeScreenshotPath(options, "screenshot")),
+    };
+    PanelManager::instance().openPanel("screenshot-action");
+    return;
+  }
   finishDelivery(std::move(image.image), options, std::move(destPath));
 }
+
+const ScreencopyImage* ScreenshotService::pendingPromptImage() const noexcept {
+  return m_pendingPrompt.has_value() ? &m_pendingPrompt->image : nullptr;
+}
+
+std::string ScreenshotService::pendingPromptDefaultName() const {
+  return m_pendingPrompt.has_value() ? m_pendingPrompt->defaultPath.stem().string() : std::string{};
+}
+
+void ScreenshotService::completePrompt(PromptAction action, std::string_view typedName) {
+  if (!m_pendingPrompt.has_value()) {
+    return;
+  }
+  PendingPrompt prompt = std::move(*m_pendingPrompt);
+  m_pendingPrompt.reset();
+
+  std::string name = sanitizeScreenshotName(typedName);
+  if (name.empty()) {
+    name = prompt.defaultPath.stem().string();
+  }
+  OutputOptions options = prompt.options;
+  options.copyToClipboard = action != PromptAction::Save;
+  options.saveToFile = action != PromptAction::Copy;
+  const auto path = prompt.defaultPath.parent_path() / (name + ".png");
+  // Saving already announces itself with the path; a copy alone would otherwise be silent.
+  if (finishDelivery(std::move(prompt.image), options, path) && action == PromptAction::Copy) {
+    m_notifications.addInternal("paw2-shell", "Screenshot", "Copied to clipboard");
+  }
+}
+
+void ScreenshotService::discardPrompt() { m_pendingPrompt.reset(); }
 
 bool ScreenshotService::finishDelivery(
     ScreencopyImage image, const OutputOptions& options, std::optional<std::filesystem::path> destPath
@@ -1870,7 +1939,7 @@ void ScreenshotService::onCaptureComplete(
 
 std::filesystem::path ScreenshotService::outputDirectory(const OutputOptions& options) const {
   if (options.directory.empty()) {
-    return FileUtils::defaultPicturesDirectory();
+    return FileUtils::defaultPicturesDirectory() / "Screenshots";
   }
   return FileUtils::expandUserPath(options.directory);
 }
@@ -1883,11 +1952,34 @@ ScreenshotService::makeScreenshotPath(const OutputOptions& options, const std::s
 }
 
 void ScreenshotService::notifySaved(const std::filesystem::path& path) {
-  m_notifications.addInternal("Noctalia", "Screenshot saved", path.string());
+  NotificationRequest request;
+  request.appName = "paw2-shell";
+  request.summary = "Screenshot saved";
+  request.body = path.filename().string();
+  request.origin = NotificationOrigin::Internal;
+  request.actions = {"open", "Open", "reveal", "Show in folder"};
+  const std::uint32_t id = m_notifications.addOrReplace(std::move(request));
+  if (id != 0) {
+    m_savedNotifications.insert_or_assign(id, path);
+  }
+}
+
+void ScreenshotService::onNotificationAction(std::uint32_t id, const std::string& actionKey) {
+  const auto it = m_savedNotifications.find(id);
+  if (it == m_savedNotifications.end()) {
+    return;
+  }
+  const std::filesystem::path path = it->second;
+  m_savedNotifications.erase(it);
+  if (actionKey == "open") {
+    (void)process::runAsync(std::vector<std::string>{"xdg-open", path.string()});
+  } else if (actionKey == "reveal") {
+    (void)process::runAsync(std::vector<std::string>{"xdg-open", path.parent_path().string()});
+  }
 }
 
 void ScreenshotService::notifyError(const std::string& message) {
-  m_notifications.addInternal("Noctalia", "Screenshot failed", message, Urgency::Critical);
+  m_notifications.addInternal("paw2-shell", "Screenshot failed", message, Urgency::Critical);
 }
 
 void ScreenshotService::setSoundPlayer(SoundPlayer* soundPlayer) { m_soundPlayer = soundPlayer; }

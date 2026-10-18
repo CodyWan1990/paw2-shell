@@ -11,6 +11,7 @@
 #include <optional>
 #include <string>
 #include <string_view>
+#include <unordered_map>
 #include <vector>
 
 class ClipboardService;
@@ -37,6 +38,8 @@ public:
     bool rememberLastRegion = false;
     bool showCursor = false;
     bool annotate = false;
+    // Hand the capture to the "screenshot-action" panel instead of delivering it directly.
+    bool askAction = false;
     std::string pipeCommand;
     std::string directory;
     std::string filenamePattern;
@@ -75,6 +78,17 @@ public:
   void registerIpc(IpcService& ipc, const ConfigService& configService);
 
   void setSoundPlayer(SoundPlayer* soundPlayer);
+
+  // ── The action panel (paw2-shell's screenshot tool) ─────────────────────────
+  enum class PromptAction : std::uint8_t { Copy, Save, Both };
+  // The capture waiting for an answer, or null when there is none.
+  [[nodiscard]] const ScreencopyImage* pendingPromptImage() const noexcept;
+  // The name the capture saves under when the user types none (no ".png").
+  [[nodiscard]] std::string pendingPromptDefaultName() const;
+  // Deliver the waiting capture. `typedName` may be empty (use the default) and is treated as a
+  // file name only: separators cannot reach outside the screenshot directory.
+  void completePrompt(PromptAction action, std::string_view typedName);
+  void discardPrompt();
 
 private:
   struct PendingCapture {
@@ -180,6 +194,7 @@ private:
   [[nodiscard]] std::filesystem::path
   makeScreenshotPath(const OutputOptions& options, const std::string& labelBase, int suffix = 0) const;
   void notifySaved(const std::filesystem::path& path);
+  void onNotificationAction(std::uint32_t id, const std::string& actionKey);
   void notifyError(const std::string& message);
   void rememberRegion(const LogicalRect& region);
   [[nodiscard]] std::optional<LogicalRect> loadRememberedRegion() const;
@@ -202,6 +217,16 @@ private:
   std::unique_ptr<capture::AnnotationOverlay> m_annotationOverlay;
   std::vector<FreezeRequest> m_pendingFreezeCaptures;
   std::optional<PendingDelivery> m_pendingDelivery;
+  // A capture waiting on the action panel.
+  struct PendingPrompt {
+    ScreencopyImage image;
+    OutputOptions options{};
+    std::filesystem::path defaultPath;
+  };
+  std::optional<PendingPrompt> m_pendingPrompt;
+  // "Screenshot saved" notifications whose Open / Show in folder actions are still live.
+  std::unordered_map<std::uint32_t, std::filesystem::path> m_savedNotifications;
+  int m_notificationActionToken = 0;
   FreezeTarget m_freezeTarget = FreezeTarget::Region;
   bool m_freezeCaptureActive = false;
   SoundPlayer* m_soundPlayer = nullptr;

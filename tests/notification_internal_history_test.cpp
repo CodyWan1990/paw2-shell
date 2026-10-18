@@ -112,6 +112,29 @@ int main() {
          )
         && ok;
     ok = check(internalKey == "default", "an internal notification action was not dispatched in-process") && ok;
+
+    // A second owner (the screenshot tool's Open / Show in folder) is called too, without
+    // displacing the first.
+    std::string screenshotKey;
+    const int token = manager.addInternalActionCallback(
+        [&screenshotKey](uint32_t, const std::string& key, const std::string&) { screenshotKey = key; }
+    );
+    internalKey.clear();
+    const auto savedId = manager.addOrReplace(
+        NotificationRequest{
+            .appName = "paw2-shell",
+            .summary = "Screenshot saved",
+            .origin = NotificationOrigin::Internal,
+            .actions = {"open", "Open", "reveal", "Show in folder"},
+        }
+    );
+    ok = check(manager.invokeAction(savedId, "reveal", false), "a screenshot action could not be invoked") && ok;
+    ok = check(screenshotKey == "reveal", "an extra internal action handler was not called") && ok;
+    ok = check(internalKey == "reveal", "the primary internal action handler was displaced") && ok;
+    manager.removeInternalActionCallback(token);
+    screenshotKey.clear();
+    ok = check(manager.invokeAction(savedId, "open", false), "a second screenshot action could not be invoked") && ok;
+    ok = check(screenshotKey.empty(), "a removed internal action handler was still called") && ok;
     ok = check(externalKey.empty(), "an internal notification action leaked to the D-Bus callback") && ok;
 
     // External notifications keep going to the D-Bus callback.

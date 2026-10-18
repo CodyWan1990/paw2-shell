@@ -3444,6 +3444,10 @@
           "description": "After drawing a region, keep the overlay open until you confirm with Enter or Space",
           "label": "Confirm Region"
         },
+        "screenshot-ask-action": {
+          "description": "After a capture, show a preview and ask: Copy, Save or Both, with an optional file name",
+          "label": "Ask What To Do"
+        },
         "screenshot-copy-to-clipboard": {
           "description": "Place the captured PNG on the clipboard selection",
           "label": "Copy to Clipboard"

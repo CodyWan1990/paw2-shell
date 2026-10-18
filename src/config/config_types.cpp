@@ -395,8 +395,12 @@ WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const Wid
   const bool widgetHasBorderKey = widget != nullptr && widget->hasSetting("capsule_border");
   const bool widgetHasUnderlineKey = widget != nullptr && widget->hasSetting("underline");
 
-  const WidgetStylePreset preset =
-      widget != nullptr ? parseWidgetStylePreset(widget->getString("style")) : WidgetStylePreset::Inherit;
+  // The workspaces widget has a `style` of its own (pills/minimal/underline/focus hint) that
+  // draws per workspace; reading it as a whole-widget preset would underline the entire widget.
+  const bool ownsStyleKey = widget != nullptr && widget->type == "workspaces";
+  const WidgetStylePreset preset = widget != nullptr && !ownsStyleKey
+      ? parseWidgetStylePreset(widget->getString("style"))
+      : WidgetStylePreset::Inherit;
   const ColorSpec accent = widget != nullptr
       ? widget->getColorSpec("color", colorSpecFromRole(ColorRole::Primary), "widget.color")
       : colorSpecFromRole(ColorRole::Primary);

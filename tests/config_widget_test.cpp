@@ -224,6 +224,17 @@ int main() {
   ok = expect(lineOnly.enabled && lineOnly.fill == clearColorSpec(), "bare underline gets invisible geometry") && ok;
   ok = expect(lineOnly.underlineWidth == 3.0F, "underline width") && ok;
 
+  // Workspaces' own `style = "underline"` underlines the focused workspace, never the whole widget.
+  WidgetConfig workspacesStyled;
+  workspacesStyled.type = "workspaces";
+  workspacesStyled.settings["style"] = std::string("underline");
+  const auto workspacesSpec = resolveWidgetBarCapsuleSpec(plainBar, &workspacesStyled);
+  ok = expect(
+           !workspacesSpec.enabled && !workspacesSpec.underline.has_value(),
+           "workspaces style is not a whole-widget preset"
+       )
+      && ok;
+
   WidgetConfig inherit;
   plainBar.widgetCapsuleDefault = true;
   const auto inherited = resolveWidgetBarCapsuleSpec(plainBar, &inherit);

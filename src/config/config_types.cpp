@@ -334,14 +334,12 @@ WidgetStylePreset parseWidgetStylePreset(std::string_view value) noexcept {
   if (value == "none") {
     return WidgetStylePreset::None;
   }
-  if (value == "capsule") {
+  // "pill" was paw2-shell's QML name for the same idea; Noctalia's capsule replaced it.
+  if (value == "capsule" || value == "pill") {
     return WidgetStylePreset::Capsule;
   }
   if (value == "box") {
     return WidgetStylePreset::Box;
-  }
-  if (value == "pill") {
-    return WidgetStylePreset::Pill;
   }
   if (value == "underline") {
     return WidgetStylePreset::Underline;
@@ -355,14 +353,12 @@ namespace {
   struct StylePresetDefaults {
     std::optional<bool> enabled;
     std::optional<ColorSpec> fill;
-    std::optional<float> opacity;
     std::optional<std::optional<ColorSpec>> border;
     std::optional<std::optional<float>> radius;
     std::optional<ColorSpec> underline;
   };
 
   constexpr float kBoxPresetRadius = 4.0F;
-  constexpr float kPillPresetFillAlpha = 0.25F;
 
   [[nodiscard]] StylePresetDefaults stylePresetDefaults(WidgetStylePreset preset, const ColorSpec& accent) {
     switch (preset) {
@@ -378,14 +374,6 @@ namespace {
           .fill = clearColorSpec(),
           .border = std::optional<ColorSpec>(accent),
           .radius = std::optional<float>(kBoxPresetRadius),
-      };
-    case WidgetStylePreset::Pill:
-      return {
-          .enabled = true,
-          .fill = accent,
-          .opacity = kPillPresetFillAlpha,
-          .border = std::optional<ColorSpec>{},
-          .radius = std::optional<float>{},
       };
     case WidgetStylePreset::Underline:
       return {
@@ -449,7 +437,7 @@ WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const Wid
         noctalia::config::schema::kBarCapsuleBorderWidthRange
     );
   }
-  spec.opacity = presetDefaults.opacity.value_or(bar.widgetCapsuleOpacity);
+  spec.opacity = bar.widgetCapsuleOpacity;
   if (widget != nullptr && widget->hasSetting("capsule_opacity")) {
     spec.opacity = std::clamp(
         static_cast<float>(widget->getDouble("capsule_opacity", static_cast<double>(spec.opacity))), 0.0F, 1.0F

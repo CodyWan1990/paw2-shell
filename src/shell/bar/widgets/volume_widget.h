@@ -29,6 +29,8 @@ public:
     std::string customImage;
     bool customImageColorize = false;
     bool showLabel = true;
+    // Hide the icon; it comes back whenever there is no label to show instead.
+    bool showGlyph = true;
     bool hideWhenInactive = false;
     ColorSpec muteColor = colorSpecFromRole(ColorRole::Error);
   };
@@ -47,6 +49,7 @@ private:
   PipeWireService* m_audio = nullptr;
   EasyEffectsService* m_easyEffects = nullptr;
   bool m_showLabel = true;
+  bool m_showGlyph = true;
   VolumeWidgetTarget m_target = VolumeWidgetTarget::Output;
   ColorSpec m_muteColor;
   std::string m_glyphOverride;

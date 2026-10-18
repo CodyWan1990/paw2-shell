@@ -553,7 +553,7 @@ enabled = false
 # battery_state_changed   = "notify-send 'Power' \"Battery: $NOCTALIA_BATTERY_STATE\""
 # battery_under_threshold = "notify-send 'Power' \"Battery at ${NOCTALIA_BATTERY_PERCENT}%\""
 # power_profile_changed   = "notify-send 'Power' \"Profile: $NOCTALIA_POWER_PROFILE\""
-# Per-widget looks (paw2-shell). `style` is a preset - none | capsule | box | pill | underline -
+# Per-widget looks (paw2-shell). `style` is a preset - none | underline | box | capsule -
 # drawn in the widget's `color`; any explicit capsule_* key still overrides it.
 # [widget.clock]
 # style = "underline"
@@ -561,7 +561,7 @@ enabled = false
 # underline_width = 2
 #
 # [widget.volume]
-# style = "pill"
+# style = "capsule"
 #
 # [widget.paw2_layout]               # paw2's tiling layout on this monitor; click/scroll to cycle
 # show_label = false

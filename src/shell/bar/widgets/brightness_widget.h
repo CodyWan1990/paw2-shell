@@ -11,6 +11,8 @@ class BrightnessWidget : public Widget {
 public:
   struct Options {
     bool showLabel = true;
+    // Hide the icon; it comes back whenever there is no label to show instead.
+    bool showGlyph = true;
     bool showWhenUnavailable = false;
   };
 
@@ -27,6 +29,7 @@ private:
   BrightnessService* m_brightness = nullptr;
   wl_output* m_output = nullptr;
   bool m_showLabel = true;
+  bool m_showGlyph = true;
   bool m_showWhenUnavailable = false;
   Glyph* m_glyph = nullptr;
   Label* m_label = nullptr;

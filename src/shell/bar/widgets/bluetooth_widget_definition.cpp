@@ -22,6 +22,9 @@ const noctalia::bar::WidgetDefinition<BluetoothWidget::Options>& bluetoothWidget
           field<&Options::showLabel>({
               .key = "show_label",
           }),
+          field<&Options::showGlyph>({
+              .key = "show_glyph",
+          }),
           field<&Options::hideWhenAdapterOff>({
               .key = "hide_when_adapter_off",
               .presentation =

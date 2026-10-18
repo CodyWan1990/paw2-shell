@@ -1249,6 +1249,7 @@
         "settings": {
           "empty": "No settings match the current filters.",
           "groups": {
+            "look": "Look",
             "actions": "Actions",
             "behavior": "Behavior",
             "grouping": "Grouping",
@@ -2036,7 +2037,7 @@
           "description": "Action run on the parts of the bar no widget covers"
         },
         "edge-margin": {
-          "description": "Gap between the bar and the screen edge it sits on; set to 0 px to sit flush against that edge"
+          "description": "Space between the bar and the screen edge; above 0 the bar floats"
         },
         "enabled": {
           "description": "Show or hide this bar"
@@ -2098,7 +2099,7 @@
         },
         "thickness": {
           "description": "Bar thickness in pixels",
-          "label": "Thickness"
+          "label": "Height"
         },
         "widget-capsules": {
           "description": "Wrap widgets in capsule backgrounds",
@@ -3143,7 +3144,7 @@
           "label": "Auto-Hide"
         },
         "background-opacity": {
-          "label": "Background Opacity"
+          "label": "Opacity"
         },
         "contact-shadow": {
           "label": "Contact Shadow"
@@ -3167,7 +3168,7 @@
           "label": "Cross Axis Padding"
         },
         "edge-margin": {
-          "label": "Edge Margin"
+          "label": "Gap"
         },
         "enabled": {
           "label": "Enabled"
@@ -4260,7 +4261,6 @@
         "style-capsule": "Capsule",
         "style-inherit": "Bar default",
         "style-none": "None",
-        "style-pill": "Pill",
         "style-underline": "Underline",
         "scroll-steps": "Every Step",
         "shared": "Shared",
@@ -4761,7 +4761,7 @@
         },
         "show-glyph": {
           "description": "Show the widget glyph or custom image",
-          "label": "Show Glyph"
+          "label": "Show Icon"
         },
         "show-icons": {
           "description": "Show the focused app icon on the active pill",

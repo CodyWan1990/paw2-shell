@@ -24,7 +24,7 @@ namespace {
 } // namespace
 
 BrightnessWidget::BrightnessWidget(BrightnessService* brightness, wl_output* output, Options options)
-    : m_brightness(brightness), m_output(output), m_showLabel(options.showLabel),
+    : m_brightness(brightness), m_output(output), m_showLabel(options.showLabel), m_showGlyph(options.showGlyph),
       m_showWhenUnavailable(options.showWhenUnavailable) {}
 
 void BrightnessWidget::create() {
@@ -70,17 +70,22 @@ void BrightnessWidget::doLayout(Renderer& renderer, float containerWidth, float 
   }
 
   const bool labelVisible = m_label->visible();
+  const bool showIcon = m_showGlyph || !labelVisible;
+  m_glyph->setVisible(showIcon);
+  const float iconW = showIcon ? m_glyph->width() : 0.0F;
+  const float iconH = showIcon ? m_glyph->height() : 0.0F;
+  const float iconGap = showIcon ? Style::spaceXs : 0.0F;
   if (m_isVertical && labelVisible) {
-    const float w = std::max(m_glyph->width(), m_label->width());
-    m_glyph->setPosition(std::round((w - m_glyph->width()) * 0.5F), 0.0F);
-    m_label->setPosition(std::round((w - m_label->width()) * 0.5F), m_glyph->height());
-    rootNode->setSize(w, m_glyph->height() + m_label->height());
+    const float w = std::max(iconW, m_label->width());
+    m_glyph->setPosition(std::round((w - iconW) * 0.5F), 0.0F);
+    m_label->setPosition(std::round((w - m_label->width()) * 0.5F), iconH);
+    rootNode->setSize(w, iconH + m_label->height());
   } else {
-    const float h = labelVisible ? std::max(m_glyph->height(), m_label->height()) : m_glyph->height();
-    m_glyph->setPosition(0.0F, std::round((h - m_glyph->height()) * 0.5F));
-    float totalWidth = m_glyph->width();
+    const float h = labelVisible ? std::max(iconH, m_label->height()) : iconH;
+    m_glyph->setPosition(0.0F, std::round((h - iconH) * 0.5F));
+    float totalWidth = iconW;
     if (labelVisible) {
-      m_label->setPosition(m_glyph->width() + Style::spaceXs, std::round((h - m_label->height()) * 0.5F));
+      m_label->setPosition(iconW + iconGap, std::round((h - m_label->height()) * 0.5F));
       totalWidth = m_label->x() + m_label->width();
     }
     rootNode->setSize(totalWidth, h);

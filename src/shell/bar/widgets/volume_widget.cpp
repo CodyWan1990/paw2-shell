@@ -17,7 +17,7 @@
 #include <utility>
 
 VolumeWidget::VolumeWidget(PipeWireService* audio, EasyEffectsService* easyEffects, Options options)
-    : m_audio(audio), m_easyEffects(easyEffects), m_showLabel(options.showLabel), m_target(options.device),
+    : m_audio(audio), m_easyEffects(easyEffects), m_showLabel(options.showLabel), m_showGlyph(options.showGlyph), m_target(options.device),
       m_muteColor(options.muteColor), m_glyphOverride(std::move(options.glyph)),
       m_muteGlyphOverride(std::move(options.muteGlyph)),
       m_effectsProfileGlyphs(std::move(options.effectsProfileGlyphs)),
@@ -61,13 +61,17 @@ void VolumeWidget::doLayout(Renderer& renderer, float containerWidth, float cont
   m_isVertical = containerHeight > containerWidth;
   syncState(renderer);
 
-  const float iconW = m_image != nullptr ? m_image->width() : m_glyph->width();
-  const float iconH = m_image != nullptr ? m_image->height() : m_glyph->height();
   if (m_label->visible()) {
     m_label->measure(renderer);
   }
 
   const bool labelVisible = m_label->visible();
+  const bool showIcon = m_showGlyph || !labelVisible;
+  Node* icon = m_image != nullptr ? static_cast<Node*>(m_image) : static_cast<Node*>(m_glyph);
+  icon->setVisible(showIcon);
+  const float iconW = showIcon ? icon->width() : 0.0F;
+  const float iconH = showIcon ? icon->height() : 0.0F;
+  const float iconGap = showIcon ? Style::spaceXs : 0.0F;
   if (m_isVertical && labelVisible) {
     const float w = std::max(iconW, m_label->width());
     if (m_image != nullptr) {
@@ -86,7 +90,7 @@ void VolumeWidget::doLayout(Renderer& renderer, float containerWidth, float cont
     }
     float totalWidth = iconW;
     if (labelVisible) {
-      m_label->setPosition(iconW + Style::spaceXs, std::round((h - m_label->height()) * 0.5F));
+      m_label->setPosition(iconW + iconGap, std::round((h - m_label->height()) * 0.5F));
       totalWidth = m_label->x() + m_label->width();
     }
     rootNode->setSize(totalWidth, h);

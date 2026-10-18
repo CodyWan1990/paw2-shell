@@ -413,9 +413,8 @@ struct WidgetBarCapsuleSpec {
 enum class WidgetStylePreset : std::uint8_t {
   Inherit,   // no preset: bar defaults apply
   None,      // no capsule
-  Capsule,   // the bar's capsule look
+  Capsule,   // the bar's capsule look ("pill" is accepted as an alias)
   Box,       // accent outline, transparent fill, small radius
-  Pill,      // translucent accent fill, fully rounded
   Underline, // accent line only
 };
 

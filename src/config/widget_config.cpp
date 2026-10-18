@@ -130,12 +130,12 @@ namespace noctalia::config {
 
     WidgetConfig launcher;
     launcher.type = "launcher";
-    launcher.settings["style"] = std::string("pill");
+    launcher.settings["style"] = std::string("capsule");
     seed("launcher", std::move(launcher));
 
     WidgetConfig paw2Layout;
     paw2Layout.type = "paw2_layout";
-    paw2Layout.settings["style"] = std::string("pill");
+    paw2Layout.settings["style"] = std::string("capsule");
     seed("paw2_layout", std::move(paw2Layout));
 
     WidgetConfig workspaces;

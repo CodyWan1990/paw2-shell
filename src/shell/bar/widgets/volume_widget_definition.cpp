@@ -49,6 +49,9 @@ const noctalia::bar::WidgetDefinition<VolumeWidget::Options>& volumeWidgetDefini
               field<&Options::showLabel>({
                   .key = "show_label",
               }),
+              field<&Options::showGlyph>({
+                  .key = "show_glyph",
+              }),
               field<&Options::muteColor>({
                   .key = "mute_color",
               }),

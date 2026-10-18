@@ -190,8 +190,11 @@ int main() {
 
   styled.settings["style"] = std::string("pill");
   const auto pill = resolveWidgetBarCapsuleSpec(plainBar, &styled);
-  ok = expect(pill.enabled && pill.fill == tertiary && pill.opacity == 0.25F, "pill: translucent accent fill") && ok;
-  ok = expect(!pill.radius.has_value() && !pill.border.has_value(), "pill: automatic radius, no border") && ok;
+  ok = expect(
+           pill.enabled && pill.fill == plainBar.widgetCapsuleFill && !pill.underline.has_value(),
+           "pill: the old name for the bar's capsule"
+       )
+      && ok;
 
   styled.settings["style"] = std::string("underline");
   const auto underline = resolveWidgetBarCapsuleSpec(plainBar, &styled);

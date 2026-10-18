@@ -312,6 +312,28 @@ namespace settings {
       return colorSpecPicker(std::optional<ColorSpec>{selected}, allowNone, std::move(noneLabel));
     }
 
+    // The bar settings paw2-shell's own Bar tab had; every other bar setting is Noctalia's
+    // fine-tuning and shows only with Advanced on. Keys are the last element of a bar entry's
+    // path (`bar.<name>.<key>`, or `bar.<name>.monitor.<match>.<key>` for an override).
+    void moveBarFineTuningToAdvanced(std::vector<SettingEntry>& entries) {
+      static constexpr std::array<std::string_view, 15> kBasicBarKeys{
+          "enabled",   "position",           "auto_hide", "auto_hide_delay_ms", "show_on_workspace_switch",
+          "thickness", "background_opacity", "margin_edge", "radius",           "shadow",
+          "capsule",   "start",              "center",      "end",              "smart_auto_hide",
+      };
+      for (auto& entry : entries) {
+        if (entry.section != SettingsSection::Bar || entry.path.size() < 3 || entry.path.front() != "bar") {
+          continue;
+        }
+        const bool barLevel = entry.path.size() == 3;
+        const bool monitorLevel = entry.path.size() == 5 && entry.path[2] == "monitor";
+        const bool basic = (barLevel || monitorLevel) && std::ranges::contains(kBasicBarKeys, entry.path.back());
+        if (!basic) {
+          entry.advanced = true;
+        }
+      }
+    }
+
     std::string pathText(const std::vector<std::string>& path) {
       std::string out;
       for (const auto& part : path) {
@@ -4144,6 +4166,7 @@ namespace settings {
       }
     }
 
+    moveBarFineTuningToAdvanced(entries);
     return entries;
   }
 

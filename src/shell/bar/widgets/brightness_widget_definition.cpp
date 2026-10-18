@@ -10,6 +10,9 @@ const noctalia::bar::WidgetDefinition<BrightnessWidget::Options>& brightnessWidg
           field<&Options::showLabel>({
               .key = "show_label",
           }),
+          field<&Options::showGlyph>({
+              .key = "show_glyph",
+          }),
           field<&Options::showWhenUnavailable>({
               .key = "show_when_unavailable",
           }),

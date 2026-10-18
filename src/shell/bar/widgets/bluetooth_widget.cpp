@@ -45,7 +45,7 @@ namespace {
 } // namespace
 
 BluetoothWidget::BluetoothWidget(BluetoothService* bluetooth, wl_output* /*output*/, Options options)
-    : m_bluetooth(bluetooth), m_showLabel(options.showLabel), m_hideWhenAdapterOff(options.hideWhenAdapterOff),
+    : m_bluetooth(bluetooth), m_showLabel(options.showLabel), m_showGlyph(options.showGlyph), m_hideWhenAdapterOff(options.hideWhenAdapterOff),
       m_hideWhenNoConnectedDevice(options.hideWhenNoConnectedDevice) {}
 
 void BluetoothWidget::create() {
@@ -82,16 +82,23 @@ void BluetoothWidget::doLayout(Renderer& renderer, float /*containerWidth*/, flo
   syncState(renderer);
 
   m_glyph->measure(renderer);
-
-  float totalWidth = m_glyph->width();
-  float contentHeight = m_glyph->height();
   if (m_label != nullptr) {
     m_label->measure(renderer);
-    if (m_label->width() > 0.0F) {
-      contentHeight = std::max(contentHeight, m_label->height());
-      m_label->setPosition(m_glyph->width() + Style::spaceXs, std::round((contentHeight - m_label->height()) * 0.5F));
-      totalWidth = m_label->x() + m_label->width();
-    }
+  }
+  // The label is only an alias while a device is connected; without one the icon is all there is.
+  const bool labelShown = m_label != nullptr && m_label->width() > 0.0F;
+  const bool showIcon = m_showGlyph || !labelShown;
+  m_glyph->setVisible(showIcon);
+  const float iconW = showIcon ? m_glyph->width() : 0.0F;
+
+  float totalWidth = iconW;
+  float contentHeight = showIcon ? m_glyph->height() : 0.0F;
+  if (labelShown) {
+    contentHeight = std::max(contentHeight, m_label->height());
+    m_label->setPosition(
+        iconW + (showIcon ? Style::spaceXs : 0.0F), std::round((contentHeight - m_label->height()) * 0.5F)
+    );
+    totalWidth = m_label->x() + m_label->width();
   }
   m_glyph->setPosition(0.0F, std::round((contentHeight - m_glyph->height()) * 0.5F));
   rootNode->setSize(totalWidth, contentHeight);

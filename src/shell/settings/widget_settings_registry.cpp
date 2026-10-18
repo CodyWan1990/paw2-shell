@@ -640,7 +640,11 @@ namespace settings {
   }
 
   std::vector<WidgetSettingSpec> commonWidgetSettingSpecs(std::string_view shellFontFamily, bool populateFontCatalogs) {
-    const WidgetSettingVisibility capsuleOn{"capsule", {"true"}};
+    // A style preset turns the capsule on without the `capsule` key, so its fine-tuning shows for either.
+    const WidgetSettingVisibility capsuleOn{
+        WidgetSettingVisibilityCondition{.key = "capsule", .values = {"true"}},
+        WidgetSettingVisibilityCondition{.key = "style", .values = {"capsule", "box"}},
+    };
 
     auto enabled = boolSpec("enabled", true);
     enabled.visibleInInspector = false;
@@ -677,22 +681,23 @@ namespace settings {
     fontFamily.literalLabels = true;
     fontFamily = withGroup(std::move(fontFamily), "presentation");
 
-    // paw2-shell decoration presets; explicit capsule_* keys below still override a preset.
+    // paw2-shell's per-widget Look: style preset, accent colour, underline thickness. Explicit
+    // capsule_* keys (Advanced) still override a preset.
     auto style = withGroup(
         selectSpec(
             "style", "",
             {{"", "settings.widgets.options.style-inherit"},
              {"none", "settings.widgets.options.style-none"},
-             {"capsule", "settings.widgets.options.style-capsule"},
+             {"underline", "settings.widgets.options.style-underline"},
              {"box", "settings.widgets.options.style-box"},
-             {"pill", "settings.widgets.options.style-pill"},
-             {"underline", "settings.widgets.options.style-underline"}},
-            true
+             {"capsule", "settings.widgets.options.style-capsule"}}
         ),
-        "presentation"
+        "look"
     );
+    style.segmented = true;
     auto underline = withGroup(colorSpec("underline", {}, true), "presentation");
-    auto underlineWidth = withGroup(doubleSpec("underline_width", 2.0, 0.0, 8.0, 0.5), "presentation");
+    auto underlineWidth = withGroup(doubleSpec("underline_width", 2.0, 0.0, 8.0, 0.5), "look");
+    underlineWidth.visibleWhen = WidgetSettingVisibility{"style", {"underline"}};
 
     auto capsuleToggle = withGroup(boolSpec("capsule", false), "presentation");
     capsuleToggle.schema.inheritsFromBar = true;
@@ -740,16 +745,33 @@ namespace settings {
     scrollRepeat.visibleWhen = WidgetSettingVisibility{"interactive", {"true"}};
     actions.visibleWhen = WidgetSettingVisibility{"interactive", {"true"}};
 
-    return {
-        std::move(enabled),           std::move(anchor),          std::move(interactive),
-        std::move(showTooltip),       std::move(scale),           std::move(fontScale),
-        std::move(widgetColor),       std::move(widgetIconColor), std::move(fontFamily),
-        std::move(fontWeight),        std::move(style),           std::move(underline),
-        std::move(underlineWidth),    std::move(capsuleToggle),   std::move(capsuleRadius),
-        std::move(capsuleFill),       std::move(capsuleBorder),   std::move(capsuleBorderWidth),
-        std::move(capsuleForeground), std::move(capsulePadding),  std::move(capsuleOpacity),
-        std::move(scrollRepeat),      std::move(actions),
+    widgetColor = withGroup(std::move(widgetColor), "look");
+
+    // The Look group is what shows by default; everything else is Noctalia's fine-tuning and waits
+    // for the Settings window's Advanced toggle.
+    std::vector<WidgetSettingSpec> look{std::move(style), std::move(widgetColor), std::move(underlineWidth)};
+    for (auto& spec : look) {
+      spec.advanced = false;
+    }
+    std::vector<WidgetSettingSpec> fineTuning{
+        std::move(anchor),          std::move(interactive),        std::move(showTooltip),
+        std::move(scale),           std::move(fontScale),          std::move(widgetIconColor),
+        std::move(fontFamily),      std::move(fontWeight),         std::move(underline),
+        std::move(capsuleToggle),   std::move(capsuleRadius),      std::move(capsuleFill),
+        std::move(capsuleBorder),   std::move(capsuleBorderWidth), std::move(capsuleForeground),
+        std::move(capsulePadding),  std::move(capsuleOpacity),     std::move(scrollRepeat),
+        std::move(actions),
     };
+    for (auto& spec : fineTuning) {
+      spec.advanced = true;
+    }
+
+    std::vector<WidgetSettingSpec> specs;
+    specs.reserve(1 + look.size() + fineTuning.size());
+    specs.push_back(std::move(enabled));
+    std::ranges::move(look, std::back_inserter(specs));
+    std::ranges::move(fineTuning, std::back_inserter(specs));
+    return specs;
   }
 
   namespace {
@@ -781,19 +803,24 @@ namespace settings {
         applyCommonOverrides(commonSpecs, projection->commonOverrides(), type);
       }
 
+      std::vector<WidgetSettingSpec> own;
       if (projection != nullptr) {
-        specs = projection->presentedSettingSpecs();
+        own = projection->presentedSettingSpecs();
       }
       // A type's own setting wins over a common one with the same key (workspaces' `style`).
-      std::erase_if(commonSpecs, [&specs](const WidgetSettingSpec& common) {
-        return std::ranges::any_of(specs, [&common](const WidgetSettingSpec& own) {
-          return own.schema.key == common.schema.key;
+      std::erase_if(commonSpecs, [&own](const WidgetSettingSpec& common) {
+        return std::ranges::any_of(own, [&common](const WidgetSettingSpec& mine) {
+          return mine.schema.key == common.schema.key;
         });
       });
 
-      specs.insert(
-          specs.end(), std::make_move_iterator(commonSpecs.begin()), std::make_move_iterator(commonSpecs.end())
-      );
+      // paw2-shell's editor order: the Look first, then what is particular to this widget, then
+      // the common fine-tuning.
+      const auto isLook = [](const WidgetSettingSpec& spec) { return spec.group == "look"; };
+      const auto rest = std::ranges::stable_partition(commonSpecs, isLook).begin();
+      specs.insert(specs.end(), std::make_move_iterator(commonSpecs.begin()), std::make_move_iterator(rest));
+      std::ranges::move(own, std::back_inserter(specs));
+      specs.insert(specs.end(), std::make_move_iterator(rest), std::make_move_iterator(commonSpecs.end()));
       applyGestureActionDefaults(specs, type, config);
       return specs;
     }

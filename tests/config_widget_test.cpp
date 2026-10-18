@@ -176,5 +176,55 @@ int main() {
   const WidgetBarCapsuleSpec groupSpec = capsuleSpecFromGroup(bar, group);
   ok = expect(groupSpec.borderWidth == 2.5F, "capsule group border width reaches the resolved spec") && ok;
 
+  // paw2-shell style presets: accent is the widget color, explicit keys still win.
+  BarConfig plainBar;
+  WidgetConfig styled;
+  styled.settings["color"] = std::string("tertiary");
+  const ColorSpec tertiary = colorSpecFromRole(ColorRole::Tertiary);
+
+  styled.settings["style"] = std::string("box");
+  const auto box = resolveWidgetBarCapsuleSpec(plainBar, &styled);
+  ok = expect(box.enabled && box.border == std::optional<ColorSpec>(tertiary), "box: accent outline") && ok;
+  ok = expect(box.fill == clearColorSpec() && box.radius == std::optional<float>(4.0F), "box: clear, square-ish") && ok;
+  ok = expect(!box.underline.has_value(), "box: no underline") && ok;
+
+  styled.settings["style"] = std::string("pill");
+  const auto pill = resolveWidgetBarCapsuleSpec(plainBar, &styled);
+  ok = expect(pill.enabled && pill.fill == tertiary && pill.opacity == 0.25F, "pill: translucent accent fill") && ok;
+  ok = expect(!pill.radius.has_value() && !pill.border.has_value(), "pill: automatic radius, no border") && ok;
+
+  styled.settings["style"] = std::string("underline");
+  const auto underline = resolveWidgetBarCapsuleSpec(plainBar, &styled);
+  ok = expect(underline.enabled && underline.underline == std::optional<ColorSpec>(tertiary), "underline: accent") && ok;
+  ok = expect(underline.fill == clearColorSpec() && !underline.border.has_value(), "underline: line only") && ok;
+
+  styled.settings["style"] = std::string("none");
+  plainBar.widgetCapsuleDefault = true;
+  ok = expect(!resolveWidgetBarCapsuleSpec(plainBar, &styled).enabled, "none: overrides a capsule bar") && ok;
+  plainBar.widgetCapsuleDefault = false;
+
+  styled.settings["style"] = std::string("box");
+  styled.settings["capsule_radius"] = 9.0;
+  styled.settings["capsule_border"] = std::string("error");
+  const auto overridden = resolveWidgetBarCapsuleSpec(plainBar, &styled);
+  ok = expect(overridden.radius == std::optional<float>(9.0F), "explicit radius beats the preset") && ok;
+  ok = expect(
+           overridden.border == std::optional<ColorSpec>(colorSpecFromRole(ColorRole::Error)),
+           "explicit border beats the preset"
+       )
+      && ok;
+
+  WidgetConfig underlineOnly;
+  underlineOnly.settings["underline"] = std::string("primary");
+  underlineOnly.settings["underline_width"] = 3.0;
+  const auto lineOnly = resolveWidgetBarCapsuleSpec(plainBar, &underlineOnly);
+  ok = expect(lineOnly.enabled && lineOnly.fill == clearColorSpec(), "bare underline gets invisible geometry") && ok;
+  ok = expect(lineOnly.underlineWidth == 3.0F, "underline width") && ok;
+
+  WidgetConfig inherit;
+  plainBar.widgetCapsuleDefault = true;
+  const auto inherited = resolveWidgetBarCapsuleSpec(plainBar, &inherit);
+  ok = expect(inherited.enabled && !inherited.underline.has_value(), "no style keeps bar defaults") && ok;
+
   return ok ? 0 : 1;
 }

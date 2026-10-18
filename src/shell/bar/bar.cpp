@@ -987,6 +987,7 @@ namespace {
     layoutWidgets(instance.endWidgets);
 
     auto finalizeCapsules = [isVertical, capsuleCross, widgetHoverPadding = instance.barConfig.widgetCapsulePadding,
+                             barOnLeft = instance.barConfig.position == "left",
                              &renderer](std::vector<BarCapsuleRun>& runs) {
       for (auto& run : runs) {
         Node* shell = run.shell;
@@ -1036,6 +1037,9 @@ namespace {
           bg->setVisible(false);
           bg->setPosition(0.0F, 0.0F);
           bg->setSize(iw, ih);
+          if (run.underline != nullptr) {
+            run.underline->setVisible(false);
+          }
           placeCapsuleHoverBoxes(run, isVertical, iw, ih, 0.0F, 0.0F, std::min(iw, ih) * 0.5F, widgetHoverPadding);
           // No pill to hover: the group renders full-size, so nothing may stay input-suppressed.
           if (run.accordion) {
@@ -1111,6 +1115,19 @@ namespace {
         const float capsuleRadius = radiusSource != nullptr ? radiusSource->resolvedBarCapsuleRadius(shellW, shellH)
                                                             : std::max(0.0F, std::min(shellW, shellH) * 0.5F);
         bg->setRadius(capsuleRadius);
+        if (run.underline != nullptr) {
+          // Bottom edge on a horizontal bar; on a vertical bar, the edge facing the screen interior.
+          const float thickness = std::min(run.spec.underlineWidth * scale, isVertical ? shellW : shellH);
+          run.underline->setVisible(thickness > 0.0F);
+          if (isVertical) {
+            run.underline->setPosition(barOnLeft ? shellW - thickness : 0.0F, 0.0F);
+            run.underline->setSize(thickness, shellH);
+          } else {
+            run.underline->setPosition(0.0F, shellH - thickness);
+            run.underline->setSize(shellW, thickness);
+          }
+          run.underline->setRadius(thickness * 0.5F);
+        }
         if (run.container == nullptr) {
           placeCapsuleHoverBoxes(
               run, isVertical, shellW, shellH, contentX, contentY, capsuleRadius, widgetHoverPadding
@@ -2625,6 +2642,22 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
     return boxPtr;
   };
 
+  // Underline accent: above the fill, below the content. Geometry is set in layoutBarSections.
+  auto addCapsuleUnderline = [](const WidgetBarCapsuleSpec& cap, Node& shell) -> Box* {
+    if (!cap.underline.has_value()) {
+      return nullptr;
+    }
+    Box* boxPtr = nullptr;
+    shell.addChild(
+        ui::box({
+            .out = &boxPtr,
+            .fill = *cap.underline,
+            .configure = [](Box& box) { box.setZIndex(-1); },
+        })
+    );
+    return boxPtr;
+  };
+
   auto attach = [&](std::vector<std::unique_ptr<Widget>>& widgets, std::vector<BarCapsuleRun>& capsuleRuns,
                     Flex* section) {
     if (section == nullptr) {
@@ -2740,6 +2773,7 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
           },
       });
       shellPtr->addChild(std::move(capsuleBg));
+      Box* underlinePtr = addCapsuleUnderline(cap, *shellPtr);
       Box* hoverPtr = addHoverBox(widget, *shellPtr);
       shellPtr->addChild(widget.releaseRoot());
       widget.setBarCapsuleScene(shellPtr, bgPtr);
@@ -2750,6 +2784,7 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
           BarCapsuleRun{
               .shell = shellPtr,
               .bg = bgPtr,
+              .underline = underlinePtr,
               .container = nullptr,
               .content = widget.outerNode(),
               .spec = cap,
@@ -2831,6 +2866,7 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
           },
       });
       shellPtr->addChild(std::move(capsuleBg));
+      Box* groupUnderlinePtr = addCapsuleUnderline(cap, *shellPtr);
 
       // Visual order: with accordion + Start direction the always-visible first member sits last,
       // so the hidden members unfold before it along the lane's main axis. Flex children,
@@ -2885,6 +2921,7 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
       BarCapsuleRun run;
       run.shell = shellPtr;
       run.bg = bgPtr;
+      run.underline = groupUnderlinePtr;
       run.container = innerPtr;
       run.content = innerPtr;
       run.spec = cap;

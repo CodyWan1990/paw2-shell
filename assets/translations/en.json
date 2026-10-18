@@ -4255,6 +4255,12 @@
         "regular": "Regular",
         "replace": "Replace",
         "scroll-gesture": "Once per Gesture",
+        "style-box": "Box",
+        "style-capsule": "Capsule",
+        "style-inherit": "Bar default",
+        "style-none": "None",
+        "style-pill": "Pill",
+        "style-underline": "Underline",
         "scroll-steps": "Every Step",
         "shared": "Shared",
         "short": "Short",
@@ -4315,6 +4321,18 @@
         "capsule": {
           "description": "Draw a capsule behind this widget",
           "label": "Capsule"
+        },
+        "style": {
+          "description": "Decoration preset: none, capsule, box outline, translucent pill or accent underline. Explicit capsule settings still override it",
+          "label": "Style"
+        },
+        "underline": {
+          "description": "Accent line along the widget's inner edge; color role or hex. The underline style uses the widget color",
+          "label": "Underline"
+        },
+        "underline-width": {
+          "description": "Thickness of the underline in pixels",
+          "label": "Underline Width"
         },
         "capsule-border": {
           "description": "Color role for the capsule outline; fixed hex colors are also supported",

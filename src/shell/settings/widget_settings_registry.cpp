@@ -674,6 +674,23 @@ namespace settings {
     fontFamily.literalLabels = true;
     fontFamily = withGroup(std::move(fontFamily), "presentation");
 
+    // paw2-shell decoration presets; explicit capsule_* keys below still override a preset.
+    auto style = withGroup(
+        selectSpec(
+            "style", "",
+            {{"", "settings.widgets.options.style-inherit"},
+             {"none", "settings.widgets.options.style-none"},
+             {"capsule", "settings.widgets.options.style-capsule"},
+             {"box", "settings.widgets.options.style-box"},
+             {"pill", "settings.widgets.options.style-pill"},
+             {"underline", "settings.widgets.options.style-underline"}},
+            true
+        ),
+        "presentation"
+    );
+    auto underline = withGroup(colorSpec("underline", {}, true), "presentation");
+    auto underlineWidth = withGroup(doubleSpec("underline_width", 2.0, 0.0, 8.0, 0.5), "presentation");
+
     auto capsuleToggle = withGroup(boolSpec("capsule", false), "presentation");
     capsuleToggle.schema.inheritsFromBar = true;
     auto capsuleFill = withGroup(colorSpec("capsule_fill", "", true), "presentation");
@@ -724,7 +741,8 @@ namespace settings {
         std::move(enabled),           std::move(anchor),          std::move(interactive),
         std::move(showTooltip),       std::move(scale),           std::move(fontScale),
         std::move(widgetColor),       std::move(widgetIconColor), std::move(fontFamily),
-        std::move(fontWeight),        std::move(capsuleToggle),   std::move(capsuleRadius),
+        std::move(fontWeight),        std::move(style),           std::move(underline),
+        std::move(underlineWidth),    std::move(capsuleToggle),   std::move(capsuleRadius),
         std::move(capsuleFill),       std::move(capsuleBorder),   std::move(capsuleBorderWidth),
         std::move(capsuleForeground), std::move(capsulePadding),  std::move(capsuleOpacity),
         std::move(scrollRepeat),      std::move(actions),

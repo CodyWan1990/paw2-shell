@@ -24,6 +24,8 @@ class Node;
 struct BarCapsuleRun {
   Node* shell = nullptr;
   Box* bg = nullptr;
+  // Accent line from `style = "underline"` / `underline`; null when the spec has none.
+  Box* underline = nullptr;
   Flex* container = nullptr;
   Node* content = nullptr;
   WidgetBarCapsuleSpec spec{};

@@ -330,16 +330,94 @@ WidgetConfig::getStringMap(const std::string& key, const std::unordered_map<std:
 
 bool WidgetConfig::hasSetting(const std::string& key) const { return findSetting(key) != nullptr; }
 
+WidgetStylePreset parseWidgetStylePreset(std::string_view value) noexcept {
+  if (value == "none") {
+    return WidgetStylePreset::None;
+  }
+  if (value == "capsule") {
+    return WidgetStylePreset::Capsule;
+  }
+  if (value == "box") {
+    return WidgetStylePreset::Box;
+  }
+  if (value == "pill") {
+    return WidgetStylePreset::Pill;
+  }
+  if (value == "underline") {
+    return WidgetStylePreset::Underline;
+  }
+  return WidgetStylePreset::Inherit;
+}
+
+namespace {
+
+  // What a style preset contributes before the widget's explicit keys are applied.
+  struct StylePresetDefaults {
+    std::optional<bool> enabled;
+    std::optional<ColorSpec> fill;
+    std::optional<float> opacity;
+    std::optional<std::optional<ColorSpec>> border;
+    std::optional<std::optional<float>> radius;
+    std::optional<ColorSpec> underline;
+  };
+
+  constexpr float kBoxPresetRadius = 4.0F;
+  constexpr float kPillPresetFillAlpha = 0.25F;
+
+  [[nodiscard]] StylePresetDefaults stylePresetDefaults(WidgetStylePreset preset, const ColorSpec& accent) {
+    switch (preset) {
+    case WidgetStylePreset::Inherit:
+      return {};
+    case WidgetStylePreset::None:
+      return {.enabled = false};
+    case WidgetStylePreset::Capsule:
+      return {.enabled = true};
+    case WidgetStylePreset::Box:
+      return {
+          .enabled = true,
+          .fill = clearColorSpec(),
+          .border = std::optional<ColorSpec>(accent),
+          .radius = std::optional<float>(kBoxPresetRadius),
+      };
+    case WidgetStylePreset::Pill:
+      return {
+          .enabled = true,
+          .fill = accent,
+          .opacity = kPillPresetFillAlpha,
+          .border = std::optional<ColorSpec>{},
+          .radius = std::optional<float>{},
+      };
+    case WidgetStylePreset::Underline:
+      return {
+          .enabled = true,
+          .fill = clearColorSpec(),
+          .border = std::optional<ColorSpec>{},
+          .underline = accent,
+      };
+    }
+    return {};
+  }
+
+} // namespace
+
 WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const WidgetConfig* widget) {
   WidgetBarCapsuleSpec spec{};
   const bool widgetHasCapsuleKey = widget != nullptr && widget->hasSetting("capsule");
   const bool widgetHasFillKey = widget != nullptr && widget->hasSetting("capsule_fill");
   const bool widgetHasBorderKey = widget != nullptr && widget->hasSetting("capsule_border");
+  const bool widgetHasUnderlineKey = widget != nullptr && widget->hasSetting("underline");
+
+  const WidgetStylePreset preset =
+      widget != nullptr ? parseWidgetStylePreset(widget->getString("style")) : WidgetStylePreset::Inherit;
+  const ColorSpec accent = widget != nullptr
+      ? widget->getColorSpec("color", colorSpecFromRole(ColorRole::Primary), "widget.color")
+      : colorSpecFromRole(ColorRole::Primary);
+  const StylePresetDefaults presetDefaults = stylePresetDefaults(preset, accent);
 
   if (widgetHasCapsuleKey) {
     spec.enabled = widget->getBool("capsule", false);
   } else {
-    spec.enabled = bar.widgetCapsuleDefault;
+    spec.enabled = presetDefaults.enabled.value_or(bar.widgetCapsuleDefault);
   }
 
   spec.padding = bar.widgetCapsulePadding;
@@ -350,6 +428,9 @@ WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const Wid
   }
   if (bar.widgetCapsuleRadius.has_value()) {
     spec.radius = std::clamp(static_cast<float>(*bar.widgetCapsuleRadius), 0.0F, 80.0F);
+  }
+  if (presetDefaults.radius.has_value()) {
+    spec.radius = *presetDefaults.radius;
   }
   if (widget != nullptr) {
     const auto radius = widget->settings.find("capsule_radius");
@@ -368,7 +449,7 @@ WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const Wid
         noctalia::config::schema::kBarCapsuleBorderWidthRange
     );
   }
-  spec.opacity = bar.widgetCapsuleOpacity;
+  spec.opacity = presetDefaults.opacity.value_or(bar.widgetCapsuleOpacity);
   if (widget != nullptr && widget->hasSetting("capsule_opacity")) {
     spec.opacity = std::clamp(
         static_cast<float>(widget->getDouble("capsule_opacity", static_cast<double>(spec.opacity))), 0.0F, 1.0F
@@ -376,18 +457,41 @@ WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const Wid
   }
   spec.hoverHighlight = bar.hoverHighlight;
 
+  if (widgetHasUnderlineKey) {
+    spec.underline = widget->getOptionalColorSpec("underline", "widget.underline");
+  } else {
+    spec.underline = presetDefaults.underline;
+  }
+  if (widget != nullptr && widget->hasSetting("underline_width")) {
+    spec.underlineWidth = std::clamp(
+        static_cast<float>(widget->getDouble("underline_width", static_cast<double>(spec.underlineWidth))), 0.0F, 8.0F
+    );
+  }
+  // The line is drawn inside the capsule shell; a widget with an underline but no capsule
+  // gets the geometry with nothing else painted.
+  const bool underlineOnly = !spec.enabled && spec.underline.has_value() && !widgetHasCapsuleKey;
+  if (underlineOnly) {
+    spec.enabled = true;
+  }
+
   if (!spec.enabled) {
     return spec;
   }
 
   if (widgetHasFillKey) {
     spec.fill = widget->getColorSpec("capsule_fill", bar.widgetCapsuleFill, "widget.capsule_fill");
+  } else if (underlineOnly) {
+    spec.fill = clearColorSpec();
   } else {
-    spec.fill = bar.widgetCapsuleFill;
+    spec.fill = presetDefaults.fill.value_or(bar.widgetCapsuleFill);
   }
 
   if (widgetHasBorderKey) {
     spec.border = widget->getOptionalColorSpec("capsule_border", "widget.capsule_border");
+  } else if (underlineOnly) {
+    spec.border = std::nullopt;
+  } else if (presetDefaults.border.has_value()) {
+    spec.border = *presetDefaults.border;
   } else if (bar.widgetCapsuleBorderSpecified) {
     spec.border = bar.widgetCapsuleBorder;
   } else {

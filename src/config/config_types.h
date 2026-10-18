@@ -399,9 +399,27 @@ struct WidgetBarCapsuleSpec {
   BarAccordionDirection accordionDirection = BarAccordionDirection::End;
   // Gap between group members; unset inherits the bar's widget_spacing. Meaningless for single widgets.
   std::optional<float> widgetSpacing;
+  // Accent line along the widget's edge facing the screen interior (`style = "underline"`, or
+  // `[widget.*] underline` with any style). Drawn inside the capsule geometry, so it implies `enabled`.
+  std::optional<ColorSpec> underline;
+  // Line thickness in logical pixels before content-scale.
+  float underlineWidth = 2.0F;
 
   bool operator==(const WidgetBarCapsuleSpec&) const = default;
 };
+
+// Per-widget decoration presets (`[widget.*] style`), carried over from paw2-shell's QML bar. A preset
+// only supplies defaults: any explicit `capsule_*` or `underline` key on the widget still wins.
+enum class WidgetStylePreset : std::uint8_t {
+  Inherit,   // no preset: bar defaults apply
+  None,      // no capsule
+  Capsule,   // the bar's capsule look
+  Box,       // accent outline, transparent fill, small radius
+  Pill,      // translucent accent fill, fully rounded
+  Underline, // accent line only
+};
+
+[[nodiscard]] WidgetStylePreset parseWidgetStylePreset(std::string_view value) noexcept;
 
 struct CommonWidgetOptions {
   bool enabled = true;

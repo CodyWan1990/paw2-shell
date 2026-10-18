@@ -1058,7 +1058,11 @@ bool WaylandConnection::hasFractionalScale() const noexcept {
 bool WaylandConnection::hasGammaControl() const noexcept { return m_gammaControlManager != nullptr; }
 bool WaylandConnection::hasOutputManagement() const noexcept { return m_outputManager != nullptr; }
 
-bool WaylandConnection::hasScreencopy() const noexcept { return m_screencopyManager != nullptr; }
+// Either capture path: wlr-screencopy, or ext-image-copy-capture with output sources (paw2).
+bool WaylandConnection::hasScreencopy() const noexcept {
+  return m_screencopyManager != nullptr
+      || (m_imageCopyCaptureManager != nullptr && m_outputImageCaptureSourceManager != nullptr);
+}
 
 zwlr_gamma_control_manager_v1* WaylandConnection::gammaControlManager() const noexcept { return m_gammaControlManager; }
 
@@ -1386,7 +1390,9 @@ void WaylandConnection::bindGlobal(
   if (m_purpose == Purpose::Screencopy
       && interfaceName != wl_shm_interface.name
       && interfaceName != wl_output_interface.name
-      && interfaceName != zwlr_screencopy_manager_v1_interface.name) {
+      && interfaceName != zwlr_screencopy_manager_v1_interface.name
+      && interfaceName != ext_image_copy_capture_manager_v1_interface.name
+      && interfaceName != ext_output_image_capture_source_manager_v1_interface.name) {
     return;
   }
 

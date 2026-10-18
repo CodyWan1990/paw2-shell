@@ -45,6 +45,11 @@ public:
   void destroyPending();
 
 private:
+  // Same result as the wlr-screencopy path, through ext-image-copy-capture-v1.
+  void captureWithImageCopy(
+      wl_output* output, std::optional<LogicalRect> region, bool overlayCursor, CompletionCallback onComplete
+  );
+
   WaylandConnection& m_wayland;
   bool m_busy = false;
   CompletionCallback m_onComplete;

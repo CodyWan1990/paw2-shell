@@ -1,9 +1,13 @@
 #include "capture/screencopy_capture.h"
 
 #include "core/log.h"
+#include "ext-image-capture-source-v1-client-protocol.h"
+#include "ext-image-copy-capture-v1-client-protocol.h"
 #include "wayland/wayland_connection.h"
 #include "wlr-screencopy-unstable-v1-client-protocol.h"
 
+#include <algorithm>
+#include <cmath>
 #include <cstring>
 #include <sys/mman.h>
 #include <unistd.h>
@@ -28,6 +32,16 @@ struct ScreencopyCapturePending {
   int stride = 0;
   bool bufferDone = false;
   bool yInvert = false;
+
+  // ext-image-copy-capture path (paw2 has no wlr-screencopy). The ext protocol always captures the
+  // whole output, so a region is cropped here, from logical output coordinates to buffer pixels.
+  ext_image_capture_source_v1* extSource = nullptr;
+  ext_image_copy_capture_session_v1* extSession = nullptr;
+  ext_image_copy_capture_frame_v1* extFrame = nullptr;
+  bool hasShmFormat = false;
+  std::optional<LogicalRect> region;
+  int logicalWidth = 0;
+  int logicalHeight = 0;
 };
 
 namespace {
@@ -342,6 +356,148 @@ namespace {
           },
   };
 
+  // Higher is better; 0 = a layout convertToRgba cannot read from a 4-byte-per-pixel buffer.
+  [[nodiscard]] int extFormatPreference(std::uint32_t format) {
+    switch (format) {
+    case WL_SHM_FORMAT_XRGB8888:
+    case WL_SHM_FORMAT_ARGB8888:
+      return 3;
+    case WL_SHM_FORMAT_XBGR8888:
+    case WL_SHM_FORMAT_ABGR8888:
+      return 2;
+    default:
+      return isPacked2101010(format) ? 1 : 0;
+    }
+  }
+
+  // Crop `image` to `region`, given in logical output coordinates.
+  void cropToLogicalRegion(ScreencopyImage& image, const LogicalRect& region, int logicalWidth, int logicalHeight) {
+    if (logicalWidth <= 0 || logicalHeight <= 0 || image.width <= 0 || image.height <= 0) {
+      return;
+    }
+    const double scaleX = static_cast<double>(image.width) / logicalWidth;
+    const double scaleY = static_cast<double>(image.height) / logicalHeight;
+    const int x0 = std::clamp(static_cast<int>(std::floor(region.x * scaleX)), 0, image.width);
+    const int y0 = std::clamp(static_cast<int>(std::floor(region.y * scaleY)), 0, image.height);
+    const int x1 = std::clamp(static_cast<int>(std::ceil((region.x + region.width) * scaleX)), x0, image.width);
+    const int y1 = std::clamp(static_cast<int>(std::ceil((region.y + region.height) * scaleY)), y0, image.height);
+    const int width = x1 - x0;
+    const int height = y1 - y0;
+    if (width <= 0 || height <= 0 || (width == image.width && height == image.height)) {
+      return;
+    }
+    std::vector<std::uint8_t> cropped(static_cast<std::size_t>(width) * static_cast<std::size_t>(height) * 4U);
+    for (int y = 0; y < height; ++y) {
+      std::memcpy(
+          cropped.data() + static_cast<std::size_t>(y) * static_cast<std::size_t>(width) * 4U,
+          image.rgba.data()
+              + (static_cast<std::size_t>(y0 + y) * static_cast<std::size_t>(image.width) + static_cast<std::size_t>(x0))
+                  * 4U,
+          static_cast<std::size_t>(width) * 4U
+      );
+    }
+    image.rgba = std::move(cropped);
+    image.width = width;
+    image.height = height;
+  }
+
+  void extCaptureFrame(ScreencopyCapturePending* pending);
+
+  const ext_image_copy_capture_frame_v1_listener kExtFrameListener = {
+      .transform = [](void*, ext_image_copy_capture_frame_v1*, std::uint32_t) {},
+      .damage = [](void*, ext_image_copy_capture_frame_v1*, std::int32_t, std::int32_t, std::int32_t, std::int32_t) {},
+      .presentation_time = [](void*, ext_image_copy_capture_frame_v1*, std::uint32_t, std::uint32_t, std::uint32_t) {},
+      .ready =
+          [](void* data, ext_image_copy_capture_frame_v1*) {
+            auto* pending = static_cast<ScreencopyCapturePending*>(data);
+            ScreencopyImage image;
+            image.width = pending->width;
+            image.height = pending->height;
+            if (!convertToRgba(
+                    static_cast<const std::uint8_t*>(pending->mapped), pending->width, pending->height, pending->stride,
+                    pending->shmFormat, image.rgba
+                )) {
+              pending->owner->fail("unsupported image-copy-capture buffer layout");
+              return;
+            }
+            if (pending->region.has_value()) {
+              cropToLogicalRegion(image, *pending->region, pending->logicalWidth, pending->logicalHeight);
+            }
+            pending->owner->finish(std::move(image));
+          },
+      .failed =
+          [](void* data, ext_image_copy_capture_frame_v1*, std::uint32_t /*reason*/) {
+            static_cast<ScreencopyCapturePending*>(data)->owner->fail("image-copy-capture frame failed");
+          },
+  };
+
+  const ext_image_copy_capture_session_v1_listener kExtSessionListener = {
+      .buffer_size =
+          [](void* data, ext_image_copy_capture_session_v1*, std::uint32_t width, std::uint32_t height) {
+            auto* pending = static_cast<ScreencopyCapturePending*>(data);
+            pending->width = static_cast<int>(width);
+            pending->height = static_cast<int>(height);
+          },
+      .shm_format =
+          [](void* data, ext_image_copy_capture_session_v1*, std::uint32_t format) {
+            auto* pending = static_cast<ScreencopyCapturePending*>(data);
+            const int preference = extFormatPreference(format);
+            if (preference > 0
+                && (!pending->hasShmFormat || preference > extFormatPreference(pending->shmFormat))) {
+              pending->shmFormat = format;
+              pending->hasShmFormat = true;
+            }
+          },
+      .dmabuf_device = [](void*, ext_image_copy_capture_session_v1*, wl_array*) {},
+      .dmabuf_format = [](void*, ext_image_copy_capture_session_v1*, std::uint32_t, wl_array*) {},
+      .done =
+          [](void* data, ext_image_copy_capture_session_v1*) {
+            auto* pending = static_cast<ScreencopyCapturePending*>(data);
+            if (pending->extFrame == nullptr) {
+              extCaptureFrame(pending);
+            }
+          },
+      .stopped =
+          [](void* data, ext_image_copy_capture_session_v1*) {
+            static_cast<ScreencopyCapturePending*>(data)->owner->fail("image-copy-capture session stopped");
+          },
+  };
+
+  void extCaptureFrame(ScreencopyCapturePending* pending) {
+    if (pending->width <= 0 || pending->height <= 0 || !pending->hasShmFormat) {
+      pending->owner->fail("compositor offered no usable shared-memory capture buffer");
+      return;
+    }
+    wl_shm* shm = pending->owner->wayland().shm();
+    if (shm == nullptr) {
+      pending->owner->fail("wl_shm unavailable");
+      return;
+    }
+    pending->stride = pending->width * 4;
+    const std::size_t bufferSize = static_cast<std::size_t>(pending->stride) * static_cast<std::size_t>(pending->height);
+    pending->fd = createAnonymousFile(bufferSize);
+    if (pending->fd < 0) {
+      pending->owner->fail("failed to allocate SHM buffer");
+      return;
+    }
+    pending->mappedSize = bufferSize;
+    pending->mapped = mmap(nullptr, bufferSize, PROT_READ | PROT_WRITE, MAP_SHARED, pending->fd, 0);
+    if (pending->mapped == MAP_FAILED) {
+      pending->owner->fail("failed to map SHM buffer");
+      return;
+    }
+    pending->pool = wl_shm_create_pool(shm, pending->fd, static_cast<int32_t>(bufferSize));
+    pending->buffer = wl_shm_pool_create_buffer(
+        pending->pool, 0, pending->width, pending->height, pending->stride, pending->shmFormat
+    );
+    pending->extFrame = ext_image_copy_capture_session_v1_create_frame(pending->extSession);
+    ext_image_copy_capture_frame_v1_add_listener(pending->extFrame, &kExtFrameListener, pending);
+    ext_image_copy_capture_frame_v1_attach_buffer(pending->extFrame, pending->buffer);
+    ext_image_copy_capture_frame_v1_damage_buffer(pending->extFrame, 0, 0, pending->width, pending->height);
+    ext_image_copy_capture_frame_v1_capture(pending->extFrame);
+    wl_display_flush(pending->owner->wayland().display());
+  }
+
 } // namespace
 
 ScreencopyCapture::ScreencopyCapture(WaylandConnection& wayland) : m_wayland(wayland) {}
@@ -369,6 +525,10 @@ void ScreencopyCapture::capture(
   destroyPending();
 
   auto* manager = m_wayland.screencopyManager();
+  if (manager == nullptr && m_wayland.imageCopyCaptureManager() != nullptr) {
+    captureWithImageCopy(output, region, overlayCursor, std::move(onComplete));
+    return;
+  }
   if (manager == nullptr) {
     if (onComplete) {
       onComplete(std::nullopt, "screencopy manager missing");
@@ -395,6 +555,38 @@ void ScreencopyCapture::capture(
 
   zwlr_screencopy_frame_v1_add_listener(m_pending->frame, &kFrameListener, m_pending.get());
   wl_display_flush(wayland().display());
+}
+
+void ScreencopyCapture::captureWithImageCopy(
+    wl_output* output, std::optional<LogicalRect> region, bool overlayCursor, CompletionCallback onComplete
+) {
+  m_busy = true;
+  m_onComplete = std::move(onComplete);
+  m_pending = std::make_unique<ScreencopyCapturePending>();
+  m_pending->owner = this;
+  if (region.has_value() && region->width > 0 && region->height > 0) {
+    m_pending->region = region;
+    if (const auto* info = m_wayland.findOutputByWl(output); info != nullptr) {
+      m_pending->logicalWidth = info->logicalWidth;
+      m_pending->logicalHeight = info->logicalHeight;
+    }
+  }
+
+  m_pending->extSource =
+      ext_output_image_capture_source_manager_v1_create_source(m_wayland.outputImageCaptureSourceManager(), output);
+  if (m_pending->extSource == nullptr) {
+    fail("failed to create output capture source");
+    return;
+  }
+  const std::uint32_t options = overlayCursor ? EXT_IMAGE_COPY_CAPTURE_MANAGER_V1_OPTIONS_PAINT_CURSORS : 0;
+  m_pending->extSession =
+      ext_image_copy_capture_manager_v1_create_session(m_wayland.imageCopyCaptureManager(), m_pending->extSource, options);
+  if (m_pending->extSession == nullptr) {
+    fail("failed to create image-copy-capture session");
+    return;
+  }
+  ext_image_copy_capture_session_v1_add_listener(m_pending->extSession, &kExtSessionListener, m_pending.get());
+  wl_display_flush(m_wayland.display());
 }
 
 void ScreencopyCapture::cancelInFlight() {
@@ -428,6 +620,18 @@ void ScreencopyCapture::destroyPending() {
   if (m_pending->frame != nullptr) {
     zwlr_screencopy_frame_v1_destroy(m_pending->frame);
     m_pending->frame = nullptr;
+  }
+  if (m_pending->extFrame != nullptr) {
+    ext_image_copy_capture_frame_v1_destroy(m_pending->extFrame);
+    m_pending->extFrame = nullptr;
+  }
+  if (m_pending->extSession != nullptr) {
+    ext_image_copy_capture_session_v1_destroy(m_pending->extSession);
+    m_pending->extSession = nullptr;
+  }
+  if (m_pending->extSource != nullptr) {
+    ext_image_capture_source_v1_destroy(m_pending->extSource);
+    m_pending->extSource = nullptr;
   }
   destroyShmBuffer(m_pending->pool, m_pending->buffer, m_pending->mapped, m_pending->mappedSize, m_pending->fd);
   m_pending.reset();

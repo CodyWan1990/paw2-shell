@@ -317,7 +317,9 @@ namespace compositors::paw2 {
       m_snapshot = {};
       m_hasSnapshot = false;
       m_trusted = false;
-      if (hadState) {
+      // Only a real disconnect is news. Without a reconnect this is teardown, and the listeners'
+      // owners (bar widgets, the platform) are already being destroyed.
+      if (hadState && scheduleReconnectFlag) {
         notify();
       }
     }

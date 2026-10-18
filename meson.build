@@ -779,6 +779,8 @@ _noctalia_sources = files(
   'src/shell/bar/widgets/caffeine_widget_definition.cpp',
   'src/shell/bar/widgets/keyboard_layout_widget.cpp',
   'src/shell/bar/widgets/keyboard_layout_widget_definition.cpp',
+  'src/shell/bar/widgets/paw2_layout_widget.cpp',
+  'src/shell/bar/widgets/paw2_layout_widget_definition.cpp',
   'src/shell/bar/widgets/lock_keys_widget.cpp',
   'src/shell/bar/widgets/lock_keys_widget_definition.cpp',
   'src/shell/bar/widgets/nightlight_widget.cpp',

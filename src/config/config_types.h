@@ -174,7 +174,7 @@ struct BarConfig {
   int fontWeight = 500;           // primary label weight for bar widgets
   // Typeface for this bar's widgets; unset inherits shell.font_family. Per-widget `font_family` overrides.
   std::optional<std::string> fontFamily;
-  std::vector<std::string> startWidgets = {"launcher", "wallpaper", "workspaces"};
+  std::vector<std::string> startWidgets = {"launcher", "wallpaper", "workspaces", "paw2_layout"};
   std::vector<std::string> centerWidgets = {"clock"};
   std::vector<std::string> endWidgets = {"media",   "tray",           "notifications", "clipboard",
                                          "network", "bluetooth",      "volume",        "brightness",

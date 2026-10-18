@@ -17,6 +17,7 @@
 #include "shell/bar/widgets/control_center_widget_definition.h"
 #include "shell/bar/widgets/custom_button_widget_definition.h"
 #include "shell/bar/widgets/keyboard_layout_widget_definition.h"
+#include "shell/bar/widgets/paw2_layout_widget_definition.h"
 #include "shell/bar/widgets/launcher_widget_definition.h"
 #include "shell/bar/widgets/lock_keys_widget_definition.h"
 #include "shell/bar/widgets/media_widget_definition.h"
@@ -154,6 +155,7 @@ namespace settings {
         projectWidgetDefinition<networkWidgetDefinition>(),
         projectWidgetDefinition<nightlightWidgetDefinition>(),
         projectWidgetDefinition<notificationWidgetDefinition>(),
+        projectWidgetDefinition<paw2LayoutWidgetDefinition>(),
         projectWidgetDefinition<powerProfileWidgetDefinition>(),
         projectWidgetDefinition<privacyWidgetDefinition>(),
         projectWidgetDefinition<screenshotWidgetDefinition>(),
@@ -238,6 +240,7 @@ namespace settings {
         {.type = "custom_button", .labelKey = "settings.widgets.types.custom-button", .glyph = "circuit-pushbutton"},
         {.type = "caffeine", .labelKey = "settings.widgets.types.caffeine", .glyph = "caffeine-off"},
         {.type = "keyboard_layout", .labelKey = "settings.widgets.types.keyboard-layout", .glyph = "keyboard"},
+        {.type = "paw2_layout", .labelKey = "settings.widgets.types.paw2-layout", .glyph = "layout-columns"},
         {.type = "launcher", .labelKey = "settings.widgets.types.launcher", .glyph = "search"},
         {.type = "lock_keys", .labelKey = "settings.widgets.types.lock-keys", .glyph = "lock"},
         {.type = "media", .labelKey = "settings.widgets.types.media", .glyph = "disc"},

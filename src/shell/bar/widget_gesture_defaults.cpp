@@ -46,6 +46,13 @@ namespace noctalia::bar {
     };
     constexpr std::array<GestureBinding, 1> kCaffeine{{{Gesture::Left, "caffeine-toggle"}}};
     constexpr std::array<GestureBinding, 1> kKeyboardLayout{{{Gesture::Left, "keyboard-layout-cycle"}}};
+    // Left and scroll-down step forward through paw2's layouts, right and scroll-up step back.
+    constexpr std::array<GestureBinding, 4> kPaw2Layout{
+        {{Gesture::Left, "paw2-layout next"},
+         {Gesture::Right, "paw2-layout prev"},
+         {Gesture::ScrollUp, "paw2-layout prev"},
+         {Gesture::ScrollDown, "paw2-layout next"}}
+    };
     // Thumb buttons skip tracks; scroll up matches forward.
     constexpr std::array<GestureBinding, 6> kMedia{
         {{Gesture::Left, "panel-toggle control-center media"},
@@ -96,7 +103,7 @@ namespace noctalia::bar {
     };
     constexpr std::array<GestureBinding, 1> kWeather{{{Gesture::Left, "panel-toggle control-center weather"}}};
 
-    constexpr std::array<TypeDefaults, 23> kTypeDefaults{{
+    constexpr std::array<TypeDefaults, 24> kTypeDefaults{{
         {"battery", kBattery},
         {"bluetooth", kBluetooth},
         {"brightness", kBrightness},
@@ -108,6 +115,7 @@ namespace noctalia::bar {
         {"launcher", kLauncher},
         {"media", kMedia},
         {"network", kNetwork},
+        {"paw2_layout", kPaw2Layout},
         {"nightlight", kNightlight},
         {"notifications", kNotification},
         {"power_profile", kPowerProfile},

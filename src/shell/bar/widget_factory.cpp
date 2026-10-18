@@ -30,6 +30,8 @@
 #include "shell/bar/widgets/idle_inhibitor_widget.h"
 #include "shell/bar/widgets/keyboard_layout_widget.h"
 #include "shell/bar/widgets/keyboard_layout_widget_definition.h"
+#include "shell/bar/widgets/paw2_layout_widget.h"
+#include "shell/bar/widgets/paw2_layout_widget_definition.h"
 #include "shell/bar/widgets/launcher_widget.h"
 #include "shell/bar/widgets/launcher_widget_definition.h"
 #include "shell/bar/widgets/lock_keys_widget.h"
@@ -260,6 +262,12 @@ std::unique_ptr<Widget> WidgetFactory::create(
             return createWidget<NotificationWidget>(
                 context.contentScale, f.m_notifications, context.output,
                 notificationWidgetDefinition().resolve(context.config, context.settingContext)
+            );
+          }},
+      {"paw2_layout", [](const WidgetFactory& f, const BuiltinWidgetContext& context) {
+            return createWidget<Paw2LayoutWidget>(
+                context.contentScale, f.m_platform, context.output,
+                paw2LayoutWidgetDefinition().resolve(context.config, context.settingContext)
             );
           }},
       {"power_profile", [](const WidgetFactory& f, const BuiltinWidgetContext& context) {

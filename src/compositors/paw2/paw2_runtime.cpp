@@ -419,13 +419,20 @@ namespace compositors::paw2 {
   }
 
   void Paw2Runtime::notify() const {
-    // Copy: a listener may add or remove listeners.
-    const auto listeners = m_listeners;
-    for (const auto& [token, listener] : listeners) {
-      (void)token;
-      if (listener) {
-        listener();
+    // A listener may add or remove listeners - a bar rebuild destroys widgets that registered one -
+    // so walk a snapshot of tokens and only call those still registered at the moment of the call.
+    std::vector<std::size_t> tokens;
+    tokens.reserve(m_listeners.size());
+    for (const auto& entry : m_listeners) {
+      tokens.push_back(entry.first);
+    }
+    for (const std::size_t token : tokens) {
+      const auto it = std::ranges::find(m_listeners, token, &decltype(m_listeners)::value_type::first);
+      if (it == m_listeners.end() || !it->second) {
+        continue;
       }
+      const Listener listener = it->second;
+      listener();
     }
   }
 

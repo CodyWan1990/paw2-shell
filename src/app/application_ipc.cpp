@@ -3,6 +3,7 @@
 #include "application_internal.h"
 #include "cli/schema_msg.h"
 #include "compositors/compositor_detect.h"
+#include "compositors/paw2/paw2_runtime.h"
 #include "config/config_types.h"
 #include "core/build_info.h"
 #include "core/deferred_call.h"
@@ -465,6 +466,46 @@ void Application::initIpc() {
       }
     }
     m_compositorPlatform.activateWorkspace(output, workspaces[target]);
+    return "ok\n";
+  });
+
+  m_ipcService.bindCycle(noctalia::cli::msg::paw2Layout, [this](const std::string& args) -> std::string {
+    const auto parts = noctalia::ipc::splitWords(args);
+    if (parts.size() != 1) {
+      return "error: paw2-layout requires <next|prev|layout>\n";
+    }
+    auto& paw2 = m_compositorPlatform.paw2Runtime();
+    if (!paw2.hasSnapshot()) {
+      return "error: not connected to paw2\n";
+    }
+    // A bar widget gesture targets its own monitor; a keybind targets the focused one.
+    wl_output* output = nullptr;
+    if (const auto& context = m_ipcService.invocationContext(); context.has_value()) {
+      output = context->output;
+    }
+    if (output == nullptr) {
+      output = m_compositorPlatform.preferredInteractiveOutput();
+    }
+    const auto* info = m_compositorPlatform.findOutputByWl(output);
+    const std::string outputName = info != nullptr ? info->connectorName : std::string{};
+    const auto& layouts = paw2.snapshot().layouts;
+    const auto* state = paw2.findOutput(outputName);
+    if (layouts.empty() || state == nullptr) {
+      return "error: paw2 has not reported a layout for this monitor\n";
+    }
+
+    std::string target = parts[0];
+    if (target == "next" || target == "prev") {
+      const auto current = std::ranges::find(layouts, state->layout);
+      std::size_t index = current == layouts.end() ? 0 : static_cast<std::size_t>(current - layouts.begin());
+      index = target == "next" ? (index + 1) % layouts.size() : (index + layouts.size() - 1) % layouts.size();
+      target = layouts[index];
+    } else if (std::ranges::find(layouts, target) == layouts.end()) {
+      return "error: paw2 has no layout named " + target + "\n";
+    }
+    if (!paw2.setLayout(target, outputName)) {
+      return "error: could not reach paw2\n";
+    }
     return "ok\n";
   });
 

@@ -257,6 +257,10 @@ namespace noctalia::cli {
       Positional{"direction", {}, kMsgWorkspaceSwitchDirectionChoices, true, false, false},
   };
 
+  inline constexpr std::array kMsgPaw2LayoutPositionals{
+      Positional{"layout", "next, prev, or a layout name such as dwindle", {}, true, false, false},
+  };
+
   namespace msg {
     inline constexpr Command annotate{
         "annotate",
@@ -817,6 +821,16 @@ namespace noctalia::cli {
     inline constexpr Command workspaceAlertStatus{
         "workspace-alert-status", "Print workspace alerts", {}, {}, {}, {}, {}, false
     };
+    inline constexpr Command paw2Layout{
+        "paw2-layout",
+        "Step through or pick paw2's tiling layout on the target monitor",
+        {},
+        {},
+        {},
+        kMsgPaw2LayoutPositionals,
+        {},
+        false
+    };
     inline constexpr Command workspaceSwitch{
         "workspace-switch",
         "Switch to the adjacent workspace on the target monitor (stops at both ends)",
@@ -898,6 +912,7 @@ namespace noctalia::cli {
       msg::notificationDndToggle,
       msg::notificationInvokeLatest,
       msg::notificationShow,
+      msg::paw2Layout,
       msg::osdDisable,
       msg::osdEnable,
       msg::osdToggle,

@@ -15,8 +15,6 @@ time_format           = "{:%H:%M}"  # default shell UI time format
 date_format           = "%A, %x"    # default shell UI date format
 offline_mode          = false        # block all outgoing HTTP when true
 # panel_anchor_bar   = "main"        # bar panels attach to without a source bar; omit = first enabled bar
-telemetry_enabled     = false        # send an anonymous startup ping
-niri_overview_type_to_launch_enabled = false # opt in to type-to-launch from niri overview
 polkit_agent          = false
 password_style        = "default"    # default | random
 readline_shortcuts    = false        # readline-style shortcuts in every text field (Ctrl+A = line start)
@@ -176,13 +174,6 @@ community_ids              = []     # fetched from api.noctalia.dev/templates, c
 # input_path  = "templates/my-app.css"
 # output_path = "~/.config/my-app/theme.css"
 # post_hook   = "my-app --reload-theme"
-
-# ── Backdrop ──────────────────────────────────────────────────────────────────
-
-[backdrop]
-enabled                = false
-blur_intensity         = 0.5        # 0.0 = no blur, 1.0 = maximum
-tint_intensity         = 0.3        # 0.0 = no tint, 1.0 = opaque
 
 # ── Notifications ─────────────────────────────────────────────────────────────
 
@@ -411,7 +402,7 @@ capsule            = false
 # capsule_border   = "outline"      # uncomment for a border on all widgets
 # capsule_border_width = 1.0        # outline thickness in pixels (0-8); needs capsule_border
 
-start  = ["launcher", "wallpaper", "workspaces"]
+start  = ["launcher", "wallpaper", "workspaces", "paw2_layout"]
 center = ["clock"]
 end    = ["media", "tray", "notifications", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "control-center", "session"]
 
@@ -560,6 +551,19 @@ enabled = false
 # battery_state_changed   = "notify-send 'Power' \"Battery: $NOCTALIA_BATTERY_STATE\""
 # battery_under_threshold = "notify-send 'Power' \"Battery at ${NOCTALIA_BATTERY_PERCENT}%\""
 # power_profile_changed   = "notify-send 'Power' \"Profile: $NOCTALIA_POWER_PROFILE\""
+# Per-widget looks (paw2-shell). `style` is a preset - none | capsule | box | pill | underline -
+# drawn in the widget's `color`; any explicit capsule_* key still overrides it.
+# [widget.clock]
+# style = "underline"
+# color = "tertiary"
+# underline_width = 2
+#
+# [widget.volume]
+# style = "pill"
+#
+# [widget.paw2_layout]               # paw2's tiling layout on this monitor; click/scroll to cycle
+# show_label = false
+
 # [widget.launcher]
 # custom_image = "/path/to/image.png"
 # custom_image_colorize = false

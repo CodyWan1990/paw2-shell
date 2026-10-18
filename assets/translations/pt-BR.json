@@ -1430,7 +1430,7 @@
         "keybinds": "Atalhos do Teclado",
         "launcher": "Launcher",
         "location": "Localização",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Notificações",
         "osd": "OSD",
         "panels": "Painéis",
@@ -1443,7 +1443,6 @@
         "shell": "Shell",
         "system": "Sistema",
         "templates": "Modelos",
-        "umbriel": "Umbriel",
         "wallpaper": "Papel de Parede"
       }
     },

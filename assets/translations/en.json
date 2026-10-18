@@ -1431,7 +1431,7 @@
         "keybinds": "Keybinds",
         "launcher": "Launcher",
         "location": "Location",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Notifications",
         "osd": "OSD",
         "panels": "Panels",
@@ -1444,7 +1444,6 @@
         "shell": "Shell",
         "system": "System",
         "templates": "Templates",
-        "umbriel": "Umbriel",
         "wallpaper": "Wallpaper"
       }
     },

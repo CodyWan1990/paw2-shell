@@ -7,7 +7,6 @@
 #include "shell/panel/panel_click_shield.h"
 #include "shell/panel/persistent_panel_host.h"
 #include "ui/dialogs/layer_popup_host.h"
-#include "wayland/hyprland/popup_grab_host.h"
 
 #include <cstdint>
 #include <functional>
@@ -24,7 +23,6 @@ class ContextMenuPopup;
 class SelectDropdownPopup;
 class Box;
 class IpcService;
-class FocusGrab;
 class LayerSurface;
 class Node;
 class Panel;
@@ -49,7 +47,7 @@ struct PanelOpenRequest {
   std::string_view sourceBarName;
 };
 
-class PanelManager : public PopupGrabHost {
+class PanelManager {
 public:
   PanelManager();
   ~PanelManager();
@@ -86,7 +84,6 @@ public:
   void setClickShieldExcludeRectsProvider(std::function<std::vector<InputRect>(wl_output*)> provider);
   // Callback returning every bar wl_surface. Used to seed the Hyprland focus
   // grab whitelist so bar widgets keep receiving clicks while a panel is open.
-  void setFocusGrabBarSurfacesProvider(std::function<std::vector<wl_surface*>()> provider);
   void setPanelClosedCallback(std::function<void()> callback);
   void setPanelOpenedCallback(std::function<void()> callback);
   void setAttachedPanelAvailabilityCallback(std::function<bool(wl_output*, std::string_view)> callback);
@@ -171,12 +168,6 @@ public:
   void beginAttachedPopup(wl_surface* surface);
   void endAttachedPopup(wl_surface* surface);
 
-  // PopupGrabHost. PopupSurface enrolls itself with us while our focus_grab
-  // is active so the compositor doesn't fire `cleared` when the user
-  // interacts with a popup opened from inside the panel.
-  void registerPopupSurface(wl_surface* surface) override;
-  void unregisterPopupSurface(wl_surface* surface) override;
-
   void registerIpc(IpcService& ipc);
 
 private:
@@ -191,12 +182,7 @@ private:
   // for its first frame. The panel rect is excluded separately because
   // same-layer stacking order is compositor-defined.
   void activateClickShield(LayerShellLayer layer);
-  // Called AFTER the panel surface is mapped so the panel wl_surface is
-  // available for the whitelist. No-op when focus-grab is unavailable.
-  void activateFocusGrab();
   void applyKeyboardRelaxation(LayerShellKeyboard mode);
-  void addFocusGrabWhitelistSurfaces(FocusGrab& grab, wl_surface* excludedSurface);
-  [[nodiscard]] bool isFocusGrabWhitelistSurface(wl_surface* surface) const;
   void deactivateOutsideClickHandlers();
   void applyAttachedReveal(float progress);
   void applyDetachedReveal(float progress);
@@ -221,7 +207,6 @@ private:
   std::function<void(wl_output*, std::string_view, std::optional<AttachedPanelGeometry>)>
       m_attachedPanelGeometryCallback;
   std::function<std::vector<InputRect>(wl_output*)> m_clickShieldExcludeRectsProvider;
-  std::function<std::vector<wl_surface*>()> m_focusGrabBarSurfacesProvider;
   std::function<void()> m_panelClosedCallback;
   std::function<void()> m_panelOpenedCallback;
   std::function<bool(wl_output*, std::string_view)> m_attachedPanelAvailabilityCallback;
@@ -229,8 +214,6 @@ private:
   std::function<bool(wl_output*, std::string_view)> m_attachedPanelBarSettledCallback;
   PanelClickShield m_clickShield;
   PersistentPanelHost m_persistentHost;
-  std::unique_ptr<FocusGrab> m_focusGrab;
-  std::unordered_set<wl_surface*> m_focusGrabPopupSurfaces;
 
   std::unique_ptr<Surface> m_surface;
   LayerSurface* m_layerSurface = nullptr;

@@ -46,9 +46,6 @@ namespace shell::dock {
       if (window.exactIdentity && !window.identifier.empty()) {
         return true;
       }
-      if (compositors::isKde()) {
-        return !window.identifier.empty() || (!window.title.empty() && !window.appId.empty());
-      }
       return false;
     }
 
@@ -176,9 +173,7 @@ namespace shell::dock {
           ContextMenuControlEntry{
               .id = kMenuWindowBaseId - static_cast<std::int32_t>(i),
               .label = title,
-              .enabled = windows[i].handle != nullptr
-                  || !windows[i].identifier.empty()
-                  || (compositors::isKde() && (!windows[i].title.empty() || !windows[i].appId.empty())),
+              .enabled = windows[i].handle != nullptr || !windows[i].identifier.empty(),
               .separator = false,
               .hasSubmenu = false,
           }

@@ -1430,7 +1430,7 @@
         "keybinds": "Scorciatoie",
         "launcher": "Launcher",
         "location": "Posizione",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Notifiche",
         "osd": "OSD",
         "panels": "Pannelli",
@@ -1443,7 +1443,6 @@
         "shell": "Shell",
         "system": "Sistema",
         "templates": "Template",
-        "umbriel": "Umbriel",
         "wallpaper": "Sfondo"
       }
     },

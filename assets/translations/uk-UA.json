@@ -1398,7 +1398,7 @@
         "keybinds": "Гарячі клавіші",
         "launcher": "Запускач",
         "location": "Місцеперебування",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Сповіщення",
         "osd": "OSD",
         "panels": "Панелі",
@@ -1411,7 +1411,6 @@
         "shell": "Оболонка",
         "system": "Система",
         "templates": "Шаблони",
-        "umbriel": "Umbriel",
         "wallpaper": "Тло екрана"
       }
     },

@@ -1271,7 +1271,7 @@
         "keybinds": "Tuş Atamaları",
         "launcher": "Başlat",
         "location": "Konum",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Bildirimler",
         "osd": "Ekranda Gösterim",
         "panels": "Paneller",
@@ -1283,7 +1283,6 @@
         "shell": "Kabuk",
         "system": "Sistem",
         "templates": "Şablonlar",
-        "umbriel": "Umbriel",
         "wallpaper": "Duvar Kağıdı"
       }
     },

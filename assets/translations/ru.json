@@ -1399,7 +1399,7 @@
         "keybinds": "Сочетания клавиш",
         "launcher": "Лаунчер",
         "location": "Местоположение",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Уведомления",
         "osd": "OSD",
         "panels": "Панели",
@@ -1412,7 +1412,6 @@
         "shell": "Оболочка",
         "system": "Система",
         "templates": "Шаблоны",
-        "umbriel": "Umbriel",
         "wallpaper": "Обои"
       }
     },

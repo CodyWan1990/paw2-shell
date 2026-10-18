@@ -1400,7 +1400,7 @@
         "keybinds": "快捷键",
         "launcher": "启动器",
         "location": "位置",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "通知",
         "osd": "OSD",
         "panels": "面板",
@@ -1413,7 +1413,6 @@
         "shell": "Shell",
         "system": "系统",
         "templates": "模板",
-        "umbriel": "Umbriel",
         "wallpaper": "壁纸"
       }
     },

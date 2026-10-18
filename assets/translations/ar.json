@@ -1288,7 +1288,7 @@
         "keybinds": "الاختصارات",
         "launcher": "المشغل",
         "location": "الموقع",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "الإشعارات",
         "osd": "العرض المباشر (OSD)",
         "panels": "اللوحات",
@@ -1300,7 +1300,6 @@
         "shell": "واجهة الأوامر",
         "system": "النظام",
         "templates": "القوالب",
-        "umbriel": "Umbriel",
         "wallpaper": "خلفية الشاشة"
       }
     },

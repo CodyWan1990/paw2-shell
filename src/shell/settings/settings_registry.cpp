@@ -86,7 +86,7 @@ namespace settings {
       return defaultKeybindSet(action);
     }
 
-    constexpr std::array<SettingsSectionDescriptor, 24> kSettingsSections{{
+    constexpr std::array<SettingsSectionDescriptor, 23> kSettingsSections{{
         {SettingsSection::Appearance, "appearance", "adjustments-horizontal"},
         {SettingsSection::Wallpaper, "wallpaper", "paint"},
         {SettingsSection::Templates, "templates", "color-swatch"},
@@ -107,8 +107,7 @@ namespace settings {
         {SettingsSection::Calendar, "calendar", "calendar"},
         {SettingsSection::Power, "power", "bolt"},
         {SettingsSection::Hooks, "hooks", "link"},
-        {SettingsSection::Niri, "niri", "niri"},
-        {SettingsSection::Umbriel, "umbriel", "umbriel"},
+        {SettingsSection::Paw2, "paw2", "paw"},
         {SettingsSection::Bar, "bar", "crop-3-2", false},
         {SettingsSection::Plugins, "plugins", "puzzle", true, true},
     }};
@@ -2518,46 +2517,6 @@ namespace settings {
         },
         "keybind shortcut hotkey delete remove clear"
     ));
-
-    // Niri-specific integrations
-    if (env.niriOverviewTypeToLaunchSupported || env.niriBackdropSupported) {
-      if (env.niriOverviewTypeToLaunchSupported) {
-        entries.push_back(makeEntry(
-            SettingsSection::Niri, "overview", tr("settings.schema.shell.niri-overview-type-to-launch.label"),
-            tr("settings.schema.shell.niri-overview-type-to-launch.description"),
-            {"shell", "niri_overview_type_to_launch_enabled"}, ToggleSetting{cfg.shell.niriOverviewTypeToLaunchEnabled},
-            "niri overview type launch launcher search keyboard focus"
-        ));
-      }
-      if (env.niriBackdropSupported) {
-        entries.push_back(makeEntry(
-            SettingsSection::Niri, "backdrop", tr("settings.schema.shared.enabled.label"),
-            tr("settings.schema.backdrop.enabled.description"), {"backdrop", "enabled"},
-            ToggleSetting{cfg.backdrop.enabled}, "wallpaper backdrop"
-        ));
-        entries.push_back(makeEntry(
-            SettingsSection::Niri, "backdrop", tr("settings.schema.backdrop.blur-intensity.label"),
-            tr("settings.schema.backdrop.blur-intensity.description"), {"backdrop", "blur_intensity"},
-            sliderFor(cfg.backdrop.blurIntensity, noctalia::config::schema::kUnitRange, false), "wallpaper"
-        ));
-        entries.push_back(makeEntry(
-            SettingsSection::Niri, "backdrop", tr("settings.schema.backdrop.tint-intensity.label"),
-            tr("settings.schema.backdrop.tint-intensity.description"), {"backdrop", "tint_intensity"},
-            sliderFor(cfg.backdrop.tintIntensity, noctalia::config::schema::kUnitRange, false), "wallpaper"
-        ));
-      }
-    }
-
-    // Umbriel-specific integrations
-    if (env.umbrielOverviewTypeToLaunchSupported) {
-      entries.push_back(makeEntry(
-          SettingsSection::Umbriel, "overview", tr("settings.schema.shell.umbriel-overview-type-to-launch.label"),
-          tr("settings.schema.shell.umbriel-overview-type-to-launch.description"),
-          {"shell", "umbriel_overview_type_to_launch_enabled"},
-          ToggleSetting{cfg.shell.umbrielOverviewTypeToLaunchEnabled},
-          "umbriel overview type launch launcher search keyboard focus"
-      ));
-    }
 
     // System
     if (env.batteryAvailable) {

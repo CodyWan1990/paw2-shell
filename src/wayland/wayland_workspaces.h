@@ -2,35 +2,28 @@
 
 #include "compositors/workspace_backend.h"
 
+#include <functional>
 #include <memory>
-#include <optional>
 #include <string>
 #include <unordered_map>
-#include <utility>
+#include <vector>
 
 struct wl_output;
 struct ext_workspace_manager_v1;
-struct org_kde_plasma_virtual_desktop_management;
-struct zdwl_ipc_manager_v2;
 
-namespace compositors {
-  class CompositorRuntimeRegistry;
-} // namespace compositors
+class ExtWorkspaceBackend;
 
+// Workspace list from ext-workspace-v1, which paw2 implements natively. Occupancy and the
+// window-to-workspace map are layered on top by the paw2 metadata backend in CompositorPlatform.
 class WaylandWorkspaces {
 public:
   using ChangeCallback = std::function<void()>;
 
-  explicit WaylandWorkspaces(compositors::CompositorRuntimeRegistry& runtimeRegistry);
+  WaylandWorkspaces();
   ~WaylandWorkspaces();
 
   void bindExtWorkspace(ext_workspace_manager_v1* manager);
-  void bindKdeVirtualDesktop(org_kde_plasma_virtual_desktop_management* management);
-  void bindDwlIpcWorkspace(zdwl_ipc_manager_v2* manager);
-  void setOutputNameResolver(std::function<std::string(wl_output*)> resolver);
   void initialize();
-  void onOutputAdded(wl_output* output);
-  void onOutputRemoved(wl_output* output);
   void setChangeCallback(ChangeCallback callback);
   void activate(const std::string& id);
   void activateForOutput(wl_output* output, const std::string& id);
@@ -52,32 +45,11 @@ public:
   [[nodiscard]] std::vector<Workspace> all() const;
   [[nodiscard]] std::vector<Workspace> forOutput(wl_output* output) const;
 
-  [[nodiscard]] wl_output* mangoIpcSelectedOutput() const;
-  [[nodiscard]] std::optional<std::pair<std::string, std::string>>
-  mangoIpcFocusedClientOnOutput(wl_output* output) const;
-  [[nodiscard]] wl_output* dwlIpcSelectedOutput() const;
-  [[nodiscard]] std::optional<std::pair<std::string, std::string>> dwlIpcFocusedClientOnOutput(wl_output* output) const;
-  [[nodiscard]] std::optional<std::string> focusedWindowId() const;
-
 private:
-  void setActiveBackend(WorkspaceBackend* backend);
-  void notifyChanged() const;
+  [[nodiscard]] const WorkspaceBackend* active() const noexcept;
+  [[nodiscard]] WorkspaceBackend* active() noexcept;
 
-  std::vector<std::unique_ptr<WorkspaceBackend>> m_backends;
-  std::vector<class OutputLifecycleObserver*> m_outputObservers;
-  std::vector<WorkspaceOutputNameResolver*> m_outputNameResolvers;
-  ExtWorkspaceProtocolBinder* m_extWorkspaceBinder = nullptr;
-  KdeVirtualDesktopProtocolBinder* m_kdeVirtualDesktopBinder = nullptr;
-  DwlIpcWorkspaceProtocolBinder* m_dwlIpcWorkspaceBinder = nullptr;
-  WorkspaceBackend* m_extBackend = nullptr;
-  WorkspaceBackend* m_mangoIpcBackend = nullptr;
-  WorkspaceSocketConnector* m_mangoIpcConnector = nullptr;
-  WorkspaceBackend* m_dwlIpcBackend = nullptr;
-  WorkspaceBackend* m_hyprlandBackend = nullptr;
-  WorkspaceBackend* m_swayBackend = nullptr;
-  WorkspaceBackend* m_kwinBackend = nullptr;
-  WorkspaceSocketConnector* m_hyprlandConnector = nullptr;
-  WorkspaceSocketConnector* m_swayConnector = nullptr;
-  WorkspaceBackend* m_activeBackend = nullptr;
+  std::unique_ptr<ExtWorkspaceBackend> m_ext;
+  bool m_active = false;
   ChangeCallback m_changeCallback;
 };

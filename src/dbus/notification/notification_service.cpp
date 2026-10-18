@@ -47,9 +47,6 @@ namespace {
   }
 
   [[nodiscard]] uint32_t notificationNameRequestFlags() {
-    if (compositors::isKde()) {
-      return kNameFlagAllowReplacement | kNameFlagReplaceExisting | kNameFlagDoNotQueue;
-    }
     return kNameFlagAllowReplacement | kNameFlagDoNotQueue;
   }
 

@@ -1,6 +1,5 @@
 #include "system/internal_app_metadata.h"
 #include "tests/test_check.h"
-#include "wayland/wayland_protocol_policy.h"
 
 #include <cstdint>
 #include <functional>
@@ -26,14 +25,6 @@ namespace internal_apps {
 } // namespace internal_apps
 
 int main() {
-  using compositors::CompositorKind;
-  using wayland_protocol_policy::shouldBindExtForeignToplevelList;
-
-  TEST_CHECK(shouldBindExtForeignToplevelList(CompositorKind::Niri));
-  TEST_CHECK(shouldBindExtForeignToplevelList(CompositorKind::Hyprland));
-  TEST_CHECK(shouldBindExtForeignToplevelList(CompositorKind::Kde));
-  TEST_CHECK(!shouldBindExtForeignToplevelList(CompositorKind::Unknown));
-  TEST_CHECK(!shouldBindExtForeignToplevelList(CompositorKind::Sway));
   TEST_CHECK(toplevel_identity::wlr(0).empty());
   TEST_CHECK(toplevel_identity::wlr(42) == "wlr:42");
   TEST_CHECK(toplevel_identity::isWlr("wlr:42"));

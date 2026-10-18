@@ -1391,7 +1391,7 @@
         "keybinds": "Atajos de teclado",
         "launcher": "Lanzador",
         "location": "Localización",
-        "niri": "Niri",
+        "paw2": "paw2",
         "notifications": "Notificaciones",
         "osd": "OSD",
         "panels": "Paneles",
@@ -1404,7 +1404,6 @@
         "shell": "Shell",
         "system": "Sistema",
         "templates": "Plantillas",
-        "umbriel": "Umbriel",
         "wallpaper": "Fondo de Pantalla"
       }
     },

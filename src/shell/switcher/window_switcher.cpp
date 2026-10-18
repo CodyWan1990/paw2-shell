@@ -3,7 +3,6 @@
 #include "capture/toplevel_thumbnail_capture.h"
 #include "compositors/compositor_detect.h"
 #include "compositors/compositor_platform.h"
-#include "compositors/hyprland/hyprland_window_id.h"
 #include "config/config_service.h"
 #include "core/deferred_call.h"
 #include "core/input/key_modifiers.h"
@@ -139,71 +138,34 @@ namespace {
 
   [[nodiscard]] std::optional<std::string>
   windowIdForToplevelInfo(const CompositorPlatform& platform, const ToplevelInfo& info) {
+    (void)platform;
     if (info.exactIdentity && !info.identifier.empty()) {
       return info.identifier;
     }
-    return platform.compositorWindowIdForToplevelInfo(info);
-  }
-
-  [[nodiscard]] std::string canonicalWindowId(std::string_view windowId) {
-    if (windowId.empty()) {
-      return {};
-    }
-    if (compositors::isHyprland()) {
-      if (const std::string normalized = compositors::hyprland::normalizeWindowId(windowId); !normalized.empty()) {
-        return normalized;
-      }
-    }
-    return std::string(windowId);
+    return std::nullopt;
   }
 
   [[nodiscard]] std::string identityKeyForToplevelInfo(const CompositorPlatform& platform, const ToplevelInfo& info) {
     if (const auto windowId = windowIdForToplevelInfo(platform, info); windowId.has_value()) {
-      return canonicalWindowId(*windowId);
+      return *windowId;
     }
     return toplevel_identity::wlr(wlrHandleForToplevel(info));
   }
 
-  [[nodiscard]] bool identityKeysEqual(const std::string_view lhs, const std::string_view rhs) {
-    if (lhs == rhs) {
-      return true;
-    }
-    if (toplevel_identity::isWlr(lhs) || toplevel_identity::isWlr(rhs)) {
-      return false;
-    }
-    return compositors::isHyprland() && compositors::hyprland::windowIdsEqual(lhs, rhs);
-  }
+  [[nodiscard]] bool identityKeysEqual(const std::string_view lhs, const std::string_view rhs) { return lhs == rhs; }
 
   void activateWindowSwitcherEntry(CompositorPlatform& platform, const WindowSwitcherEntry& entry) {
-    // Niri: foreign-toplevel activate does not reliably focus/scroll the column.
-    if (compositors::isNiri() && !entry.windowId.empty()) {
-      platform.focusCompositorWindow(entry.windowId);
-      return;
-    }
-    // Umbriel's exact-id action preserves the switcher's pointer-warp intent without changing taskbar activation.
-    if (compositors::isUmbriel() && !entry.windowId.empty()) {
+    // paw2: the exact id goes straight to the control socket's focus-window.
+    if (!entry.windowId.empty()) {
       platform.focusCompositorWindow(entry.windowId, true);
       return;
     }
-    // Prefer wlr-foreign-toplevel activate (same path as the taskbar). On Hyprland this
-    // raises floating windows and respects cursor:no_warps / scrolling follow_focus;
-    // dispatch focuswindow alone does not.
     if (entry.closeHandle != 0) {
       auto* handle = reinterpret_cast<zwlr_foreign_toplevel_handle_v1*>(entry.closeHandle);
       if (platform.containsWlrToplevelHandle(handle)) {
         platform.activateToplevel(handle);
-        return;
       }
     }
-    if (entry.windowId.empty()) {
-      return;
-    }
-    if (zwlr_foreign_toplevel_handle_v1* handle = platform.toplevelHandleForCompositorWindowId(entry.windowId);
-        handle != nullptr && platform.containsWlrToplevelHandle(handle)) {
-      platform.activateToplevel(handle);
-      return;
-    }
-    platform.focusCompositorWindow(entry.windowId, true);
   }
 
   [[nodiscard]] std::string identityKeyForEntry(const WindowSwitcherEntry& entry) { return entry.identityKey; }
@@ -211,38 +173,21 @@ namespace {
   [[nodiscard]] std::string currentFocusedWindowKey(const CompositorPlatform& platform) {
     const auto focusedId = platform.focusedCompositorWindowId();
     if (focusedId.has_value()) {
-      return canonicalWindowId(*focusedId);
+      return *focusedId;
     }
 
     const auto active = platform.activeToplevel();
     if (!active.has_value() || active->handle == nullptr) {
       return {};
     }
-    if (const auto mappedId = platform.compositorWindowIdForToplevel(active->handle); mappedId.has_value()) {
-      return canonicalWindowId(*mappedId);
-    }
     return toplevel_identity::wlr(reinterpret_cast<std::uintptr_t>(active->handle));
   }
 
   [[nodiscard]] std::uintptr_t resolveCloseHandle(
-      const CompositorPlatform& platform, std::string_view windowId, std::string_view appId, std::string_view title
+      const CompositorPlatform& platform, std::string_view appId, std::string_view title
   ) {
-    if (!windowId.empty()) {
-      if (zwlr_foreign_toplevel_handle_v1* handle = platform.toplevelHandleForCompositorWindowId(windowId);
-          handle != nullptr) {
-        return reinterpret_cast<std::uintptr_t>(handle);
-      }
-    }
-
     const std::string idLower = StringUtils::toLower(appId);
     for (const auto& info : platform.windowsForApp(idLower, idLower)) {
-      if (!windowId.empty()) {
-        if (const auto mapped = platform.compositorWindowIdForToplevelInfo(info); mapped.has_value()
-            && (compositors::isHyprland() ? compositors::hyprland::windowIdsEqual(*mapped, windowId)
-                                          : *mapped == windowId)) {
-          return wlrHandleForToplevel(info);
-        }
-      }
       if (!title.empty() && info.title == title) {
         return wlrHandleForToplevel(info);
       }
@@ -312,7 +257,7 @@ namespace {
     entry.appLabel = resolveWindowAppLabel(entry.appId);
     entry.title = !assignment.title.empty() ? assignment.title : entry.appLabel;
     entry.iconPath = resolveWindowIconPath(entry.appId, iconResolver, iconSize);
-    entry.closeHandle = resolveCloseHandle(platform, entry.windowId, entry.appId, entry.title);
+    entry.closeHandle = resolveCloseHandle(platform, entry.appId, entry.title);
     entry.captureHandle = resolveCaptureHandle(wayland, entry.appId, entry.title);
     return entry;
   }
@@ -359,12 +304,12 @@ namespace {
   }
 
   // Identity keys of every window the switcher can list right now. Compositors reuse
-  // window ids (Hyprland reuses addresses), so MRU ranks must expire with the window.
+  // window ids, so MRU ranks must expire with the window.
   [[nodiscard]] std::unordered_set<std::string> liveWindowKeys(const CompositorPlatform& platform) {
     std::unordered_set<std::string> keys;
     keys.reserve(32);
     for (const auto& assignment : platform.workspaceWindowAssignments()) {
-      if (std::string key = canonicalWindowId(assignment.windowId); !key.empty()) {
+      if (std::string key = assignment.windowId; !key.empty()) {
         keys.insert(std::move(key));
       }
     }
@@ -387,7 +332,7 @@ namespace {
       if (assignment.workspaceKey.empty() || assignment.windowId.empty()) {
         continue;
       }
-      const std::string key = canonicalWindowId(assignment.windowId);
+      const std::string key = assignment.windowId;
       if (identityKeysEqual(key, focusedKey)) {
         return assignment.workspaceKey;
       }
@@ -464,7 +409,7 @@ namespace {
     std::unordered_map<std::string, WorkspaceWindowAssignment> assignmentByIdentity;
     assignmentByIdentity.reserve(assignments.size());
     for (const auto& assignment : assignments) {
-      const std::string key = canonicalWindowId(assignment.windowId);
+      const std::string key = assignment.windowId;
       if (key.empty()) {
         continue;
       }
@@ -974,9 +919,8 @@ void WindowSwitcher::activateSelected() {
   if (mruEnabled()) {
     promoteMruKey(identityKeyForEntry(entry));
   }
-  // Hyprland ignores zwlr_foreign_toplevel_handle_v1.activate while an exclusive
-  // keyboard layer-shell surface is mapped (hyprwm/Hyprland#4829). Snapshot the
-  // selection, tear the overlay down, then activate on the next loop tick.
+  // Snapshot the selection and tear the exclusive-keyboard overlay down first, so
+  // the compositor's focus change is not immediately undone; activate next tick.
   CompositorPlatform* platform = m_platform;
   hide();
   DeferredCall::callLater([platform, entry]() { activateWindowSwitcherEntry(*platform, entry); });
@@ -994,11 +938,10 @@ void WindowSwitcher::closeWindowAt(std::size_t index) {
       handle = nullptr;
     }
   }
-  if (handle == nullptr && !entry.windowId.empty()) {
-    handle = m_platform->toplevelHandleForCompositorWindowId(entry.windowId);
-  }
-  if (handle == nullptr) {
-    const std::uintptr_t resolved = resolveCloseHandle(*m_platform, entry.windowId, entry.appId, entry.title);
+  if (handle == nullptr && m_platform->closeCompositorWindow(entry.windowId)) {
+    // Closed by exact id through the control socket.
+  } else if (handle == nullptr) {
+    const std::uintptr_t resolved = resolveCloseHandle(*m_platform, entry.appId, entry.title);
     if (resolved != 0) {
       handle = reinterpret_cast<zwlr_foreign_toplevel_handle_v1*>(resolved);
       if (!m_platform->containsWlrToplevelHandle(handle)) {

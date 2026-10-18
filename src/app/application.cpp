@@ -263,9 +263,6 @@ void Application::run(std::function<void()> startupReadyCallback) {
     m_hookManager.reload(m_configService.config().hooks);
     m_hookManager.fire(HookKind::Started);
   });
-  runStartupPhase("telemetry enqueue", [this]() {
-    m_telemetryService.maybeSend(m_configService, m_httpClient, m_wayland);
-  });
 
 #ifdef __GLIBC__
   runStartupPhase("allocator_trim", []() {

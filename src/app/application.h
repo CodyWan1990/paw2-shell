@@ -71,7 +71,6 @@
 #include "system/lock_keys_poll_source.h"
 #include "system/lock_keys_service.h"
 #include "system/screen_time_service.h"
-#include "system/telemetry_service.h"
 #include "system/weather_poll_source.h"
 #include "system/weather_service.h"
 #include "theme/community_palettes.h"
@@ -325,7 +324,6 @@ private:
   std::unique_ptr<PipeWireSpectrum> m_pipewireSpectrum;
   std::shared_ptr<SoundPlayer> m_soundPlayer;
 
-  TelemetryService m_telemetryService;
   ScreenTimeService m_screenTimeService;
 
   GlSharedContext m_glShared;

@@ -1729,11 +1729,6 @@ namespace settings {
         ToggleSetting{cfg.shell.externalIpEnabled}, "wan external ip public address network resolve"
     ));
     entries.push_back(makeEntry(
-        SettingsSection::Security, "network", tr("settings.schema.shell.telemetry.label"),
-        tr("settings.schema.shell.telemetry.description"), {"shell", "telemetry_enabled"},
-        ToggleSetting{cfg.shell.telemetryEnabled}, "analytics ping privacy"
-    ));
-    entries.push_back(makeEntry(
         SettingsSection::Security, "authentication", tr("settings.schema.shell.polkit-agent.label"),
         tr("settings.schema.shell.polkit-agent.description"), {"shell", "polkit_agent"},
         ToggleSetting{cfg.shell.polkitAgent}, "auth password"

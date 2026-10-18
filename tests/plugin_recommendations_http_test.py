@@ -28,7 +28,7 @@ def run(binary):
         state_root = root / "state/noctalia"
         config_dir = root / "config/noctalia"
         config_dir.mkdir(parents=True)
-        (config_dir / "config.toml").write_text("[shell]\ntelemetry_enabled = false\nsetup_wizard_enabled = false\n")
+        (config_dir / "config.toml").write_text("[shell]\nsetup_wizard_enabled = false\n")
         for source in ["official", "community"]:
             repo = state_root / "plugins/sources" / source / "repo"
             repo.mkdir(parents=True)

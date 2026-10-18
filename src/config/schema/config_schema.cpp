@@ -1648,7 +1648,6 @@ namespace noctalia::config::schema {
         field(&ShellConfig::offlineMode, "offline_mode"),
         stringIfNonEmptyField(&ShellConfig::panelAnchorBar, "panel_anchor_bar"),
         field(&ShellConfig::externalIpEnabled, "external_ip_enabled"),
-        field(&ShellConfig::telemetryEnabled, "telemetry_enabled"),
         field(&ShellConfig::setupWizardEnabled, "setup_wizard_enabled"),
         field(&ShellConfig::polkitAgent, "polkit_agent"),
         enumField(&ShellConfig::passwordMaskStyle, "password_style", kPasswordMaskStyles),

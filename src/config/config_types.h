@@ -1274,7 +1274,6 @@ struct ShellConfig {
   std::string panelAnchorBar;
   /// Resolve and show the connection's external (WAN) IP in the Control Center network tab.
   bool externalIpEnabled = false;
-  bool telemetryEnabled = false;
   bool setupWizardEnabled = true;
   bool polkitAgent = false;
   PasswordMaskStyle passwordMaskStyle = PasswordMaskStyle::CircleFilled;

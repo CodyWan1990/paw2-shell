@@ -2232,10 +2232,9 @@ bool ConfigService::hasConfiguredWallpaper() const {
   return !m_monitorWallpaperPaths.empty();
 }
 
+// The bundled paw2 background whenever no wallpaper is configured - not only during first-run
+// setup, so a reset or hand-edited settings file falls back to it instead of an empty desktop.
 std::string ConfigService::firstRunWallpaperPath() const {
-  if (m_setupMarkerPath.empty() || std::filesystem::exists(m_setupMarkerPath)) {
-    return {};
-  }
   if (hasConfiguredWallpaper()) {
     return {};
   }

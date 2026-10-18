@@ -432,6 +432,15 @@ namespace {
     void onClick() override { PanelManager::instance().togglePanel("wallpaper"); }
   };
 
+  class ThemesShortcut final : public Shortcut {
+  public:
+    std::string_view id() const override { return "themes"; }
+    std::string defaultLabel() const override { return i18n::tr("control-center.shortcuts.themes"); }
+    std::string_view iconOn() const override { return "palette"; }
+    std::string_view iconOff() const override { return "palette"; }
+    void onClick() override { PanelManager::instance().togglePanel("themes"); }
+  };
+
   class SessionShortcut final : public Shortcut {
   public:
     std::string_view id() const override { return "session"; }
@@ -531,6 +540,10 @@ namespace {
       builtinShortcut<WallpaperShortcut>({
           .type = "wallpaper",
           .labelKey = "control-center.shortcuts.wallpaper",
+      }),
+      builtinShortcut<ThemesShortcut>({
+          .type = "themes",
+          .labelKey = "control-center.shortcuts.themes",
       }),
       builtinShortcut<SessionShortcut>({
           .type = "session",

@@ -2,6 +2,7 @@
 
 #include "config/config_service.h"
 #include "core/input/keybind_matcher.h"
+#include "core/deferred_call.h"
 #include "core/log.h"
 #include "core/random.h"
 #include "core/ui_phase.h"
@@ -253,6 +254,8 @@ public:
   void setRenderer(Renderer* renderer) { m_renderer = renderer; }
   void setConfig(ConfigService* config) { m_config = config; }
   void setCurrentWallpaperPath(std::string path) { m_currentWallpaperPath = std::move(path); }
+  // In pick mode the "current" ring marks the ticked wallpapers instead.
+  void setPicked(const std::set<std::string>* picked) { m_picked = picked; }
   void setThumbnailService(ThumbnailService* service) {
     m_thumbnails = service;
     for (WallpaperTile* tile : m_pool) {
@@ -315,11 +318,17 @@ public:
       }
     }
     wt->setSelected(selected);
-    wt->setCurrent(
-        m_entries != nullptr
-        && index < m_entries->size()
-        && wallpaperEntryIsCurrent((*m_entries)[index], m_currentWallpaperPath)
-    );
+    if (m_picked != nullptr) {
+      wt->setCurrent(
+          m_entries != nullptr && index < m_entries->size() && m_picked->contains((*m_entries)[index].absPath.string())
+      );
+    } else {
+      wt->setCurrent(
+          m_entries != nullptr
+          && index < m_entries->size()
+          && wallpaperEntryIsCurrent((*m_entries)[index], m_currentWallpaperPath)
+      );
+    }
     wt->setHoveredVisual(hovered && !selected);
   }
 
@@ -387,6 +396,7 @@ private:
   float m_scale;
   const std::vector<WallpaperEntry>* m_entries = nullptr;
   std::string m_currentWallpaperPath;
+  const std::set<std::string>* m_picked = nullptr;
   Renderer* m_renderer = nullptr;
   ThumbnailService* m_thumbnails = nullptr;
   ConfigService* m_config = nullptr;
@@ -841,6 +851,35 @@ void WallpaperPanel::create() {
       )
   );
 
+  // Pick mode's footer: how many are ticked, and the way out.
+  root->addChild(ui::row(
+      {
+          .out = &m_pickBar,
+          .align = FlexAlign::Center,
+          .gap = Style::spaceSm * scale,
+          .fillWidth = true,
+          .visible = false,
+      },
+      ui::label({
+          .out = &m_pickCount,
+          .fontSize = Style::fontSizeBody * scale,
+          .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
+          .flexGrow = 1.0F,
+      }),
+      ui::button({
+          .text = i18n::tr("common.actions.cancel"),
+          .variant = ButtonVariant::Outline,
+          .onClick = [this]() { finishPick(false); },
+      }),
+      ui::button({
+          .out = &m_pickAddButton,
+          .text = i18n::tr("wallpaper.panel.pick.add"),
+          .glyph = "plus",
+          .variant = ButtonVariant::Primary,
+          .onClick = [this]() { finishPick(true); },
+      })
+  ));
+
   setRoot(std::move(root));
   if (m_animations != nullptr) {
     this->root()->setAnimationManager(m_animations);
@@ -921,7 +960,16 @@ void WallpaperPanel::onPanelCardOpacityChanged(float opacity) {
   }
 }
 
-void WallpaperPanel::onOpen(std::string_view /*context*/) {
+void WallpaperPanel::requestPick(PickCallback done) { s_pendingPick = std::move(done); }
+
+void WallpaperPanel::onOpen(std::string_view context) {
+  m_picking = context == "pick" && s_pendingPick != nullptr;
+  m_pickDone = m_picking ? std::exchange(s_pendingPick, nullptr) : nullptr;
+  m_picked.clear();
+  if (m_adapter != nullptr) {
+    m_adapter->setPicked(m_picking ? &m_picked : nullptr);
+  }
+  syncPickBar();
   m_filterQuery.clear();
   m_pendingFilterQuery.clear();
   m_filterDebounceTimer.stop();
@@ -951,6 +999,14 @@ void WallpaperPanel::onOpen(std::string_view /*context*/) {
 }
 
 void WallpaperPanel::onClose() {
+  // Closed some other way than Add or Cancel: still hand control back.
+  if (m_pickDone) {
+    DeferredCall::callLater([done = std::exchange(m_pickDone, nullptr)]() { done({}); });
+  }
+  m_picking = false;
+  m_pickBar = nullptr;
+  m_pickCount = nullptr;
+  m_pickAddButton = nullptr;
   m_filterDebounceTimer.stop();
   m_pendingFilterQuery.clear();
   m_filterQuery.clear();
@@ -1872,6 +1928,10 @@ void WallpaperPanel::applyWallpaperFromEntry(const WallpaperEntry& entry) {
   }
 
   const std::string path = entry.absPath.string();
+  if (m_picking) {
+    togglePicked(path);
+    return;
+  }
   applyWallpaperPath(path, favoriteThemeToApply(path));
   kLog.info(
       "applied wallpaper {} to {}", path,
@@ -1903,4 +1963,40 @@ void WallpaperPanel::applyColorWallpaper() {
     syncBrowseChrome();
     kLog.info("applied color wallpaper {}", colorWallpaperPath(rgb));
   });
+}
+
+void WallpaperPanel::togglePicked(const std::string& path) {
+  if (!m_picked.erase(path)) {
+    m_picked.insert(path);
+  }
+  syncPickBar();
+  rebindGrid();
+  PanelManager::instance().refresh();
+}
+
+void WallpaperPanel::finishPick(bool accept) {
+  if (!m_pickDone) {
+    return;
+  }
+  std::vector<std::string> paths;
+  if (accept) {
+    paths.assign(m_picked.begin(), m_picked.end());
+  }
+  // Called after the close, so the picker can open its own panel again.
+  DeferredCall::callLater([done = std::exchange(m_pickDone, nullptr), paths = std::move(paths)]() { done(paths); });
+  PanelManager::instance().closePanel();
+}
+
+void WallpaperPanel::syncPickBar() {
+  if (m_pickBar == nullptr) {
+    return;
+  }
+  m_pickBar->setVisible(m_picking);
+  m_pickBar->setParticipatesInLayout(m_picking);
+  if (m_pickCount != nullptr) {
+    m_pickCount->setText(i18n::tr("wallpaper.panel.pick.count", "count", std::to_string(m_picked.size())));
+  }
+  if (m_pickAddButton != nullptr) {
+    m_pickAddButton->setEnabled(!m_picked.empty());
+  }
 }

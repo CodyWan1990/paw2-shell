@@ -76,6 +76,8 @@
 #include "theme/community_palettes.h"
 #include "theme/community_templates.h"
 #include "theme/paw2_theme_sync.h"
+#include "theme/theme_presets.h"
+#include "util/file_utils.h"
 #include "theme/template_apply_service.h"
 #include "theme/theme_service.h"
 #include "time/time_poll_source.h"
@@ -95,6 +97,7 @@
 
 #include <atomic>
 #include <cstdint>
+#include <filesystem>
 #include <functional>
 #include <memory>
 #include <optional>
@@ -248,6 +251,16 @@ private:
   noctalia::theme::ThemeService m_themeService{m_configService, m_httpClient};
   noctalia::theme::TemplateApplyService m_templateApplyService{m_configService};
   noctalia::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform, m_configService};
+  // Saved themes. Applying one goes through the same wallpaper and palette paths
+  // as `wallpaper-set` and `color-scheme-set`.
+  noctalia::theme::ThemePresetService m_themePresets{
+      std::filesystem::path(FileUtils::stateDir()) / "themes.json",
+      {
+          .setWallpaper = [this](const std::string& path) { return m_wallpaper.applyWallpaperImage(std::nullopt, path); },
+          .setColorScheme = [this](PaletteSource source,
+                                   std::string_view value) { return m_configService.setThemeColorScheme(source, value); },
+      },
+  };
   scripting::ScriptApiContext m_scriptApi;
   std::function<void()> m_syncScriptApiOutputs;
   scripting::PluginManager m_pluginManager{m_configService};

@@ -209,6 +209,9 @@ namespace noctalia::cli {
   inline constexpr std::array kMsgTaskbarCyclePositionals{
       Positional{"direction", {}, kMsgTaskbarCycleDirectionChoices, true, false, false},
   };
+  inline constexpr std::array kMsgThemeApplyPositionals{
+      Positional{"theme", "Theme id or title (partial matches work when unambiguous)", {}, true, false, true},
+  };
   inline constexpr std::array kMsgThemeModeSetPositionals{
       Positional{"mode", {}, kMsgThemeModeSetModeChoices, true, false, false},
   };
@@ -706,6 +709,23 @@ namespace noctalia::cli {
     inline constexpr Command templatesApply{
         "templates-apply", "Apply configured theme templates for the current palette", {}, {}, {}, {}, {}, false
     };
+    inline constexpr Command themeApply{
+        "theme-apply", "Apply a saved theme: its wallpaper, then its palette", {}, {}, {}, kMsgThemeApplyPositionals,
+        {},            false
+    };
+    inline constexpr Command themeList{
+        "theme-list", "List saved themes, marking the applied one with *", {}, {}, {}, {}, {}, false
+    };
+    inline constexpr Command themeNext{"theme-next", "Apply the next saved theme", {}, {}, {}, {}, {}, false};
+    inline constexpr Command themePrevious{
+        "theme-previous", "Apply the previous saved theme", {}, {}, {}, {}, {}, false
+    };
+    inline constexpr Command themeWallpaperNext{
+        "theme-wallpaper-next", "Show the applied theme's next wallpaper", {}, {}, {}, {}, {}, false
+    };
+    inline constexpr Command themeWallpaperRandom{
+        "theme-wallpaper-random", "Show a random wallpaper from the applied theme", {}, {}, {}, {}, {}, false
+    };
     inline constexpr Command themeModeGet{
         "theme-mode-get", "Print the current resolved theme mode", {}, {}, {}, {}, {}, false
     };
@@ -935,9 +955,15 @@ namespace noctalia::cli {
       msg::status,
       msg::taskbarCycle,
       msg::templatesApply,
+      msg::themeApply,
+      msg::themeList,
       msg::themeModeGet,
       msg::themeModeSet,
       msg::themeModeToggle,
+      msg::themeNext,
+      msg::themePrevious,
+      msg::themeWallpaperNext,
+      msg::themeWallpaperRandom,
       msg::volumeDown,
       msg::volumeMute,
       msg::volumeOsd,

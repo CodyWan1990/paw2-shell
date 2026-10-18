@@ -68,6 +68,7 @@
 #include "shell/bar/widgets/volume_widget.h"
 #include "shell/bar/widgets/volume_widget_definition.h"
 #include "shell/bar/widgets/wallpaper_widget.h"
+#include "shell/bar/widgets/themes_widget_definition.h"
 #include "shell/bar/widgets/wallpaper_widget_definition.h"
 #include "shell/bar/widgets/weather_widget.h"
 #include "shell/bar/widgets/weather_widget_definition.h"
@@ -338,6 +339,17 @@ std::unique_ptr<Widget> WidgetFactory::create(
           }},
       {"theme_mode", [](const WidgetFactory& f, const BuiltinWidgetContext& context) {
             return createWidget<ThemeModeWidget>(context.contentScale, f.m_themeService);
+          }},
+      {"themes", [](const WidgetFactory&, const BuiltinWidgetContext& context) {
+            const auto options = themesWidgetDefinition().resolve(context.config, context.settingContext);
+            return createWidget<WallpaperWidget>(
+                context.contentScale, context.output,
+                WallpaperWidget::Options{
+                    .glyph = options.glyph,
+                    .customImage = options.customImage,
+                    .customImageColorize = options.customImageColorize,
+                }
+            );
           }},
       {"tray", [](const WidgetFactory& f, const BuiltinWidgetContext& context) {
             return createWidget<TrayWidget>(

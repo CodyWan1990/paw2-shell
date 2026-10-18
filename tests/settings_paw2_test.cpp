@@ -248,6 +248,32 @@ int main() {
     ok &= check(
         !settings::paw2SettingOverridden(writer, {"paw2", "bindings", "close_window"}), "reset to paw2's default"
     );
+    // Shell actions are command bindings that run `paw2-shell msg ...`.
+    const std::vector<std::string> nextTheme{"paw2", "bindings", "shell", "theme-next"};
+    ok &= check(!settings::paw2SettingOverridden(writer, nextTheme), "a shell shortcut starts unbound");
+    ok &= check(
+        settings::applyPaw2Setting(writer, nextTheme, std::vector<std::string>{"Super+t", "Super+F5"}),
+        "shell shortcut accepted"
+    );
+    const nlohmann::json themeNextArgv = nlohmann::json::array({"paw2-shell", "msg", "theme-next"});
+    ok &= check(
+        writer.get("bindings.commands.Super+t") == themeNextArgv && writer.get("bindings.commands.Super+F5") == themeNextArgv,
+        "each key runs the shell command"
+    );
+    (void)settings::applyPaw2Setting(writer, nextTheme, std::vector<std::string>{"Super+n"});
+    ok &= check(!writer.get("bindings.commands.Super+t").has_value(), "rebinding drops the old keys");
+    ok &= check(
+        writer.get("bindings.commands.Super+e") == nlohmann::json::array({"dolphin", "--new-window"}),
+        "other commands are left alone"
+    );
+    const auto shortcut = std::ranges::find(settings::shellShortcuts(), std::string_view("theme-next"), &settings::ShellShortcut::name);
+    ok &= check(
+        settings::shellShortcutKeys(*writer.get("bindings.commands"), *shortcut) == std::vector<std::string>{"Super+n"},
+        "keys read back from the commands table"
+    );
+    settings::resetPaw2Setting(writer, nextTheme);
+    ok &= check(!settings::paw2SettingOverridden(writer, nextTheme), "reset unbinds it");
+    ok &= check(writer.get("bindings.commands.Super+e").has_value(), "reset keeps other commands");
   }
   // One control for both: shell settings carry over to paw2's matching ones.
   {

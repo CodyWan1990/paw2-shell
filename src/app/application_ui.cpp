@@ -75,6 +75,8 @@
 #include "shell/test/test_panel.h"
 #include "shell/tooltip/tooltip_manager.h"
 #include "shell/tray/tray_drawer_panel.h"
+#include "shell/themes/theme_editor_panel.h"
+#include "shell/themes/themes_panel.h"
 #include "shell/wallpaper/panel/wallpaper_panel.h"
 #include "shell/wallpaper/wallpaper_paths.h"
 #include "system/brightness_poll_source.h"
@@ -695,6 +697,16 @@ void Application::initPanelManagerAndPanels() {
       "wallpaper",
       std::make_unique<WallpaperPanel>(
           &m_wayland, &m_configService, &m_thumbnailService, &m_wallpaperScanner, &m_themeService
+      )
+  );
+  m_panelManager.registerPanel(
+      "themes", std::make_unique<ThemesPanel>(&m_themePresets, &m_configService, &m_asyncTextureCache)
+  );
+  m_panelManager.registerPanel(
+      "theme-editor",
+      std::make_unique<ThemeEditorPanel>(
+          &m_themePresets, &m_configService, &m_screenshotService,
+          [this]() { return m_compositorPlatform.preferredInteractiveOutput(); }, &m_asyncTextureCache
       )
   );
   m_panelManager.registerPanel("tray-drawer", std::make_unique<TrayDrawerPanel>(m_trayService.get(), &m_configService));

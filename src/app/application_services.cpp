@@ -511,6 +511,7 @@ void Application::initServices() {
       "storage-key"
   );
   m_secretStore.retryAvailabilityCheck();
+  m_themePresets.load();
   initStyleThemeAndWayland();
   // initStyleThemeAndWayland() initialized i18n, so the early session bus failure
   // can now be reported with a translated message.

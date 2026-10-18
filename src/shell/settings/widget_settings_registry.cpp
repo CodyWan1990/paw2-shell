@@ -37,6 +37,7 @@
 #include "shell/bar/widgets/theme_mode_widget_definition.h"
 #include "shell/bar/widgets/tray_widget_definition.h"
 #include "shell/bar/widgets/volume_widget_definition.h"
+#include "shell/bar/widgets/themes_widget_definition.h"
 #include "shell/bar/widgets/wallpaper_widget_definition.h"
 #include "shell/bar/widgets/weather_widget_definition.h"
 #include "shell/bar/widgets/workspaces_widget_definition.h"
@@ -167,6 +168,7 @@ namespace settings {
         projectWidgetDefinition<testWidgetDefinition>(),
         projectWidgetDefinition<textWidgetDefinition>(),
         projectWidgetDefinition<themeModeWidgetDefinition>(),
+        projectWidgetDefinition<themesWidgetDefinition>(),
         projectWidgetDefinition<trayWidgetDefinition>(),
         projectWidgetDefinition<volumeWidgetDefinition>(),
         projectWidgetDefinition<wallpaperWidgetDefinition>(),
@@ -258,6 +260,7 @@ namespace settings {
         {.type = "test", .labelKey = "settings.widgets.types.test", .glyph = "flask", .visibleInPicker = false},
         {.type = "text", .labelKey = "settings.widgets.types.text", .glyph = "letter-t"},
         {.type = "theme_mode", .labelKey = "settings.widgets.types.theme-mode", .glyph = "theme-mode"},
+        {.type = "themes", .labelKey = "settings.widgets.types.themes", .glyph = "palette"},
         {.type = "tray", .labelKey = "settings.widgets.types.tray", .glyph = "apps"},
         {.type = "volume", .labelKey = "settings.widgets.types.volume", .glyph = "volume-high"},
         {.type = "wallpaper", .labelKey = "settings.widgets.types.wallpaper", .glyph = "wallpaper-selector"},

@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <expected>
 #include <filesystem>
+#include <functional>
 #include <memory>
 #include <optional>
 #include <string>
@@ -54,6 +55,9 @@ public:
   [[nodiscard]] bool available() const noexcept;
 
   void captureFullscreen(const OutputOptions& options, wl_output* output = nullptr);
+  // Capture `output` straight to a PNG at `path`, with no notification, clipboard or prompt -
+  // for the shell's own use, such as theme previews. `done` reports whether the file was written.
+  void captureToFile(wl_output* output, std::filesystem::path path, std::function<void(bool)> done);
   void captureFullscreenInteractive(RenderContext& renderContext, const OutputOptions& options);
   void beginRegionCapture(RenderContext& renderContext, const OutputOptions& options);
   void beginFullscreenCapture(RenderContext& renderContext, const OutputOptions& options);

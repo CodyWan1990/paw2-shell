@@ -799,6 +799,7 @@ void Application::initIpc() {
   m_gammaService.registerIpc(m_ipcService);
   m_themeService.registerIpc(m_ipcService);
   m_templateApplyService.registerIpc(m_ipcService);
+  m_themePresets.registerIpc(m_ipcService);
   m_dock.registerIpc(m_ipcService);
   m_wallpaper.registerIpc(m_ipcService);
   greeter::registerIpc(

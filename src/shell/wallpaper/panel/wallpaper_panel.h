@@ -9,9 +9,11 @@
 #include <cstddef>
 #include <cstdint>
 #include <filesystem>
+#include <functional>
 #include <limits>
 #include <memory>
 #include <optional>
+#include <set>
 #include <string>
 #include <unordered_set>
 #include <vector>
@@ -47,6 +49,12 @@ public:
       WaylandConnection* wayland, ConfigService* config, ThumbnailService* thumbnails, WallpaperScanner* scanner,
       noctalia::theme::ThemeService* themeService = nullptr
   );
+
+  // Chosen wallpaper paths, or none when the choice was cancelled.
+  using PickCallback = std::function<void(std::vector<std::string>)>;
+  // The next open with context "pick" lets the user tick any number of wallpapers
+  // for `done` instead of applying one.
+  static void requestPick(PickCallback done);
   ~WallpaperPanel() override;
 
   void create() override;
@@ -117,6 +125,9 @@ private:
   [[nodiscard]] std::string currentWallpaperPathForSelection() const;
   [[nodiscard]] std::vector<std::string> allMonitorConnectors() const;
   [[nodiscard]] std::optional<Color> selectedFillColor() const;
+  void togglePicked(const std::string& path);
+  void finishPick(bool accept);
+  void syncPickBar();
   [[nodiscard]] static std::string displayNameForWallpaperPath(std::string_view path);
 
   WaylandConnection* m_wayland = nullptr;
@@ -146,7 +157,16 @@ private:
   VirtualGridView* m_grid = nullptr;
   Flex* m_loadingBox = nullptr;
   Spinner* m_spinner = nullptr;
+  Flex* m_pickBar = nullptr;
+  Label* m_pickCount = nullptr;
+  Button* m_pickAddButton = nullptr;
   std::unique_ptr<WallpaperGridAdapter> m_adapter;
+
+  // Pick mode: tiles toggle in and out of m_picked instead of applying.
+  static inline PickCallback s_pendingPick;
+  PickCallback m_pickDone;
+  std::set<std::string> m_picked;
+  bool m_picking = false;
 
   std::vector<MonitorChoice> m_monitorChoices;
   std::size_t m_selectedMonitorIndex = 0;

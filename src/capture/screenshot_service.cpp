@@ -1661,6 +1661,34 @@ void ScreenshotService::captureOutput(
   );
 }
 
+void ScreenshotService::captureToFile(
+    wl_output* output, std::filesystem::path path, std::function<void(bool)> done
+) {
+  if (output == nullptr || m_capture.busy()) {
+    done(false);
+    return;
+  }
+  m_capture.capture(
+      output, std::nullopt, false, false,
+      [path = std::move(path),
+       done = std::move(done)](std::optional<capture::ScreenshotImage> capture, const std::string& error) {
+        if (!error.empty() || !capture.has_value()) {
+          kLog.warn("capture to {} failed: {}", path.string(), error.empty() ? "empty frame" : error);
+          done(false);
+          return;
+        }
+        const ScreencopyImage& image = capture->image;
+        std::string encodeError;
+        const auto png = encodePng(image.rgba.data(), image.width, image.height, &encodeError);
+        std::error_code ec;
+        std::filesystem::create_directories(path.parent_path(), ec);
+        std::ofstream out(path, std::ios::binary | std::ios::trunc);
+        out.write(reinterpret_cast<const char*>(png.data()), static_cast<std::streamsize>(png.size()));
+        done(!png.empty() && static_cast<bool>(out));
+      }
+  );
+}
+
 void ScreenshotService::startNextQueuedCapture() {
   if (m_captureQueue.empty() || m_capture.busy()) {
     return;

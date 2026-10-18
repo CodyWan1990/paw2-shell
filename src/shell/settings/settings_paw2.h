@@ -60,6 +60,19 @@ namespace settings {
   };
   [[nodiscard]] std::span<const Paw2BindingAction> paw2BindingActions();
 
+  // A shell action paw2 can bind: a command binding that runs `paw2-shell msg <command>`. The
+  // Shortcuts page lists it like a compositor action, at {"paw2", "bindings", "shell", name}; its
+  // keys are whichever entries of [bindings.commands] run exactly that command.
+  struct ShellShortcut {
+    std::string_view name;    // e.g. "theme-next"; also its label's translation key
+    std::string_view command; // the `msg` arguments, e.g. "panel-toggle themes"
+    std::string_view group;   // the Shortcuts page group it sits in
+  };
+  [[nodiscard]] std::span<const ShellShortcut> shellShortcuts();
+  [[nodiscard]] std::vector<std::string> shellShortcutArgv(const ShellShortcut& shortcut);
+  // The keys bound to `shortcut` in a [bindings.commands] table.
+  [[nodiscard]] std::vector<std::string> shellShortcutKeys(const nlohmann::json& commands, const ShellShortcut& shortcut);
+
   // A command binding's argv as one line, and back: split on spaces, with "double" or 'single'
   // quotes keeping an argument whole and a backslash escaping the next character.
   [[nodiscard]] std::string joinCommandLine(const std::vector<std::string>& argv);

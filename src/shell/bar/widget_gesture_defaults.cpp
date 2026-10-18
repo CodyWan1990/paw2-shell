@@ -88,6 +88,9 @@ namespace noctalia::bar {
     constexpr std::array<GestureBinding, 1> kSysmon{{{Gesture::Left, "panel-toggle control-center system"}}};
     constexpr std::array<GestureBinding, 1> kWallpaper{{{Gesture::Left, "panel-toggle wallpaper"}}};
     constexpr std::array<GestureBinding, 1> kThemeMode{{{Gesture::Left, "theme-mode-toggle"}}};
+    constexpr std::array<GestureBinding, 2> kThemes{
+        {{Gesture::Left, "panel-toggle themes"}, {Gesture::Right, "panel-toggle themes wallpapers"}}
+    };
     constexpr std::array<GestureBinding, 4> kVolumeOutput{
         {{Gesture::Left, "panel-toggle control-center audio"},
          {Gesture::Right, "volume-mute"},
@@ -103,7 +106,7 @@ namespace noctalia::bar {
     };
     constexpr std::array<GestureBinding, 1> kWeather{{{Gesture::Left, "panel-toggle control-center weather"}}};
 
-    constexpr std::array<TypeDefaults, 24> kTypeDefaults{{
+    constexpr std::array<TypeDefaults, 25> kTypeDefaults{{
         {"battery", kBattery},
         {"bluetooth", kBluetooth},
         {"brightness", kBrightness},
@@ -125,6 +128,7 @@ namespace noctalia::bar {
         {"sysmon", kSysmon},
         {"taskbar", kTaskbar},
         {"theme_mode", kThemeMode},
+        {"themes", kThemes},
         {"wallpaper", kWallpaper},
         {"weather", kWeather},
         {"workspaces", kWorkspaces},

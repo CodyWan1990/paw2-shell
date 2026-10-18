@@ -2,8 +2,11 @@
 
 #include "compositors/paw2/paw2_config_writer.h"
 #include "ui/style.h"
+#include "util/app_dir_name.h"
+#include "util/string_utils.h"
 
 #include <algorithm>
+#include <array>
 #include <cctype>
 #include <cmath>
 #include <cstdio>
@@ -43,6 +46,31 @@ namespace settings {
     // {"paw2", "bindings", "commands", "Super+Return"}
     [[nodiscard]] bool isCommandBindingPath(const std::vector<std::string>& path) {
       return path.size() == 4 && path[1] == "bindings" && path[2] == "commands";
+    }
+
+    constexpr auto kShellShortcuts = std::to_array<ShellShortcut>({
+        {"theme-next", "theme-next", "paw2-keys-themes"},
+        {"theme-previous", "theme-previous", "paw2-keys-themes"},
+        {"themes-open", "panel-toggle themes", "paw2-keys-themes"},
+        {"theme-wallpaper-next", "theme-wallpaper-next", "paw2-keys-themes"},
+        {"theme-wallpaper-random", "theme-wallpaper-random", "paw2-keys-themes"},
+    });
+
+    // {"paw2", "bindings", "shell", "theme-next"}
+    [[nodiscard]] const ShellShortcut* shellShortcutAt(const std::vector<std::string>& path) {
+      if (path.size() != 4 || path[1] != "bindings" || path[2] != "shell") {
+        return nullptr;
+      }
+      const auto it = std::ranges::find(kShellShortcuts, path[3], &ShellShortcut::name);
+      return it != kShellShortcuts.end() ? &*it : nullptr;
+    }
+
+    // Unbind every key that runs `shortcut`, leaving other commands alone.
+    void unbindShellShortcut(compositors::paw2::Paw2ConfigWriter& writer, const ShellShortcut& shortcut) {
+      const auto commands = writer.get("bindings.commands").value_or(nlohmann::json::object());
+      for (const auto& key : shellShortcutKeys(commands, shortcut)) {
+        writer.setBinding("commands." + key, nullptr);
+      }
     }
 
     constexpr auto kBindingActions = std::to_array<Paw2BindingAction>({
@@ -242,6 +270,18 @@ namespace settings {
     if (json.is_null()) {
       return false;
     }
+    if (const auto* shortcut = shellShortcutAt(path)) {
+      if (!json.is_array()) {
+        return false;
+      }
+      unbindShellShortcut(writer, *shortcut);
+      for (const auto& key : json) {
+        if (key.is_string() && !key.get<std::string>().empty()) {
+          writer.setBinding("commands." + key.get<std::string>(), shellShortcutArgv(*shortcut));
+        }
+      }
+      return true;
+    }
     if (isMonitorPath(path)) {
       return setMonitorRow(writer, path[2], path[3], std::move(json));
     }
@@ -280,7 +320,9 @@ namespace settings {
   }
 
   void resetPaw2Setting(compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& path) {
-    if (isMonitorPath(path)) {
+    if (const auto* shortcut = shellShortcutAt(path)) {
+      unbindShellShortcut(writer, *shortcut);
+    } else if (isMonitorPath(path)) {
       writer.setMonitor(path[2], path[3], nullptr);
     } else if (isBindingPath(path)) {
       writer.setBinding(dottedPaw2Path(path, 2), nullptr);
@@ -293,6 +335,9 @@ namespace settings {
     // A monitor entry is written whole, so no single key of it has a default to go back to.
     if (isMonitorPath(path)) {
       return false;
+    }
+    if (const auto* shortcut = shellShortcutAt(path)) {
+      return !shellShortcutKeys(writer.get("bindings.commands").value_or(nlohmann::json::object()), *shortcut).empty();
     }
     // A shortcut set anywhere replaces paw2's default for that action; the commands map has none.
     if (isBindingPath(path)) {
@@ -409,6 +454,30 @@ namespace settings {
         writer.set(std::move(path), std::move(json));
       }
     }
+  }
+
+  std::span<const ShellShortcut> shellShortcuts() { return kShellShortcuts; }
+
+  std::vector<std::string> shellShortcutArgv(const ShellShortcut& shortcut) {
+    std::vector<std::string> argv{std::string(FileUtils::kAppDirName), "msg"};
+    for (const auto& part : StringUtils::splitWhitespace(shortcut.command)) {
+      argv.emplace_back(part);
+    }
+    return argv;
+  }
+
+  std::vector<std::string> shellShortcutKeys(const nlohmann::json& commands, const ShellShortcut& shortcut) {
+    std::vector<std::string> keys;
+    if (!commands.is_object()) {
+      return keys;
+    }
+    const nlohmann::json argv = shellShortcutArgv(shortcut);
+    for (const auto& [key, command] : commands.items()) {
+      if (command == argv) {
+        keys.push_back(key);
+      }
+    }
+    return keys;
   }
 
   std::span<const Paw2BindingAction> paw2BindingActions() { return kBindingActions; }

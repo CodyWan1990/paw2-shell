@@ -14,6 +14,7 @@
 #include "shell/bar/widget_gesture_defaults.h"
 #include "shell/control_center/control_center_panel.h"
 #include "shell/control_center/shortcut_registry.h"
+#include "shell/panel/panel_manager.h"
 #include "shell/settings/color_spec_picker.h"
 #include "shell/settings/font_weight_catalog.h"
 #include "shell/settings/settings_paw2.h"
@@ -624,6 +625,18 @@ namespace settings {
             ListSetting{.items = std::move(keys)}, "paw2 shortcuts keybinds " + std::string(action.key)
         ));
       }
+
+      // Shell actions, bound as commands that call back into the shell.
+      const auto commandTable = env.paw2Value("bindings.commands").value_or(nlohmann::json::object());
+      for (const auto& shortcut : shellShortcuts()) {
+        entries.push_back(makeEntry(
+            section, std::string(shortcut.group), i18n::tr(text + ".shell." + std::string(shortcut.name)),
+            i18n::tr(text + ".shell.runs", "command", joinCommandLine(shellShortcutArgv(shortcut))),
+            {"paw2", "bindings", "shell", std::string(shortcut.name)},
+            ListSetting{.items = shellShortcutKeys(commandTable, shortcut)},
+            "paw2 shortcuts keybinds themes wallpaper " + std::string(shortcut.name)
+        ));
+      }
     }
 
     void appendPaw2DisplayEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
@@ -1135,6 +1148,17 @@ namespace settings {
     std::vector<SettingEntry> entries;
 
     // Appearance
+    // Saved themes come first: picking one sets the palette and wallpaper rows below.
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "theme", tr("settings.schema.appearance.saved-themes.label"),
+        tr("settings.schema.appearance.saved-themes.description"), {},
+        ButtonSetting{
+            .label = tr("settings.schema.appearance.saved-themes.open"),
+            .action = []() { PanelManager::instance().togglePanel("themes"); },
+            .glyph = "palette",
+        },
+        "themes presets saved palette wallpaper switcher"
+    ));
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "theme", tr("settings.schema.appearance.theme-mode.label"),
         tr("settings.schema.appearance.theme-mode.description"), {"theme", "mode"},

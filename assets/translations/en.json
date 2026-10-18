@@ -449,6 +449,7 @@
       "screen-time": "Screen Time",
       "session": "Session",
       "system": "System",
+      "themes": "Themes",
       "wallpaper": "Wallpaper",
       "weather": "Weather",
       "wifi": "Wi-Fi"
@@ -1349,6 +1350,7 @@
         "paw2-keys-monitors": "Monitors",
         "paw2-keys-session": "Overview & Session",
         "paw2-keys-tabs": "Tabs",
+        "paw2-keys-themes": "Themes",
         "paw2-keys-windows": "Windows",
         "paw2-keys-workspaces": "Workspaces",
         "paw2-input": "Input",
@@ -1856,6 +1858,14 @@
           },
           "default": "Default: {keys}",
           "no-default": "Unbound by default",
+          "shell": {
+            "runs": "Runs {command}",
+            "theme-next": "Next theme",
+            "theme-previous": "Previous theme",
+            "theme-wallpaper-next": "Next wallpaper in the theme",
+            "theme-wallpaper-random": "Random wallpaper from the theme",
+            "themes-open": "Open themes"
+          },
           "actions": {
             "focus-left": "Focus left",
             "focus-right": "Focus right",
@@ -2190,6 +2200,11 @@
           "button": "Inspect Colors",
           "description": "View template color names, swatches, and hex values for the active palette",
           "label": "Palette Inspector"
+        },
+        "saved-themes": {
+          "description": "Named looks, each a palette with its wallpapers. Apply one from the themes panel, the bar or a shortcut.",
+          "label": "Saved themes",
+          "open": "Open themes"
         },
         "palette-source": {
           "description": "Where to derive the color palette from",
@@ -5247,6 +5262,7 @@
         "test": "Test",
         "text": "Text",
         "theme-mode": "Theme Mode",
+        "themes": "Themes",
         "tray": "Tray",
         "volume": "Volume",
         "wallpaper": "Wallpaper",
@@ -5305,6 +5321,43 @@
       "unknown-cpu": "Unknown CPU",
       "unknown-distro": "Unknown distro",
       "unknown-gpu": "Unknown GPU"
+    }
+  },
+  "themes": {
+    "editor": {
+      "add-current": "Add current",
+      "browse": "Browse…",
+      "capture": "Capture desktop",
+      "delete": "Delete",
+      "delete-confirm": "Delete for good?",
+      "edit-title": "Edit theme",
+      "name": "Name",
+      "name-placeholder": "e.g. Rosé Pine",
+      "new-title": "New theme",
+      "no-wallpapers": "No wallpapers yet: add the current one, or browse for more.",
+      "palette": "Palette",
+      "palette-placeholder": "Choose a palette",
+      "preview": "Preview",
+      "preview-captured": "Showing a capture of the desktop.",
+      "preview-none": "No preview: capture the desktop or add a wallpaper.",
+      "preview-wallpaper": "Showing the theme's wallpaper.",
+      "remove-wallpaper": "Remove from this theme",
+      "save": "Save",
+      "use-wallpaper": "Use wallpaper"
+    },
+    "panel": {
+      "edit": "Edit theme",
+      "from-wallpaper": "Colours from the wallpaper",
+      "hint": "←/→ choose   Enter apply   Tab switch view   Esc close",
+      "new": "New theme",
+      "no-wallpapers": "The applied theme has no wallpapers.",
+      "none-applied": "No theme applied yet.",
+      "random": "Random",
+      "title": "Themes",
+      "view": {
+        "themes": "Themes",
+        "wallpapers": "Wallpapers"
+      }
     }
   },
   "theme": {
@@ -5422,6 +5475,10 @@
       "flatten": "Flatten",
       "loading": "Loading wallpapers…",
       "navigate-up": "Go to parent folder",
+      "pick": {
+        "add": "Add wallpapers",
+        "count": "{count} selected"
+      },
       "refresh": "Refresh wallpapers",
       "sort-date-asc": "Sort by date (oldest first)",
       "sort-date-desc": "Sort by date (newest first)",

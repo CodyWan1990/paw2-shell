@@ -1,3 +1,40 @@
+# paw2-shell
+
+paw2-shell is the desktop shell for the [paw2](https://github.com/CodyWan1990/paw2) Wayland compositor. It is a fork of
+[Noctalia](https://noctalia.dev) v5.3.0 that keeps Noctalia's bars, widgets, panels, lock screen and Luau plugins, drops
+support for every other compositor, and adds:
+
+- a paw2 backend over `$PAW2_SOCKET`: workspace occupancy, the focused window and monitor, exact window identity for
+  the dock, taskbar and switcher, logout through paw2, and the overview toggle
+- per-widget style presets: `[widget.<name>] style = none | capsule | box | pill | underline`, drawn in the widget's
+  `color`, with `underline` / `underline_width` for an accent line on any widget
+- a `paw2_layout` bar widget and `paw2-shell msg paw2-layout next|prev|<name>`
+
+It installs as `paw2-shell` with its own `~/.config/paw2-shell`, so it sits beside upstream Noctalia without sharing
+config. Noctalia's [documentation](https://docs.noctalia.dev) applies to everything not listed above; read
+`noctalia ...` commands there as `paw2-shell ...`.
+
+### Build and install
+
+```sh
+meson setup build --buildtype=release
+ninja -C build
+sudo meson install -C build          # installs to /usr/local
+```
+
+paw2 only shows window titles and the window list to programs installed by root, so run the installed
+`/usr/local/bin/paw2-shell`, not the build directory copy. Start it from paw2's `config.toml`:
+
+```toml
+[autostart]
+commands = [["paw2-shell", "--daemon"]]
+```
+
+Screen locking, idle actions and night light need a paw2 build with `ext-session-lock`, `ext-idle-notify` and
+`wlr-gamma-control` support.
+
+---
+
 # Noctalia
 
 Noctalia is a native Wayland desktop shell for people who want a polished, configurable Linux desktop without stitching

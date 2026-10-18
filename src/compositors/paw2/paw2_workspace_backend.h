@@ -39,6 +39,8 @@ public:
   [[nodiscard]] std::optional<std::string> focusedWindowId() const override;
   bool focusWindowById(const std::string& windowId, bool warpPointer = false) override;
   bool closeWindowById(const std::string& windowId) override;
+  bool minimizeWindowById(const std::string& windowId) override;
+  [[nodiscard]] std::vector<std::string> minimizedWindowIds() const override;
   void cleanup() override;
 
 private:

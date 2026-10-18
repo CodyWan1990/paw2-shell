@@ -132,4 +132,19 @@ bool Paw2WorkspaceBackend::closeWindowById(const std::string& windowId) {
   return window != nullptr && m_runtime.closeWindow(window->id);
 }
 
+bool Paw2WorkspaceBackend::minimizeWindowById(const std::string& windowId) {
+  const auto* window = m_runtime.findWindowByIdentifier(windowId);
+  return window != nullptr && m_runtime.minimizeWindow(window->id);
+}
+
+std::vector<std::string> Paw2WorkspaceBackend::minimizedWindowIds() const {
+  std::vector<std::string> ids;
+  for (const auto& window : m_runtime.snapshot().windows) {
+    if (window.minimized && !window.identifier.empty()) {
+      ids.push_back(window.identifier);
+    }
+  }
+  return ids;
+}
+
 void Paw2WorkspaceBackend::cleanup() { m_runtime.cleanup(); }

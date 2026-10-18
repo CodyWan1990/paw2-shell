@@ -942,12 +942,7 @@ void TaskbarWidget::buildTaskButtons(Renderer& renderer) {
     const TaskModel& task = *taskModel;
     auto area = ui::inputArea({});
     area->setFrameSize(tileWidthWithTitle, tileSize);
-    float tileOpacity = task.active ? m_activeOpacity : m_inactiveOpacity;
-    // Pinned-but-not-running tiles are launchers, dim them so they don't read as open apps.
-    if (task.pinned && !task.running) {
-      tileOpacity *= m_pinnedOpacity;
-    }
-    area->setOpacity(tileOpacity);
+    area->setOpacity(tileOpacity(task));
     area->setAcceptedButtons(InputArea::buttonMask({BTN_LEFT, BTN_RIGHT, BTN_MIDDLE}));
     auto* dragArea = area.get();
     const bool tileDraggable = taskRef.index < draggableTileCount;
@@ -1881,6 +1876,11 @@ void TaskbarWidget::updateModels() {
       }
     }
   }
+  if (const auto minimizedIds = m_platform.minimizedCompositorWindowIds(); !minimizedIds.empty()) {
+    for (auto& task : nextTasks) {
+      task.minimized = !task.exactWindowId.empty() && std::ranges::contains(minimizedIds, task.exactWindowId);
+    }
+  }
 
   if (!workspaceAssignments.empty()) {
     if (assignmentMode == TaskbarAssignmentMode::WorkspaceOccurrenceTitle) {
@@ -2662,11 +2662,7 @@ void TaskbarWidget::updateModels() {
         }
         if (comparison.activesChanged) {
           if (tile.area != nullptr) {
-            float opacity = task.active ? m_activeOpacity : m_inactiveOpacity;
-            if (task.pinned && !task.running) {
-              opacity *= m_pinnedOpacity;
-            }
-            tile.area->setOpacity(opacity);
+            tile.area->setOpacity(tileOpacity(task));
           }
           if (tile.activeIndicator != nullptr) {
             tile.activeIndicator->setVisible(task.active);
@@ -2701,6 +2697,19 @@ bool TaskbarWidget::onPointerEvent(const PointerEvent& event) {
     return true;
   }
   return consumed;
+}
+
+float TaskbarWidget::tileOpacity(const TaskModel& task) const {
+  float opacity = task.active ? m_activeOpacity : m_inactiveOpacity;
+  // Pinned-but-not-running tiles are launchers, dim them so they don't read as open apps.
+  if (task.pinned && !task.running) {
+    opacity *= m_pinnedOpacity;
+  }
+  // Minimized windows fade the same way: listed, but out of sight.
+  if (task.minimized) {
+    opacity *= m_pinnedOpacity;
+  }
+  return opacity;
 }
 
 void TaskbarWidget::openTaskContextMenu(const TaskModel& task, InputArea& area) {
@@ -2793,7 +2802,10 @@ void TaskbarWidget::openTaskContextMenu(const TaskModel& task, InputArea& area) 
   const bool pinAvailable = !m_groupByWorkspace && menuEntry.has_value() && !menuEntry->id.empty();
   const bool isPinned = pinAvailable && shell::dock::pinned_apps::containsEntry(pinnedConfigIds(), *menuEntry);
 
-  // IDs 0..N-1 => desktop actions, -1 => close single, -2 => close all, -4 => pin toggle.
+  // A single exact-identity window that is on screen can be minimized from here.
+  const bool showMinimize = infoClose && task.running && !task.minimized && m_contextMenuInfoPrimary.exactIdentity;
+
+  // IDs 0..N-1 => desktop actions, -1 => close single, -2 => close all, -4 => pin toggle, -5 => minimize.
   std::vector<ContextMenuControlEntry> entries;
   entries.reserve(entryActions.size() + 5);
   if (pinAvailable) {
@@ -2818,12 +2830,25 @@ void TaskbarWidget::openTaskContextMenu(const TaskModel& task, InputArea& area) 
         }
     );
   }
-  if (showClose) {
+  if (showClose || showMinimize) {
     if (!entries.empty()) {
       entries.push_back(
           ContextMenuControlEntry{.id = -3, .label = {}, .enabled = false, .separator = true, .hasSubmenu = false}
       );
     }
+  }
+  if (showMinimize) {
+    entries.push_back(
+        ContextMenuControlEntry{
+            .id = -5,
+            .label = i18n::tr("dock.actions.minimize"),
+            .enabled = true,
+            .separator = false,
+            .hasSubmenu = false,
+        }
+    );
+  }
+  if (showClose) {
     entries.push_back(
         ContextMenuControlEntry{
             .id = -1,
@@ -2887,6 +2912,10 @@ void TaskbarWidget::openTaskContextMenu(const TaskModel& task, InputArea& area) 
           );
         });
       }
+      return;
+    }
+    if (entry.id == -5) {
+      m_platform.minimizeToplevelInfo(m_contextMenuInfoPrimary);
       return;
     }
     if (entry.id == -1) {
@@ -3054,7 +3083,8 @@ TaskbarWidget::ModelComparison TaskbarWidget::compareModels(
   for (std::size_t i = 0; i < nextTasks.size(); ++i) {
     const bool titleChanged =
         nextTasks[i].title != previousTasks[i].title || nextTasks[i].displayName != previousTasks[i].displayName;
-    const bool activeChanged = nextTasks[i].active != previousTasks[i].active;
+    const bool activeChanged =
+        nextTasks[i].active != previousTasks[i].active || nextTasks[i].minimized != previousTasks[i].minimized;
     titlesChanged = titlesChanged || titleChanged;
     activesChanged = activesChanged || activeChanged;
     if (nextTasks[i].appId != previousTasks[i].appId

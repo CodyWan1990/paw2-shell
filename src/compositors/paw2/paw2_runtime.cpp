@@ -106,6 +106,7 @@ namespace compositors::paw2 {
                 .output = jsonString(entry, "output"),
                 .workspace = jsonIndex(entry, "workspace"),
                 .focused = jsonBool(entry, "focused"),
+                .minimized = jsonBool(entry, "minimized"),
             }
         );
       }
@@ -191,6 +192,8 @@ namespace compositors::paw2 {
   bool Paw2Runtime::focusWindow(std::uint64_t id) { return send({{"cmd", "focus-window"}, {"id", id}}); }
 
   bool Paw2Runtime::closeWindow(std::uint64_t id) { return send({{"cmd", "close-window"}, {"id", id}}); }
+
+  bool Paw2Runtime::minimizeWindow(std::uint64_t id) { return send({{"cmd", "minimize-window"}, {"id", id}}); }
 
   bool Paw2Runtime::setLayout(std::string_view layout, std::string_view output) {
     nlohmann::json command{{"cmd", "set-layout"}};

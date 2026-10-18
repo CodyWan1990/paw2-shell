@@ -8,6 +8,7 @@
 #include "util/string_utils.h"
 #include "wayland/wayland_toplevels.h"
 
+#include <algorithm>
 #include <unordered_map>
 
 namespace {
@@ -112,6 +113,7 @@ namespace shell::dock {
       }
     }
 
+    const auto minimizedIds = deps.platform.minimizedCompositorWindowIds();
     snapshot.items.reserve(itemEntries.size());
     for (const auto& entry : itemEntries) {
       DockItemModel dockItem;
@@ -130,6 +132,12 @@ namespace shell::dock {
       }
 
       dockItem.active = !snapshot.activeAppIdLower.empty() && snapshot.activeAppIdLower == dockItem.idLower;
+      if (dockItem.running && !minimizedIds.empty()) {
+        const auto windows = windowsForDockItem(deps.platform, dockItem, snapshot.filterOutput);
+        dockItem.minimized = !windows.empty() && std::ranges::all_of(windows, [&](const ToplevelInfo& window) {
+          return std::ranges::contains(minimizedIds, window.identifier);
+        });
+      }
       if (deps.config.showDots || deps.config.showInstanceCount) {
         dockItem.instanceCount = windowsForDockItem(deps.platform, dockItem, snapshot.filterOutput).size();
       }

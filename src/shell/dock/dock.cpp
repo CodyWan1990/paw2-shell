@@ -1242,6 +1242,12 @@ void Dock::openItemMenu(shell::dock::DockInstance& instance, const shell::dock::
               m_platform->closeToplevelInfo(windows[windowIndex]);
             }
           },
+      .minimizeWindow =
+          [this, windows](std::size_t windowIndex) {
+            if (windowIndex < windows.size()) {
+              m_platform->minimizeToplevelInfo(windows[windowIndex]);
+            }
+          },
       .launchAction =
           [this, entryId, entryWorkingDir, entryTerminal, entryForPin,
            output = instance.output](const DesktopAction& desktopAction) {

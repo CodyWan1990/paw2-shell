@@ -33,7 +33,7 @@ namespace {
       R"("windows":[)"
       R"({"id":3,"identifier":"aaa","title":"term","app_id":"kitty","output":"DP-1","workspace":0,"focused":false},)"
       R"({"id":4,"identifier":"bbb","title":"web","app_id":"firefox","output":"DP-1","workspace":1,"focused":true},)"
-      R"({"id":9,"identifier":"ccc","title":"chat","app_id":"vesktop","output":"HDMI-A-1","workspace":0,"focused":false}],)"
+      R"({"id":9,"identifier":"ccc","title":"chat","app_id":"vesktop","output":"HDMI-A-1","workspace":0,"focused":false,"minimized":true}],)"
       R"("scratchpads":[{"name":"term","app_id":"kitty","loaded":true,"visible":false,"output":null}],)"
       R"("layouts":["scrolling","dwindle","master","monocle"]})";
 
@@ -115,6 +115,7 @@ int main() {
   ok &= check(runtime.focusedOutput() != nullptr && runtime.focusedOutput()->name == "DP-1", "focused output");
   ok &= check(backend.hasExactWindowIdentity(), "identifiers present means exact identity");
   ok &= check(backend.focusedWindowId() == std::optional<std::string>("bbb"), "focused window id");
+  ok &= check(backend.minimizedWindowIds() == std::vector<std::string>{"ccc"}, "minimized window ids");
 
   std::vector<Workspace> workspaces{
       {.id = "DP-1:1", .name = "1"}, {.id = "DP-1:2", .name = "2"}, {.id = "DP-1:3", .name = "3"}

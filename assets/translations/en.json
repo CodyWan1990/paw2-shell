@@ -713,7 +713,8 @@
   "dock": {
     "actions": {
       "close": "Close",
-      "close-all": "Close All"
+      "close-all": "Close All",
+      "minimize": "Minimize"
     },
     "launcher": "Launcher"
   },
@@ -1866,6 +1867,8 @@
             "swap-down": "Move window down",
             "close-window": "Close window",
             "toggle-floating": "Float or tile window",
+            "minimize-window": "Minimize window",
+            "restore-minimized": "Restore last minimized window",
             "toggle-fullscreen": "Fullscreen",
             "consume-or-expel-left": "Join or leave column on the left",
             "consume-or-expel-right": "Join or leave column on the right",

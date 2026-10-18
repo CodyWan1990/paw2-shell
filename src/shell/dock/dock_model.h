@@ -23,6 +23,8 @@ namespace shell::dock {
     std::string windowLookupWmClassLower;
     bool running = false;
     bool active = false;
+    // Every window of the app is minimized: drawn faded until one is restored.
+    bool minimized = false;
     std::size_t instanceCount = 0;
   };
 

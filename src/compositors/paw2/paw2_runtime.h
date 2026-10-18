@@ -25,6 +25,8 @@ namespace compositors::paw2 {
     // 0-based on the wire; ext-workspace ids are "<output>:<index + 1>".
     std::uint32_t workspace = 0;
     bool focused = false;
+    // Out of its workspace until restored; focusing it restores it.
+    bool minimized = false;
 
     bool operator==(const Paw2Window&) const = default;
   };
@@ -117,6 +119,7 @@ namespace compositors::paw2 {
     bool focusWorkspace(std::string_view output, std::uint32_t zeroBasedIndex);
     bool focusWindow(std::uint64_t id);
     bool closeWindow(std::uint64_t id);
+    bool minimizeWindow(std::uint64_t id);
     // An empty name cycles to the next layout.
     bool setLayout(std::string_view layout, std::string_view output = {});
     bool toggleScratchpad(std::string_view name);

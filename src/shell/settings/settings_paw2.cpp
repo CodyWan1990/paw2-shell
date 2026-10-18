@@ -56,6 +56,8 @@ namespace settings {
         {"swap_down", "paw2-keys-windows", "Super+Shift+j Super+Shift+Down"},
         {"close_window", "paw2-keys-windows", "Super+q Super+BackSpace"},
         {"toggle_floating", "paw2-keys-windows", ""},
+        {"minimize_window", "paw2-keys-windows", ""},
+        {"restore_minimized", "paw2-keys-windows", ""},
         {"toggle_fullscreen", "paw2-keys-windows", ""},
         {"consume_or_expel_left", "paw2-keys-windows", ""},
         {"consume_or_expel_right", "paw2-keys-windows", ""},

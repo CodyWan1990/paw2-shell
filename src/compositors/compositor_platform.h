@@ -104,6 +104,9 @@ public:
   void activateToplevelInfo(const ToplevelInfo& window);
   void closeToplevel(zwlr_foreign_toplevel_handle_v1* handle);
   void closeToplevelInfo(const ToplevelInfo& window);
+  void minimizeToplevelInfo(const ToplevelInfo& window);
+  // Exact ids (ToplevelInfo::identifier) of windows the compositor has minimized.
+  [[nodiscard]] std::vector<std::string> minimizedCompositorWindowIds() const;
   void focusCompositorWindow(const std::string& windowId, bool warpPointer = false) const;
   // Returns false when no backend could act on `windowId`.
   bool closeCompositorWindow(const std::string& windowId) const;
@@ -206,5 +209,6 @@ private:
   std::unique_ptr<OutputProbe> m_outputProbe;
   std::vector<WorkspaceModelSnapshot> m_lastWorkspaceModelSnapshot;
   std::optional<std::string> m_lastFocusedCompositorWindowId;
+  std::vector<std::string> m_lastMinimizedCompositorWindowIds;
   bool m_initialized = false;
 };

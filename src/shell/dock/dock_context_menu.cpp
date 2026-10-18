@@ -35,6 +35,7 @@ namespace shell::dock {
     constexpr std::int32_t kMenuCloseAllId = -2;
     constexpr std::int32_t kMenuSeparatorId = -3;
     constexpr std::int32_t kMenuPinToggleId = -4;
+    constexpr std::int32_t kMenuMinimizeId = -5;
     constexpr std::int32_t kMenuWindowBaseId = -1000;
 
     bool isWindowClosable(const ToplevelInfo& window) {
@@ -220,6 +221,20 @@ namespace shell::dock {
         );
       }
       if (closableCount == 1) {
+        // A lone window the compositor can minimize, and has not yet.
+        const auto& window = menu->windows[closableWindowIndices[0]];
+        if (callbacks.minimizeWindow && window.exactIdentity && !window.identifier.empty()
+            && !std::ranges::contains(platform.minimizedCompositorWindowIds(), window.identifier)) {
+          bodyEntries.push_back(
+              ContextMenuControlEntry{
+                  .id = kMenuMinimizeId,
+                  .label = i18n::tr("dock.actions.minimize"),
+                  .enabled = true,
+                  .separator = false,
+                  .hasSubmenu = false
+              }
+          );
+        }
         bodyEntries.push_back(
             ContextMenuControlEntry{
                 .id = kMenuCloseId,
@@ -404,6 +419,10 @@ namespace shell::dock {
             const auto idx = static_cast<std::size_t>(id);
             if (idx < entryActions.size() && callbacks.launchAction) {
               callbacks.launchAction(entryActions[idx]);
+            }
+          } else if (id == kMenuMinimizeId && !closableWindowIndices.empty()) {
+            if (callbacks.minimizeWindow) {
+              callbacks.minimizeWindow(closableWindowIndices[0]);
             }
           } else if (id == kMenuCloseId && !closableWindowIndices.empty()) {
             if (callbacks.closeWindow) {

@@ -119,6 +119,8 @@ private:
     // Pinned flat-strip slot (empty when not running). Ignored while group_by_workspace is on.
     bool pinned = false;
     bool running = true;
+    // Minimized by the compositor: still listed, drawn faded, restored by activating it.
+    bool minimized = false;
     zwlr_foreign_toplevel_handle_v1* firstHandle = nullptr;
   };
 
@@ -196,6 +198,7 @@ private:
   void buildDesktopIconIndex();
   [[nodiscard]] std::string resolveIconPath(const std::string& appId, const std::string& iconNameOrPath);
   void openTaskContextMenu(const TaskModel& task, InputArea& area);
+  [[nodiscard]] float tileOpacity(const TaskModel& task) const;
   void activateAdjacentWorkspace(int direction);
   void activateAdjacentTask(int direction);
   [[nodiscard]] bool activeWorkspaceIndex(std::size_t& index) const;

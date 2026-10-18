@@ -431,6 +431,19 @@ void CompositorPlatform::closeToplevelInfo(const ToplevelInfo& window) {
   }
 }
 
+void CompositorPlatform::minimizeToplevelInfo(const ToplevelInfo& window) {
+  if (window.exactIdentity && !window.identifier.empty() && m_workspaceMetadataBackend != nullptr) {
+    (void)m_workspaceMetadataBackend->minimizeWindowById(window.identifier);
+  }
+}
+
+std::vector<std::string> CompositorPlatform::minimizedCompositorWindowIds() const {
+  if (m_workspaceMetadataBackend == nullptr) {
+    return {};
+  }
+  return m_workspaceMetadataBackend->minimizedWindowIds();
+}
+
 bool CompositorPlatform::containsWlrToplevelHandle(zwlr_foreign_toplevel_handle_v1* handle) const {
   return m_wayland.containsWlrToplevelHandle(handle);
 }
@@ -458,17 +471,25 @@ void CompositorPlatform::setWorkspaceChangeCallback(ChangeCallback callback) {
   m_workspaceChangeCallback = std::move(callback);
   m_lastWorkspaceModelSnapshot = workspaceModelSnapshot();
   m_lastFocusedCompositorWindowId = focusedCompositorWindowId();
+  m_lastMinimizedCompositorWindowIds = minimizedCompositorWindowIds();
   auto wrapper = [this]() {
     auto nextSnapshot = workspaceModelSnapshot();
     auto nextFocused = focusedCompositorWindowId();
+    auto nextMinimized = minimizedCompositorWindowIds();
+    const bool minimizedChanged = nextMinimized != m_lastMinimizedCompositorWindowIds;
     if (sameWorkspaceModelSnapshot(nextSnapshot, m_lastWorkspaceModelSnapshot)
-        && nextFocused == m_lastFocusedCompositorWindowId) {
+        && nextFocused == m_lastFocusedCompositorWindowId && !minimizedChanged) {
       return;
     }
     m_lastWorkspaceModelSnapshot = std::move(nextSnapshot);
     m_lastFocusedCompositorWindowId = std::move(nextFocused);
+    m_lastMinimizedCompositorWindowIds = std::move(nextMinimized);
     if (m_workspaceChangeCallback) {
       m_workspaceChangeCallback();
+    }
+    // A window minimizing changes how the taskbar and dock draw it, not where it is.
+    if (minimizedChanged && m_toplevelChangeCallback) {
+      m_toplevelChangeCallback();
     }
   };
 

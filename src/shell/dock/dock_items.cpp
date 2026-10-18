@@ -790,7 +790,9 @@ namespace shell::dock {
       const bool dragActive = instance.drag.active;
       const bool isDraggedItem = dragActive && itemIndex == instance.drag.sourceIndex;
       const float iconScale = model.active ? cfg.activeScale : cfg.inactiveScale;
-      const float iconOpacity = model.active ? cfg.activeOpacity : cfg.inactiveOpacity;
+      // A fully minimized app fades like the taskbar's minimized tiles.
+      const float iconOpacity =
+          (model.active ? cfg.activeOpacity : cfg.inactiveOpacity) * (model.minimized ? 0.5F : 1.0F);
       applyShellAppIconColorization(item.iconImage, shell);
       Node* iconNode =
           item.iconImage != nullptr ? static_cast<Node*>(item.iconImage) : static_cast<Node*>(item.iconGlyph);

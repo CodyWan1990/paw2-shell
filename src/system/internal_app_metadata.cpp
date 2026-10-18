@@ -13,7 +13,7 @@ namespace internal_apps {
             .appId = "paw2-shell",
             .windowTitle = "paw2-shell Settings",
             .displayName = "paw2-shell",
-            .iconAssetPath = "noctalia.svg",
+            .iconAssetPath = "paw2.svg",
         },
     };
 

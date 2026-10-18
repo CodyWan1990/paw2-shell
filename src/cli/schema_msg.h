@@ -8,8 +8,8 @@
 
 namespace noctalia::cli {
 
-  inline constexpr std::array<std::string_view, 10> kBuiltinPaletteNames{
-      "Ayu", "Catppuccin", "Dracula", "Eldritch", "Gruvbox", "Kanagawa", "Noctalia", "Nord", "Rosé Pine", "Tokyo-Night",
+  inline constexpr std::array<std::string_view, 9> kBuiltinPaletteNames{
+      "Ayu", "Catppuccin", "Dracula", "Eldritch", "Gruvbox", "Kanagawa", "Nord", "Rosé Pine", "Tokyo-Night",
   };
 
   inline constexpr std::array kMsgColorSchemeSetBuiltinPositionals{

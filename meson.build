@@ -1114,8 +1114,9 @@ install_data(
 )
 
 install_data(
-  'assets/noctalia.svg',
+  'assets/paw2.svg',
   install_dir: get_option('datadir') / 'icons' / 'hicolor' / 'scalable' / 'apps',
+  rename: 'paw2-shell.svg',
 )
 
 if build_tests

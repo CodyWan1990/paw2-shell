@@ -7,7 +7,7 @@
 #include <mutex>
 #include <string>
 
-Palette palette = noctalia::theme::findBuiltinPalette("Noctalia")->dark.palette;
+Palette palette = noctalia::theme::findBuiltinPalette("Tokyo-Night")->dark.palette;
 bool g_resolvedThemeLight = false;
 
 namespace {

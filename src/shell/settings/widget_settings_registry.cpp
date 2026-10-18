@@ -235,7 +235,7 @@ namespace settings {
         {.type = "bluetooth", .labelKey = "settings.widgets.types.bluetooth", .glyph = "bluetooth"},
         {.type = "brightness", .labelKey = "settings.widgets.types.brightness", .glyph = "brightness-high"},
         {.type = "clock", .labelKey = "settings.widgets.types.clock", .glyph = "clock"},
-        {.type = "control-center", .labelKey = "settings.widgets.types.control-center", .glyph = "noctalia"},
+        {.type = "control-center", .labelKey = "settings.widgets.types.control-center", .glyph = "paw"},
         {.type = "clipboard", .labelKey = "settings.widgets.types.clipboard", .glyph = "clipboard"},
         {.type = "custom_button", .labelKey = "settings.widgets.types.custom-button", .glyph = "circuit-pushbutton"},
         {.type = "caffeine", .labelKey = "settings.widgets.types.caffeine", .glyph = "caffeine-off"},
@@ -784,6 +784,12 @@ namespace settings {
       if (projection != nullptr) {
         specs = projection->presentedSettingSpecs();
       }
+      // A type's own setting wins over a common one with the same key (workspaces' `style`).
+      std::erase_if(commonSpecs, [&specs](const WidgetSettingSpec& common) {
+        return std::ranges::any_of(specs, [&common](const WidgetSettingSpec& own) {
+          return own.schema.key == common.schema.key;
+        });
+      });
 
       specs.insert(
           specs.end(), std::make_move_iterator(commonSpecs.begin()), std::make_move_iterator(commonSpecs.end())
@@ -1169,6 +1175,11 @@ namespace settings {
       auto fields = projection->schemaFields();
       auto common = commonWidgetSettingSpecs("sans-serif", false);
       applyCommonOverrides(common, projection->commonOverrides(), type);
+      std::erase_if(common, [&fields](const WidgetSettingSpec& spec) {
+        return std::ranges::any_of(fields, [&spec](const schema::WidgetSettingField& own) {
+          return own.key == spec.schema.key;
+        });
+      });
       std::ranges::transform(common, std::back_inserter(fields), [](const WidgetSettingSpec& spec) {
         return spec.schema;
       });

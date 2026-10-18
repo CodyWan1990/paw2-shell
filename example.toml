@@ -154,8 +154,8 @@ recursive                  = true    # include subdirectories when picking rando
 [theme]
 mode   = "dark"                     # dark | light | auto
 source = "builtin"                  # builtin | wallpaper | community
-builtin = "Noctalia"                # Ayu | Catppuccin | Dracula | Eldritch | Gruvbox |
-                                    # Kanagawa | Noctalia | Nord | Rosé Pine | Tokyo-Night
+builtin = "Tokyo-Night"             # Ayu | Catppuccin | Dracula | Eldritch | Gruvbox |
+                                    # Kanagawa | Nord | Rosé Pine | Tokyo-Night
 # community_palette = "Noctalia"    # fetched from api.noctalia.dev, cached locally
 # wallpaper_scheme  = "m3-content"  # m3-tonal-spot | m3-content | m3-fruit-salad |
                                     # m3-rainbow | m3-monochrome | vibrant | faithful |
@@ -379,13 +379,15 @@ delete   = ["del"]
 
 [bar.main]
 position           = "top"          # top | bottom | left | right
-thickness          = 34
+thickness          = 28
 background_opacity = 1.0
 compositor_blur    = true          # false stops compositor blur for this bar
-radius             = 12
-margin_ends        = 180
-margin_edge        = 10
-padding            = 14
+radius             = 0
+concave_edge_corners = false
+panel_overlap      = 0
+margin_ends        = 0
+margin_edge        = 0
+padding            = 15
 widget_spacing     = 6
 scale              = 1.0
 font_scale         = 1.0            # text-only scale multiplier across widgets
@@ -402,9 +404,9 @@ capsule            = false
 # capsule_border   = "outline"      # uncomment for a border on all widgets
 # capsule_border_width = 1.0        # outline thickness in pixels (0-8); needs capsule_border
 
-start  = ["launcher", "wallpaper", "workspaces", "paw2_layout"]
+start  = ["control-center", "workspaces", "paw2_layout", "launcher"]
 center = ["clock"]
-end    = ["media", "tray", "notifications", "clipboard", "network", "bluetooth", "volume", "brightness", "battery", "control-center", "session"]
+end    = ["media", "volume", "spacer", "wallpaper", "clipboard", "notifications", "spacer", "tray", "spacer", "session"]
 
 # Commands for the bar margin outside widget sections (dead zone):
 # [bar.main.dead_zone.actions]
@@ -425,7 +427,7 @@ end    = ["media", "tray", "notifications", "clipboard", "network", "bluetooth",
 # ── Dock ──────────────────────────────────────────────────────────────────────
 
 [dock]
-enabled             = false         # set true to activate
+enabled             = true
 position            = "bottom"      # top | bottom | left | right
 icon_size           = 48
 main_axis_padding   = 16
@@ -456,7 +458,7 @@ show_instance_count = true
 launcher_position   = "none"       # none | start | end
 launcher_icon       = "grid-dots"  # Tabler glyph name
 active_monitor_only = false
-pinned              = []            # e.g. ["firefox", "code", "kitty"]
+pinned              = ["paw2-shell", "kitty"]
 
 # Per-monitor override example; first match wins and omitted fields inherit [dock]:
 # [dock.monitor.laptop]

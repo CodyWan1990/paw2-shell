@@ -1,5 +1,6 @@
 #include "config/widget_config.h"
 
+#include "core/files/resource_paths.h"
 #include "ui/style.h"
 
 #include <optional>
@@ -110,7 +111,37 @@ namespace noctalia::config {
     media.settings["min_length"] = 80.0;
     media.settings["art_size"] = 16.0;
     media.settings["title_scroll"] = std::string("none");
+    media.settings["hide_when_no_media"] = true;
     seed("media", std::move(media));
+
+    // paw2-shell's own bar looks.
+    WidgetConfig clock;
+    clock.type = "clock";
+    clock.settings["format"] = std::string("{:%h %d, %Y. %H:%M %p}");
+    clock.settings["style"] = std::string("underline");
+    seed("clock", std::move(clock));
+
+    WidgetConfig controlCenter;
+    controlCenter.type = "control-center";
+    controlCenter.settings["custom_image"] = paths::assetPath("paw2.svg").string();
+    controlCenter.settings["scale"] = 1.5;
+    controlCenter.settings["style"] = std::string("none");
+    seed("control-center", std::move(controlCenter));
+
+    WidgetConfig launcher;
+    launcher.type = "launcher";
+    launcher.settings["style"] = std::string("pill");
+    seed("launcher", std::move(launcher));
+
+    WidgetConfig paw2Layout;
+    paw2Layout.type = "paw2_layout";
+    paw2Layout.settings["style"] = std::string("pill");
+    seed("paw2_layout", std::move(paw2Layout));
+
+    WidgetConfig workspaces;
+    workspaces.type = "workspaces";
+    workspaces.settings["style"] = std::string("minimal");
+    seed("workspaces", std::move(workspaces));
 
     WidgetConfig keyboardLayout;
     keyboardLayout.type = "keyboard_layout";

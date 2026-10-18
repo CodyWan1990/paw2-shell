@@ -4,7 +4,7 @@
 
 namespace Style {
 
-  inline constexpr int barThicknessDefault = 34;
+  inline constexpr int barThicknessDefault = 28;
 
   inline constexpr int animFast = 100;
   inline constexpr int animNormal = 200;

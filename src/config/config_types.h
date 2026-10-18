@@ -151,34 +151,34 @@ struct BarConfig {
   // Inside outline for the bar background; attached panels inherit the resolved values.
   ColorSpec border = colorSpecFromRole(ColorRole::Outline);
   float borderWidth = 0.0F;
-  std::int32_t radius = static_cast<std::int32_t>(Style::radiusXl);
-  std::int32_t radiusTopLeft = static_cast<std::int32_t>(Style::radiusXl);
-  std::int32_t radiusTopRight = static_cast<std::int32_t>(Style::radiusXl);
-  std::int32_t radiusBottomLeft = static_cast<std::int32_t>(Style::radiusXl);
-  std::int32_t radiusBottomRight = static_cast<std::int32_t>(Style::radiusXl);
-  bool concaveEdgeCorners = true;
-  std::int32_t marginEnds = 100;       // inset from each end of the bar along its main axis
+  // paw2-shell's bar is a flat, square, edge-to-edge strip.
+  std::int32_t radius = 0;
+  std::int32_t radiusTopLeft = 0;
+  std::int32_t radiusTopRight = 0;
+  std::int32_t radiusBottomLeft = 0;
+  std::int32_t radiusBottomRight = 0;
+  bool concaveEdgeCorners = false;
+  std::int32_t marginEnds = 0;         // inset from each end of the bar along its main axis
   std::int32_t marginEdge = 0;         // distance from the nearest screen edge (floats the bar when > 0)
   std::int32_t marginOppositeEdge = 0; // extra reserved space on the inward side of the bar
-  std::int32_t padding = 14;           // main-axis padding from bar edges to start/end sections
+  std::int32_t padding = 15;           // main-axis padding from bar edges to start/end sections
   std::int32_t widgetSpacing = 6;      // gap between widgets within a section
   bool shadow = true;                  // use the global shell shadow
   bool contactShadow = false;          // dark gradient between attached panel and bar
   // Logical px the attached panel overlaps the bar edge so their seam is hidden. The ideal value depends on the
   // compositor and the output's fractional scale (physical-pixel rounding), so it is exposed for per-bar/per-monitor
   // tuning. Negative values pull the panel away from the bar.
-  std::int32_t panelOverlap = 1;
+  std::int32_t panelOverlap = 0;
   float capsuleThickness = 0.76F; // capsule cross-size as a fraction of bar thickness
   float scale = 1.0F;             // content scale multiplier for glyphs and text
   float fontScale = 1.0F;         // font scale multiplier, independent of content scale
   int fontWeight = 500;           // primary label weight for bar widgets
   // Typeface for this bar's widgets; unset inherits shell.font_family. Per-widget `font_family` overrides.
   std::optional<std::string> fontFamily;
-  std::vector<std::string> startWidgets = {"launcher", "wallpaper", "workspaces", "paw2_layout"};
+  std::vector<std::string> startWidgets = {"control-center", "workspaces", "paw2_layout", "launcher"};
   std::vector<std::string> centerWidgets = {"clock"};
-  std::vector<std::string> endWidgets = {"media",   "tray",           "notifications", "clipboard",
-                                         "network", "bluetooth",      "volume",        "brightness",
-                                         "battery", "control-center", "session"};
+  std::vector<std::string> endWidgets = {"media",  "volume",        "spacer", "wallpaper", "clipboard",
+                                         "notifications", "spacer", "tray",   "spacer",    "session"};
   // When true, widgets on this bar use a capsule unless `[widget.*] capsule = false`.
   bool widgetCapsuleDefault = false;
   ColorSpec widgetCapsuleFill = colorSpecFromRole(ColorRole::SurfaceVariant);
@@ -704,7 +704,7 @@ struct DockMonitorOverride {
 };
 
 struct DockConfig {
-  bool enabled = false; // opt-in; dock is hidden by default
+  bool enabled = true;
   DockEdge position = DockEdge::Bottom;
   bool activeMonitorOnly = false;    // render only on preferred active output
   std::int32_t iconSize = 48;        // icon size in pixels (before ui_scale)
@@ -743,7 +743,7 @@ struct DockConfig {
   std::string launcherIcon = "grid-dots";   // Tabler glyph name
   std::string launcherCustomImage = "";     // image path; overrides launcherIcon glyph when set
   bool launcherCustomImageColorize = false; // tint the custom image with the icon color role
-  std::vector<std::string> pinned;          // desktop entry IDs to always show
+  std::vector<std::string> pinned = {"paw2-shell", "kitty"}; // desktop entry IDs to always show
   std::vector<DockMonitorOverride> monitorOverrides;
   bool operator==(const DockConfig&) const = default;
 };
@@ -1768,7 +1768,7 @@ struct ThemeConfig {
   };
 
   PaletteSource source = PaletteSource::Builtin;
-  std::string builtinPalette = "Noctalia";
+  std::string builtinPalette = "Tokyo-Night";
   std::string communityPalette = "Oxocarbon";
   std::string customPalette;
   std::string wallpaperScheme = "m3-content";

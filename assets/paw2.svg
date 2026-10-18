@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="256" height="256" viewBox="0 0 256 256" role="img" aria-labelledby="title">
+  <title id="title">Softly rounded paw print with claws</title>
+  <defs>
+    <radialGradient id="pad" cx="32%" cy="22%" r="85%" fx="30%" fy="18%">
+      <stop offset="0" stop-color="#737780"/>
+      <stop offset="0.32" stop-color="#454850"/>
+      <stop offset="0.7" stop-color="#24262c"/>
+      <stop offset="1" stop-color="#101115"/>
+    </radialGradient>
+    <linearGradient id="claw" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f1f0e9"/>
+      <stop offset="0.45" stop-color="#c3c4c5"/>
+      <stop offset="1" stop-color="#626770"/>
+    </linearGradient>
+    <filter id="shadow" x="-40%" y="-40%" width="180%" height="190%" color-interpolation-filters="sRGB">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <g fill="url(#claw)" stroke="#626770" stroke-width="0.5" stroke-linejoin="round" filter="url(#shadow)">
+    <path d="M39 63 C30 62 24 52 25 38 C31 46 39 48 45 57 C47 62 44 65 39 63 Z"/>
+    <path d="M89 25 C82 22 82 11 88 3 C90 11 96 13 99 20 C101 25 94 28 89 25 Z"/>
+    <path d="M167 25 C174 22 174 11 168 3 C166 11 160 13 157 20 C155 25 162 28 167 25 Z"/>
+    <path d="M217 63 C226 62 232 52 231 38 C225 46 217 48 211 57 C209 62 212 65 217 63 Z"/>
+  </g>
+  <g fill="url(#pad)" stroke="#111216" stroke-width="0.6" filter="url(#shadow)">
+    <ellipse cx="49" cy="99" rx="22" ry="30" transform="rotate(-25 49 99)"/>
+    <ellipse cx="99" cy="62" rx="23" ry="32" transform="rotate(-10 99 62)"/>
+    <ellipse cx="157" cy="62" rx="23" ry="32" transform="rotate(10 157 62)"/>
+    <ellipse cx="207" cy="99" rx="22" ry="30" transform="rotate(25 207 99)"/>
+    <path d="M128 116 C108 116 99 134 85 150 C72 164 59 179 65 198 C72 220 95 222 112 214 C122 209 134 209 144 214 C161 222 184 220 191 198 C197 179 184 164 171 150 C157 134 148 116 128 116 Z"/>
+  </g>
+</svg>

@@ -706,22 +706,22 @@ struct DockConfig {
   bool enabled = true;
   DockEdge position = DockEdge::Bottom;
   bool activeMonitorOnly = false;    // render only on preferred active output
-  std::int32_t iconSize = 48;        // icon size in pixels (before ui_scale)
-  std::int32_t mainAxisPadding = 16; // inner padding along the icon row (main axis)
-  std::int32_t crossAxisPadding = 8; // inner padding perpendicular to the icon row
-  std::int32_t itemSpacing = 6;      // gap between items
-  float backgroundOpacity = 0.88F;
+  std::int32_t iconSize = 38;        // icon size in pixels (before ui_scale)
+  std::int32_t mainAxisPadding = 0;  // inner padding along the icon row (main axis)
+  std::int32_t crossAxisPadding = 0; // inner padding perpendicular to the icon row
+  std::int32_t itemSpacing = 0;      // gap between items
+  float backgroundOpacity = 0.5F;
   // Inside outline for the dock background.
   ColorSpec border = colorSpecFromRole(ColorRole::Outline);
   float borderWidth = 0.0F;
-  std::int32_t radius = 16;            // dock background corner radius
-  std::int32_t radiusTopLeft = 16;     // dock background top-left corner radius
-  std::int32_t radiusTopRight = 16;    // dock background top-right corner radius
-  std::int32_t radiusBottomLeft = 16;  // dock background bottom-left corner radius
-  std::int32_t radiusBottomRight = 16; // dock background bottom-right corner radius
-  bool concaveEdgeCorners = true;      // carve concave corners on the side that touches the screen edge
+  std::int32_t radius = 0;             // dock background corner radius
+  std::int32_t radiusTopLeft = 0;      // dock background top-left corner radius
+  std::int32_t radiusTopRight = 0;     // dock background top-right corner radius
+  std::int32_t radiusBottomLeft = 0;   // dock background bottom-left corner radius
+  std::int32_t radiusBottomRight = 0;  // dock background bottom-right corner radius
+  bool concaveEdgeCorners = false;     // carve concave corners on the side that touches the screen edge
   std::int32_t marginEnds = 0;         // inset from each end of the dock along its main axis
-  std::int32_t marginEdge = 0;         // distance from the nearest screen edge (floats the dock when > 0)
+  std::int32_t marginEdge = 15;        // distance from the nearest screen edge (floats the dock when > 0)
   bool shadow = true;                  // use the global shell shadow
   bool showRunning = true;             // also show running apps not in pinned list
   bool autoHide = false;               // slide out when not hovered (overlay mode)
@@ -736,7 +736,7 @@ struct DockConfig {
   float magnificationScale = 1.45F; // max icon scale multiplier at the pointer center
   float activeOpacity = 1.0F;       // focused app icon opacity
   float inactiveOpacity = 0.85F;    // non-focused app icon opacity
-  bool showDots = false;            // show optional running window dots below app icons
+  bool showDots = true;             // show optional running window dots below app icons
   bool showInstanceCount = true;    // show a badge with count when app has >1 window
   DockLauncherPosition launcherPosition = DockLauncherPosition::None;
   std::string launcherIcon = "grid-dots";   // Tabler glyph name
@@ -781,7 +781,7 @@ struct DesktopWidgetState {
 };
 
 struct DesktopWidgetsConfig {
-  bool enabled = true;
+  bool enabled = false;
   std::int32_t schemaVersion = 2;
   DesktopWidgetsGridState grid;
   std::vector<DesktopWidgetState> widgets;
@@ -1083,8 +1083,8 @@ struct ShellConfig {
   };
 
   struct ShadowConfig {
-    ShadowDirection direction = ShadowDirection::Down;
-    float alpha = 0.55F;
+    ShadowDirection direction = ShadowDirection::DownRight;
+    float alpha = 1.0F;
 
     bool operator==(const ShadowConfig&) const = default;
   };
@@ -1113,7 +1113,7 @@ struct ShellConfig {
     std::string sessionPosition = "auto";
     std::string polkitPosition = "center";
     std::int32_t floatingOffset = 8; // logical px gap between a floating/detached panel and the bar edge
-    bool openNearClickControlCenter = false;
+    bool openNearClickControlCenter = true;
     bool openNearClickLauncher = false;
     bool openNearClickClipboard = false;
     bool openNearClickWallpaper = false;
@@ -1165,7 +1165,7 @@ struct ShellConfig {
     LauncherLayout layout = LauncherLayout::Full;
     std::int32_t width = kDefaultWidth;
     LauncherSearchPosition searchPosition = LauncherSearchPosition::Bottom;
-    LauncherDefaultView defaultView = LauncherDefaultView::Recent;
+    LauncherDefaultView defaultView = LauncherDefaultView::All;
     // Simple layout only: show the category chip row under the search field.
     bool categories = true;
     bool categoryIconsOnly = false;
@@ -1173,7 +1173,7 @@ struct ShellConfig {
     bool showSessionButton = true;
     bool showIcons = true;
     bool showAppOriginIndicator = true;
-    bool compact = false;
+    bool compact = true;
     bool appGrid = false;
     bool showAppActions = false;
     bool trackUsage = true;
@@ -1277,12 +1277,12 @@ struct ShellConfig {
     bool operator==(const WindowSwitcherConfig&) const = default;
   };
 
-  float cornerRadiusScale = 1.0F;
-  bool buttonBorders = true;
-  bool inputBorders = true;
-  bool popupBorders = true;
+  float cornerRadiusScale = 0.0F; // paw2-shell is square-cornered
+  bool buttonBorders = false;
+  bool inputBorders = false;
+  bool popupBorders = false;
   bool popupShadows = true;
-  bool cardBorders = true;
+  bool cardBorders = false;
   bool showCloseButtons = true;
   std::string fontFamily = "sans-serif";
   std::string lang; // empty = auto-detect from $LC_ALL/$LC_MESSAGES/$LANG
@@ -1295,7 +1295,7 @@ struct ShellConfig {
   /// Resolve and show the connection's external (WAN) IP in the Control Center network tab.
   bool externalIpEnabled = false;
   bool setupWizardEnabled = true;
-  bool polkitAgent = false;
+  bool polkitAgent = true;
   PasswordMaskStyle passwordMaskStyle = PasswordMaskStyle::CircleFilled;
   /// Readline-style editing shortcuts in every text input (Ctrl+A moves to the start instead of selecting all).
   bool readlineShortcuts = false;
@@ -1811,7 +1811,7 @@ struct ControlCenterConfig {
   std::vector<ShortcutConfig> shortcuts;
   std::vector<std::string> hiddenTabs; // tab keys (see kTabs) the user has hidden; empty = all available shown
   ControlCenterSidebarMode sidebarMode = ControlCenterSidebarMode::Compact;
-  ControlCenterSidebarMode sidebarSectionMode = ControlCenterSidebarMode::Compact;
+  ControlCenterSidebarMode sidebarSectionMode = ControlCenterSidebarMode::None;
   std::int32_t width = kDefaultWidth; // full-sidebar logical width; compact/none modes scale down from this
   bool showShortcutLabels = true;
   bool showSessionButton = true;

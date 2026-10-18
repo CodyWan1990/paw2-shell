@@ -140,7 +140,10 @@ namespace noctalia::config {
 
     WidgetConfig workspaces;
     workspaces.type = "workspaces";
-    workspaces.settings["style"] = std::string("minimal");
+    workspaces.settings["style"] = std::string("underline");
+    workspaces.settings["underline_width"] = 1.5;
+    workspaces.settings["scale"] = 1.2;
+    workspaces.settings["focused_output_only"] = true;
     seed("workspaces", std::move(workspaces));
 
     WidgetConfig keyboardLayout;

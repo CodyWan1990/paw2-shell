@@ -572,7 +572,7 @@ namespace noctalia::theme {
       return *scheduleNight ? "dark" : "light";
     };
     const std::string mode = modeName(cfg.mode);
-    const std::string shellMode = modeName(shellThemeMode(cfg));
+    const std::string& shellMode = mode;
 
     std::optional<ResolvedTheme> resolved;
     if (cfg.source == PaletteSource::Custom && !cfg.customPalette.empty()) {
@@ -693,7 +693,7 @@ namespace noctalia::theme {
 
   bool ThemeService::hasAutoMode() const noexcept {
     const auto& theme = m_config.config().theme;
-    return theme.mode == ThemeMode::Auto || shellThemeMode(theme) == ThemeMode::Auto;
+    return theme.mode == ThemeMode::Auto;
   }
 
   void ThemeService::startTransition(const Palette& target) {

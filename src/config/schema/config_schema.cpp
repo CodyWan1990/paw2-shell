@@ -1281,7 +1281,6 @@ namespace noctalia::config::schema {
         field(&ThemeConfig::customPalette, "custom_palette"),
         field(&ThemeConfig::wallpaperScheme, "wallpaper_scheme"),
         enumField(&ThemeConfig::mode, "mode", kThemeModes),
-        enumField(&ThemeConfig::shellMode, "shell_mode", kShellThemeModes),
         field(&ThemeConfig::pureBlackDark, "pure_black_dark"),
         field(&ThemeConfig::syncColorScheme, "sync_color_scheme"),
         subTable(&ThemeConfig::templates, "templates", templatesSchema()),

@@ -47,7 +47,7 @@ namespace noctalia::theme {
     void toggleLightDark();
     void cycleMode();
     [[nodiscard]] ThemeMode configuredMode() const noexcept;
-    // Noctalia's own resolved mode ([theme].shell_mode, or [theme].mode when it follows).
+    // The shell's own resolved mode: [theme].mode, with auto settled to dark or light.
     [[nodiscard]] bool isLightMode() const noexcept;
     [[nodiscard]] std::string_view resolvedShellMode() const noexcept;
     // The resolved [theme].mode, which drives apps.

@@ -790,7 +790,7 @@ void Wallpaper::setAutomationGate(std::function<bool()> gate) { m_automationGate
 bool Wallpaper::automationAllowed() const noexcept { return !m_automationGate || m_automationGate(); }
 
 ThemeMode Wallpaper::directoryThemeMode() const noexcept {
-  const ThemeMode configured = m_config != nullptr ? shellThemeMode(m_config->config().theme) : ThemeMode::Dark;
+  const ThemeMode configured = m_config != nullptr ? m_config->config().theme.mode : ThemeMode::Dark;
   const bool isLight = m_themeService != nullptr ? m_themeService->isLightMode() : configured == ThemeMode::Light;
   return wallpaper::effectiveThemeMode(configured, isLight);
 }

@@ -1123,7 +1123,7 @@ std::filesystem::path WallpaperPanel::rootDirectoryForSelection() const {
     return {};
   }
   const auto& wp = m_config->config().wallpaper;
-  const ThemeMode configured = shellThemeMode(m_config->config().theme);
+  const ThemeMode configured = m_config->config().theme.mode;
   const bool isLight = m_themeService != nullptr ? m_themeService->isLightMode() : configured == ThemeMode::Light;
   const ThemeMode mode = wallpaper::effectiveThemeMode(configured, isLight);
 

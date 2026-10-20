@@ -1,6 +1,5 @@
-// [theme].mode is the app-facing mode: it is what the resolved callback carries to templates,
-// the GTK color scheme, and theme_mode_changed hooks. [theme].shell_mode pins the palette
-// Noctalia itself renders with, without moving the app-facing mode.
+// [theme].mode is the one light/dark mode: the shell renders with it, and the resolved callback
+// carries it to templates, the GTK color scheme, and theme_mode_changed hooks.
 
 #include "config/config_service.h"
 #include "core/deferred_call.h"
@@ -66,40 +65,29 @@ int main() {
   // ConfigService reads its persisted overrides from <state dir>/settings.toml, the same file
   // the settings GUI writes.
   const std::filesystem::path overrides = root / "state" / FileUtils::kAppDirName / "settings.toml";
-  // follow: one mode drives Noctalia and apps together.
+  // One mode drives the shell and apps together.
   {
-    const Resolution r = resolve(overrides, "[theme]\nmode = \"light\"\nshell_mode = \"follow\"\n");
+    const Resolution r = resolve(overrides, "[theme]\nmode = \"light\"\n");
     TEST_CHECK(r.mode == "light");
     TEST_CHECK(r.shellMode == "light");
     TEST_CHECK(r.shellLight);
     TEST_CHECK(r.appliedMode == "light");
   }
-
-  // Pinned dark shell, light apps: only the shell palette is held back.
-  {
-    const Resolution r = resolve(overrides, "[theme]\nmode = \"light\"\nshell_mode = \"dark\"\n");
-    TEST_CHECK(r.mode == "light");
-    TEST_CHECK(r.shellMode == "dark");
-    TEST_CHECK(!r.shellLight);
-    TEST_CHECK(r.appliedMode == "light");
-  }
-
-  // The inverse pinning, so a light shell cannot leak into what apps are told.
-  {
-    const Resolution r = resolve(overrides, "[theme]\nmode = \"dark\"\nshell_mode = \"light\"\n");
-    TEST_CHECK(r.mode == "dark");
-    TEST_CHECK(r.shellMode == "light");
-    TEST_CHECK(r.shellLight);
-    TEST_CHECK(r.appliedMode == "dark");
-  }
-
-  // An unset shell_mode behaves like follow.
   {
     const Resolution r = resolve(overrides, "[theme]\nmode = \"dark\"\n");
     TEST_CHECK(r.mode == "dark");
     TEST_CHECK(r.shellMode == "dark");
     TEST_CHECK(!r.shellLight);
     TEST_CHECK(r.appliedMode == "dark");
+  }
+
+  // A shell_mode left over from Noctalia no longer pins the shell apart from apps.
+  {
+    const Resolution r = resolve(overrides, "[theme]\nmode = \"light\"\nshell_mode = \"dark\"\n");
+    TEST_CHECK(r.mode == "light");
+    TEST_CHECK(r.shellMode == "light");
+    TEST_CHECK(r.shellLight);
+    TEST_CHECK(r.appliedMode == "light");
   }
 
   std::filesystem::remove_all(root);

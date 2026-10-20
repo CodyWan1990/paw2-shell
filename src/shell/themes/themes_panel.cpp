@@ -216,7 +216,7 @@ void ThemesPanel::rebuildCards() {
 void ThemesPanel::addThemeCards() {
   const float scale = contentScale();
   Flex* strip = m_scroll->content();
-  const ThemeMode mode = m_config != nullptr ? shellThemeMode(m_config->config().theme) : ThemeMode::Dark;
+  const ThemeMode mode = m_config != nullptr ? m_config->config().theme.mode : ThemeMode::Dark;
 
   for (const auto& preset : m_presets->presets()) {
     const std::size_t index = m_cards.size();

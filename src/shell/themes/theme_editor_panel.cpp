@@ -268,7 +268,7 @@ void ThemeEditorPanel::syncPaletteSelect() {
   if (m_paletteSelect == nullptr) {
     return;
   }
-  const ThemeMode mode = m_config != nullptr ? shellThemeMode(m_config->config().theme) : ThemeMode::Dark;
+  const ThemeMode mode = m_config != nullptr ? m_config->config().theme.mode : ThemeMode::Dark;
   m_choices = themes::paletteChoices(m_draft.source, mode);
   std::vector<std::string> labels;
   std::vector<ColorSwatchPreview> previews;

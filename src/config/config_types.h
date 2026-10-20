@@ -1302,8 +1302,6 @@ struct ShellConfig {
   AnimationConfig animation;
   std::string avatarPath;
   bool settingsShowAdvanced = true;
-  // paw2's focus ring and overview backdrop follow the palette (written into paw2's config.d/).
-  bool paw2ThemeColors = true;
   bool settingsExpandAllGroups = false;
   bool settingsWindowTranslucent = false;
   bool showLocation = true;

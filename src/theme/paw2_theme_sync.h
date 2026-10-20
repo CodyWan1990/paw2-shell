@@ -10,10 +10,9 @@ class ConfigService;
 
 namespace noctalia::theme {
 
-  // With [shell] paw2_theme_colors on, paw2's focus ring, titlebars, window shadows and overview
-  // backdrop follow the shell's palette. They are paw2's settings, so they go through Paw2ConfigWriter like any
-  // Settings edit: when the palette resolves, when the setting is turned on, and when paw2 connects, which may be after
-  // the shell has started.
+  // paw2's focus ring, titlebars, window shadows and overview backdrop follow the shell's palette.
+  // They are paw2's settings, so they go through Paw2ConfigWriter like any Settings edit: when the
+  // palette resolves, and when paw2 connects, which may be after the shell has started.
   class Paw2ThemeSync {
   public:
     Paw2ThemeSync(CompositorPlatform& platform, ConfigService& config);
@@ -23,7 +22,7 @@ namespace noctalia::theme {
     Paw2ThemeSync& operator=(const Paw2ThemeSync&) = delete;
 
     void setColors(const Color& focusRing, const Color& titlebar, const Color& shadow, const Color& backdrop);
-    // Call on config reload: the setting may just have been turned on.
+    // Call on config reload: the font may have changed.
     void refresh();
 
   private:

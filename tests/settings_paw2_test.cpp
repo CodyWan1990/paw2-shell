@@ -127,11 +127,14 @@ int main() {
 
   const auto* gaps = findEntry(entries, {"paw2", "appearance", "gaps"});
   ok &= check(gaps != nullptr && std::get<settings::SliderSetting>(gaps->control).value == 15.0, "gaps from paw2");
-  const auto* corners = findEntry(entries, {"paw2", "appearance", "corner_radius"});
   ok &= check(
-      corners != nullptr && std::get<settings::SliderSetting>(corners->control).value == 0.0,
+      titlebarHeight != nullptr && std::get<settings::SliderSetting>(titlebarHeight->control).value == 24.0,
       "unset keys read as paw2's defaults"
   );
+  // The shell's corner, shadow, speed and font rows write these, so they get no row of their own.
+  ok &= check(findEntry(entries, {"paw2", "appearance", "corner_radius"}) == nullptr, "one corner control");
+  ok &= check(findEntry(entries, {"paw2", "animations", "slowdown"}) == nullptr, "one speed control");
+  ok &= check(findEntry(entries, {"paw2", "appearance", "focus_ring_color"}) == nullptr, "colours follow the palette");
   const auto* layouts = findEntry(entries, {"paw2", "layout", "enabled_layouts"});
   ok &= check(layouts != nullptr && std::get<settings::ListSetting>(layouts->control).items.size() == 2, "layouts");
   const auto* blurRadius = findEntry(entries, {"paw2", "appearance", "blur_radius"});

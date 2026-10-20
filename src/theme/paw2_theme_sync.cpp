@@ -30,7 +30,7 @@ namespace noctalia::theme {
   }
 
   void Paw2ThemeSync::refresh() {
-    // Titlebar text follows the shell's font whether or not the colours do.
+    // Titlebar text follows the shell's font.
     // Unchanged values are no-ops in the writer, so a reload that touched nothing writes nothing.
     auto& writer = m_platform.paw2ConfigWriter();
     // paw2 rejects a blank family, and unset falls back to its own default.
@@ -40,11 +40,7 @@ namespace noctalia::theme {
       writer.set("theme.titlebar_font", family);
     }
 
-    if (!m_config.config().shell.paw2ThemeColors
-        || !m_focusRing.has_value()
-        || !m_titlebar.has_value()
-        || !m_shadow.has_value()
-        || !m_backdrop.has_value()) {
+    if (!m_focusRing.has_value() || !m_titlebar.has_value() || !m_shadow.has_value() || !m_backdrop.has_value()) {
       return;
     }
     writer.set("appearance.focus_ring_color", formatRgbHex(*m_focusRing));

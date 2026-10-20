@@ -699,22 +699,8 @@ namespace settings {
       entries.push_back(std::move(entry));
     }
 
-    // While the theme owns paw2's colours, their rows would only be overwritten on the next palette change.
-    [[nodiscard]] SettingVisibility paw2ThemeColorsOff() {
-      return [](const Config& config) { return !config.shell.paw2ThemeColors; };
-    }
-
     // paw2's look sits on the Appearance page beside the shell's: each helper below fills one of
     // that page's groups, and is called where the group sits.
-
-    void appendPaw2ThemeEntries(std::vector<SettingEntry>& entries, const Config& cfg) {
-      entries.push_back(makeEntry(
-          SettingsSection::Appearance, "theme", i18n::tr("settings.schema.paw2.theme-colors.label"),
-          i18n::tr("settings.schema.paw2.theme-colors.description"), {"shell", "paw2_theme_colors"},
-          ToggleSetting{cfg.shell.paw2ThemeColors},
-          "paw2 compositor focus ring overview backdrop shadow colour color palette theme windows"
-      ));
-    }
 
     void appendPaw2WindowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
       constexpr auto section = SettingsSection::Appearance;
@@ -730,21 +716,6 @@ namespace settings {
           makePaw2Entry(
               section, "windows", "appearance.focus_ring_width",
               SliderSetting{paw2.number("appearance.focus_ring_width", 0), 0, 16, 1, true}, "focus ring border width"
-          )
-      );
-      SettingEntry focusRingColor = makePaw2Entry(
-          section, "windows", "appearance.focus_ring_color",
-          TextSetting{.value = paw2.text("appearance.focus_ring_color", "#0b3d91"), .placeholder = "#rrggbb"},
-          "focus ring border colour color"
-      );
-      focusRingColor.visibleWhen = paw2ThemeColorsOff();
-      pushPaw2Entry(entries, std::move(focusRingColor));
-      // Interface roundness sets it too; this is the fine-tuning.
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "windows", "appearance.corner_radius",
-              SliderSetting{paw2.number("appearance.corner_radius", 0), 0, 64, 1, true}, "rounded corners radius", true
           )
       );
 
@@ -766,59 +737,16 @@ namespace settings {
           ),
           titlebarsOn
       );
-      SettingEntry titlebarColor = makePaw2Entry(
-          section, "windows", "appearance.titlebar_color",
-          TextSetting{.value = paw2.text("appearance.titlebar_color", "#1f1f24"), .placeholder = "#rrggbb"},
-          "titlebar colour color background"
-      );
-      titlebarColor.visibleWhen = paw2ThemeColorsOff();
-      pushPaw2Entry(entries, std::move(titlebarColor), titlebarsOn);
     }
 
     void appendPaw2ShadowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
       constexpr auto section = SettingsSection::Appearance;
-      const bool shadowOn = paw2.number("appearance.shadow_radius", 0) > 0;
       pushPaw2Entry(
           entries,
           makePaw2Entry(
               section, "shadows", "appearance.shadow_radius",
               SliderSetting{paw2.number("appearance.shadow_radius", 0), 0, 64, 1, true}, "window shadow drop size"
           )
-      );
-      SettingEntry shadowColor = makePaw2Entry(
-          section, "shadows", "appearance.shadow_color",
-          TextSetting{.value = paw2.text("appearance.shadow_color", "#000000"), .placeholder = "#rrggbb"},
-          "window shadow colour color", true
-      );
-      shadowColor.visibleWhen = paw2ThemeColorsOff();
-      pushPaw2Entry(entries, std::move(shadowColor), shadowOn);
-      // The shell's shadow strength and direction set these too; these are the fine-tuning.
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "shadows", "appearance.shadow_opacity",
-              SliderSetting{paw2.number("appearance.shadow_opacity", 0.45), 0.0, 1.0, 0.05, false},
-              "window shadow opacity alpha", true
-          ),
-          shadowOn
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "shadows", "appearance.shadow_offset_x",
-              SliderSetting{paw2.number("appearance.shadow_offset_x", 0), -64, 64, 1, true},
-              "window shadow offset horizontal", true
-          ),
-          shadowOn
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "shadows", "appearance.shadow_offset_y",
-              SliderSetting{paw2.number("appearance.shadow_offset_y", 4), -64, 64, 1, true},
-              "window shadow offset vertical", true
-          ),
-          shadowOn
       );
     }
 
@@ -857,30 +785,6 @@ namespace settings {
       );
     }
 
-    void appendPaw2MotionEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      // The shell's Animations and speed rows switch and pace these too; these are the fine-tuning.
-      constexpr auto section = SettingsSection::Appearance;
-      const bool animationsOn = paw2.boolean("animations.enabled", false);
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "motion", "animations.duration_ms",
-              SliderSetting{paw2.number("animations.duration_ms", 150), 0, 1000, 10, true},
-              "window animation duration speed", true
-          ),
-          animationsOn
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "motion", "animations.slowdown",
-              SliderSetting{paw2.number("animations.slowdown", 1.0), 0.1, 10.0, 0.1, false},
-              "window animation slow motion", true
-          ),
-          animationsOn
-      );
-    }
-
     void appendPaw2DesktopThemeEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
       constexpr auto section = SettingsSection::Appearance;
       pushPaw2Entry(
@@ -916,14 +820,6 @@ namespace settings {
           makePaw2Entry(
               section, "desktop-theme", "theme.qt_style",
               TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"}, "qt style kvantum"
-          )
-      );
-      // Interface font sets it too, keeping the size; this is the fine-tuning.
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "desktop-theme", "theme.font",
-              TextSetting{.value = paw2.text("theme.font"), .placeholder = "Inter 11"}, "app font interface", true
           )
       );
     }
@@ -973,13 +869,6 @@ namespace settings {
               SliderSetting{paw2.number("overview.zoom", 0.5), 0.2, 0.75, 0.05, false}, "overview zoom size"
           )
       );
-      SettingEntry backdropColor = makePaw2Entry(
-          section, "paw2-overview", "overview.backdrop_color",
-          TextSetting{.value = paw2.text("overview.backdrop_color", "#1c1c1c"), .placeholder = "#rrggbb"},
-          "overview backdrop background colour color"
-      );
-      backdropColor.visibleWhen = paw2ThemeColorsOff();
-      pushPaw2Entry(entries, std::move(backdropColor));
       constexpr std::array<std::string_view, 5> kScratchpadPositions{"centered", "top", "bottom", "left", "right"};
       pushPaw2Entry(
           entries,
@@ -1236,9 +1125,6 @@ namespace settings {
     ));
     // paw2's look sits beside the shell's on this page, while paw2 shares its config with the shell.
     const std::optional<Paw2Values> paw2 = env.paw2Value ? std::optional<Paw2Values>(std::in_place, env) : std::nullopt;
-    if (paw2) {
-      appendPaw2ThemeEntries(entries, cfg);
-    }
     {
       SettingControl fontFamilyControl =
           TextSetting{.value = cfg.shell.fontFamily, .placeholder = "sans-serif", .browseFileExtensions = {}};
@@ -1358,9 +1244,6 @@ namespace settings {
         tr("settings.schema.appearance.animation-speed.description"), {"shell", "animation", "speed"},
         sliderFor(cfg.shell.animation.speed, noctalia::config::schema::kAnimationSpeedRange, false), "motion"
     ));
-    if (paw2) {
-      appendPaw2MotionEntries(entries, *paw2);
-    }
     if (paw2) {
       appendPaw2DesktopThemeEntries(entries, *paw2);
     }

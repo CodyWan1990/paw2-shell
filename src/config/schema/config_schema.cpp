@@ -1653,7 +1653,6 @@ namespace noctalia::config::schema {
         enumField(&ShellConfig::passwordMaskStyle, "password_style", kPasswordMaskStyles),
         field(&ShellConfig::readlineShortcuts, "readline_shortcuts"),
         field(&ShellConfig::settingsShowAdvanced, "settings_show_advanced"),
-        field(&ShellConfig::paw2ThemeColors, "paw2_theme_colors"),
         field(&ShellConfig::settingsExpandAllGroups, "settings_expand_all_groups"),
         field(&ShellConfig::settingsWindowTranslucent, "settings_window_translucent"),
         field(&ShellConfig::showLocation, "show_location"),

@@ -336,8 +336,6 @@ namespace settings {
     case SettingsSection::Notifications:
     case SettingsSection::Osd:
     case SettingsSection::Screenshot:
-    case SettingsSection::Shell:
-    case SettingsSection::Keybinds:
     case SettingsSection::System:
     case SettingsSection::Power:
     case SettingsSection::Hooks:
@@ -374,8 +372,6 @@ namespace settings {
     case SettingsSection::Notifications:
     case SettingsSection::Osd:
     case SettingsSection::Screenshot:
-    case SettingsSection::Shell:
-    case SettingsSection::Keybinds:
     case SettingsSection::System:
     case SettingsSection::Power:
     case SettingsSection::Hooks:

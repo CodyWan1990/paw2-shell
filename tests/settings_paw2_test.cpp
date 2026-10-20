@@ -95,7 +95,10 @@ int main() {
     }
     if (entry.section == settings::SettingsSection::Paw2) {
       ok &= check(
-          entry.group == "paw2-tiling" || entry.group == "paw2-overview" || entry.group == "paw2-input",
+          entry.group == "paw2-tiling"
+              || entry.group == "paw2-overview"
+              || entry.group == "paw2-input"
+              || entry.group == "window-switcher",
           "behaviour only on the paw2 page: " + entry.group
       );
     }
@@ -104,7 +107,7 @@ int main() {
       appearanceGroups
           == std::vector<
               std::
-                  string>{"theme", "interface", "windows", "borders", "shadows", "transparency", "motion", "desktop-theme", "accessibility"},
+                  string>{"theme", "interface", "windows", "borders", "shadows", "transparency", "motion", "desktop-theme", "accessibility", "profile", "formats"},
       "appearance group order"
   );
   ok &= check(findEntry(entries, {"paw2", "animations", "enabled"}) == nullptr, "one Animations switch");
@@ -173,11 +176,13 @@ int main() {
   ok &= check(argv == std::vector<std::string>{"sh", "-c", "echo \"hi\"", "a b", "x y"}, "command line split");
   ok &= check(settings::splitCommandLine(settings::joinCommandLine(argv)) == argv, "join and split round-trip");
 
-  // Without paw2's config every paw2 page shows why, instead of controls.
+  // Without paw2's config every paw2 page shows why, instead of paw2's controls. Rows for the
+  // shell's own config on those pages (window switcher, panel keys, night light) stay.
   const auto offline = settings::buildSettingsRegistry(cfg, nullptr, nullptr, {});
   std::size_t statusRows = 0;
   for (const auto& entry : offline) {
-    if (isPaw2Section(entry.section)) {
+    const bool shellRow = !entry.path.empty() && entry.path.front() != "paw2";
+    if (isPaw2Section(entry.section) && !shellRow) {
       ++statusRows;
       ok &= check(std::holds_alternative<settings::ButtonSetting>(entry.control), "offline row is the notice");
     }

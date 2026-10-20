@@ -37,8 +37,6 @@ namespace settings {
     Notifications,
     Osd,
     Screenshot,
-    Shell,
-    Keybinds,
     Security,
     System,
     Services,

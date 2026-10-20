@@ -89,7 +89,7 @@ namespace settings {
       return defaultKeybindSet(action);
     }
 
-    constexpr std::array<SettingsSectionDescriptor, 25> kSettingsSections{{
+    constexpr std::array<SettingsSectionDescriptor, 23> kSettingsSections{{
         {SettingsSection::Appearance, "appearance", "adjustments-horizontal"},
         {SettingsSection::Wallpaper, "wallpaper", "paint"},
         {SettingsSection::Templates, "templates", "color-swatch"},
@@ -101,8 +101,6 @@ namespace settings {
         {SettingsSection::Notifications, "notifications", "bell"},
         {SettingsSection::Osd, "osd", "message-circle"},
         {SettingsSection::Screenshot, "screenshot", "screenshot"},
-        {SettingsSection::Shell, "shell", "app-window"},
-        {SettingsSection::Keybinds, "keybinds", "keyboard"},
         {SettingsSection::Security, "security", "shield-lock"},
         {SettingsSection::System, "system", "activity-heartbeat"},
         {SettingsSection::Services, "services", "stack-2"},
@@ -1301,6 +1299,17 @@ namespace settings {
         ToggleSetting{cfg.shell.showCloseButtons},
         "close button cross dismiss hide panel notification toast popup dialog sheet settings window"
     ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "interface", tr("settings.schema.shell.settings-window-translucent.label"),
+        tr("settings.schema.shell.settings-window-translucent.description"), {"shell", "settings_window_translucent"},
+        ToggleSetting{cfg.shell.settingsWindowTranslucent},
+        "settings window background alpha transparency translucent opacity"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "interface", tr("settings.schema.shell.settings-expand-all-groups.label"),
+        tr("settings.schema.shell.settings-expand-all-groups.description"), {"shell", "settings_expand_all_groups"},
+        ToggleSetting{cfg.shell.settingsExpandAllGroups}, "settings window groups expand collapse expanded"
+    ));
     if (paw2) {
       appendPaw2WindowEntries(entries, *paw2);
     }
@@ -1372,6 +1381,41 @@ namespace settings {
         ToggleSetting{cfg.accessibility.highContrast}, "accessibility high contrast visually impaired"
     ));
 
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "profile", tr("settings.schema.shell.avatar-path.label"),
+        tr("settings.schema.shell.avatar-path.description"), {"shell", "avatar_path"},
+        TextSetting{
+            .value = env.shellAvatarPath,
+            .placeholder = tr("settings.schema.shell.avatar-path.placeholder"),
+            .browseMode = TextSettingBrowseMode::OpenFile,
+            .browseFileExtensions = DirectoryScanner::imageExtensionFilter(true)
+        },
+        "image picture"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "formats", tr("settings.schema.shell.time-format.label"),
+        tr("settings.schema.shell.time-format.description"), {"shell", "time_format"},
+        TextSetting{.value = cfg.shell.timeFormat, .placeholder = "{:%H:%M}", .browseFileExtensions = {}},
+        "clock time format strftime chrono"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "formats", tr("settings.schema.shell.date-format.label"),
+        tr("settings.schema.shell.date-format.description"), {"shell", "date_format"},
+        TextSetting{.value = cfg.shell.dateFormat, .placeholder = "%A, %x", .browseFileExtensions = {}},
+        "calendar date format strftime chrono"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Appearance, "formats", tr("settings.schema.shell.keyboard-layout-custom-labels.label"),
+        tr("settings.schema.shell.keyboard-layout-custom-labels.description"),
+        {"shell", "keyboard_layout", "custom_labels"},
+        StringMapSetting{
+            .entries = cfg.shell.keyboardLayout.customLabels,
+            .suggestedKeys = env.keyboardLayoutNames,
+            .keyPlaceholder = tr("settings.widgets.map-placeholders.layout-name"),
+            .valuePlaceholder = tr("settings.widgets.map-placeholders.value"),
+        },
+        "keyboard layout nickname alias label"
+    ));
     // Wallpaper
     entries.push_back(makeEntry(
         SettingsSection::Wallpaper, "general", tr("settings.schema.shared.enabled.label"),
@@ -2122,6 +2166,34 @@ namespace settings {
         enumSelect(kClipboardAutoPasteModes, cfg.shell.launcher.autoPaste), "launcher auto paste"
     ));
     entries.push_back(makeEntry(
+        SettingsSection::Launcher, "behavior", tr("settings.schema.shell.launch-apps-as-systemd-services.label"),
+        env.systemdUserManaged ? tr("settings.schema.shell.launch-apps-as-systemd-services.description")
+                               : tr("settings.schema.shell.launch-apps-as-systemd-services.requires-systemd-session"),
+        {"shell", "launch_apps_as_systemd_services"},
+        ToggleSetting{
+            .checked = cfg.shell.launchAppsAsSystemdServices,
+            // Keep a leftover `true` switchable off even when the session cannot honor it.
+            .enabled = env.systemdUserManaged || cfg.shell.launchAppsAsSystemdServices
+        }
+    ));
+    {
+      auto e = makeEntry(
+          SettingsSection::Launcher, "behavior", tr("settings.schema.shell.launch-apps-custom-command.label"),
+          tr("settings.schema.shell.launch-apps-custom-command.description"), {"shell", "launch_apps_custom_command"},
+          TextSetting{
+              .value = cfg.shell.launchAppsCustomCommand,
+              .placeholder = tr("settings.schema.shell.launch-apps-custom-command.placeholder"),
+              .width = 320.0F,
+              .browseFileExtensions = {},
+          },
+          "app command custom launcher dock taskbar"
+      );
+      e.visibleWhen = [managed = env.systemdUserManaged](const Config& c) {
+        return !(c.shell.launchAppsAsSystemdServices && managed);
+      };
+      entries.push_back(std::move(e));
+    }
+    entries.push_back(makeEntry(
         SettingsSection::Launcher, "history", tr("settings.schema.panels.launcher-track-usage.label"),
         tr("settings.schema.panels.launcher-track-usage.description"), {"shell", "launcher", "track_usage"},
         ToggleSetting{cfg.shell.launcher.trackUsage}, "launcher track usage recent history frequency privacy"
@@ -2179,6 +2251,71 @@ namespace settings {
             "launcher panels ignore hide exclude noise polkit setup wizard test"
         ));
       }
+    }
+    const SettingVisibility clipboardOn = [](const Config& c) { return c.shell.clipboardEnabled; };
+    entries.push_back(makeEntry(
+        SettingsSection::Panels, "clipboard", tr("settings.schema.shell.clipboard-enabled.label"),
+        tr("settings.schema.shell.clipboard-enabled.description"), {"shell", "clipboard_enabled"},
+        ToggleSetting{cfg.shell.clipboardEnabled}, "clipboard history paste copy"
+    ));
+    // Deliberately not gated on clipboardOn: this keeps the live selection
+    // alive, which is part of the transport that stays active when history
+    // retention is turned off.
+    entries.push_back(makeEntry(
+        SettingsSection::Panels, "clipboard", tr("settings.schema.shell.clipboard-keep-from-closed-apps.label"),
+        tr("settings.schema.shell.clipboard-keep-from-closed-apps.description"),
+        {"shell", "clipboard_keep_from_closed_apps"}, ToggleSetting{cfg.shell.clipboardKeepFromClosedApps},
+        "clipboard paste close quit exit persist"
+    ));
+    {
+      auto e = makeEntry(
+          SettingsSection::Panels, "clipboard", tr("settings.schema.shell.clipboard-history-max-entries.label"),
+          tr("settings.schema.shell.clipboard-history-max-entries.description"),
+          {"shell", "clipboard_history_max_entries"},
+          StepperSetting{
+              .value = cfg.shell.clipboardHistoryMaxEntries,
+              .minValue = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.min.value()),
+              .maxValue = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.max.value()),
+              .step = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.step.value())
+          },
+          "clipboard history limit entries"
+      );
+      e.visibleWhen = clipboardOn;
+      entries.push_back(std::move(e));
+    }
+    {
+      auto e = makeEntry(
+          SettingsSection::Panels, "clipboard", tr("settings.schema.shell.clipboard-confirm-clear-history.label"),
+          tr("settings.schema.shell.clipboard-confirm-clear-history.description"),
+          {"shell", "clipboard_confirm_clear_history"}, ToggleSetting{cfg.shell.clipboardConfirmClearHistory},
+          "clipboard history clear confirm pinned"
+      );
+      e.visibleWhen = clipboardOn;
+      entries.push_back(std::move(e));
+    }
+    {
+      auto e = makeEntry(
+          SettingsSection::Panels, "clipboard", tr("settings.schema.shell.clipboard-auto-paste.label"),
+          tr("settings.schema.shell.clipboard-auto-paste.description"), {"shell", "clipboard_auto_paste"},
+          enumSelect(kClipboardAutoPasteModes, cfg.shell.clipboardAutoPaste), "clipboard paste"
+      );
+      e.visibleWhen = clipboardOn;
+      entries.push_back(std::move(e));
+    }
+    {
+      auto e = makeEntry(
+          SettingsSection::Panels, "clipboard", tr("settings.schema.shell.clipboard-image-action.label"),
+          tr("settings.schema.shell.clipboard-image-action.description"), {"shell", "clipboard_image_action_command"},
+          TextSetting{
+              .value = cfg.shell.clipboardImageActionCommand,
+              .placeholder = tr("settings.schema.shell.clipboard-image-action.placeholder"),
+              .width = 320.0F,
+              .browseFileExtensions = {}
+          },
+          "clipboard image action annotation editor external gimp satty gradia"
+      );
+      e.visibleWhen = clipboardOn;
+      entries.push_back(std::move(e));
     }
     entries.push_back(makeEntry(
         SettingsSection::Panels, "clipboard", tr("settings.schema.panels.placement-clipboard.label"),
@@ -2618,151 +2755,6 @@ namespace settings {
           "greeter sync pkexec run0 ghostty terminal sudo polkit wrapper"
       ));
     }
-    // Shell
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.avatar-path.label"),
-        tr("settings.schema.shell.avatar-path.description"), {"shell", "avatar_path"},
-        TextSetting{
-            .value = env.shellAvatarPath,
-            .placeholder = tr("settings.schema.shell.avatar-path.placeholder"),
-            .browseMode = TextSettingBrowseMode::OpenFile,
-            .browseFileExtensions = DirectoryScanner::imageExtensionFilter(true)
-        },
-        "image picture"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.settings-window-translucent.label"),
-        tr("settings.schema.shell.settings-window-translucent.description"), {"shell", "settings_window_translucent"},
-        ToggleSetting{cfg.shell.settingsWindowTranslucent},
-        "settings window background alpha transparency translucent opacity"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.settings-expand-all-groups.label"),
-        tr("settings.schema.shell.settings-expand-all-groups.description"), {"shell", "settings_expand_all_groups"},
-        ToggleSetting{cfg.shell.settingsExpandAllGroups}, "settings window groups expand collapse expanded"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.time-format.label"),
-        tr("settings.schema.shell.time-format.description"), {"shell", "time_format"},
-        TextSetting{.value = cfg.shell.timeFormat, .placeholder = "{:%H:%M}", .browseFileExtensions = {}},
-        "clock time format strftime chrono"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.date-format.label"),
-        tr("settings.schema.shell.date-format.description"), {"shell", "date_format"},
-        TextSetting{.value = cfg.shell.dateFormat, .placeholder = "%A, %x", .browseFileExtensions = {}},
-        "calendar date format strftime chrono"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.readline-shortcuts.label"),
-        tr("settings.schema.shell.readline-shortcuts.description"), {"shell", "readline_shortcuts"},
-        ToggleSetting{cfg.shell.readlineShortcuts}, "readline emacs keyboard shortcuts text input line editing"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "keyboard-layout", tr("settings.schema.shell.keyboard-layout-custom-labels.label"),
-        tr("settings.schema.shell.keyboard-layout-custom-labels.description"),
-        {"shell", "keyboard_layout", "custom_labels"},
-        StringMapSetting{
-            .entries = cfg.shell.keyboardLayout.customLabels,
-            .suggestedKeys = env.keyboardLayoutNames,
-            .keyPlaceholder = tr("settings.widgets.map-placeholders.layout-name"),
-            .valuePlaceholder = tr("settings.widgets.map-placeholders.value"),
-        },
-        "keyboard layout nickname alias label"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "general", tr("settings.schema.shell.launch-apps-as-systemd-services.label"),
-        env.systemdUserManaged ? tr("settings.schema.shell.launch-apps-as-systemd-services.description")
-                               : tr("settings.schema.shell.launch-apps-as-systemd-services.requires-systemd-session"),
-        {"shell", "launch_apps_as_systemd_services"},
-        ToggleSetting{
-            .checked = cfg.shell.launchAppsAsSystemdServices,
-            // Keep a leftover `true` switchable off even when the session cannot honor it.
-            .enabled = env.systemdUserManaged || cfg.shell.launchAppsAsSystemdServices
-        }
-    ));
-    {
-      auto e = makeEntry(
-          SettingsSection::Shell, "general", tr("settings.schema.shell.launch-apps-custom-command.label"),
-          tr("settings.schema.shell.launch-apps-custom-command.description"), {"shell", "launch_apps_custom_command"},
-          TextSetting{
-              .value = cfg.shell.launchAppsCustomCommand,
-              .placeholder = tr("settings.schema.shell.launch-apps-custom-command.placeholder"),
-              .width = 320.0F,
-              .browseFileExtensions = {},
-          },
-          "app command custom launcher dock taskbar"
-      );
-      e.visibleWhen = [managed = env.systemdUserManaged](const Config& c) {
-        return !(c.shell.launchAppsAsSystemdServices && managed);
-      };
-      entries.push_back(std::move(e));
-    }
-    const SettingVisibility clipboardOn = [](const Config& c) { return c.shell.clipboardEnabled; };
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "clipboard", tr("settings.schema.shell.clipboard-enabled.label"),
-        tr("settings.schema.shell.clipboard-enabled.description"), {"shell", "clipboard_enabled"},
-        ToggleSetting{cfg.shell.clipboardEnabled}, "clipboard history paste copy"
-    ));
-    // Deliberately not gated on clipboardOn: this keeps the live selection
-    // alive, which is part of the transport that stays active when history
-    // retention is turned off.
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "clipboard", tr("settings.schema.shell.clipboard-keep-from-closed-apps.label"),
-        tr("settings.schema.shell.clipboard-keep-from-closed-apps.description"),
-        {"shell", "clipboard_keep_from_closed_apps"}, ToggleSetting{cfg.shell.clipboardKeepFromClosedApps},
-        "clipboard paste close quit exit persist"
-    ));
-    {
-      auto e = makeEntry(
-          SettingsSection::Shell, "clipboard", tr("settings.schema.shell.clipboard-history-max-entries.label"),
-          tr("settings.schema.shell.clipboard-history-max-entries.description"),
-          {"shell", "clipboard_history_max_entries"},
-          StepperSetting{
-              .value = cfg.shell.clipboardHistoryMaxEntries,
-              .minValue = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.min.value()),
-              .maxValue = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.max.value()),
-              .step = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.step.value())
-          },
-          "clipboard history limit entries"
-      );
-      e.visibleWhen = clipboardOn;
-      entries.push_back(std::move(e));
-    }
-    {
-      auto e = makeEntry(
-          SettingsSection::Shell, "clipboard", tr("settings.schema.shell.clipboard-confirm-clear-history.label"),
-          tr("settings.schema.shell.clipboard-confirm-clear-history.description"),
-          {"shell", "clipboard_confirm_clear_history"}, ToggleSetting{cfg.shell.clipboardConfirmClearHistory},
-          "clipboard history clear confirm pinned"
-      );
-      e.visibleWhen = clipboardOn;
-      entries.push_back(std::move(e));
-    }
-    {
-      auto e = makeEntry(
-          SettingsSection::Shell, "clipboard", tr("settings.schema.shell.clipboard-auto-paste.label"),
-          tr("settings.schema.shell.clipboard-auto-paste.description"), {"shell", "clipboard_auto_paste"},
-          enumSelect(kClipboardAutoPasteModes, cfg.shell.clipboardAutoPaste), "clipboard paste"
-      );
-      e.visibleWhen = clipboardOn;
-      entries.push_back(std::move(e));
-    }
-    {
-      auto e = makeEntry(
-          SettingsSection::Shell, "clipboard", tr("settings.schema.shell.clipboard-image-action.label"),
-          tr("settings.schema.shell.clipboard-image-action.description"), {"shell", "clipboard_image_action_command"},
-          TextSetting{
-              .value = cfg.shell.clipboardImageActionCommand,
-              .placeholder = tr("settings.schema.shell.clipboard-image-action.placeholder"),
-              .width = 320.0F,
-              .browseFileExtensions = {}
-          },
-          "clipboard image action annotation editor external gimp satty gradia"
-      );
-      e.visibleWhen = clipboardOn;
-      entries.push_back(std::move(e));
-    }
     entries.push_back(makeEntry(
         SettingsSection::Screenshot, "screenshot-capture", tr("settings.schema.shell.screenshot-freeze-screen.label"),
         tr("settings.schema.shell.screenshot-freeze-screen.description"), {"shell", "screenshot", "freeze_screen"},
@@ -2884,48 +2876,6 @@ namespace settings {
       e.visibleWhen = [](const Config& c) { return c.shell.screenshot.pipeToCommand; };
       entries.push_back(std::move(e));
     }
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher", tr("settings.schema.shell.window-switcher-style.label"),
-        tr("settings.schema.shell.window-switcher-style.description"), {"shell", "window_switcher", "style"},
-        enumSelect(ShellConfig::kWindowSwitcherStyles, cfg.shell.windowSwitcher.style),
-        "window switcher alt tab style carousel compact"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher", tr("settings.schema.shell.window-switcher-mru.label"),
-        tr("settings.schema.shell.window-switcher-mru.description"), {"shell", "window_switcher", "mru"},
-        ToggleSetting{cfg.shell.windowSwitcher.mru}, "window switcher alt tab mru most recently used"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher", tr("settings.schema.shell.window-switcher-show-caption.label"),
-        tr("settings.schema.shell.window-switcher-show-caption.description"),
-        {"shell", "window_switcher", "show_caption"}, ToggleSetting{cfg.shell.windowSwitcher.showCaption},
-        "window switcher alt tab caption title application name"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher", tr("settings.schema.shell.window-switcher-show-count.label"),
-        tr("settings.schema.shell.window-switcher-show-count.description"), {"shell", "window_switcher", "show_count"},
-        ToggleSetting{cfg.shell.windowSwitcher.showCount}, "window switcher alt tab count position total"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher", tr("settings.schema.shell.window-switcher-show-app-icon.label"),
-        tr("settings.schema.shell.window-switcher-show-app-icon.description"),
-        {"shell", "window_switcher", "show_app_icon"}, ToggleSetting{cfg.shell.windowSwitcher.showAppIcon},
-        "window switcher alt tab application app icon"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher", tr("settings.schema.shell.window-switcher-show-all-outputs.label"),
-        tr("settings.schema.shell.window-switcher-show-all-outputs.description"),
-        {"shell", "window_switcher", "show_all_outputs"}, ToggleSetting{cfg.shell.windowSwitcher.showAllOutputs},
-        "window switcher alt tab monitor display output screen all current"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Shell, "window-switcher",
-        tr("settings.schema.shell.window-switcher-current-workspace-only.label"),
-        tr("settings.schema.shell.window-switcher-current-workspace-only.description"),
-        {"shell", "window_switcher", "current_workspace_only"},
-        ToggleSetting{cfg.shell.windowSwitcher.currentWorkspaceOnly},
-        "window switcher alt tab workspace current only filter"
-    ));
     entries.push_back(makeEntry(
         SettingsSection::Osd, "osd", tr("settings.schema.shell.osd-enabled.label"),
         tr("settings.schema.shell.osd-enabled.description"), {"osd", "enabled"}, ToggleSetting{cfg.osd.enabled},
@@ -3132,80 +3082,6 @@ namespace settings {
           ? SettingVisibility{[prev = std::move(prev)](const Config& c) { return c.osd.enabled && prev(c); }}
           : SettingVisibility{[](const Config& c) { return c.osd.enabled; }};
     }
-
-    // Keybinds
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.validate.label"),
-        tr("settings.schema.keybinds.validate.description"), {"keybinds", "validate"},
-        KeybindListSetting{
-            .items = effectiveKeybindItems(cfg.keybinds.validate, KeybindAction::Validate), .maxItems = 4
-        },
-        "keybind shortcut hotkey enter accept submit confirm"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.cancel.label"),
-        tr("settings.schema.keybinds.cancel.description"), {"keybinds", "cancel"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.cancel, KeybindAction::Cancel), .maxItems = 4},
-        "keybind shortcut hotkey escape close dismiss"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.left.label"),
-        tr("settings.schema.keybinds.left.description"), {"keybinds", "left"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.left, KeybindAction::Left), .maxItems = 4},
-        "keybind shortcut hotkey arrow move"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.right.label"),
-        tr("settings.schema.keybinds.right.description"), {"keybinds", "right"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.right, KeybindAction::Right), .maxItems = 4},
-        "keybind shortcut hotkey arrow move"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.up.label"),
-        tr("settings.schema.keybinds.up.description"), {"keybinds", "up"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.up, KeybindAction::Up), .maxItems = 4},
-        "keybind shortcut hotkey arrow move"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.down.label"),
-        tr("settings.schema.keybinds.down.description"), {"keybinds", "down"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.down, KeybindAction::Down), .maxItems = 4},
-        "keybind shortcut hotkey arrow move"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.tab-previous.label"),
-        tr("settings.schema.keybinds.tab-previous.description"), {"keybinds", "tab_previous"},
-        KeybindListSetting{
-            .items = effectiveKeybindItems(cfg.keybinds.tabPrevious, KeybindAction::TabPrevious), .maxItems = 4
-        },
-        "keybind shortcut hotkey shift tab focus pane"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.tab-next.label"),
-        tr("settings.schema.keybinds.tab-next.description"), {"keybinds", "tab_next"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.tabNext, KeybindAction::TabNext), .maxItems = 4},
-        "keybind shortcut hotkey tab focus pane"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.copy.label"),
-        tr("settings.schema.keybinds.copy.description"), {"keybinds", "copy"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.copy, KeybindAction::Copy), .maxItems = 4},
-        "keybind shortcut hotkey copy clipboard"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.save.label"),
-        tr("settings.schema.keybinds.save.description"), {"keybinds", "save"},
-        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.save, KeybindAction::Save), .maxItems = 4},
-        "keybind shortcut hotkey save file"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Keybinds, "keybinds", tr("settings.schema.keybinds.delete.label"),
-        tr("settings.schema.keybinds.delete.description"), {"keybinds", "delete"},
-        KeybindListSetting{
-            .items = effectiveKeybindItems(cfg.keybinds.deleteEntry, KeybindAction::Delete), .maxItems = 4
-        },
-        "keybind shortcut hotkey delete remove clear"
-    ));
 
     // System
     if (env.batteryAvailable) {
@@ -3505,103 +3381,6 @@ namespace settings {
       entries.push_back(std::move(e));
     }
 
-    if (!env.gammaControlAvailable) {
-      entries.push_back(makeEntry(
-          SettingsSection::Location, "night-light", tr("settings.schema.services.night-light.label"),
-          tr("settings.schema.services.night-light.requires-gamma-control"), {"nightlight", "enabled"},
-          ToggleSetting{.checked = cfg.nightlight.enabled, .enabled = false}, "nightlight"
-      ));
-    } else {
-      entries.push_back(makeEntry(
-          SettingsSection::Location, "night-light", tr("settings.schema.services.night-light.label"),
-          tr("settings.schema.services.night-light.description"), {"nightlight", "enabled"},
-          ToggleSetting{cfg.nightlight.enabled}, "nightlight"
-      ));
-      const SettingVisibility nightLightOn = [](const Config& c) { return c.nightlight.enabled; };
-      {
-        auto e = makeEntry(
-            SettingsSection::Location, "night-light", tr("settings.schema.services.force-night-light.label"),
-            tr("settings.schema.services.force-night-light.description"), {"nightlight", "force"},
-            ToggleSetting{cfg.nightlight.force}, "nightlight"
-        );
-        e.visibleWhen = nightLightOn;
-        entries.push_back(std::move(e));
-      }
-      // Both sliders span the same range; the day > night invariant is enforced at commit time
-      // via SliderSetting::linkedCommit, which pushes the other temperature when needed.
-      const auto tempMin = static_cast<double>(NightLightConfig::kTemperatureMin);
-      const auto tempMax = static_cast<double>(NightLightConfig::kTemperatureMax);
-      const auto tempStep = static_cast<double>(NightLightConfig::kTemperatureGap);
-
-      SliderSetting daySlider{static_cast<double>(cfg.nightlight.dayTemperature), tempMin, tempMax, tempStep, true};
-      daySlider.linkedCommit = [curNight = cfg.nightlight.nightTemperature](double v) {
-        std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides;
-        const auto newDay = std::clamp(
-            static_cast<std::int32_t>(std::lround(v)), NightLightConfig::kTemperatureMin,
-            NightLightConfig::kTemperatureMax
-        );
-        if (newDay - NightLightConfig::kTemperatureGap < curNight) {
-          std::int32_t pushedNight =
-              std::max(NightLightConfig::kTemperatureMin, newDay - NightLightConfig::kTemperatureGap);
-          if (pushedNight + NightLightConfig::kTemperatureGap > newDay) {
-            // Day was below kTemperatureMin + kTemperatureGap; bump day up too. The slider value
-            // refresh comes through the rebuilt registry on the next config reload.
-            const std::int32_t bumpedDay =
-                std::min(NightLightConfig::kTemperatureMax, pushedNight + NightLightConfig::kTemperatureGap);
-            overrides.emplace_back(
-                std::vector<std::string>{"nightlight", "temperature_day"}, static_cast<std::int64_t>(bumpedDay)
-            );
-          }
-          overrides.emplace_back(
-              std::vector<std::string>{"nightlight", "temperature_night"}, static_cast<std::int64_t>(pushedNight)
-          );
-        }
-        return overrides;
-      };
-      {
-        auto e = makeEntry(
-            SettingsSection::Location, "night-light", tr("settings.schema.services.day-temperature.label"),
-            tr("settings.schema.services.day-temperature.description"), {"nightlight", "temperature_day"},
-            std::move(daySlider), "nightlight kelvin"
-        );
-        e.visibleWhen = nightLightOn;
-        entries.push_back(std::move(e));
-      }
-
-      SliderSetting nightSlider{static_cast<double>(cfg.nightlight.nightTemperature), tempMin, tempMax, tempStep, true};
-      nightSlider.linkedCommit = [curDay = cfg.nightlight.dayTemperature](double v) {
-        std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides;
-        const auto newNight = std::clamp(
-            static_cast<std::int32_t>(std::lround(v)), NightLightConfig::kTemperatureMin,
-            NightLightConfig::kTemperatureMax
-        );
-        if (curDay - NightLightConfig::kTemperatureGap < newNight) {
-          std::int32_t pushedDay =
-              std::min(NightLightConfig::kTemperatureMax, newNight + NightLightConfig::kTemperatureGap);
-          if (pushedDay - NightLightConfig::kTemperatureGap < newNight) {
-            const std::int32_t bumpedNight =
-                std::max(NightLightConfig::kTemperatureMin, pushedDay - NightLightConfig::kTemperatureGap);
-            overrides.emplace_back(
-                std::vector<std::string>{"nightlight", "temperature_night"}, static_cast<std::int64_t>(bumpedNight)
-            );
-          }
-          overrides.emplace_back(
-              std::vector<std::string>{"nightlight", "temperature_day"}, static_cast<std::int64_t>(pushedDay)
-          );
-        }
-        return overrides;
-      };
-      {
-        auto e = makeEntry(
-            SettingsSection::Location, "night-light", tr("settings.schema.services.night-temperature.label"),
-            tr("settings.schema.services.night-temperature.description"), {"nightlight", "temperature_night"},
-            std::move(nightSlider), "nightlight kelvin"
-        );
-        e.visibleWhen = nightLightOn;
-        entries.push_back(std::move(e));
-      }
-    }
-
     const SettingVisibility calendarOn = [](const Config& c) { return c.calendar.enabled; };
     entries.push_back(makeEntry(
         SettingsSection::Calendar, "general", tr("settings.schema.services.calendar.label"),
@@ -3761,23 +3540,6 @@ namespace settings {
         SettingsSection::Services, "audio", tr("settings.schema.services.sound-theme.label"),
         tr("settings.schema.services.sound-theme.description"), {"audio", "sound_theme"},
         SelectSetting{std::move(soundThemeOptions), cfg.audio.soundTheme}, "sound theme"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Services, "brightness", tr("settings.schema.services.ddcutil.label"),
-        env.ddcutilAvailable ? tr("settings.schema.services.ddcutil.description")
-                             : tr("settings.schema.services.ddcutil.requires-ddcutil"),
-        {"brightness", "enable_ddcutil"},
-        ToggleSetting{.checked = cfg.brightness.enableDdcutil, .enabled = env.ddcutilAvailable}, "monitor ddcutil"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Services, "brightness", tr("settings.schema.services.minimum-brightness.label"),
-        tr("settings.schema.services.minimum-brightness.description"), {"brightness", "minimum_brightness"},
-        sliderFor(cfg.brightness.minimumBrightness, noctalia::config::schema::kUnitRange, false), "floor clamp"
-    ));
-    entries.push_back(makeEntry(
-        SettingsSection::Services, "brightness", tr("settings.schema.services.sync-monitor-brightness.label"),
-        tr("settings.schema.services.sync-monitor-brightness.description"), {"brightness", "sync_all_monitors"},
-        ToggleSetting{.checked = cfg.brightness.syncBrightnessOfAllMonitors}, "monitor brightness"
     ));
     entries.push_back(makeEntry(
         SettingsSection::Services, "media", tr("settings.schema.services.mpris-blacklist.label"),
@@ -4819,6 +4581,244 @@ namespace settings {
       appendPaw2ShortcutEntries(entries, env);
     } else {
       appendPaw2Unavailable(entries, env);
+    }
+    // The window switcher is paw2 window handling; it sits on that page whether or not paw2 shares its config.
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher", tr("settings.schema.shell.window-switcher-style.label"),
+        tr("settings.schema.shell.window-switcher-style.description"), {"shell", "window_switcher", "style"},
+        enumSelect(ShellConfig::kWindowSwitcherStyles, cfg.shell.windowSwitcher.style),
+        "window switcher alt tab style carousel compact"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher", tr("settings.schema.shell.window-switcher-mru.label"),
+        tr("settings.schema.shell.window-switcher-mru.description"), {"shell", "window_switcher", "mru"},
+        ToggleSetting{cfg.shell.windowSwitcher.mru}, "window switcher alt tab mru most recently used"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher", tr("settings.schema.shell.window-switcher-show-caption.label"),
+        tr("settings.schema.shell.window-switcher-show-caption.description"),
+        {"shell", "window_switcher", "show_caption"}, ToggleSetting{cfg.shell.windowSwitcher.showCaption},
+        "window switcher alt tab caption title application name"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher", tr("settings.schema.shell.window-switcher-show-count.label"),
+        tr("settings.schema.shell.window-switcher-show-count.description"), {"shell", "window_switcher", "show_count"},
+        ToggleSetting{cfg.shell.windowSwitcher.showCount}, "window switcher alt tab count position total"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher", tr("settings.schema.shell.window-switcher-show-app-icon.label"),
+        tr("settings.schema.shell.window-switcher-show-app-icon.description"),
+        {"shell", "window_switcher", "show_app_icon"}, ToggleSetting{cfg.shell.windowSwitcher.showAppIcon},
+        "window switcher alt tab application app icon"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher", tr("settings.schema.shell.window-switcher-show-all-outputs.label"),
+        tr("settings.schema.shell.window-switcher-show-all-outputs.description"),
+        {"shell", "window_switcher", "show_all_outputs"}, ToggleSetting{cfg.shell.windowSwitcher.showAllOutputs},
+        "window switcher alt tab monitor display output screen all current"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2, "window-switcher",
+        tr("settings.schema.shell.window-switcher-current-workspace-only.label"),
+        tr("settings.schema.shell.window-switcher-current-workspace-only.description"),
+        {"shell", "window_switcher", "current_workspace_only"},
+        ToggleSetting{cfg.shell.windowSwitcher.currentWorkspaceOnly},
+        "window switcher alt tab workspace current only filter"
+    ));
+
+    // Keys inside the shell's panels and menus, on the Shortcuts page beside paw2's global ones.
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.validate.label"),
+        tr("settings.schema.keybinds.validate.description"), {"keybinds", "validate"},
+        KeybindListSetting{
+            .items = effectiveKeybindItems(cfg.keybinds.validate, KeybindAction::Validate), .maxItems = 4
+        },
+        "keybind shortcut hotkey enter accept submit confirm"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.cancel.label"),
+        tr("settings.schema.keybinds.cancel.description"), {"keybinds", "cancel"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.cancel, KeybindAction::Cancel), .maxItems = 4},
+        "keybind shortcut hotkey escape close dismiss"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.left.label"),
+        tr("settings.schema.keybinds.left.description"), {"keybinds", "left"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.left, KeybindAction::Left), .maxItems = 4},
+        "keybind shortcut hotkey arrow move"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.right.label"),
+        tr("settings.schema.keybinds.right.description"), {"keybinds", "right"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.right, KeybindAction::Right), .maxItems = 4},
+        "keybind shortcut hotkey arrow move"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.up.label"),
+        tr("settings.schema.keybinds.up.description"), {"keybinds", "up"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.up, KeybindAction::Up), .maxItems = 4},
+        "keybind shortcut hotkey arrow move"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.down.label"),
+        tr("settings.schema.keybinds.down.description"), {"keybinds", "down"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.down, KeybindAction::Down), .maxItems = 4},
+        "keybind shortcut hotkey arrow move"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.tab-previous.label"),
+        tr("settings.schema.keybinds.tab-previous.description"), {"keybinds", "tab_previous"},
+        KeybindListSetting{
+            .items = effectiveKeybindItems(cfg.keybinds.tabPrevious, KeybindAction::TabPrevious), .maxItems = 4
+        },
+        "keybind shortcut hotkey shift tab focus pane"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.tab-next.label"),
+        tr("settings.schema.keybinds.tab-next.description"), {"keybinds", "tab_next"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.tabNext, KeybindAction::TabNext), .maxItems = 4},
+        "keybind shortcut hotkey tab focus pane"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.copy.label"),
+        tr("settings.schema.keybinds.copy.description"), {"keybinds", "copy"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.copy, KeybindAction::Copy), .maxItems = 4},
+        "keybind shortcut hotkey copy clipboard"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.save.label"),
+        tr("settings.schema.keybinds.save.description"), {"keybinds", "save"},
+        KeybindListSetting{.items = effectiveKeybindItems(cfg.keybinds.save, KeybindAction::Save), .maxItems = 4},
+        "keybind shortcut hotkey save file"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.keybinds.delete.label"),
+        tr("settings.schema.keybinds.delete.description"), {"keybinds", "delete"},
+        KeybindListSetting{
+            .items = effectiveKeybindItems(cfg.keybinds.deleteEntry, KeybindAction::Delete), .maxItems = 4
+        },
+        "keybind shortcut hotkey delete remove clear"
+    ));
+
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Shortcuts, "panel-keys", tr("settings.schema.shell.readline-shortcuts.label"),
+        tr("settings.schema.shell.readline-shortcuts.description"), {"shell", "readline_shortcuts"},
+        ToggleSetting{cfg.shell.readlineShortcuts}, "readline emacs keyboard shortcuts text input line editing"
+    ));
+
+    // Night light and brightness act on the monitors, so they sit under them on Displays.
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Displays, "brightness", tr("settings.schema.services.ddcutil.label"),
+        env.ddcutilAvailable ? tr("settings.schema.services.ddcutil.description")
+                             : tr("settings.schema.services.ddcutil.requires-ddcutil"),
+        {"brightness", "enable_ddcutil"},
+        ToggleSetting{.checked = cfg.brightness.enableDdcutil, .enabled = env.ddcutilAvailable}, "monitor ddcutil"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Displays, "brightness", tr("settings.schema.services.minimum-brightness.label"),
+        tr("settings.schema.services.minimum-brightness.description"), {"brightness", "minimum_brightness"},
+        sliderFor(cfg.brightness.minimumBrightness, noctalia::config::schema::kUnitRange, false), "floor clamp"
+    ));
+    entries.push_back(makeEntry(
+        SettingsSection::Paw2Displays, "brightness", tr("settings.schema.services.sync-monitor-brightness.label"),
+        tr("settings.schema.services.sync-monitor-brightness.description"), {"brightness", "sync_all_monitors"},
+        ToggleSetting{.checked = cfg.brightness.syncBrightnessOfAllMonitors}, "monitor brightness"
+    ));
+    if (!env.gammaControlAvailable) {
+      entries.push_back(makeEntry(
+          SettingsSection::Paw2Displays, "night-light", tr("settings.schema.services.night-light.label"),
+          tr("settings.schema.services.night-light.requires-gamma-control"), {"nightlight", "enabled"},
+          ToggleSetting{.checked = cfg.nightlight.enabled, .enabled = false}, "nightlight"
+      ));
+    } else {
+      entries.push_back(makeEntry(
+          SettingsSection::Paw2Displays, "night-light", tr("settings.schema.services.night-light.label"),
+          tr("settings.schema.services.night-light.description"), {"nightlight", "enabled"},
+          ToggleSetting{cfg.nightlight.enabled}, "nightlight"
+      ));
+      const SettingVisibility nightLightOn = [](const Config& c) { return c.nightlight.enabled; };
+      {
+        auto e = makeEntry(
+            SettingsSection::Paw2Displays, "night-light", tr("settings.schema.services.force-night-light.label"),
+            tr("settings.schema.services.force-night-light.description"), {"nightlight", "force"},
+            ToggleSetting{cfg.nightlight.force}, "nightlight"
+        );
+        e.visibleWhen = nightLightOn;
+        entries.push_back(std::move(e));
+      }
+      // Both sliders span the same range; the day > night invariant is enforced at commit time
+      // via SliderSetting::linkedCommit, which pushes the other temperature when needed.
+      const auto tempMin = static_cast<double>(NightLightConfig::kTemperatureMin);
+      const auto tempMax = static_cast<double>(NightLightConfig::kTemperatureMax);
+      const auto tempStep = static_cast<double>(NightLightConfig::kTemperatureGap);
+
+      SliderSetting daySlider{static_cast<double>(cfg.nightlight.dayTemperature), tempMin, tempMax, tempStep, true};
+      daySlider.linkedCommit = [curNight = cfg.nightlight.nightTemperature](double v) {
+        std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides;
+        const auto newDay = std::clamp(
+            static_cast<std::int32_t>(std::lround(v)), NightLightConfig::kTemperatureMin,
+            NightLightConfig::kTemperatureMax
+        );
+        if (newDay - NightLightConfig::kTemperatureGap < curNight) {
+          std::int32_t pushedNight =
+              std::max(NightLightConfig::kTemperatureMin, newDay - NightLightConfig::kTemperatureGap);
+          if (pushedNight + NightLightConfig::kTemperatureGap > newDay) {
+            // Day was below kTemperatureMin + kTemperatureGap; bump day up too. The slider value
+            // refresh comes through the rebuilt registry on the next config reload.
+            const std::int32_t bumpedDay =
+                std::min(NightLightConfig::kTemperatureMax, pushedNight + NightLightConfig::kTemperatureGap);
+            overrides.emplace_back(
+                std::vector<std::string>{"nightlight", "temperature_day"}, static_cast<std::int64_t>(bumpedDay)
+            );
+          }
+          overrides.emplace_back(
+              std::vector<std::string>{"nightlight", "temperature_night"}, static_cast<std::int64_t>(pushedNight)
+          );
+        }
+        return overrides;
+      };
+      {
+        auto e = makeEntry(
+            SettingsSection::Paw2Displays, "night-light", tr("settings.schema.services.day-temperature.label"),
+            tr("settings.schema.services.day-temperature.description"), {"nightlight", "temperature_day"},
+            std::move(daySlider), "nightlight kelvin"
+        );
+        e.visibleWhen = nightLightOn;
+        entries.push_back(std::move(e));
+      }
+
+      SliderSetting nightSlider{static_cast<double>(cfg.nightlight.nightTemperature), tempMin, tempMax, tempStep, true};
+      nightSlider.linkedCommit = [curDay = cfg.nightlight.dayTemperature](double v) {
+        std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> overrides;
+        const auto newNight = std::clamp(
+            static_cast<std::int32_t>(std::lround(v)), NightLightConfig::kTemperatureMin,
+            NightLightConfig::kTemperatureMax
+        );
+        if (curDay - NightLightConfig::kTemperatureGap < newNight) {
+          std::int32_t pushedDay =
+              std::min(NightLightConfig::kTemperatureMax, newNight + NightLightConfig::kTemperatureGap);
+          if (pushedDay - NightLightConfig::kTemperatureGap < newNight) {
+            const std::int32_t bumpedNight =
+                std::max(NightLightConfig::kTemperatureMin, pushedDay - NightLightConfig::kTemperatureGap);
+            overrides.emplace_back(
+                std::vector<std::string>{"nightlight", "temperature_night"}, static_cast<std::int64_t>(bumpedNight)
+            );
+          }
+          overrides.emplace_back(
+              std::vector<std::string>{"nightlight", "temperature_day"}, static_cast<std::int64_t>(pushedDay)
+          );
+        }
+        return overrides;
+      };
+      {
+        auto e = makeEntry(
+            SettingsSection::Paw2Displays, "night-light", tr("settings.schema.services.night-temperature.label"),
+            tr("settings.schema.services.night-temperature.description"), {"nightlight", "temperature_night"},
+            std::move(nightSlider), "nightlight kelvin"
+        );
+        e.visibleWhen = nightLightOn;
+        entries.push_back(std::move(e));
+      }
     }
 
     // Integrity guard: every override path must resolve to a real schema key, else

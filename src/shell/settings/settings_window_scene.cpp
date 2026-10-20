@@ -1754,13 +1754,13 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
     }
 
     auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& entry) {
-      return entry.section == settings::SettingsSection::Shell && entry.group == "clipboard";
+      return entry.section == settings::SettingsSection::Panels && entry.group == "clipboard";
     });
     if (it != m_settingsRegistry.end()) {
       ++it;
     }
     settings::SettingEntry retry{
-        .section = settings::SettingsSection::Shell,
+        .section = settings::SettingsSection::Panels,
         .group = "clipboard",
         .title = i18n::tr("settings.schema.shell.clipboard-storage.label"),
         .subtitle = i18n::tr(descriptionKey),
@@ -1831,7 +1831,7 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
     insertStorageRecovery(settings::SettingsSection::Calendar, "general");
   }
   if (clipboardStorageRecovery && m_resetEncryptedStorage) {
-    insertStorageRecovery(settings::SettingsSection::Shell, "clipboard");
+    insertStorageRecovery(settings::SettingsSection::Panels, "clipboard");
   }
 
   if (m_syncGreeterAppearance && env.greeterSyncAvailable) {

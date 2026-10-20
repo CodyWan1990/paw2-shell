@@ -19,9 +19,14 @@ enum class ModifierPolicy : std::uint8_t {
   Forbidden, // Modifiers are rejected; only bare keys are accepted.
 };
 
-// Records a KeyChord from live keyboard input. Rejects any chord involving Super.
+// Records a KeyChord from live keyboard input. Rejects any chord involving Super, unless it records
+// a compositor shortcut (setAllowSuper).
 class KeybindRecorder : public Flex {
 public:
+  // Told when any recorder starts or stops recording, so the window can ask the compositor to pass
+  // its own shortcuts through meanwhile. One observer for the process: only one window records at a time.
+  static void setRecordingObserver(std::function<void(bool recording)> observer);
+
   KeybindRecorder();
   ~KeybindRecorder() override;
 
@@ -33,6 +38,8 @@ public:
   void setRecordingPlaceholder(std::string_view text);
   void setOnCommit(std::function<void(KeyChord)> callback);
   void setModifierPolicy(ModifierPolicy policy);
+  // For paw2 shortcuts: keep Super, and record keys the way paw2 matches them (Shift+1, not "!").
+  void setAllowSuper(bool allow);
   void setTabFocusKey(std::string key);
 
   [[nodiscard]] bool isRecording() const noexcept { return m_recording; }
@@ -47,10 +54,11 @@ private:
   void doLayout(Renderer& renderer) override;
   LayoutSize doMeasure(Renderer& renderer, const LayoutConstraints& constraints) override;
   void doArrange(Renderer& renderer, const LayoutRect& rect) override;
-  void handleKeyDown(std::uint32_t sym, std::uint32_t modifiers);
+  void handleKeyDown(std::uint32_t sym, std::uint32_t shortcutSym, std::uint32_t modifiers);
   void handleKeyUp(std::uint32_t sym, std::uint32_t modifiers);
   void enterRecording();
   void exitRecording(bool commit);
+  void setRecording(bool recording);
   void refreshLabel();
   void applyVisualState(VisualState state);
   Label* m_label = nullptr;
@@ -64,6 +72,7 @@ private:
   float m_scale = 1.0F;
   bool m_recording = false;
   bool m_enabled = true;
+  bool m_allowSuper = false;
   ModifierPolicy m_modifierPolicy = ModifierPolicy::Required;
   VisualState m_visualState = VisualState::Idle;
 };

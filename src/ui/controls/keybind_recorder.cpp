@@ -22,7 +22,16 @@ namespace {
 
   constexpr float kRecorderMinWidth = 220.0F;
 
+  std::function<void(bool)>& recordingObserver() {
+    static std::function<void(bool)> observer;
+    return observer;
+  }
+
 } // namespace
+
+void KeybindRecorder::setRecordingObserver(std::function<void(bool recording)> observer) {
+  recordingObserver() = std::move(observer);
+}
 
 KeybindRecorder::KeybindRecorder() {
   setDirection(FlexDirection::Horizontal);
@@ -76,7 +85,7 @@ KeybindRecorder::KeybindRecorder() {
       enterRecording();
       return;
     }
-    handleKeyDown(data.sym, data.modifiers);
+    handleKeyDown(data.sym, data.shortcutSym, data.modifiers);
   });
   area->setOnKeyUp([this](const InputArea::KeyData& data) {
     if (data.preedit) {
@@ -96,7 +105,10 @@ KeybindRecorder::KeybindRecorder() {
   refreshLabel();
 }
 
-KeybindRecorder::~KeybindRecorder() = default;
+KeybindRecorder::~KeybindRecorder() {
+  // A commit rebuilds the settings page, which can destroy this recorder mid-recording.
+  setRecording(false);
+}
 
 void KeybindRecorder::setChord(std::optional<KeyChord> chord) {
   m_chord = chord;
@@ -147,6 +159,8 @@ void KeybindRecorder::setOnCommit(std::function<void(KeyChord)> callback) { m_on
 
 void KeybindRecorder::setModifierPolicy(ModifierPolicy policy) { m_modifierPolicy = policy; }
 
+void KeybindRecorder::setAllowSuper(bool allow) { m_allowSuper = allow; }
+
 void KeybindRecorder::setTabFocusKey(std::string key) {
   if (m_inputArea != nullptr) {
     m_inputArea->setTabFocusKey(std::move(key));
@@ -173,13 +187,13 @@ LayoutSize KeybindRecorder::doMeasure(Renderer& renderer, const LayoutConstraint
 
 void KeybindRecorder::doArrange(Renderer& renderer, const LayoutRect& rect) { arrangeByLayout(renderer, rect); }
 
-void KeybindRecorder::handleKeyDown(std::uint32_t sym, std::uint32_t modifiers) {
+void KeybindRecorder::handleKeyDown(std::uint32_t sym, std::uint32_t shortcutSym, std::uint32_t modifiers) {
   if (!m_recording) {
     return;
   }
 
   // Must run before the modifier-preview branch so a bare Super press is also caught.
-  if ((modifiers & KeyMod::Super) != 0 || KeySymbol::isSuperModifier(sym)) {
+  if (!m_allowSuper && ((modifiers & KeyMod::Super) != 0 || KeySymbol::isSuperModifier(sym))) {
     notify::error(
         i18n::tr("notifications.internal.keybind-app"), i18n::tr("notifications.internal.keybind-invalid-title"),
         i18n::tr("notifications.internal.keybind-invalid-super")
@@ -232,8 +246,10 @@ void KeybindRecorder::handleKeyDown(std::uint32_t sym, std::uint32_t modifiers) 
     return;
   }
 
-  const std::uint32_t cleanModifiers = modifiers & ~KeyMod::Super;
-  KeyChord chord{.sym = sym, .modifiers = cleanModifiers};
+  const std::uint32_t cleanModifiers = m_allowSuper ? modifiers : modifiers & ~KeyMod::Super;
+  // paw2 matches the unshifted key, so a shortcut recorded as "!" would never fire.
+  const std::uint32_t chordSym = (m_allowSuper && shortcutSym != 0) ? shortcutSym : sym;
+  KeyChord chord{.sym = chordSym, .modifiers = cleanModifiers};
   m_chord = chord;
   if (m_onCommit) {
     m_onCommit(chord);
@@ -255,7 +271,7 @@ void KeybindRecorder::enterRecording() {
   if (!m_enabled || m_recording) {
     return;
   }
-  m_recording = true;
+  setRecording(true);
   m_pendingModifiers = 0;
   applyVisualState(VisualState::Recording);
   refreshLabel();
@@ -265,10 +281,20 @@ void KeybindRecorder::exitRecording(bool /*commit*/) {
   if (!m_recording) {
     return;
   }
-  m_recording = false;
+  setRecording(false);
   m_pendingModifiers = 0;
   applyVisualState(VisualState::Idle);
   refreshLabel();
+}
+
+void KeybindRecorder::setRecording(bool recording) {
+  if (m_recording == recording) {
+    return;
+  }
+  m_recording = recording;
+  if (m_allowSuper && recordingObserver()) {
+    recordingObserver()(recording);
+  }
 }
 
 void KeybindRecorder::refreshLabel() {
@@ -280,6 +306,9 @@ void KeybindRecorder::refreshLabel() {
     if (m_pendingModifiers != 0) {
       const KeyChord preview{.sym = 0, .modifiers = m_pendingModifiers};
       std::string text;
+      if ((preview.modifiers & KeyMod::Super) != 0) {
+        text += "Super + ";
+      }
       if ((preview.modifiers & KeyMod::Ctrl) != 0) {
         text += "Ctrl + ";
       }

@@ -585,6 +585,7 @@ namespace settings {
           .suggestedKeys = {},
           .keyPlaceholder = "Super+Return",
           .valuePlaceholder = "kitty --single-instance",
+          .recordKeys = true,
       };
       if (const auto map = env.paw2Value("bindings.commands"); map.has_value() && map->is_object()) {
         for (const auto& [trigger, argv] : map->items()) {
@@ -620,7 +621,8 @@ namespace settings {
             : i18n::tr(text + ".default", "keys", StringUtils::join(paw2Chords(action.defaults), ", "));
         entries.push_back(makeEntry(
             section, std::string(action.group), i18n::tr(key), defaults, std::move(path),
-            ListSetting{.items = std::move(keys)}, "paw2 shortcuts keybinds " + std::string(action.key)
+            ListSetting{.items = std::move(keys), .recordKeys = true},
+            "paw2 shortcuts keybinds " + std::string(action.key)
         ));
       }
 
@@ -631,7 +633,7 @@ namespace settings {
             section, std::string(shortcut.group), i18n::tr(text + ".shell." + std::string(shortcut.name)),
             i18n::tr(text + ".shell.runs", "command", joinCommandLine(shellShortcutArgv(shortcut))),
             {"paw2", "bindings", "shell", std::string(shortcut.name)},
-            ListSetting{.items = shellShortcutKeys(commandTable, shortcut)},
+            ListSetting{.items = shellShortcutKeys(commandTable, shortcut), .recordKeys = true},
             "paw2 shortcuts keybinds themes wallpaper " + std::string(shortcut.name)
         ));
       }

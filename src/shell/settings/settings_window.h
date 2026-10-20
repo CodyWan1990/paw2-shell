@@ -56,6 +56,7 @@ struct KeyboardEvent;
 struct PointerEvent;
 struct wl_output;
 struct wl_surface;
+struct zwp_keyboard_shortcuts_inhibitor_v1;
 
 namespace scripting {
   class PluginRecommendations;
@@ -160,6 +161,9 @@ public:
 
 private:
   void destroyWindow();
+  // While a paw2 shortcut is being recorded, paw2 passes its own shortcuts to this window
+  // instead of running them, so Super+Return is recorded rather than opening a terminal.
+  void setShortcutsInhibited(bool inhibited);
   [[nodiscard]] bool shouldUseModalDialogs() const noexcept;
   void prepareFrame(bool needsUpdate, bool needsLayout);
   void buildScene(std::uint32_t width, std::uint32_t height);
@@ -260,6 +264,7 @@ private:
   void dismissOpenSelectDropdown();
 
   WaylandConnection* m_wayland = nullptr;
+  zwp_keyboard_shortcuts_inhibitor_v1* m_shortcutsInhibitor = nullptr;
   CompositorPlatform* m_platform = nullptr;
   std::size_t m_paw2ListenerToken = 0;
   // paw2's config generation the open pages were built from.

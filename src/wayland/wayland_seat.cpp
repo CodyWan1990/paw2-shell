@@ -777,6 +777,7 @@ void WaylandSeat::handleKeyboardKey(
           .utf32 = utf32,
           .key = key,
           .modifiers = mods,
+          .shortcutSym = input::compositorShortcutKeysym(self->m_xkbState, xkbKeycode),
           .pressed = pressed,
       }
   );

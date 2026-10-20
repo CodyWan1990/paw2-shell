@@ -86,6 +86,7 @@ namespace settings {
     );
 
     void makeListBlock(Flex& section, const SettingEntry& entry, const ListSetting& list);
+    void makeKeyRecordingListBlock(Flex& section, const SettingEntry& entry, const ListSetting& list);
     void makeStringMapBlock(Flex& section, const SettingEntry& entry, const StringMapSetting& map);
 
     [[nodiscard]] std::unique_ptr<Flex> makeOverrideResetActions(const std::vector<std::string>& path);

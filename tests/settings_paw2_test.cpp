@@ -175,6 +175,28 @@ int main() {
   );
   ok &= check(findEntry(entries, {"paw2", "bindings", "workspace", "next"}) != nullptr, "workspace shortcuts");
 
+  // Recorded keys and paw2's binding strings convert both ways.
+  for (const std::string binding : {"Super+Return", "Super+Shift+h", "Print", "Ctrl+Alt+Delete", "Super+Shift+1"}) {
+    const auto chord = settings::paw2KeyChord(binding);
+    ok &= check(chord.has_value() && settings::paw2BindingString(*chord) == binding, "binding round-trip: " + binding);
+  }
+  ok &= check(
+      settings::paw2BindingString(*settings::paw2KeyChord("logo+control+H")) == "Super+Ctrl+h",
+      "aliases and case normalise"
+  );
+  ok &= check(!settings::paw2KeyChord("Super+WheelScrollUp").has_value(), "wheel bindings have no chord");
+  ok &= check(!settings::paw2KeyChord("Super").has_value(), "a modifier alone is no binding");
+  const auto* closeWindow = findEntry(entries, {"paw2", "bindings", "close_window"});
+  ok &= check(
+      closeWindow != nullptr && std::get<settings::ListSetting>(closeWindow->control).recordKeys,
+      "shortcut rows record keys"
+  );
+  const auto* commandRow = findEntry(entries, {"paw2", "bindings", "commands"});
+  ok &= check(
+      commandRow != nullptr && std::get<settings::StringMapSetting>(commandRow->control).recordKeys,
+      "command keys are recorded too"
+  );
+
   const auto argv = settings::splitCommandLine(R"(sh -c "echo \"hi\"" 'a b' x\ y)");
   ok &= check(argv == std::vector<std::string>{"sh", "-c", "echo \"hi\"", "a b", "x y"}, "command line split");
   ok &= check(settings::splitCommandLine(settings::joinCommandLine(argv)) == argv, "join and split round-trip");

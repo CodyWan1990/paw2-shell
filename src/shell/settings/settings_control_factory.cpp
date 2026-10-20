@@ -9,10 +9,12 @@
 #include "shell/settings/color_spec_picker.h"
 #include "shell/settings/path_browse.h"
 #include "shell/settings/settings_content_common.h"
+#include "shell/settings/settings_paw2.h"
 #include "ui/builders.h"
 #include "ui/controls/button.h"
 #include "ui/controls/flex.h"
 #include "ui/controls/input.h"
+#include "ui/controls/keybind_recorder.h"
 #include "ui/controls/list_editor.h"
 #include "ui/controls/segmented.h"
 #include "ui/controls/select.h"
@@ -31,6 +33,7 @@
 #include <format>
 #include <functional>
 #include <memory>
+#include <optional>
 #include <unordered_set>
 #include <utility>
 
@@ -157,6 +160,30 @@ namespace settings {
         }
       }
       return false;
+    }
+
+    // Records a paw2 shortcut: click it, press the keys. `minHeight` lines it up with the inputs beside it.
+    std::unique_ptr<KeybindRecorder> paw2KeyRecorder(
+        float scale, std::optional<KeyChord> chord, std::string placeholder, std::function<void(KeyChord)> onCommit,
+        float minHeight = 0.0F
+    ) {
+      return ui::keybindRecorder({
+          .chord = chord,
+          .scale = scale,
+          .unsetPlaceholder = std::move(placeholder),
+          .recordingPlaceholder = i18n::tr("settings.controls.keybind.recording-placeholder"),
+          // A letter needs a modifier; Print and the F keys work on their own.
+          .modifierPolicy = ModifierPolicy::Required,
+          .allowSuper = true,
+          .flexGrow = 1.0F,
+          .onCommit = std::move(onCommit),
+          .configure = [minHeight](KeybindRecorder& control) {
+            control.setMinWidth(0.0F);
+            if (minHeight > 0.0F) {
+              control.setMinHeight(minHeight);
+            }
+          },
+      });
     }
 
   } // namespace
@@ -1162,6 +1189,10 @@ namespace settings {
   }
 
   void SettingsControlFactory::makeListBlock(Flex& section, const SettingEntry& entry, const ListSetting& list) {
+    if (list.recordKeys) {
+      makeKeyRecordingListBlock(section, entry, list);
+      return;
+    }
     auto& ctx = m_ctx;
     const float scale = m_scale;
     const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
@@ -1204,6 +1235,90 @@ namespace settings {
     });
     block->addChild(std::move(listEditor));
 
+    section.addChild(std::move(block));
+  }
+
+  void
+  SettingsControlFactory::makeKeyRecordingListBlock(Flex& section, const SettingEntry& entry, const ListSetting& list) {
+    auto& ctx = m_ctx;
+    const float scale = m_scale;
+    const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
+
+    auto block = makeCollectionBlock(entry, overridden);
+    auto rows = ui::column({.align = FlexAlign::Stretch, .gap = Style::spaceXs * scale, .fillWidth = true});
+
+    const auto commit = [setOverride = ctx.setOverride, path = entry.path](std::vector<std::string> items) {
+      setOverride(path, std::move(items));
+    };
+    // A key bound twice to one action is still one key.
+    const auto withKey = [](std::vector<std::string> items, std::size_t index, const KeyChord& chord) {
+      const std::string binding = paw2BindingString(chord);
+      if (binding.empty() || std::ranges::contains(items, binding)) {
+        return items;
+      }
+      if (index < items.size()) {
+        items[index] = binding;
+      } else {
+        items.push_back(binding);
+      }
+      return items;
+    };
+    const auto recorder =
+        [scale](std::optional<KeyChord> chord, std::string placeholder, std::function<void(KeyChord)> onCommit) {
+          return paw2KeyRecorder(scale, chord, std::move(placeholder), std::move(onCommit));
+        };
+    const auto removeButton = [&](std::size_t index) {
+      return ui::button({
+          .glyph = "close",
+          .glyphSize = Style::fontSizeCaption * scale,
+          .variant = ButtonVariant::Ghost,
+          .minWidth = Style::controlHeightSm * scale,
+          .minHeight = Style::controlHeightSm * scale,
+          .maxWidth = Style::controlHeightSm * scale,
+          .maxHeight = Style::controlHeightSm * scale,
+          .padding = Style::spaceXs * scale,
+          .radius = Style::scaledRadiusSm(scale),
+          .onClick = [commit, items = list.items, index]() mutable {
+            if (index < items.size()) {
+              items.erase(items.begin() + static_cast<std::ptrdiff_t>(index));
+              commit(std::move(items));
+            }
+          },
+      });
+    };
+
+    for (std::size_t i = 0; i < list.items.size(); ++i) {
+      auto row = ui::row({.align = FlexAlign::Center, .gap = Style::spaceXs * scale, .fillWidth = true});
+      if (const auto chord = paw2KeyChord(list.items[i]); chord.has_value()) {
+        // Click to record a replacement.
+        row->addChild(recorder(chord, {}, [commit, withKey, items = list.items, i](KeyChord recorded) {
+          commit(withKey(items, i, recorded));
+        }));
+      } else {
+        // A mouse or wheel binding can't be recorded from the keyboard; it can still be removed.
+        row->addChild(
+            ui::label({
+                .text = list.items[i],
+                .fontSize = Style::fontSizeCaption * scale,
+                .color = colorSpecFromRole(ColorRole::OnSurface),
+                .flexGrow = 1.0F,
+            })
+        );
+      }
+      row->addChild(removeButton(i));
+      rows->addChild(std::move(row));
+    }
+
+    auto addRow = ui::row({.align = FlexAlign::Center, .gap = Style::spaceXs * scale, .fillWidth = true});
+    addRow->addChild(recorder(
+        std::nullopt, i18n::tr("settings.controls.keybind.add"),
+        [commit, withKey, items = list.items](KeyChord recorded) { commit(withKey(items, items.size(), recorded)); }
+    ));
+    // Keep the add row lined up with the rows above it, which end in a remove button.
+    addRow->addChild(ui::row({.width = Style::controlHeightSm * scale}));
+    rows->addChild(std::move(addRow));
+
+    block->addChild(std::move(rows));
     section.addChild(std::move(block));
   }
 
@@ -1307,26 +1422,42 @@ namespace settings {
     const auto addCustomRow = [&](const std::string& key) {
       const std::string value = map.entries.at(key);
       auto row = ui::row({.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true});
-      row->addChild(
-          ui::input({
-              .value = key,
-              .placeholder = map.keyPlaceholder,
-              .fontSize = Style::fontSizeBody * scale,
-              .controlHeight = Style::controlHeight * scale,
-              .horizontalPadding = Style::spaceSm * scale,
-              .height = Style::controlHeight * scale,
-              .flexGrow = 1.0F,
-              .onSubmit =
-                  [removeAndCommit, setAndCommit, value, oldKey = key](const std::string& newKey) {
-                    if (newKey.empty() || newKey == oldKey) {
-                      return;
-                    }
-                    removeAndCommit(oldKey);
-                    setAndCommit(newKey, value);
-                  },
-              .submitOnFocusLoss = true,
-          })
-      );
+      if (const auto chord = map.recordKeys ? paw2KeyChord(key) : std::nullopt; chord.has_value()) {
+        // Click to record a replacement; the command moves to the new keys.
+        row->addChild(paw2KeyRecorder(
+            scale, chord, {},
+            [removeAndCommit, setAndCommit, value, oldKey = key](KeyChord recorded) {
+              const std::string newKey = paw2BindingString(recorded);
+              if (newKey.empty() || newKey == oldKey) {
+                return;
+              }
+              removeAndCommit(oldKey);
+              setAndCommit(newKey, value);
+            },
+            Style::controlHeight * scale
+        ));
+      } else {
+        row->addChild(
+            ui::input({
+                .value = key,
+                .placeholder = map.keyPlaceholder,
+                .fontSize = Style::fontSizeBody * scale,
+                .controlHeight = Style::controlHeight * scale,
+                .horizontalPadding = Style::spaceSm * scale,
+                .height = Style::controlHeight * scale,
+                .flexGrow = 1.0F,
+                .onSubmit =
+                    [removeAndCommit, setAndCommit, value, oldKey = key](const std::string& newKey) {
+                      if (newKey.empty() || newKey == oldKey) {
+                        return;
+                      }
+                      removeAndCommit(oldKey);
+                      setAndCommit(newKey, value);
+                    },
+                .submitOnFocusLoss = true,
+            })
+        );
+      }
       row->addChild(
           ui::label({
               .text = "->",
@@ -1371,17 +1502,26 @@ namespace settings {
     auto addRow = ui::row({.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true});
     Input* keyInput = nullptr;
     Input* valueInput = nullptr;
-    addRow->addChild(
-        ui::input({
-            .out = &keyInput,
-            .placeholder = map.keyPlaceholder,
-            .fontSize = Style::fontSizeBody * scale,
-            .controlHeight = Style::controlHeight * scale,
-            .horizontalPadding = Style::spaceSm * scale,
-            .height = Style::controlHeight * scale,
-            .flexGrow = 1.0F,
-        })
-    );
+    // With recordKeys the new row's keys are recorded rather than typed, and held here until "add".
+    auto recordedKey = std::make_shared<std::string>();
+    if (map.recordKeys) {
+      addRow->addChild(paw2KeyRecorder(
+          scale, std::nullopt, i18n::tr("settings.controls.keybind.add"),
+          [recordedKey](KeyChord recorded) { *recordedKey = paw2BindingString(recorded); }, Style::controlHeight * scale
+      ));
+    } else {
+      addRow->addChild(
+          ui::input({
+              .out = &keyInput,
+              .placeholder = map.keyPlaceholder,
+              .fontSize = Style::fontSizeBody * scale,
+              .controlHeight = Style::controlHeight * scale,
+              .horizontalPadding = Style::spaceSm * scale,
+              .height = Style::controlHeight * scale,
+              .flexGrow = 1.0F,
+          })
+      );
+    }
     addRow->addChild(
         ui::label({
             .text = "->",
@@ -1408,11 +1548,11 @@ namespace settings {
             .variant = ButtonVariant::Ghost,
             .minWidth = Style::controlHeight * scale,
             .minHeight = Style::controlHeight * scale,
-            .onClick = [keyInput, valueInput, setAndCommit]() {
-              if (keyInput == nullptr || valueInput == nullptr) {
+            .onClick = [keyInput, valueInput, recordedKey, setAndCommit]() {
+              if (valueInput == nullptr) {
                 return;
               }
-              const std::string key = keyInput->value();
+              const std::string key = keyInput != nullptr ? keyInput->value() : *recordedKey;
               const std::string value = valueInput->value();
               if (!key.empty()) {
                 setAndCommit(key, value);

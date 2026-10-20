@@ -178,6 +178,9 @@ std::string keyChordDisplayLabel(const KeyChord& chord) {
     }
     out += part;
   };
+  if ((chord.modifiers & KeyMod::Super) != 0) {
+    appendPart("Super");
+  }
   if ((chord.modifiers & KeyMod::Ctrl) != 0) {
     appendPart("Ctrl");
   }

@@ -49,6 +49,9 @@ struct KeyboardEvent {
   std::uint32_t utf32 = 0;     // Unicode codepoint (0 for non-printable keys)
   std::uint32_t key = 0;       // raw Linux keycode
   std::uint32_t modifiers = 0; // KeyMod bitmask
+  // The key as paw2 matches shortcuts: unshifted on the current layout, or its latin letter
+  // on a non-latin layout (Shift+1 is "1", not "exclam").
+  std::uint32_t shortcutSym = 0;
   bool pressed = false;
   bool preedit = false; // dead key preview (composing in progress)
   bool repeat = false;  // synthesized by client-side key repeat, not a fresh press

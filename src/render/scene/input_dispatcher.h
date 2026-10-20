@@ -48,7 +48,10 @@ public:
   void cancelPointerCapture();
 
   // Dispatch keyboard events to the focused area
-  void keyEvent(std::uint32_t sym, std::uint32_t utf32, std::uint32_t modifiers, bool pressed, bool preedit = false);
+  void keyEvent(
+      std::uint32_t sym, std::uint32_t utf32, std::uint32_t modifiers, bool pressed, bool preedit = false,
+      std::uint32_t shortcutSym = 0
+  );
 
   // Focus management
   void setFocus(InputArea* area);

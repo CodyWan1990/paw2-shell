@@ -207,6 +207,9 @@ namespace settings {
     // instead of a free-form text input, and row labels resolve to the option's friendly label.
     // Useful when the catalog of valid values is known.
     std::vector<SelectOption> suggestedOptions;
+    // Items are paw2 key bindings ("Super+Return"): each row and the add row record a key
+    // combination when clicked, instead of taking typed text.
+    bool recordKeys = false;
   };
 
   struct StringMapSetting {
@@ -214,6 +217,8 @@ namespace settings {
     std::vector<std::string> suggestedKeys;
     std::string keyPlaceholder;
     std::string valuePlaceholder;
+    // Keys are paw2 key bindings: recorded by pressing them, like ListSetting::recordKeys.
+    bool recordKeys = false;
   };
 
   struct ShortcutListSetting {

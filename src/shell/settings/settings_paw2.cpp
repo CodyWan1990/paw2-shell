@@ -1,6 +1,7 @@
 #include "shell/settings/settings_paw2.h"
 
 #include "compositors/paw2/paw2_config_writer.h"
+#include "core/input/key_modifiers.h"
 #include "ui/style.h"
 #include "util/app_dir_name.h"
 #include "util/string_utils.h"
@@ -19,6 +20,7 @@
 #include <sstream>
 #include <utility>
 #include <variant>
+#include <xkbcommon/xkbcommon.h>
 
 namespace settings {
   namespace {
@@ -482,6 +484,55 @@ namespace settings {
   }
 
   std::span<const Paw2BindingAction> paw2BindingActions() { return kBindingActions; }
+
+  std::optional<KeyChord> paw2KeyChord(std::string_view binding) {
+    KeyChord chord;
+    for (const std::string_view piece : StringUtils::split(binding, '+')) {
+      const std::string part(piece);
+      const std::string lower = StringUtils::toLower(part);
+      if (lower == "super" || lower == "logo") {
+        chord.modifiers |= KeyMod::Super;
+      } else if (lower == "ctrl" || lower == "control") {
+        chord.modifiers |= KeyMod::Ctrl;
+      } else if (lower == "alt") {
+        chord.modifiers |= KeyMod::Alt;
+      } else if (lower == "shift") {
+        chord.modifiers |= KeyMod::Shift;
+      } else if (chord.sym != 0) {
+        return std::nullopt; // two keys, or a modifier after the key
+      } else {
+        chord.sym = static_cast<std::uint32_t>(xkb_keysym_from_name(part.c_str(), XKB_KEYSYM_CASE_INSENSITIVE));
+        if (chord.sym == XKB_KEY_NoSymbol) {
+          return std::nullopt; // MouseLeft, WheelScrollUp, ...
+        }
+      }
+    }
+    if (chord.sym == 0) {
+      return std::nullopt;
+    }
+    return chord;
+  }
+
+  std::string paw2BindingString(const KeyChord& chord) {
+    std::string out;
+    if ((chord.modifiers & KeyMod::Super) != 0) {
+      out += "Super+";
+    }
+    if ((chord.modifiers & KeyMod::Ctrl) != 0) {
+      out += "Ctrl+";
+    }
+    if ((chord.modifiers & KeyMod::Alt) != 0) {
+      out += "Alt+";
+    }
+    if ((chord.modifiers & KeyMod::Shift) != 0) {
+      out += "Shift+";
+    }
+    std::array<char, 64> name{};
+    if (xkb_keysym_get_name(static_cast<xkb_keysym_t>(chord.sym), name.data(), name.size()) <= 0) {
+      return {};
+    }
+    return out + name.data();
+  }
 
   std::string joinCommandLine(const std::vector<std::string>& argv) {
     std::string line;

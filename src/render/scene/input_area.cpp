@@ -361,9 +361,17 @@ bool InputArea::dispatchAxis(
 }
 
 void InputArea::dispatchKey(
-    std::uint32_t sym, std::uint32_t utf32, std::uint32_t modifiers, bool pressed, bool preedit
+    std::uint32_t sym, std::uint32_t utf32, std::uint32_t modifiers, bool pressed, bool preedit,
+    std::uint32_t shortcutSym
 ) {
-  const KeyData data{.sym = sym, .utf32 = utf32, .modifiers = modifiers, .pressed = pressed, .preedit = preedit};
+  const KeyData data{
+      .sym = sym,
+      .utf32 = utf32,
+      .modifiers = modifiers,
+      .pressed = pressed,
+      .preedit = preedit,
+      .shortcutSym = shortcutSym,
+  };
   if (pressed) {
     if (m_onKeyDown) {
       m_onKeyDown(data);

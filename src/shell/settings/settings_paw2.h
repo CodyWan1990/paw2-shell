@@ -1,9 +1,11 @@
 #pragma once
 
 #include "config/config_types.h"
+#include "core/input/key_chord.h"
 
 #include <cstdint>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <span>
 #include <string>
 #include <string_view>
@@ -72,6 +74,11 @@ namespace settings {
   [[nodiscard]] std::vector<std::string> shellShortcutArgv(const ShellShortcut& shortcut);
   // The keys bound to `shortcut` in a [bindings.commands] table.
   [[nodiscard]] std::vector<std::string> shellShortcutKeys(const nlohmann::json& commands, const ShellShortcut& shortcut);
+
+  // A paw2 key binding ("Super+Shift+h", "Print") as a recorded chord, and back. Mouse and wheel
+  // bindings ("Super+WheelScrollUp") have no chord: nullopt.
+  [[nodiscard]] std::optional<KeyChord> paw2KeyChord(std::string_view binding);
+  [[nodiscard]] std::string paw2BindingString(const KeyChord& chord);
 
   // A command binding's argv as one line, and back: split on spaces, with "double" or 'single'
   // quotes keeping an argument whole and a backslash escaping the next character.

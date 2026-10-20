@@ -13,6 +13,7 @@
 #include "core/ui_phase.h"
 #include "i18n/i18n.h"
 #include "idle/idle_manager.h"
+#include "keyboard-shortcuts-inhibit-unstable-v1-client-protocol.h"
 #include "render/core/async_texture_cache.h"
 #include "render/render_context.h"
 #include "render/text/font_weight_catalog.h"
@@ -25,6 +26,7 @@
 #include "ui/controls/box.h"
 #include "ui/controls/flex.h"
 #include "ui/controls/input.h"
+#include "ui/controls/keybind_recorder.h"
 #include "ui/controls/label.h"
 #include "ui/controls/scroll_view.h"
 #include "ui/controls/select_dropdown_popup.h"
@@ -171,6 +173,7 @@ SettingsWindow::SettingsWindow() = default;
 
 SettingsWindow::~SettingsWindow() {
   destroyWindow();
+  KeybindRecorder::setRecordingObserver({});
   if (m_platform != nullptr) {
     m_platform->paw2Runtime().removeListener(m_paw2ListenerToken);
   }
@@ -191,6 +194,7 @@ void SettingsWindow::initialize(
   m_dependencies = dependencies;
   m_upower = upower;
   m_accounts = accounts;
+  KeybindRecorder::setRecordingObserver([this](bool recording) { setShortcutsInhibited(recording); });
   m_showAdvanced = m_config != nullptr ? m_config->config().shell.settingsShowAdvanced : false;
   if (m_platform != nullptr) {
     m_paw2ListenerToken = m_platform->paw2Runtime().addListener([this]() { onPaw2Changed(); });
@@ -605,6 +609,22 @@ void SettingsWindow::dismissOpenSelectDropdown() {
   }
 }
 
+void SettingsWindow::setShortcutsInhibited(bool inhibited) {
+  if (!inhibited) {
+    if (m_shortcutsInhibitor != nullptr) {
+      zwp_keyboard_shortcuts_inhibitor_v1_destroy(m_shortcutsInhibitor);
+      m_shortcutsInhibitor = nullptr;
+    }
+    return;
+  }
+  auto* manager = m_wayland != nullptr ? m_wayland->keyboardShortcutsInhibitManager() : nullptr;
+  if (m_shortcutsInhibitor != nullptr || manager == nullptr || wlSurface() == nullptr) {
+    return;
+  }
+  m_shortcutsInhibitor =
+      zwp_keyboard_shortcuts_inhibit_manager_v1_inhibit_shortcuts(manager, wlSurface(), m_wayland->seat());
+}
+
 void SettingsWindow::destroyWindow() {
   m_modalHost.closeAll();
   m_configExportDialogModal.reset();
@@ -644,6 +664,7 @@ void SettingsWindow::destroyWindow() {
     m_selectPopup->closeSelectDropdown();
   }
   m_sceneRoot.reset();
+  setShortcutsInhibited(false);
   m_surface.reset();
   m_pointerInside = false;
   m_output = nullptr;
@@ -1206,11 +1227,13 @@ void SettingsWindow::onKeyboardEvent(const KeyboardEvent& event) {
       && (m_actionsMenuPopup == nullptr || !m_actionsMenuPopup->isOpen())
       && isSettingsSearchTypingKey(event)) {
     m_inputDispatcher.setFocus(m_settingsSearchInput->inputArea());
-    m_inputDispatcher.keyEvent(event.sym, event.utf32, event.modifiers, event.pressed, event.preedit);
+    m_inputDispatcher.keyEvent(
+        event.sym, event.utf32, event.modifiers, event.pressed, event.preedit, event.shortcutSym
+    );
     requestSceneInvalidation(m_sceneRoot.get(), m_surface.get());
     return;
   }
-  m_inputDispatcher.keyEvent(event.sym, event.utf32, event.modifiers, event.pressed, event.preedit);
+  m_inputDispatcher.keyEvent(event.sym, event.utf32, event.modifiers, event.pressed, event.preedit, event.shortcutSym);
   if (m_sceneRoot != nullptr && m_surface != nullptr && (m_sceneRoot->paintDirty() || m_sceneRoot->layoutDirty())) {
     if (m_sceneRoot->layoutDirty()) {
       m_surface->requestLayout();

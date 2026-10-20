@@ -237,8 +237,11 @@ namespace {
            });
   }
 
+  // A dock on a monitor with its own [dock.monitor.*] table pins into that table, so each monitor keeps its own apps.
+  // The first edit there copies the inherited list along with the change; monitors without a table share
+  // [dock] pinned.
   [[nodiscard]] std::vector<std::string> dockPinnedOverridePath(const shell::dock::DockInstance& instance) {
-    if (instance.pinnedOverridden && !instance.monitorOverrideTable.empty()) {
+    if (!instance.monitorOverrideTable.empty()) {
       return {"dock", "monitor", instance.monitorOverrideTable, "pinned"};
     }
     return {"dock", "pinned"};
@@ -801,7 +804,6 @@ void Dock::createInstance(const WaylandOutput& output) {
   instance->config = cfg;
   if (const auto* override = matchingDockMonitorOverride(baseConfig, output); override != nullptr) {
     instance->monitorOverrideTable = override->tableName;
-    instance->pinnedOverridden = override->pinned.has_value();
   }
 
   const auto& shadowConfig = m_config->config().shell.shadow;

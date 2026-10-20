@@ -36,7 +36,6 @@ namespace shell::dock {
     std::int32_t outputLogicalHeight = 0;
     DockConfig config;
     std::string monitorOverrideTable;
-    bool pinnedOverridden = false;
     std::vector<std::string> lastPinnedConfig;
     std::vector<DesktopEntry> pinnedEntries;
     std::uint64_t modelSerial = 0;

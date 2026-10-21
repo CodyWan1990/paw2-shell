@@ -136,6 +136,36 @@ namespace settings {
       };
     }
 
+    template <typename V, typename T>
+    StepperSetting stepperFor(V value, const noctalia::config::schema::Range<T>& range, std::string suffix = {}) {
+      return StepperSetting{
+          .value = static_cast<int>(value),
+          .minValue = static_cast<int>(range.min.value()),
+          .maxValue = static_cast<int>(range.max.value()),
+          .step = static_cast<int>(range.step.value()),
+          .valueSuffix = std::move(suffix),
+      };
+    }
+
+    // A search picker over `options` when there are any, else a plain text field.
+    SettingControl searchPickerOrText(
+        const std::vector<SelectOption>& options, std::string value, std::string textPlaceholder,
+        std::string searchPlaceholder, float preferredHeight
+    ) {
+      if (options.empty()) {
+        return TextSetting{
+            .value = std::move(value), .placeholder = std::move(textPlaceholder), .browseFileExtensions = {}
+        };
+      }
+      return SearchPickerSetting{
+          .options = options,
+          .selectedValue = std::move(value),
+          .placeholder = std::move(searchPlaceholder),
+          .emptyText = i18n::tr("ui.controls.search-picker.empty"),
+          .preferredHeight = preferredHeight,
+      };
+    }
+
     SelectSetting asSegmented(SelectSetting setting) {
       setting.segmented = true;
       return setting;
@@ -195,6 +225,30 @@ namespace settings {
         opts.push_back(SelectOption{std::string(value), i18n::tr(labelKey)});
       }
       return SelectSetting{std::move(opts), std::string(selected)};
+    }
+
+    // Select over screen anchors ("top_left", ...), labelled from settings.options.screen-position.*.
+    SelectSetting screenPositionSelect(std::span<const std::string_view> anchors, std::string_view selected) {
+      std::vector<SelectOption> opts;
+      opts.reserve(anchors.size());
+      for (const auto anchor : anchors) {
+        std::string key(anchor);
+        std::ranges::replace(key, '_', '-');
+        opts.push_back(SelectOption{std::string(anchor), i18n::tr("settings.options.screen-position." + key)});
+      }
+      return SelectSetting{std::move(opts), std::string(selected)};
+    }
+
+    constexpr std::array<std::string_view, 8> kEdgeAnchors{
+        "top_right",   "top_left",      "top_center",   "bottom_right",
+        "bottom_left", "bottom_center", "center_right", "center_left",
+    };
+
+    // Layer-shell layer of a surface: top | overlay.
+    SelectSetting layerSelect(std::string_view selected) {
+      return asSegmented(
+          plainSelect({{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}}, selected)
+      );
     }
 
     [[nodiscard]] std::string barAutoHideMode(bool autoHide, bool smartAutoHide) {
@@ -953,33 +1007,19 @@ namespace settings {
           wallpaperSchemeSelect(cfg.theme.wallpaperScheme), "wallpaper palette generator scheme material you m3 colors"
       ));
     } else if (cfg.theme.source == PaletteSource::Community) {
-      SettingControl communityPaletteControl =
-          TextSetting{.value = cfg.theme.communityPalette, .placeholder = "Oxocarbon", .browseFileExtensions = {}};
-      if (!env.communityPalettes.empty()) {
-        communityPaletteControl = SearchPickerSetting{
-            .options = env.communityPalettes,
-            .selectedValue = cfg.theme.communityPalette,
-            .placeholder = tr("settings.schema.appearance.community-palette.search-placeholder"),
-            .emptyText = tr("ui.controls.search-picker.empty"),
-            .preferredHeight = 240.0F,
-        };
-      }
+      SettingControl communityPaletteControl = searchPickerOrText(
+          env.communityPalettes, cfg.theme.communityPalette, "Oxocarbon",
+          tr("settings.schema.appearance.community-palette.search-placeholder"), 240.0F
+      );
       entries.push_back(keyedEntry(
           SettingsSection::Appearance, "theme", "appearance.community-palette", {"theme", "community_palette"},
           std::move(communityPaletteControl), "community palette colors"
       ));
     } else if (cfg.theme.source == PaletteSource::Custom) {
-      SettingControl customPaletteControl =
-          TextSetting{.value = cfg.theme.customPalette, .placeholder = "", .browseFileExtensions = {}};
-      if (!env.customPalettes.empty()) {
-        customPaletteControl = SearchPickerSetting{
-            .options = env.customPalettes,
-            .selectedValue = cfg.theme.customPalette,
-            .placeholder = tr("settings.schema.appearance.custom-palette.search-placeholder"),
-            .emptyText = tr("ui.controls.search-picker.empty"),
-            .preferredHeight = 240.0F,
-        };
-      }
+      SettingControl customPaletteControl = searchPickerOrText(
+          env.customPalettes, cfg.theme.customPalette, "",
+          tr("settings.schema.appearance.custom-palette.search-placeholder"), 240.0F
+      );
       entries.push_back(keyedEntry(
           SettingsSection::Appearance, "theme", "appearance.custom-palette", {"theme", "custom_palette"},
           std::move(customPaletteControl), "custom palette colors"
@@ -1006,16 +1046,7 @@ namespace settings {
     const std::optional<Paw2Values> paw2 = env.paw2Value ? std::optional<Paw2Values>(std::in_place, env) : std::nullopt;
     {
       SettingControl fontFamilyControl =
-          TextSetting{.value = cfg.shell.fontFamily, .placeholder = "sans-serif", .browseFileExtensions = {}};
-      if (!env.fontFamilies.empty()) {
-        fontFamilyControl = SearchPickerSetting{
-            .options = env.fontFamilies,
-            .selectedValue = cfg.shell.fontFamily,
-            .placeholder = "sans-serif",
-            .emptyText = tr("ui.controls.search-picker.empty"),
-            .preferredHeight = 280.0F,
-        };
-      }
+          searchPickerOrText(env.fontFamilies, cfg.shell.fontFamily, "sans-serif", "sans-serif", 280.0F);
       entries.push_back(keyedEntry(
           SettingsSection::Appearance, "interface", "appearance.font-family", {"shell", "font_family"},
           std::move(fontFamilyControl), "typeface"
@@ -1303,13 +1334,9 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Wallpaper, "automation", "wallpaper.automation-interval",
         {"wallpaper", "automation", "interval_seconds"},
-        StepperSetting{
-            .value = cfg.wallpaper.automation.intervalSeconds,
-            .minValue = static_cast<int>(noctalia::config::schema::kWallpaperAutomationIntervalRange.min.value()),
-            .maxValue = static_cast<int>(noctalia::config::schema::kWallpaperAutomationIntervalRange.max.value()),
-            .step = static_cast<int>(noctalia::config::schema::kWallpaperAutomationIntervalRange.step.value()),
-            .valueSuffix = "s",
-        },
+        stepperFor(
+            cfg.wallpaper.automation.intervalSeconds, noctalia::config::schema::kWallpaperAutomationIntervalRange, "s"
+        ),
         "rotate slideshow"
     ));
     entries.push_back(keyedEntry(
@@ -1418,11 +1445,7 @@ namespace settings {
           "exclusive zone"
       ));
       entries.push_back(keyedEntry(
-          SettingsSection::Dock, "behavior", "dock.layer", path("layer"),
-          asSegmented(plainSelect(
-              {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}}, dock.layer
-          )),
-          "layer shell z-order"
+          SettingsSection::Dock, "behavior", "dock.layer", path("layer"), layerSelect(dock.layer), "layer shell z-order"
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "behavior", "dock.show-running", path("show_running"), ToggleSetting{dock.showRunning},
@@ -1600,10 +1623,7 @@ namespace settings {
     }
     entries.push_back(keyedEntry(
         SettingsSection::Panels, "general", "panels.floating-layer", {"shell", "panel", "floating_layer"},
-        asSegmented(plainSelect(
-            {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}},
-            cfg.shell.panel.floatingLayer
-        )),
+        layerSelect(cfg.shell.panel.floatingLayer),
         "floating detached panel layer shell z-order input method popup fullscreen"
     ));
     entries.push_back(keyedEntry(
@@ -1651,19 +1671,17 @@ namespace settings {
       auto e = makeEntry(
           section, group, tr(labelKey), tr(descKey),
           {std::string("shell"), std::string("panel"), std::string(panelKey) + "_position"},
-          plainSelect(
-              {{"auto", "settings.options.panel-position.auto"},
-               {"center", "settings.options.screen-position.center"},
-               {"top_left", "settings.options.screen-position.top-left"},
-               {"top_center", "settings.options.screen-position.top-center"},
-               {"top_right", "settings.options.screen-position.top-right"},
-               {"center_left", "settings.options.screen-position.center-left"},
-               {"center_right", "settings.options.screen-position.center-right"},
-               {"bottom_left", "settings.options.screen-position.bottom-left"},
-               {"bottom_center", "settings.options.screen-position.bottom-center"},
-               {"bottom_right", "settings.options.screen-position.bottom-right"}},
-              current
-          ),
+          [&current] {
+            static constexpr std::array<std::string_view, 9> kPanelAnchors{
+                "center",       "top_left",    "top_center",    "top_right",    "center_left",
+                "center_right", "bottom_left", "bottom_center", "bottom_right",
+            };
+            auto select = screenPositionSelect(kPanelAnchors, current);
+            select.options.insert(
+                select.options.begin(), SelectOption{"auto", i18n::tr("settings.options.panel-position.auto")}
+            );
+            return select;
+          }(),
           "panel position screen anchor corner edge floating bottom right"
       );
       e.visibleWhen = [placement](const Config& c) { return c.shell.panel.*placement == PanelPlacement::Floating; };
@@ -1888,12 +1906,7 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Panels, "clipboard", "shell.clipboard-history-max-entries",
         {"shell", "clipboard_history_max_entries"},
-        StepperSetting{
-            .value = cfg.shell.clipboardHistoryMaxEntries,
-            .minValue = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.min.value()),
-            .maxValue = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.max.value()),
-            .step = static_cast<int>(noctalia::config::schema::kClipboardHistoryMaxEntriesRange.step.value())
-        },
+        stepperFor(cfg.shell.clipboardHistoryMaxEntries, noctalia::config::schema::kClipboardHistoryMaxEntriesRange),
         "clipboard history limit entries", false, clipboardOn
     ));
     entries.push_back(keyedEntry(
@@ -2413,43 +2426,15 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-position", {"osd", "position"},
-        plainSelect(
-            {{"top_right", "settings.options.screen-position.top-right"},
-             {"top_left", "settings.options.screen-position.top-left"},
-             {"top_center", "settings.options.screen-position.top-center"},
-             {"bottom_right", "settings.options.screen-position.bottom-right"},
-             {"bottom_left", "settings.options.screen-position.bottom-left"},
-             {"bottom_center", "settings.options.screen-position.bottom-center"},
-             {"center_right", "settings.options.screen-position.center-right"},
-             {"center_left", "settings.options.screen-position.center-left"}},
-            cfg.osd.position
-        ),
-        "hud overlay volume brightness horizontal text"
+        screenPositionSelect(kEdgeAnchors, cfg.osd.position), "hud overlay volume brightness horizontal text"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-position-vertical", {"osd", "position_vertical"},
-        plainSelect(
-            {{"top_right", "settings.options.screen-position.top-right"},
-             {"top_left", "settings.options.screen-position.top-left"},
-             {"top_center", "settings.options.screen-position.top-center"},
-             {"bottom_right", "settings.options.screen-position.bottom-right"},
-             {"bottom_left", "settings.options.screen-position.bottom-left"},
-             {"bottom_center", "settings.options.screen-position.bottom-center"},
-             {"center_right", "settings.options.screen-position.center-right"},
-             {"center_left", "settings.options.screen-position.center-left"}},
-            cfg.osd.positionVertical
-        ),
-        "hud overlay volume brightness vertical slider"
+        screenPositionSelect(kEdgeAnchors, cfg.osd.positionVertical), "hud overlay volume brightness vertical slider"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-hide-delay", {"osd", "hide_delay_ms"},
-        StepperSetting{
-            .value = static_cast<int>(cfg.osd.hideDelayMs),
-            .minValue = static_cast<int>(noctalia::config::schema::kOsdHideDelayMsRange.min.value()),
-            .maxValue = static_cast<int>(noctalia::config::schema::kOsdHideDelayMsRange.max.value()),
-            .step = static_cast<int>(noctalia::config::schema::kOsdHideDelayMsRange.step.value()),
-            .valueSuffix = "ms",
-        },
+        stepperFor(cfg.osd.hideDelayMs, noctalia::config::schema::kOsdHideDelayMsRange, "ms"),
         "hud overlay popup timeout duration visible"
     ));
     entries.push_back(keyedEntry(
@@ -2959,12 +2944,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Power, "session-panel", "power.session-grid-columns", {"shell", "session", "grid_columns"},
-        StepperSetting{
-            .value = static_cast<int>(cfg.shell.session.gridColumns),
-            .minValue = static_cast<int>(noctalia::config::schema::kSessionGridColumnsRange.min.value()),
-            .maxValue = static_cast<int>(noctalia::config::schema::kSessionGridColumnsRange.max.value()),
-            .step = static_cast<int>(noctalia::config::schema::kSessionGridColumnsRange.step.value()),
-        },
+        stepperFor(cfg.shell.session.gridColumns, noctalia::config::schema::kSessionGridColumnsRange),
         "session panel grid columns per row", false, [](const Config& c) { return c.shell.session.grid; }
     ));
     entries.push_back(keyedEntry(
@@ -3095,23 +3075,11 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Notifications, "toasts", "notifications.layer", {"notification", "layer"},
-        asSegmented(plainSelect(
-            {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}},
-            cfg.notification.layer
-        )),
-        "toast layer shell z-order"
+        layerSelect(cfg.notification.layer), "toast layer shell z-order"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Notifications, "toasts", "notifications.position", {"notification", "position"},
-        plainSelect(
-            {{"top_right", "settings.options.screen-position.top-right"},
-             {"top_left", "settings.options.screen-position.top-left"},
-             {"top_center", "settings.options.screen-position.top-center"},
-             {"bottom_right", "settings.options.screen-position.bottom-right"},
-             {"bottom_left", "settings.options.screen-position.bottom-left"},
-             {"bottom_center", "settings.options.screen-position.bottom-center"}},
-            cfg.notification.position
-        ),
+        screenPositionSelect(std::span(kEdgeAnchors).first(6), cfg.notification.position),
         "toast popup placement anchor"
     ));
     entries.push_back(keyedEntry(
@@ -3254,13 +3222,7 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           section, "general", "bar.auto-hide-delay", path("auto_hide_delay_ms"),
-          StepperSetting{
-              .value = eff.autoHideDelayMs,
-              .minValue = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.min.value()),
-              .maxValue = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.max.value()),
-              .step = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.step.value()),
-              .valueSuffix = "ms",
-          },
+          stepperFor(eff.autoHideDelayMs, noctalia::config::schema::kBarAutoHideDelayMsRange, "ms"),
           "autohide delay wait", false, whenBar([](const BarConfig& b) { return b.autoHide && !b.smartAutoHide; })
       ));
       entries.push_back(keyedEntry(
@@ -3273,13 +3235,9 @@ namespace settings {
           tr("settings.schema.bar.reserve-space.description"), path("reserve_space"), ToggleSetting{eff.reserveSpace},
           "exclusive zone"
       ));
-      entries.push_back(keyedEntry(
-          section, "general", "bar.layer", path("layer"),
-          asSegmented(plainSelect(
-              {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}}, eff.layer
-          )),
-          "layer shell z-order"
-      ));
+      entries.push_back(
+          keyedEntry(section, "general", "bar.layer", path("layer"), layerSelect(eff.layer), "layer shell z-order")
+      );
       entries.push_back(keyedEntry(
           section, "layout", "bar.thickness", path("thickness"),
           SliderSetting{eff.thickness, 10.0F, 120.0F, 1.0F, true}, "height width"
@@ -3374,16 +3332,7 @@ namespace settings {
         const std::string inheritedFamily =
             ovr != nullptr ? bar.fontFamily.value_or(cfg.shell.fontFamily) : cfg.shell.fontFamily;
         SettingControl fontFamilyControl =
-            TextSetting{.value = ownFamily.value_or(""), .placeholder = inheritedFamily, .browseFileExtensions = {}};
-        if (!env.fontFamilies.empty()) {
-          fontFamilyControl = SearchPickerSetting{
-              .options = env.fontFamilies,
-              .selectedValue = ownFamily.value_or(""),
-              .placeholder = inheritedFamily,
-              .emptyText = tr("ui.controls.search-picker.empty"),
-              .preferredHeight = 280.0F,
-          };
-        }
+            searchPickerOrText(env.fontFamilies, ownFamily.value_or(""), inheritedFamily, inheritedFamily, 280.0F);
         entries.push_back(keyedEntry(
             section, "widgets", "bar.font-family", path("font_family"), std::move(fontFamilyControl), "typeface font",
             ovr != nullptr

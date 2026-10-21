@@ -6,6 +6,7 @@
 #include "ui/controls/scroll_view.h"
 #include "ui/popup_chrome.h"
 #include "ui/popup_parent.h"
+#include "wayland/parent_keyboard_grab.h"
 
 #include <cstdint>
 #include <functional>
@@ -96,7 +97,6 @@ private:
   wl_surface* m_pointerParentSurface = nullptr;
   bool m_pointerInside = false;
 
-  void restoreParentKeyboardInteractivity();
   void ensureHighlightedVisible();
   void requestVisualUpdate();
   void deferActivation(ContextMenuControlEntry entry);
@@ -109,11 +109,7 @@ private:
   // example, a plugin panel being unregistered) destroys the popup.
   std::shared_ptr<bool> m_alive = std::make_shared<bool>(true);
 
-  // Parent layer surface (e.g. a bar) whose keyboard interactivity is flipped to
-  // OnDemand while the menu is open so the grabbing popup inherits keyboard
-  // focus, then restored to None on close.
-  zwlr_layer_surface_v1* m_keyboardParentLayerSurface = nullptr;
-  wl_surface* m_keyboardParentWlSurface = nullptr;
+  ParentKeyboardGrab m_parentKeyboard;
 
   static ContextMenuPopup* s_openMenu;
 };

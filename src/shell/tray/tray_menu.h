@@ -7,6 +7,7 @@
 #include "ui/controls/context_menu.h"
 #include "ui/controls/scroll_view.h"
 #include "ui/popup_chrome.h"
+#include "wayland/parent_keyboard_grab.h"
 #include "wayland/popup_surface.h"
 
 #include <chrono>
@@ -58,24 +59,20 @@ private:
 
   void refreshEntries();
   void scheduleEntryRetry(int attempt);
-  [[nodiscard]] uint32_t surfaceHeightPx() const;
-  [[nodiscard]] uint32_t submenuHeightPx(const std::vector<TrayMenuEntry>& submenuEntries) const;
+  [[nodiscard]] uint32_t menuHeightPx(const std::vector<TrayMenuEntry>& menuEntries) const;
   [[nodiscard]] bool ownsSurface(wl_surface* surface) const;
   [[nodiscard]] float contentScale() const noexcept;
   [[nodiscard]] float menuWidth() const noexcept;
   void ensureSurface();
   void resizeMainSurfaceToEntries();
   void destroySurface();
-  void restoreBarKeyboardInteractivity();
   void rebuildScenes();
-  void prepareMainMenuFrame(MenuInstance& inst, bool needsUpdate, bool needsLayout);
-  void buildScene(MenuInstance& inst, uint32_t width, uint32_t height);
+  void prepareMenuFrame(std::optional<std::size_t> submenuLevel, MenuInstance& inst, bool needsLayout);
+  void buildMenuScene(std::optional<std::size_t> submenuLevel, MenuInstance& inst, uint32_t width, uint32_t height);
   void openSubmenu(std::int32_t parentEntryId, float rowCenterY);
   void openSubmenuAtLevel(std::size_t levelIndex, std::int32_t parentEntryId, float rowCenterY);
   void closeSubmenu();
   void closeSubmenusFrom(std::size_t levelIndex);
-  void prepareSubmenuFrame(std::size_t levelIndex, MenuInstance& inst, bool needsUpdate, bool needsLayout);
-  void buildSubmenuScene(std::size_t levelIndex, MenuInstance& inst, uint32_t width, uint32_t height);
   [[nodiscard]] std::optional<TrayItemInfo> activeTrayItem() const;
   [[nodiscard]] bool activeItemPinned() const;
   bool toggleActiveItemPinned();
@@ -89,11 +86,8 @@ private:
   std::vector<TrayMenuEntry> m_entries;
   std::unique_ptr<MenuInstance> m_instance;
 
-  // Bar layer surface (owned by the bar) whose keyboard interactivity is flipped
-  // to OnDemand while the menu is open so the grabbing popup inherits keyboard
-  // focus, then restored to None on close.
-  zwlr_layer_surface_v1* m_keyboardBarLayerSurface = nullptr;
-  wl_surface* m_keyboardBarWlSurface = nullptr;
+  // The bar under the menu takes keyboard focus while the menu is open.
+  ParentKeyboardGrab m_parentKeyboard;
   float m_contentScale = 1.0F;
   bool m_visible = false;
   std::string m_lastClosedItemId;

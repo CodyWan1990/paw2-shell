@@ -175,10 +175,8 @@ void SessionPanel::create() {
 }
 
 Button* SessionPanel::createActionButton(const SessionPanelActionConfig& cfg, std::size_t index, float scale) {
-  const std::string labelText =
-      cfg.label.has_value() && !cfg.label->empty() ? *cfg.label : i18n::tr(session_action::labelKey(cfg.action));
-  const std::string glyph =
-      cfg.glyph.has_value() && !cfg.glyph->empty() ? *cfg.glyph : session_action::defaultGlyph(cfg.action);
+  const std::string labelText = session_action::displayLabel(cfg);
+  const std::string glyph = session_action::displayGlyph(cfg);
   const std::optional<std::string> badge = index < m_entryShortcutBadges.size()
           && m_entryShortcutBadges[index].has_value()
           && m_config->config().shell.session.showShortcuts

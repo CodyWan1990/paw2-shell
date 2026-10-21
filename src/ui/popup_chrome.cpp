@@ -128,4 +128,30 @@ namespace popup_chrome {
     return static_cast<Box*>(parent.addChild(std::move(box)));
   }
 
+  ScrollView* addScrollingMenuFrame(
+      Node& parent, const Geometry& geometry, const ShellConfig::ShadowConfig& shadow, float contentScale,
+      ScrollViewState* state
+  ) {
+    if (Style::popupShadowsEnabled()) {
+      (void)addShadow(parent, geometry, shadow, Style::scaledRadiusLg(contentScale));
+    }
+    (void)addCardBackground(parent, geometry, contentScale);
+    auto scrollView = ui::scrollView({
+        .state = state,
+        .contentScale = contentScale,
+        .scrollbarVisible = true,
+        .viewportPaddingH = 0.0F,
+        .viewportPaddingV = 0.0F,
+        .radius = 0.0F,
+        .width = geometry.contentWidth,
+        .height = geometry.contentHeight,
+        .transparent = true,
+        .configure = [&geometry, contentScale](ScrollView& view) {
+          view.setPosition(geometry.contentX(), geometry.contentY());
+          view.setScrollbarInsetV(Style::scaledRadiusLg(contentScale));
+        },
+    });
+    return static_cast<ScrollView*>(parent.addChild(std::move(scrollView)));
+  }
+
 } // namespace popup_chrome

@@ -17,6 +17,7 @@
 #include "ui/popup_chrome.h"
 #include "ui/style.h"
 #include "wayland/layer_surface.h"
+#include "wayland/parent_keyboard_grab.h"
 #include "wayland/wayland_connection.h"
 #include "wayland/wayland_seat.h"
 #include "wlr-layer-shell-unstable-v1-client-protocol.h"
@@ -197,7 +198,28 @@ namespace {
     return config != nullptr ? config->config().shell.shadow : ShellConfig::ShadowConfig{};
   }
 
+  [[nodiscard]] std::vector<ContextMenuControlEntry> controlEntries(const std::vector<TrayMenuEntry>& menuEntries) {
+    std::vector<ContextMenuControlEntry> entries;
+    entries.reserve(menuEntries.size());
+    for (const auto& entry : menuEntries) {
+      entries.push_back(
+          ContextMenuControlEntry{
+              .id = entry.id,
+              .label = entry.label.empty() ? iconNameToLabel(entry.iconName) : entry.label,
+              .enabled = entry.enabled,
+              .separator = entry.separator,
+              .hasSubmenu = entry.hasSubmenu,
+              .checkmark = entry.checkmark,
+              .radio = entry.radio,
+              .toggleState = entry.toggleState,
+          }
+      );
+    }
+    return entries;
+  }
+
 } // namespace
+
 void TrayMenu::initialize(
     WaylandConnection& wayland, ConfigService* config, TrayService* tray, RenderContext* renderContext
 ) {
@@ -603,45 +625,8 @@ void TrayMenu::scheduleEntryRetry(int attempt) {
   });
 }
 
-uint32_t TrayMenu::submenuHeightPx(const std::vector<TrayMenuEntry>& submenuEntries) const {
-  std::vector<ContextMenuControlEntry> entries;
-  entries.reserve(submenuEntries.size());
-  for (const auto& entry : submenuEntries) {
-    entries.push_back(
-        ContextMenuControlEntry{
-            .id = entry.id,
-            .label = entry.label,
-            .enabled = entry.enabled,
-            .separator = entry.separator,
-            .hasSubmenu = entry.hasSubmenu,
-            .checkmark = entry.checkmark,
-            .radio = entry.radio,
-            .toggleState = entry.toggleState,
-        }
-    );
-  }
-  return static_cast<uint32_t>(
-      std::ceil(ContextMenuControl::preferredHeight(entries, visibleEntryLimit(entries.size()), contentScale()))
-  );
-}
-
-uint32_t TrayMenu::surfaceHeightPx() const {
-  std::vector<ContextMenuControlEntry> entries;
-  entries.reserve(m_entries.size());
-  for (const auto& entry : m_entries) {
-    entries.push_back(
-        ContextMenuControlEntry{
-            .id = entry.id,
-            .label = entry.label.empty() ? iconNameToLabel(entry.iconName) : entry.label,
-            .enabled = entry.enabled,
-            .separator = entry.separator,
-            .hasSubmenu = entry.hasSubmenu,
-            .checkmark = entry.checkmark,
-            .radio = entry.radio,
-            .toggleState = entry.toggleState,
-        }
-    );
-  }
+uint32_t TrayMenu::menuHeightPx(const std::vector<TrayMenuEntry>& menuEntries) const {
+  const auto entries = controlEntries(menuEntries);
   return static_cast<uint32_t>(
       std::ceil(ContextMenuControl::preferredHeight(entries, visibleEntryLimit(entries.size()), contentScale()))
   );
@@ -692,13 +677,14 @@ void TrayMenu::ensureSurface() {
   inst->surface->setConfigureCallback([instPtr](uint32_t /*width*/, uint32_t /*height*/) {
     instPtr->surface->requestLayout();
   });
-  inst->surface->setPrepareFrameCallback([this, instPtr](bool needsUpdate, bool needsLayout) {
-    prepareMainMenuFrame(*instPtr, needsUpdate, needsLayout);
+  inst->surface->setPrepareFrameCallback([this, instPtr](bool /*needsUpdate*/, bool needsLayout) {
+    prepareMenuFrame(std::nullopt, *instPtr, needsLayout);
   });
   inst->surface->setDismissedCallback([this]() { close(); });
 
   const auto chrome = popup_chrome::computeGeometry(
-      menuWidth(), static_cast<float>(surfaceHeightPx()), popupShadowConfig(m_config), Style::popupShadowsEnabled()
+      menuWidth(), static_cast<float>(menuHeightPx(m_entries)), popupShadowConfig(m_config),
+      Style::popupShadowsEnabled()
   );
   PopupPlacement placement{};
   if (const auto bar = resolveTrayBarConfig(m_config, m_wayland, output); bar.has_value()) {
@@ -731,17 +717,12 @@ void TrayMenu::ensureSurface() {
   // parent that already takes keyboard (the tray drawer panel) is left alone.
   const LayerSurface* parentOwner = m_wayland->layerSurfaceOwnerFor(parentWlSurface);
   if (parentOwner != nullptr && parentOwner->keyboardInteractivity() == LayerShellKeyboard::None) {
-    m_keyboardBarLayerSurface = parentLayerSurface;
-    m_keyboardBarWlSurface = parentWlSurface;
-    zwlr_layer_surface_v1_set_keyboard_interactivity(
-        parentLayerSurface, static_cast<std::uint32_t>(LayerShellKeyboard::OnDemand)
-    );
-    wl_surface_commit(parentWlSurface);
+    m_parentKeyboard.grab(parentLayerSurface, parentWlSurface);
   }
 
   if (!inst->surface->initialize(parentLayerSurface, output, popupConfig)) {
     kLog.debug("tray menu: failed to create popup surface");
-    restoreBarKeyboardInteractivity();
+    m_parentKeyboard.release(m_wayland);
     return;
   }
 
@@ -756,7 +737,8 @@ void TrayMenu::resizeMainSurfaceToEntries() {
   }
 
   const auto chrome = popup_chrome::computeGeometry(
-      menuWidth(), static_cast<float>(surfaceHeightPx()), popupShadowConfig(m_config), Style::popupShadowsEnabled()
+      menuWidth(), static_cast<float>(menuHeightPx(m_entries)), popupShadowConfig(m_config),
+      Style::popupShadowsEnabled()
   );
   const auto desiredWidth = chrome.surfaceWidth;
   const auto desiredHeight = chrome.surfaceHeight;
@@ -777,22 +759,9 @@ void TrayMenu::destroySurface() {
     m_instance->inputDispatcher.setSceneRoot(nullptr);
   }
   m_instance.reset();
-  restoreBarKeyboardInteractivity();
+  m_parentKeyboard.release(m_wayland);
 }
 
-void TrayMenu::restoreBarKeyboardInteractivity() {
-  zwlr_layer_surface_v1* layerSurface = m_keyboardBarLayerSurface;
-  wl_surface* wlSurface = m_keyboardBarWlSurface;
-  m_keyboardBarLayerSurface = nullptr;
-  m_keyboardBarWlSurface = nullptr;
-  // The parent (a bar or the tray drawer panel) can be destroyed while the menu
-  // is open. Its proxies are then freed, so only touch it while still registered.
-  if (layerSurface == nullptr || m_wayland == nullptr || m_wayland->layerSurfaceFor(wlSurface) != layerSurface) {
-    return;
-  }
-  zwlr_layer_surface_v1_set_keyboard_interactivity(layerSurface, static_cast<std::uint32_t>(LayerShellKeyboard::None));
-  wl_surface_commit(wlSurface);
-}
 
 void TrayMenu::rebuildScenes() {
   uiAssertNotRendering("TrayMenu::rebuildScenes");
@@ -809,7 +778,7 @@ void TrayMenu::rebuildScenes() {
   }
 }
 
-void TrayMenu::prepareMainMenuFrame(MenuInstance& inst, bool /*needsUpdate*/, bool needsLayout) {
+void TrayMenu::prepareMenuFrame(std::optional<std::size_t> submenuLevel, MenuInstance& inst, bool needsLayout) {
   if (m_renderContext == nullptr || inst.surface == nullptr) {
     return;
   }
@@ -827,63 +796,31 @@ void TrayMenu::prepareMainMenuFrame(MenuInstance& inst, bool /*needsUpdate*/, bo
       || static_cast<uint32_t>(std::round(inst.sceneRoot->height())) != height;
   if (needsSceneBuild || needsLayout) {
     UiPhaseScope layoutPhase(UiPhase::Layout);
-    buildScene(inst, width, height);
+    buildMenuScene(submenuLevel, inst, width, height);
   }
 }
 
-void TrayMenu::buildScene(MenuInstance& inst, uint32_t width, uint32_t height) {
-  uiAssertNotRendering("TrayMenu::buildScene");
-  const auto w = static_cast<float>(width);
-  const auto h = static_cast<float>(height);
-
+// One scene for the main menu (no submenuLevel) and every submenu level.
+void TrayMenu::buildMenuScene(
+    std::optional<std::size_t> submenuLevel, MenuInstance& inst, uint32_t width, uint32_t height
+) {
+  uiAssertNotRendering("TrayMenu::buildMenuScene");
   inst.sceneRoot = ui::node({});
-  inst.sceneRoot->setSize(w, h);
-  if (Style::popupShadowsEnabled()) {
-    (void)popup_chrome::addShadow(
-        *inst.sceneRoot, inst.chrome, popupShadowConfig(m_config), Style::scaledRadiusLg(contentScale())
-    );
+  inst.sceneRoot->setSize(static_cast<float>(width), static_cast<float>(height));
+  ScrollView* scrollView = popup_chrome::addScrollingMenuFrame(
+      *inst.sceneRoot, inst.chrome, popupShadowConfig(m_config), contentScale(), &inst.scrollState
+  );
+
+  if (submenuLevel.has_value() && *submenuLevel >= m_submenuLevels.size()) {
+    return;
   }
-  (void)popup_chrome::addCardBackground(*inst.sceneRoot, inst.chrome, contentScale());
+  auto entries = controlEntries(submenuLevel.has_value() ? m_submenuLevels[*submenuLevel].entries : m_entries);
+  const std::size_t nextLevel = submenuLevel.has_value() ? *submenuLevel + 1 : 0;
 
-  std::vector<ContextMenuControlEntry> entries;
-  entries.reserve(m_entries.size());
-  for (const auto& entry : m_entries) {
-    entries.push_back(
-        ContextMenuControlEntry{
-            .id = entry.id,
-            .label = entry.label.empty() ? iconNameToLabel(entry.iconName) : entry.label,
-            .enabled = entry.enabled,
-            .separator = entry.separator,
-            .hasSubmenu = entry.hasSubmenu,
-            .checkmark = entry.checkmark,
-            .radio = entry.radio,
-            .toggleState = entry.toggleState,
-        }
-    );
-  }
-
-  const float menuWidth = std::max(1.0F, inst.chrome.contentWidth);
-
-  auto scrollView = ui::scrollView({
-      .state = &inst.scrollState,
-      .contentScale = contentScale(),
-      .scrollbarVisible = true,
-      .viewportPaddingH = 0.0F,
-      .viewportPaddingV = 0.0F,
-      .radius = 0.0F,
-      .width = inst.chrome.contentWidth,
-      .height = inst.chrome.contentHeight,
-      .configure = [this, &inst](ScrollView& view) {
-        view.setPosition(inst.chrome.contentX(), inst.chrome.contentY());
-        view.clearFill();
-        view.clearBorder();
-        view.setScrollbarInsetV(Style::scaledRadiusLg(contentScale()));
-      },
-  });
   auto menu = std::make_unique<ContextMenuControl>();
   menu->setReserveToggleSpace(true);
   menu->setContentScale(contentScale());
-  menu->setMenuWidth(menuWidth);
+  menu->setMenuWidth(std::max(1.0F, inst.chrome.contentWidth));
   menu->setMaxVisible(entries.size()); // Always lay out all entries for scrolling
   menu->setSubmenuDirection(inst.submenuDirection);
   menu->setEntries(std::move(entries));
@@ -912,12 +849,11 @@ void TrayMenu::buildScene(MenuInstance& inst, uint32_t width, uint32_t height) {
       closeTrayDrawerPanelIfOpen();
     });
   });
-  menu->setOnSubmenuOpen([this](const ContextMenuControlEntry& entry, float rowCenterY) {
-    openSubmenuAtLevel(0, entry.id, rowCenterY);
+  menu->setOnSubmenuOpen([this, nextLevel](const ContextMenuControlEntry& entry, float rowCenterY) {
+    openSubmenuAtLevel(nextLevel, entry.id, rowCenterY);
   });
   scrollView->content()->addChild(std::move(menu));
   scrollView->layout(inst.surface->renderTarget().renderer());
-  inst.sceneRoot->addChild(std::move(scrollView));
 
   inst.inputDispatcher.setSceneRoot(inst.sceneRoot.get());
   inst.inputDispatcher.setCursorShapeCallback([this](uint32_t serial, uint32_t shape) {
@@ -1077,7 +1013,7 @@ void TrayMenu::openSubmenuAtLevel(std::size_t levelIndex, std::int32_t parentEnt
   const auto subGap = std::max(1, static_cast<std::int32_t>(std::lround(4.0F * scale)));
 
   const auto chrome = popup_chrome::computeGeometry(
-      menuWidth(), static_cast<float>(submenuHeightPx(level.entries)), popupShadowConfig(m_config),
+      menuWidth(), static_cast<float>(menuHeightPx(level.entries)), popupShadowConfig(m_config),
       Style::popupShadowsEnabled()
   );
 
@@ -1123,8 +1059,8 @@ void TrayMenu::openSubmenuAtLevel(std::size_t levelIndex, std::int32_t parentEnt
   auto* instPtr = inst.get();
 
   inst->surface->setConfigureCallback([instPtr](uint32_t /*w*/, uint32_t /*h*/) { instPtr->surface->requestLayout(); });
-  inst->surface->setPrepareFrameCallback([this, levelIndex, instPtr](bool needsUpdate, bool needsLayout) {
-    prepareSubmenuFrame(levelIndex, *instPtr, needsUpdate, needsLayout);
+  inst->surface->setPrepareFrameCallback([this, levelIndex, instPtr](bool /*needsUpdate*/, bool needsLayout) {
+    prepareMenuFrame(levelIndex, *instPtr, needsLayout);
   });
   inst->surface->setDismissedCallback([this, levelIndex]() { closeSubmenusFrom(levelIndex); });
 
@@ -1156,118 +1092,4 @@ void TrayMenu::openSubmenuAtLevel(std::size_t levelIndex, std::int32_t parentEnt
   popup_chrome::setContentInputRegion(*inst->surface, inst->chrome);
   inst->wlSurface = inst->surface->wlSurface();
   level.instance = std::move(inst);
-}
-
-void TrayMenu::prepareSubmenuFrame(std::size_t levelIndex, MenuInstance& inst, bool /*needsUpdate*/, bool needsLayout) {
-  if (m_renderContext == nullptr || inst.surface == nullptr) {
-    return;
-  }
-
-  const auto width = inst.surface->width();
-  const auto height = inst.surface->height();
-  if (width == 0 || height == 0) {
-    return;
-  }
-
-  m_renderContext->makeCurrent(inst.surface->renderTarget());
-
-  const bool needsSceneBuild = inst.sceneRoot == nullptr
-      || static_cast<uint32_t>(std::round(inst.sceneRoot->width())) != width
-      || static_cast<uint32_t>(std::round(inst.sceneRoot->height())) != height;
-  if (needsSceneBuild || needsLayout) {
-    UiPhaseScope layoutPhase(UiPhase::Layout);
-    buildSubmenuScene(levelIndex, inst, width, height);
-  }
-}
-
-void TrayMenu::buildSubmenuScene(std::size_t levelIndex, MenuInstance& inst, uint32_t width, uint32_t height) {
-  uiAssertNotRendering("TrayMenu::buildSubmenuScene");
-  const auto w = static_cast<float>(width);
-  const auto h = static_cast<float>(height);
-
-  inst.sceneRoot = ui::node({});
-  inst.sceneRoot->setSize(w, h);
-  if (Style::popupShadowsEnabled()) {
-    (void)popup_chrome::addShadow(
-        *inst.sceneRoot, inst.chrome, popupShadowConfig(m_config), Style::scaledRadiusLg(contentScale())
-    );
-  }
-  (void)popup_chrome::addCardBackground(*inst.sceneRoot, inst.chrome, contentScale());
-
-  if (levelIndex >= m_submenuLevels.size()) {
-    return;
-  }
-  std::vector<ContextMenuControlEntry> entries;
-  const auto& submenuEntries = m_submenuLevels[levelIndex].entries;
-  entries.reserve(submenuEntries.size());
-  for (const auto& entry : submenuEntries) {
-    entries.push_back(
-        ContextMenuControlEntry{
-            .id = entry.id,
-            .label = entry.label,
-            .enabled = entry.enabled,
-            .separator = entry.separator,
-            .hasSubmenu = entry.hasSubmenu,
-            .checkmark = entry.checkmark,
-            .radio = entry.radio,
-            .toggleState = entry.toggleState,
-        }
-    );
-  }
-
-  const float menuWidth = std::max(1.0F, inst.chrome.contentWidth);
-
-  auto scrollView = ui::scrollView({
-      .state = &inst.scrollState,
-      .contentScale = contentScale(),
-      .scrollbarVisible = true,
-      .viewportPaddingH = 0.0F,
-      .viewportPaddingV = 0.0F,
-      .radius = 0.0F,
-      .width = inst.chrome.contentWidth,
-      .height = inst.chrome.contentHeight,
-      .configure = [this, &inst](ScrollView& view) {
-        view.setPosition(inst.chrome.contentX(), inst.chrome.contentY());
-        view.clearFill();
-        view.clearBorder();
-        view.setScrollbarInsetV(Style::scaledRadiusLg(contentScale()));
-      },
-  });
-
-  auto menu = std::make_unique<ContextMenuControl>();
-  menu->setReserveToggleSpace(true);
-  menu->setContentScale(contentScale());
-  menu->setMenuWidth(menuWidth);
-  menu->setMaxVisible(entries.size()); // Always lay out all entries for scrolling
-  menu->setSubmenuDirection(inst.submenuDirection);
-  menu->setEntries(std::move(entries));
-  menu->setRedrawCallback([&inst]() {
-    if (inst.surface != nullptr) {
-      inst.surface->requestRedraw();
-    }
-  });
-  menu->setOnActivate([this](const ContextMenuControlEntry& entry) {
-    if (m_tray == nullptr || m_activeItemId.empty()) {
-      return;
-    }
-    DeferredCall::callLater([this, entry]() {
-      if (m_tray != nullptr) {
-        (void)m_tray->activateMenuEntry(m_activeItemId, entry.id);
-      }
-      close();
-      closeTrayDrawerPanelIfOpen();
-    });
-  });
-  menu->setOnSubmenuOpen([this, levelIndex](const ContextMenuControlEntry& entry, float rowCenterY) {
-    openSubmenuAtLevel(levelIndex + 1, entry.id, rowCenterY);
-  });
-  scrollView->content()->addChild(std::move(menu));
-  scrollView->layout(inst.surface->renderTarget().renderer());
-  inst.sceneRoot->addChild(std::move(scrollView));
-
-  inst.inputDispatcher.setSceneRoot(inst.sceneRoot.get());
-  inst.inputDispatcher.setCursorShapeCallback([this](uint32_t serial, uint32_t shape) {
-    m_wayland->setCursorShape(serial, shape);
-  });
-  inst.surface->setSceneRoot(inst.sceneRoot.get());
 }

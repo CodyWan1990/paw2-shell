@@ -109,10 +109,8 @@ namespace {
       SessionActionEntry entry;
       entry.index = i;
       entry.config = row;
-      entry.title =
-          row.label.has_value() && !row.label->empty() ? *row.label : i18n::tr(session_action::labelKey(row.action));
-      entry.glyph =
-          row.glyph.has_value() && !row.glyph->empty() ? *row.glyph : session_action::defaultGlyph(row.action);
+      entry.title = session_action::displayLabel(row);
+      entry.glyph = session_action::displayGlyph(row);
       entry.subtitle = actionSubtitle(row);
       entry.searchable = StringUtils::toLower(entry.title + " " + row.action + " " + aliasesForAction(row.action));
       if (row.command.has_value()) {

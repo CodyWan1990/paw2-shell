@@ -1,82 +1,64 @@
 #include "shell/session/session_action_meta.h"
 
+#include "config/config_types.h"
+#include "i18n/i18n.h"
+
+#include <algorithm>
+#include <array>
 #include <string_view>
 
 namespace session_action {
 
   namespace {
 
-    [[nodiscard]] bool isBuiltinAction(std::string_view action) {
-      return action == "lock"
-          || action == "logout"
-          || action == "suspend"
-          || action == "lock_and_suspend"
-          || action == "reboot"
-          || action == "shutdown";
+    struct ActionMeta {
+      std::string_view name;
+      const char* labelKey;
+      const char* glyph;
+    };
+
+    constexpr std::array<ActionMeta, 6> kBuiltinActions{{
+        {"lock", "session.actions.lock", "lock"},
+        {"logout", "session.actions.logout", "logout"},
+        {"suspend", "session.actions.suspend", "suspend"},
+        {"lock_and_suspend", "session.actions.lock-and-suspend", "suspend"},
+        {"reboot", "session.actions.reboot", "reboot"},
+        {"shutdown", "session.actions.shutdown", "shutdown"},
+    }};
+
+    [[nodiscard]] const ActionMeta* builtin(std::string_view action) {
+      const auto* it = std::ranges::find(kBuiltinActions, action, &ActionMeta::name);
+      return it != kBuiltinActions.end() ? it : nullptr;
     }
 
   } // namespace
 
-  bool isKnown(std::string_view action) {
-    return action == "lock"
-        || action == "logout"
-        || action == "suspend"
-        || action == "lock_and_suspend"
-        || action == "reboot"
-        || action == "shutdown"
-        || action == "command";
-  }
+  bool isKnown(std::string_view action) { return action == "command" || builtin(action) != nullptr; }
 
   const char* labelKey(std::string_view action) {
-    if (action == "lock") {
-      return "session.actions.lock";
-    }
-    if (action == "logout") {
-      return "session.actions.logout";
-    }
-    if (action == "suspend") {
-      return "session.actions.suspend";
-    }
-    if (action == "lock_and_suspend") {
-      return "session.actions.lock-and-suspend";
-    }
-    if (action == "reboot") {
-      return "session.actions.reboot";
-    }
-    if (action == "shutdown") {
-      return "session.actions.shutdown";
-    }
-    return "session.actions.custom";
+    const auto* meta = builtin(action);
+    return meta != nullptr ? meta->labelKey : "session.actions.custom";
   }
 
   const char* defaultGlyph(std::string_view action) {
-    if (action == "lock") {
-      return "lock";
-    }
-    if (action == "logout") {
-      return "logout";
-    }
-    if (action == "suspend") {
-      return "suspend";
-    }
-    if (action == "lock_and_suspend") {
-      return "suspend";
-    }
-    if (action == "reboot") {
-      return "reboot";
-    }
-    if (action == "shutdown") {
-      return "shutdown";
-    }
-    return "terminal";
+    const auto* meta = builtin(action);
+    return meta != nullptr ? meta->glyph : "terminal";
+  }
+
+  std::string displayLabel(const SessionPanelActionConfig& action) {
+    return action.label.has_value() && !action.label->empty() ? *action.label : i18n::tr(labelKey(action.action));
+  }
+
+  std::string displayGlyph(const SessionPanelActionConfig& action) {
+    return action.glyph.has_value() && !action.glyph->empty() ? *action.glyph : defaultGlyph(action.action);
   }
 
   std::optional<std::string_view> canonicalActionName(std::string_view ipcOrConfigAction) {
     if (ipcOrConfigAction == "lock-and-suspend") {
       return std::string_view{"lock_and_suspend"};
     }
-    if (isBuiltinAction(ipcOrConfigAction)) {
-      return ipcOrConfigAction;
+    if (const auto* meta = builtin(ipcOrConfigAction); meta != nullptr) {
+      return meta->name;
     }
     return std::nullopt;
   }

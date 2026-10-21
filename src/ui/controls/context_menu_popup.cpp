@@ -12,6 +12,7 @@
 #include "ui/popup_chrome.h"
 #include "ui/style.h"
 #include "wayland/layer_surface.h"
+#include "wayland/parent_keyboard_grab.h"
 #include "wayland/popup_surface.h"
 #include "wayland/wayland_connection.h"
 #include "wayland/wayland_seat.h"
@@ -145,25 +146,9 @@ void ContextMenuPopup::open(ContextMenuPopupRequest request) {
 
     self->m_sceneRoot = std::make_unique<Node>();
     self->m_sceneRoot->setSize(fw, fh);
-    if (Style::popupShadowsEnabled()) {
-      (void)popup_chrome::addShadow(
-          *self->m_sceneRoot, chrome, self->m_shadowConfig, Style::scaledRadiusLg(contentScale)
-      );
-    }
-    (void)popup_chrome::addCardBackground(*self->m_sceneRoot, chrome, contentScale);
-
-    auto scrollView = std::make_unique<ScrollView>();
-    scrollView->setPosition(chrome.contentX(), chrome.contentY());
-    scrollView->setSize(chrome.contentWidth, chrome.contentHeight);
-    scrollView->setContentScale(contentScale);
-    scrollView->setViewportPaddingH(0.0F);
-    scrollView->setViewportPaddingV(0.0F);
-    scrollView->clearFill();
-    scrollView->clearBorder();
-    scrollView->setRadius(0.0F);
-    scrollView->bindState(&self->m_scrollState);
-    scrollView->setScrollbarVisible(true);
-    scrollView->setScrollbarInsetV(Style::scaledRadiusLg(contentScale));
+    ScrollView* scrollView = popup_chrome::addScrollingMenuFrame(
+        *self->m_sceneRoot, chrome, self->m_shadowConfig, contentScale, &self->m_scrollState
+    );
 
     auto ctrl = std::make_unique<ContextMenuControl>();
     ContextMenuControl* menuPtr = ctrl.get();
@@ -180,14 +165,12 @@ void ContextMenuPopup::open(ContextMenuPopupRequest request) {
     });
     ctrl->setOnActivate([self](const ContextMenuControlEntry& e) { self->deferActivation(e); });
     scrollView->content()->addChild(std::move(ctrl));
-    ScrollView* scrollPtr = scrollView.get();
     scrollView->layout(self->m_surface->renderTarget().renderer());
 
-    self->m_scrollView = scrollPtr;
+    self->m_scrollView = scrollView;
     self->m_menu = menuPtr;
     self->ensureHighlightedVisible();
 
-    self->m_sceneRoot->addChild(std::move(scrollView));
     self->m_inputDispatcher.setSceneRoot(self->m_sceneRoot.get());
     self->m_inputDispatcher.setCursorShapeCallback([self](std::uint32_t serial, std::uint32_t shape) {
       self->m_wayland.setCursorShape(serial, shape);
@@ -197,25 +180,15 @@ void ContextMenuPopup::open(ContextMenuPopupRequest request) {
 
   m_surface->setDismissedCallback([self]() { self->deferClose(); });
 
-  // Layer-shell popups inherit their parent's keyboard interactivity. A bar is
-  // None, so flip it to OnDemand before the popup maps or the grabbing popup
-  // gets no keyboard focus and ESC cannot reach it. Only bar-style callers pass
-  // a parent wlSurface; panels are already OnDemand and leave it null.
-  if (request.parent.layerSurface != nullptr && request.parent.wlSurface != nullptr) {
-    m_keyboardParentLayerSurface = request.parent.layerSurface;
-    m_keyboardParentWlSurface = request.parent.wlSurface;
-    zwlr_layer_surface_v1_set_keyboard_interactivity(
-        request.parent.layerSurface, static_cast<std::uint32_t>(LayerShellKeyboard::OnDemand)
-    );
-    wl_surface_commit(request.parent.wlSurface);
-  }
+  // Only bar-style callers pass a parent wlSurface; panels are already OnDemand and leave it null.
+  m_parentKeyboard.grab(request.parent.layerSurface, request.parent.wlSurface);
 
   const bool initialized = request.parent.xdgSurface != nullptr
       ? m_surface->initializeAsChild(request.parent.xdgSurface, request.parent.output, popupCfg)
       : m_surface->initialize(request.parent.layerSurface, request.parent.output, popupCfg);
   if (!initialized) {
     kLog.warn("failed to create context menu popup");
-    restoreParentKeyboardInteractivity();
+    m_parentKeyboard.release(&m_wayland);
     m_surface.reset();
     return;
   }
@@ -232,7 +205,7 @@ void ContextMenuPopup::close() {
   if (s_openMenu == this) {
     s_openMenu = nullptr;
   }
-  restoreParentKeyboardInteractivity();
+  m_parentKeyboard.release(&m_wayland);
   m_menu = nullptr;
   m_scrollView = nullptr;
   m_sceneRoot.reset();
@@ -461,19 +434,6 @@ void ContextMenuPopup::requestVisualUpdate() {
   }
 }
 
-void ContextMenuPopup::restoreParentKeyboardInteractivity() {
-  zwlr_layer_surface_v1* layerSurface = m_keyboardParentLayerSurface;
-  wl_surface* wlSurface = m_keyboardParentWlSurface;
-  m_keyboardParentLayerSurface = nullptr;
-  m_keyboardParentWlSurface = nullptr;
-  // The parent surface can be destroyed while the menu is open (bar rebuild,
-  // output removal). Its proxies are then freed, so only touch it while still registered.
-  if (layerSurface == nullptr || m_wayland.layerSurfaceFor(wlSurface) != layerSurface) {
-    return;
-  }
-  zwlr_layer_surface_v1_set_keyboard_interactivity(layerSurface, static_cast<std::uint32_t>(LayerShellKeyboard::None));
-  wl_surface_commit(wlSurface);
-}
 
 bool ContextMenuPopup::dispatchKeyboardEvent(const KeyboardEvent& event) {
   if (s_openMenu == nullptr || !s_openMenu->isOpen()) {

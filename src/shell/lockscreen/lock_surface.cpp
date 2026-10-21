@@ -1693,7 +1693,7 @@ void LockSurface::rebuildSessionButtons() {
     auto button = ui::button({
         .out = nullptr,
         .text = labelText,
-        .glyph = cfg.glyph.has_value() && !cfg.glyph->empty() ? *cfg.glyph : session_action::defaultGlyph(cfg.action),
+        .glyph = session_action::displayGlyph(cfg),
         .fontSize = Style::fontSizeCaption,
         .glyphSize = 16.0F,
         .contentAlign = ButtonContentAlign::Center,

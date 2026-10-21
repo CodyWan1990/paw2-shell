@@ -73,18 +73,8 @@ namespace settings {
         .gap = Style::spaceXs * scale,
     });
 
-    const std::string previewGlyph = [&] {
-      if (row.glyph.has_value() && !row.glyph->empty()) {
-        return *row.glyph;
-      }
-      return std::string(session_action::defaultGlyph(row.action));
-    }();
-    const auto previewGlyphForRow = [&row]() {
-      if (row.glyph.has_value() && !row.glyph->empty()) {
-        return *row.glyph;
-      }
-      return std::string(session_action::defaultGlyph(row.action));
-    };
+    const std::string previewGlyph = session_action::displayGlyph(row);
+    const auto previewGlyphForRow = [&row]() { return session_action::displayGlyph(row); };
     const auto hasCustomGlyph = [&row]() { return row.glyph.has_value() && !row.glyph->empty(); };
 
     Button* glyphPickBtnPtr = nullptr;

@@ -9,6 +9,8 @@ class Box;
 class Node;
 class PopupSurface;
 class RectNode;
+class ScrollView;
+struct ScrollViewState;
 struct InputRect;
 struct PopupSurfaceConfig;
 
@@ -63,5 +65,12 @@ namespace popup_chrome {
   // ContextMenuControl draw the card here so its corners stay pinned to the viewport
   // instead of scrolling away with the rows.
   Box* addCardBackground(Node& parent, const Geometry& geometry, float contentScale);
+  // The frame of a scrolling popup menu: shadow (when popup shadows are on), card background,
+  // and a transparent scroll view over the content rect for the menu rows. Returns the scroll
+  // view, already added to `parent`.
+  ScrollView* addScrollingMenuFrame(
+      Node& parent, const Geometry& geometry, const ShellConfig::ShadowConfig& shadow, float contentScale,
+      ScrollViewState* state
+  );
 
 } // namespace popup_chrome

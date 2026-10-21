@@ -2111,7 +2111,7 @@
             "label": "Al cambiar el modo de tema"
           },
           "wallpaper-changed": {
-            "description": "Comando a ejecutar cuando cambia el fondo de pantalla; proporciona NOCTALIA_WALLPAPER_PATH y NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Comando a ejecutar cuando cambia el fondo de pantalla; proporciona PAW2_SHELL_WALLPAPER_PATH y PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "Al cambiar el fondo de pantalla"
           },
           "wifi-disabled": {

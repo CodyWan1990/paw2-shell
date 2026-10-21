@@ -5,7 +5,7 @@
 #include <array>
 #include <vector>
 
-namespace noctalia::bar {
+namespace paw2shell::bar {
 
   namespace {
 
@@ -201,4 +201,4 @@ namespace noctalia::bar {
     return actions;
   }
 
-} // namespace noctalia::bar
+} // namespace paw2shell::bar

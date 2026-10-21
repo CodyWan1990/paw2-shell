@@ -24,8 +24,8 @@
 namespace {
 
   using Clock = std::chrono::steady_clock;
-  using noctalia::theme::GeneratedPalette;
-  using noctalia::theme::TemplateApplyService;
+  using paw2shell::theme::GeneratedPalette;
+  using paw2shell::theme::TemplateApplyService;
 
   constexpr std::chrono::milliseconds kGrace{1500};
 
@@ -179,9 +179,9 @@ int main() {
   std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "data");
-  ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-  ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-  ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_STATE_HOME", (root / "state").c_str(), 1);
+  ::setenv("PAW2_SHELL_DATA_HOME", (root / "data").c_str(), 1);
   writeFile(root / "input.tmpl", "static content, this test is about hooks\n");
   // A minimal asset bundle, so the built-in template config can be replaced.
   std::filesystem::create_directories(root / "assets" / "fonts");
@@ -191,16 +191,16 @@ int main() {
   writeFile(root / "assets" / "fonts" / "noctalia-tabler.ttf", "");
   writeFile(root / "assets" / "templates" / "builtin.toml", "");
   writeFile(root / "assets" / "translations" / "en.json", "{}\n");
-  ::setenv("NOCTALIA_ASSETS_DIR", (root / "assets").c_str(), 1);
+  ::setenv("PAW2_SHELL_ASSETS_DIR", (root / "assets").c_str(), 1);
 
   test_stuck_inline_post_hook(root);
   test_stuck_sync_and_async_hooks_share_one_deadline(root);
   test_stuck_undo_hook(root);
 
-  ::unsetenv("NOCTALIA_CONFIG_HOME");
-  ::unsetenv("NOCTALIA_STATE_HOME");
-  ::unsetenv("NOCTALIA_DATA_HOME");
-  ::unsetenv("NOCTALIA_ASSETS_DIR");
+  ::unsetenv("PAW2_SHELL_CONFIG_HOME");
+  ::unsetenv("PAW2_SHELL_STATE_HOME");
+  ::unsetenv("PAW2_SHELL_DATA_HOME");
+  ::unsetenv("PAW2_SHELL_ASSETS_DIR");
   std::filesystem::remove_all(root);
   return 0;
 }

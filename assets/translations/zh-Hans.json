@@ -2120,7 +2120,7 @@
             "label": "主题模式切换时"
           },
           "wallpaper-changed": {
-            "description": "壁纸改变时执行的命令；可使用 NOCTALIA_WALLPAPER_PATH 和 NOCTALIA_WALLPAPER_CONNECTOR 环境变量",
+            "description": "壁纸改变时执行的命令；可使用 PAW2_SHELL_WALLPAPER_PATH 和 PAW2_SHELL_WALLPAPER_CONNECTOR 环境变量",
             "label": "壁纸改变时"
           },
           "wifi-disabled": {

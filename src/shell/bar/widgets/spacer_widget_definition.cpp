@@ -1,10 +1,10 @@
 #include "shell/bar/widgets/spacer_widget_definition.h"
 
-const noctalia::bar::WidgetDefinition<SpacerWidget::Options>& spacerWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<SpacerWidget::Options>& spacerWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = SpacerWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "spacer",
       .fields =
           {

@@ -2,12 +2,12 @@
 
 #include "shell/bar/widgets/glyph_button_definition.h"
 
-const noctalia::bar::WidgetDefinition<SessionWidget::Options>& sessionWidgetDefinition() {
+const paw2shell::bar::WidgetDefinition<SessionWidget::Options>& sessionWidgetDefinition() {
   using Options = SessionWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "session",
-      .fields = noctalia::bar::glyphButtonFields<Options>(),
+      .fields = paw2shell::bar::glyphButtonFields<Options>(),
       .glyph = [](const Options& options) { return options.glyph; },
   };
   return definition;

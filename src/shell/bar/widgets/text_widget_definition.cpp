@@ -1,10 +1,10 @@
 #include "shell/bar/widgets/text_widget_definition.h"
 
-const noctalia::bar::WidgetDefinition<TextWidget::Options>& textWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<TextWidget::Options>& textWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = TextWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "text",
       .fields = {
           field<&Options::text>({

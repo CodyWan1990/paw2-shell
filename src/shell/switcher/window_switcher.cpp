@@ -567,7 +567,7 @@ void WindowSwitcher::initialize(
 }
 
 void WindowSwitcher::registerIpc(IpcService& ipc) {
-  ipc.bind(noctalia::cli::msg::windowSwitcher, [this](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::windowSwitcher, [this](const std::string& args) -> std::string {
     const std::string token = StringUtils::trim(args);
     if (token == "close" || token == "hide") {
       if (m_active) {

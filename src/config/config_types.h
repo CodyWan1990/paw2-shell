@@ -1308,7 +1308,7 @@ struct ShellConfig {
   /// stays pasteable. Independent of history retention: this keeps the live clipboard, not the stored history.
   bool clipboardKeepFromClosedApps = true;
   /// Maximum unpinned clipboard history entries retained (pinned entries are exempt).
-  int clipboardHistoryMaxEntries = static_cast<int>(noctalia::config::kClipboardHistoryDefaultEntries);
+  int clipboardHistoryMaxEntries = static_cast<int>(paw2shell::config::kClipboardHistoryDefaultEntries);
   /// When true, clearing clipboard history or deleting unpinned entries from the panel asks for confirmation first.
   bool clipboardConfirmClearHistory = true;
   /// Disables per-app tracking and Control Center usage UI.
@@ -1415,55 +1415,55 @@ struct SystemConfig {
     float networkPollSeconds = 3.0F;
     float diskPollSeconds = 10.0F;
     double cpuUsageActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::CpuUsage).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::CpuUsage).activityDefault;
     double cpuUsageCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::CpuUsage).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::CpuUsage).criticalDefault;
     double cpuTempActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::CpuTemp).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::CpuTemp).activityDefault;
     double cpuTempCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::CpuTemp).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::CpuTemp).criticalDefault;
     double cpuFreqActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::CpuFreq).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::CpuFreq).activityDefault;
     double cpuFreqCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::CpuFreq).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::CpuFreq).criticalDefault;
     double gpuTempActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::GpuTemp).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::GpuTemp).activityDefault;
     double gpuTempCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::GpuTemp).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::GpuTemp).criticalDefault;
     double gpuUsageActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::GpuUsage).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::GpuUsage).activityDefault;
     double gpuUsageCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::GpuUsage).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::GpuUsage).criticalDefault;
     double gpuVramActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::GpuVram).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::GpuVram).activityDefault;
     double gpuVramCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::GpuVram).criticalDefault;
-    double ramPctActivityThreshold = noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::RamPct).activityDefault;
-    double ramPctCriticalThreshold = noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::RamPct).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::GpuVram).criticalDefault;
+    double ramPctActivityThreshold = paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::RamPct).activityDefault;
+    double ramPctCriticalThreshold = paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::RamPct).criticalDefault;
     double swapPctActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::SwapPct).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::SwapPct).activityDefault;
     double swapPctCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::SwapPct).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::SwapPct).criticalDefault;
     double diskUsedPctActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskUsedPct).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskUsedPct).activityDefault;
     double diskUsedPctCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskUsedPct).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskUsedPct).criticalDefault;
     double diskUsedActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskUsed).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskUsed).activityDefault;
     double diskUsedCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskUsed).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskUsed).criticalDefault;
     double diskFreePctActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskFreePct).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskFreePct).activityDefault;
     double diskFreePctCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskFreePct).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskFreePct).criticalDefault;
     double diskFreeActivityThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskFree).activityDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskFree).activityDefault;
     double diskFreeCriticalThreshold =
-        noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::DiskFree).criticalDefault;
-    double netRxActivityThreshold = noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::NetRx).activityDefault;
-    double netRxCriticalThreshold = noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::NetRx).criticalDefault;
-    double netTxActivityThreshold = noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::NetTx).activityDefault;
-    double netTxCriticalThreshold = noctalia::sysmon::thresholdProfile(noctalia::sysmon::Stat::NetTx).criticalDefault;
+        paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::DiskFree).criticalDefault;
+    double netRxActivityThreshold = paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::NetRx).activityDefault;
+    double netRxCriticalThreshold = paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::NetRx).criticalDefault;
+    double netTxActivityThreshold = paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::NetTx).activityDefault;
+    double netTxCriticalThreshold = paw2shell::sysmon::thresholdProfile(paw2shell::sysmon::Stat::NetTx).criticalDefault;
 
     bool operator==(const MonitorConfig&) const = default;
   };

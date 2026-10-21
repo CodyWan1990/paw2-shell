@@ -38,11 +38,11 @@ namespace {
 
 } // namespace
 
-const noctalia::bar::WidgetDefinition<WorkspacesWidget::Options>& workspacesWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<WorkspacesWidget::Options>& workspacesWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = WorkspacesWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "workspaces",
       .fields =
           {

@@ -2,12 +2,12 @@
 
 #include "shell/bar/widgets/glyph_button_definition.h"
 
-const noctalia::bar::WidgetDefinition<ThemesWidgetOptions>& themesWidgetDefinition() {
+const paw2shell::bar::WidgetDefinition<ThemesWidgetOptions>& themesWidgetDefinition() {
   using Options = ThemesWidgetOptions;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "themes",
-      .fields = noctalia::bar::glyphButtonFields<Options>(),
+      .fields = paw2shell::bar::glyphButtonFields<Options>(),
       .glyph = [](const Options& options) { return options.glyph; },
   };
   return definition;

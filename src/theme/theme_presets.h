@@ -12,7 +12,7 @@
 
 class IpcService;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   // A saved look: a palette choice plus the wallpapers that go with it. The JSON
   // shape matches the Theme Switcher plugin's themes.json, so its files load as-is.
@@ -94,4 +94,4 @@ namespace noctalia::theme {
     mutable Signal<> m_changed;
   };
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

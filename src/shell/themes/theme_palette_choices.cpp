@@ -32,7 +32,7 @@ namespace themes {
       };
     }
 
-    ColorSwatchPreview previewOf(const noctalia::theme::AvailablePalette::PreviewMode& metadata) {
+    ColorSwatchPreview previewOf(const paw2shell::theme::AvailablePalette::PreviewMode& metadata) {
       ColorSwatchPreview preview;
       if (Color surface; tryParseHexColor(metadata.surface, surface)) {
         preview.surface = fixedColorSpec(surface);
@@ -45,7 +45,7 @@ namespace themes {
       return preview;
     }
 
-    ColorSwatchPreview previewOf(const noctalia::theme::AvailablePalette& palette, ThemeMode mode) {
+    ColorSwatchPreview previewOf(const paw2shell::theme::AvailablePalette& palette, ThemeMode mode) {
       if (mode == ThemeMode::Light) {
         if (auto light = previewOf(palette.preview.light); !light.empty()) {
           return light;
@@ -55,7 +55,7 @@ namespace themes {
     }
 
     std::vector<PaletteChoice>
-    fromAvailable(const std::vector<noctalia::theme::AvailablePalette>& palettes, ThemeMode mode) {
+    fromAvailable(const std::vector<paw2shell::theme::AvailablePalette>& palettes, ThemeMode mode) {
       std::vector<PaletteChoice> choices;
       choices.reserve(palettes.size());
       for (const auto& palette : palettes) {
@@ -70,7 +70,7 @@ namespace themes {
     switch (source) {
     case PaletteSource::Builtin: {
       std::vector<PaletteChoice> choices;
-      for (const auto& palette : noctalia::theme::builtinPalettes()) {
+      for (const auto& palette : paw2shell::theme::builtinPalettes()) {
         choices.push_back({
             .value = std::string(palette.name),
             .label = std::string(palette.name),
@@ -79,7 +79,7 @@ namespace themes {
       }
       // A shipped preset named like a compiled one would be unreachable, so the
       // compiled one keeps the name.
-      for (auto& choice : fromAvailable(noctalia::theme::availablePresetPalettes(), mode)) {
+      for (auto& choice : fromAvailable(paw2shell::theme::availablePresetPalettes(), mode)) {
         if (!std::ranges::contains(choices, choice.value, &PaletteChoice::value)) {
           choices.push_back(std::move(choice));
         }
@@ -99,12 +99,12 @@ namespace themes {
       return choices;
     }
     case PaletteSource::Custom:
-      return fromAvailable(noctalia::theme::availableCustomPalettes(), mode);
+      return fromAvailable(paw2shell::theme::availableCustomPalettes(), mode);
     }
     return {};
   }
 
-  ColorSwatchPreview presetPreview(const noctalia::theme::ThemePreset& preset, ThemeMode mode) {
+  ColorSwatchPreview presetPreview(const paw2shell::theme::ThemePreset& preset, ThemeMode mode) {
     if (preset.source == PaletteSource::Wallpaper) {
       return {};
     }

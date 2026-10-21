@@ -58,7 +58,7 @@
 #include <utility>
 
 namespace settings {
-  namespace schema = noctalia::config::schema;
+  namespace schema = paw2shell::config::schema;
 
   // File/Folder/Glyph carry a String value; Select an Enum; ColorSpec a Color; the rest map 1:1.
   schema::WidgetSettingType schemaTypeForControl(WidgetControlKind control) {
@@ -96,7 +96,7 @@ namespace settings {
       std::string_view (*type)();
       schema::WidgetSettingSchema (*schemaFields)();
       std::vector<WidgetSettingSpec> (*presentedSettingSpecs)();
-      const std::vector<noctalia::bar::WidgetCommonSettingOverride>& (*commonOverrides)();
+      const std::vector<paw2shell::bar::WidgetCommonSettingOverride>& (*commonOverrides)();
       std::string (*glyph)(const WidgetConfig* config);
       std::optional<std::string> (*validateConfig)(const WidgetConfig* config);
     };
@@ -116,7 +116,7 @@ namespace settings {
           .type = [] { return DefinitionAccessor().type; },
           .schemaFields = [] { return DefinitionAccessor().schemaFields(); },
           .presentedSettingSpecs = [] { return DefinitionAccessor().presentedSettingSpecs(); },
-          .commonOverrides = []() -> const std::vector<noctalia::bar::WidgetCommonSettingOverride>& {
+          .commonOverrides = []() -> const std::vector<paw2shell::bar::WidgetCommonSettingOverride>& {
             return DefinitionAccessor().commonOverrides;
           },
           .glyph = [](const WidgetConfig* config) -> std::string {
@@ -183,7 +183,7 @@ namespace settings {
     // setting is a definition bug, not a silent no-op.
     void applyCommonOverrides(
         std::vector<WidgetSettingSpec>& commonSpecs,
-        const std::vector<noctalia::bar::WidgetCommonSettingOverride>& overrides, std::string_view type
+        const std::vector<paw2shell::bar::WidgetCommonSettingOverride>& overrides, std::string_view type
     ) {
       for (const auto& entry : overrides) {
         const auto spec = std::ranges::find_if(commonSpecs, [&entry](const WidgetSettingSpec& candidate) {
@@ -610,7 +610,7 @@ namespace settings {
     auto capsuleBorder = withGroup(colorSpec("capsule_border", {}, true), "presentation");
     capsuleBorder.visibleWhen = capsuleOn;
 
-    const auto& borderWidthRange = noctalia::config::schema::kBarCapsuleBorderWidthRange;
+    const auto& borderWidthRange = paw2shell::config::schema::kBarCapsuleBorderWidthRange;
     auto capsuleBorderWidth = withGroup(
         doubleSpec(
             "capsule_border_width", static_cast<double>(Style::borderWidth), static_cast<double>(*borderWidthRange.min),
@@ -688,7 +688,7 @@ namespace settings {
         return std::string_view(spec.schema.key);
       });
       if (it != specs.end()) {
-        it->schema.defaultValue = noctalia::bar::defaultActionsForType(type, config);
+        it->schema.defaultValue = paw2shell::bar::defaultActionsForType(type, config);
       }
     }
 
@@ -888,19 +888,19 @@ namespace settings {
 
   } // namespace
 
-  noctalia::config::schema::WidgetSettingSchema widgetSettingSchema(std::string_view type) {
+  paw2shell::config::schema::WidgetSettingSchema widgetSettingSchema(std::string_view type) {
     if (auto fields = typedWidgetSettingSchema(type)) {
       return std::move(*fields);
     }
-    noctalia::config::schema::WidgetSettingSchema out;
+    paw2shell::config::schema::WidgetSettingSchema out;
     for (const auto& spec : widgetSettingSpecs(type, nullptr, "sans-serif", false)) {
       out.push_back(spec.schema);
     }
     return out;
   }
 
-  noctalia::config::schema::WidgetSettingSchema widgetSettingSchema(std::string_view type, const WidgetConfig* config) {
-    noctalia::config::schema::WidgetSettingSchema out;
+  paw2shell::config::schema::WidgetSettingSchema widgetSettingSchema(std::string_view type, const WidgetConfig* config) {
+    paw2shell::config::schema::WidgetSettingSchema out;
     if (auto fields = typedWidgetSettingSchema(type)) {
       return std::move(*fields);
     }
@@ -910,7 +910,7 @@ namespace settings {
     return out;
   }
 
-  std::optional<noctalia::config::schema::WidgetSettingField>
+  std::optional<paw2shell::config::schema::WidgetSettingField>
   findWidgetSettingField(std::string_view widgetType, std::string_view settingKey) {
     if (auto fields = typedWidgetSettingSchema(widgetType)) {
       const auto field = std::ranges::find(*fields, settingKey, &schema::WidgetSettingField::key);

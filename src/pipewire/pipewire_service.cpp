@@ -662,7 +662,7 @@ namespace {
   }
 
   [[nodiscard]] bool isAudioCaptureConsumer(const PipeWireService::NodeData& nd) {
-    return noctalia::pipewire::isPrivacyAudioCaptureConsumer({
+    return paw2shell::pipewire::isPrivacyAudioCaptureConsumer({
         .mediaClass = nd.mediaClass,
         .linkGroup = nd.linkGroup,
         .nodePassive = nd.nodePassive,
@@ -1002,15 +1002,15 @@ void PipeWireService::announceConnection() {
 
 void PipeWireService::onCoreError(std::uint32_t id, int sequence, int result, const char* message) {
   const char* const detail = message != nullptr ? message : "unknown";
-  switch (noctalia::pipewire::classifyError(id, result)) {
-  case noctalia::pipewire::ErrorDisposition::Reconnect:
+  switch (paw2shell::pipewire::classifyError(id, result)) {
+  case paw2shell::pipewire::ErrorDisposition::Reconnect:
     kLog.warn("core connection error seq={} result={} ({}): {}", sequence, result, spa_strerror(result), detail);
     m_connectionLossPending = true;
     return;
-  case noctalia::pipewire::ErrorDisposition::StaleObject:
+  case paw2shell::pipewire::ErrorDisposition::StaleObject:
     kLog.debug("request target {} seq={} no longer available: {}", id, sequence, detail);
     return;
-  case noctalia::pipewire::ErrorDisposition::Report:
+  case paw2shell::pipewire::ErrorDisposition::Report:
     break;
   }
 
@@ -2424,8 +2424,8 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
   const auto parseVolumeStepError = "error: invalid volume step (use percent like 5 or 5%, or normalized like 0.05)\n";
 
   ipc.bind(
-      noctalia::cli::msg::volumeSet, [this, maxVolume, parseVolumeValueError](const std::string& args) -> std::string {
-        const auto parts = noctalia::ipc::splitWords(args);
+      paw2shell::cli::msg::volumeSet, [this, maxVolume, parseVolumeValueError](const std::string& args) -> std::string {
+        const auto parts = paw2shell::ipc::splitWords(args);
         if (parts.size() != 1) {
           return "error: volume-set requires <value>\n";
         }
@@ -2433,7 +2433,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
         if (!sink)
           return "error: no default output\n";
 
-        const auto amount = noctalia::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
+        const auto amount = paw2shell::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
         if (!amount.has_value()) {
           return parseVolumeValueError;
         }
@@ -2444,8 +2444,8 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
   );
 
   ipc.bind(
-      noctalia::cli::msg::volumeUp, [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
-        const auto parts = noctalia::ipc::splitWords(args);
+      paw2shell::cli::msg::volumeUp, [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
+        const auto parts = paw2shell::ipc::splitWords(args);
         if (parts.size() > 1) {
           return "error: volume-up accepts at most one optional [step]\n";
         }
@@ -2454,7 +2454,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
           return "error: no default output\n";
 
         const auto step = parts.empty() ? std::optional<float>(kVolumeStepDefault)
-                                        : noctalia::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
+                                        : paw2shell::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
         if (!step.has_value()) {
           return parseVolumeStepError;
         }
@@ -2465,8 +2465,8 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
   );
 
   ipc.bind(
-      noctalia::cli::msg::volumeDown, [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
-        const auto parts = noctalia::ipc::splitWords(args);
+      paw2shell::cli::msg::volumeDown, [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
+        const auto parts = paw2shell::ipc::splitWords(args);
         if (parts.size() > 1) {
           return "error: volume-down accepts at most one optional [step]\n";
         }
@@ -2475,7 +2475,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
           return "error: no default output\n";
 
         const auto step = parts.empty() ? std::optional<float>(kVolumeStepDefault)
-                                        : noctalia::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
+                                        : paw2shell::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
         if (!step.has_value()) {
           return parseVolumeStepError;
         }
@@ -2485,7 +2485,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
       }
   );
 
-  ipc.bind(noctalia::cli::msg::volumeMute, [this](const std::string&) -> std::string {
+  ipc.bind(paw2shell::cli::msg::volumeMute, [this](const std::string&) -> std::string {
     const auto* sink = defaultSink();
     if (!sink)
       return "error: no default output\n";
@@ -2494,9 +2494,9 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
   });
 
   ipc.bind(
-      noctalia::cli::msg::micVolumeSet,
+      paw2shell::cli::msg::micVolumeSet,
       [this, maxVolume, parseVolumeValueError](const std::string& args) -> std::string {
-        const auto parts = noctalia::ipc::splitWords(args);
+        const auto parts = paw2shell::ipc::splitWords(args);
         if (parts.size() != 1) {
           return "error: mic-volume-set requires <value>\n";
         }
@@ -2504,7 +2504,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
         if (!source)
           return "error: no default input\n";
 
-        const auto amount = noctalia::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
+        const auto amount = paw2shell::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
         if (!amount.has_value()) {
           return parseVolumeValueError;
         }
@@ -2515,8 +2515,8 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
   );
 
   ipc.bind(
-      noctalia::cli::msg::micVolumeUp, [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
-        const auto parts = noctalia::ipc::splitWords(args);
+      paw2shell::cli::msg::micVolumeUp, [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
+        const auto parts = paw2shell::ipc::splitWords(args);
         if (parts.size() > 1) {
           return "error: mic-volume-up accepts at most one optional [step]\n";
         }
@@ -2525,7 +2525,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
           return "error: no default input\n";
 
         const auto step = parts.empty() ? std::optional<float>(kVolumeStepDefault)
-                                        : noctalia::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
+                                        : paw2shell::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
         if (!step.has_value()) {
           return parseVolumeStepError;
         }
@@ -2536,9 +2536,9 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
   );
 
   ipc.bind(
-      noctalia::cli::msg::micVolumeDown,
+      paw2shell::cli::msg::micVolumeDown,
       [this, maxVolume, parseVolumeStepError](const std::string& args) -> std::string {
-        const auto parts = noctalia::ipc::splitWords(args);
+        const auto parts = paw2shell::ipc::splitWords(args);
         if (parts.size() > 1) {
           return "error: mic-volume-down accepts at most one optional [step]\n";
         }
@@ -2547,7 +2547,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
           return "error: no default input\n";
 
         const auto step = parts.empty() ? std::optional<float>(kVolumeStepDefault)
-                                        : noctalia::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
+                                        : paw2shell::ipc::parseNormalizedOrPercent(parts[0], maxVolume() * 100.0F);
         if (!step.has_value()) {
           return parseVolumeStepError;
         }
@@ -2557,7 +2557,7 @@ void PipeWireService::registerIpc(IpcService& ipc, const ConfigService& config) 
       }
   );
 
-  ipc.bind(noctalia::cli::msg::micMute, [this](const std::string&) -> std::string {
+  ipc.bind(paw2shell::cli::msg::micMute, [this](const std::string&) -> std::string {
     const auto* source = defaultSource();
     if (!source)
       return "error: no default input\n";

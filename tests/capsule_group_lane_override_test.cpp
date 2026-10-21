@@ -44,7 +44,7 @@ int main() {
 start = [ "clock", "weather" ]
 )");
 
-  ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (root / "state").c_str(), 1);
 
   const std::vector<std::string> lanePath{"bar", "default", "start"};

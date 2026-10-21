@@ -27,7 +27,7 @@ namespace {
     return true;
   }
 
-  bool expectTemp(const noctalia::system::cpu_temp::ProbeResult& result, double expected, const std::string& message) {
+  bool expectTemp(const paw2shell::system::cpu_temp::ProbeResult& result, double expected, const std::string& message) {
     if (!result.reading.has_value()) {
       fail(message + ": no reading; error=" + result.error);
       return false;
@@ -82,9 +82,9 @@ namespace {
     writeText(zone / "temp", std::to_string(raw));
   }
 
-  noctalia::system::cpu_temp::ProbeResult
+  paw2shell::system::cpu_temp::ProbeResult
   readFixture(const std::filesystem::path& root, const std::string& configuredPath = "") {
-    return noctalia::system::cpu_temp::read(root / "hwmon", root / "thermal", configuredPath);
+    return paw2shell::system::cpu_temp::read(root / "hwmon", root / "thermal", configuredPath);
   }
 
   void checkAmdPrefersTctl() {

@@ -1896,7 +1896,7 @@
             "label": "Témamód megváltozásakor"
           },
           "wallpaper-changed": {
-            "description": "A háttérkép váltásakor futtatandó parancs; megadja a NOCTALIA_WALLPAPER_PATH és a\nNOCTALIA_WALLPAPER_CONNECTOR változókat",
+            "description": "A háttérkép váltásakor futtatandó parancs; megadja a PAW2_SHELL_WALLPAPER_PATH és a\nPAW2_SHELL_WALLPAPER_CONNECTOR változókat",
             "label": "Háttérkép változásakor"
           },
           "wifi-disabled": {

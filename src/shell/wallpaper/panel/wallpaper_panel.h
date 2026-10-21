@@ -32,7 +32,7 @@ class VirtualGridView;
 class WallpaperGridAdapter;
 class WaylandConnection;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   class ThemeService;
 }
 
@@ -48,7 +48,7 @@ public:
 
   WallpaperPanel(
       WaylandConnection* wayland, ConfigService* config, ThumbnailService* thumbnails, WallpaperScanner* scanner,
-      noctalia::theme::ThemeService* themeService = nullptr
+      paw2shell::theme::ThemeService* themeService = nullptr
   );
 
   // Chosen wallpaper paths, or none when the choice was cancelled.
@@ -131,7 +131,7 @@ private:
   ConfigService* m_config = nullptr;
   ThumbnailService* m_thumbnails = nullptr;
   WallpaperScanner* m_scanner = nullptr;
-  noctalia::theme::ThemeService* m_themeService = nullptr;
+  paw2shell::theme::ThemeService* m_themeService = nullptr;
 
   // Scene nodes owned by root(); onClose() drops them all at once.
   struct Ui {

@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/media_widget.h"
 
-[[nodiscard]] const noctalia::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefinition();
+[[nodiscard]] const paw2shell::bar::WidgetDefinition<MediaWidget::Options>& mediaWidgetDefinition();

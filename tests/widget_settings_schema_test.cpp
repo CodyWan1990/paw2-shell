@@ -20,8 +20,8 @@ namespace {
     return condition;
   }
 
-  bool hasKey(const noctalia::config::schema::WidgetSettingSchema& schema, std::string_view key) {
-    return std::ranges::any_of(schema, [&](const noctalia::config::schema::WidgetSettingField& field) {
+  bool hasKey(const paw2shell::config::schema::WidgetSettingSchema& schema, std::string_view key) {
+    return std::ranges::any_of(schema, [&](const paw2shell::config::schema::WidgetSettingField& field) {
       return field.key == key;
     });
   }

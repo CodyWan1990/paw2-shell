@@ -52,7 +52,7 @@ int main() {
   std::filesystem::remove_all(root);
   writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", "[dock]\nenabled = true\nmonitors = [\"legacy\"]\n");
 
-  ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (root / "state").c_str(), 1);
 
   const std::vector<std::string> typePath{"calendar", "account", "feed", "type"};
@@ -133,7 +133,7 @@ int main() {
   writeFile(
       overlayRoot / "state" / FileUtils::kAppDirName / "settings.toml", "config_version = 14\n[dock]\nmonitors = [\"DP-1\"]\n"
   );
-  ::setenv("NOCTALIA_CONFIG_HOME", (overlayRoot / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (overlayRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (overlayRoot / "state").c_str(), 1);
   {
     ConfigService config;
@@ -154,7 +154,7 @@ int main() {
       inheritRoot / "config" / FileUtils::kAppDirName / "config.toml",
       "[bar.default]\nshow_tooltip = false\n\n[widget.clock]\ntype = \"clock\"\n"
   );
-  ::setenv("NOCTALIA_CONFIG_HOME", (inheritRoot / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (inheritRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (inheritRoot / "state").c_str(), 1);
   {
     ConfigService config;
@@ -169,7 +169,7 @@ int main() {
   // panel open without a source bar (IPC, shortcuts) fails on the stale name. Deleting it clears the key.
   const std::filesystem::path anchorRoot = root / "anchor-bar-case";
   writeFile(anchorRoot / "config" / FileUtils::kAppDirName / "config.toml", "");
-  ::setenv("NOCTALIA_CONFIG_HOME", (anchorRoot / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (anchorRoot / "config").c_str(), 1);
   ::setenv("XDG_STATE_HOME", (anchorRoot / "state").c_str(), 1);
   {
     ConfigService config;

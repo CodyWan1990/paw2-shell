@@ -29,7 +29,7 @@
 #include <system_error>
 #include <utility>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -745,12 +745,12 @@ namespace noctalia::theme {
   }
 
   void ThemeService::registerIpc(IpcService& ipc) {
-    ipc.bind(noctalia::cli::msg::themeModeToggle, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeModeToggle, [this](const std::string&) -> std::string {
       toggleLightDark();
       return "ok\n";
     });
     ipc.bind(
-        noctalia::cli::msg::themeModeGet,
+        paw2shell::cli::msg::themeModeGet,
         [this](const std::string&) -> std::string {
           std::string out(resolvedMode());
           out.push_back('\n');
@@ -758,7 +758,7 @@ namespace noctalia::theme {
         },
         IpcService::HandlerOptions{.actionEditorVisibility = IpcService::ActionEditorVisibility::Hidden}
     );
-    ipc.bind(noctalia::cli::msg::themeModeSet, [this](const std::string& args) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeModeSet, [this](const std::string& args) -> std::string {
       const std::string token = StringUtils::trim(args);
       const auto mode = enumFromKey(kThemeModes, token);
       if (!mode.has_value()) {
@@ -768,11 +768,11 @@ namespace noctalia::theme {
       return "ok\n";
     });
     ipc.bind(
-        noctalia::cli::msg::colorSchemeGet,
+        paw2shell::cli::msg::colorSchemeGet,
         [this](const std::string&) -> std::string { return formatColorSchemeLine(m_config.config().theme); },
         IpcService::HandlerOptions{.actionEditorVisibility = IpcService::ActionEditorVisibility::Hidden}
     );
-    ipc.bind(noctalia::cli::msg::colorSchemeSet, [this](const std::string& args) -> std::string {
+    ipc.bind(paw2shell::cli::msg::colorSchemeSet, [this](const std::string& args) -> std::string {
       PaletteSource source = PaletteSource::Builtin;
       std::string value;
       std::string error;
@@ -786,4 +786,4 @@ namespace noctalia::theme {
     });
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

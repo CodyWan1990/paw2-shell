@@ -31,9 +31,9 @@ namespace {
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("PAW2_SHELL_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("PAW2_SHELL_DATA_HOME", (root / "data").c_str(), 1);
 
     {
       std::ofstream out(root / "config" / FileUtils::kAppDirName / "config.toml", std::ios::trunc);
@@ -53,9 +53,9 @@ namespace {
         "config.toml path was dropped by the first sidecar write"
     );
 
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("PAW2_SHELL_CONFIG_HOME");
+    ::unsetenv("PAW2_SHELL_STATE_HOME");
+    ::unsetenv("PAW2_SHELL_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -67,9 +67,9 @@ namespace {
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("PAW2_SHELL_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("PAW2_SHELL_DATA_HOME", (root / "data").c_str(), 1);
 
     {
       std::ofstream out(root / "config" / FileUtils::kAppDirName / "config.toml", std::ios::trunc);
@@ -87,9 +87,9 @@ namespace {
     expect(config.getWallpaperPath("DP-9") == "/tmp/dp9.png", "per-monitor path did not survive a reload");
     expect(config.getWallpaperPath("DP-8") == "/tmp/picked.png", "unconfigured monitor did not fall back to default");
 
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("PAW2_SHELL_CONFIG_HOME");
+    ::unsetenv("PAW2_SHELL_STATE_HOME");
+    ::unsetenv("PAW2_SHELL_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -102,26 +102,26 @@ namespace {
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
-    ::setenv("NOCTALIA_WP_TEST", "/tmp/wp-root", 1);
+    ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("PAW2_SHELL_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("PAW2_SHELL_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("PAW2_SHELL_WP_TEST", "/tmp/wp-root", 1);
 
     {
       std::ofstream out(root / "config" / FileUtils::kAppDirName / "config.toml", std::ios::trunc);
-      out << "[wallpaper]\nenabled = true\ndirectory = \"$NOCTALIA_WP_TEST/pics\"\n";
+      out << "[wallpaper]\nenabled = true\ndirectory = \"$PAW2_SHELL_WP_TEST/pics\"\n";
     }
 
     ConfigService config;
     expect(
         config.config().wallpaper.directory == "/tmp/wp-root/pics",
-        "wallpaper.directory did not expand $NOCTALIA_WP_TEST"
+        "wallpaper.directory did not expand $PAW2_SHELL_WP_TEST"
     );
 
-    ::unsetenv("NOCTALIA_WP_TEST");
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("PAW2_SHELL_WP_TEST");
+    ::unsetenv("PAW2_SHELL_CONFIG_HOME");
+    ::unsetenv("PAW2_SHELL_STATE_HOME");
+    ::unsetenv("PAW2_SHELL_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 
@@ -134,9 +134,9 @@ namespace {
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "data");
-    ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-    ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-    ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+    ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
+    ::setenv("PAW2_SHELL_STATE_HOME", (root / "state").c_str(), 1);
+    ::setenv("PAW2_SHELL_DATA_HOME", (root / "data").c_str(), 1);
 
     {
       std::ofstream out(root / "state" / FileUtils::kAppDirName / "settings.toml", std::ios::trunc);
@@ -159,9 +159,9 @@ namespace {
     );
     expect(config.config().theme.mode == ThemeMode::Light, "favorite theme_mode was not applied");
 
-    ::unsetenv("NOCTALIA_CONFIG_HOME");
-    ::unsetenv("NOCTALIA_STATE_HOME");
-    ::unsetenv("NOCTALIA_DATA_HOME");
+    ::unsetenv("PAW2_SHELL_CONFIG_HOME");
+    ::unsetenv("PAW2_SHELL_STATE_HOME");
+    ::unsetenv("PAW2_SHELL_DATA_HOME");
     std::filesystem::remove_all(root);
   }
 

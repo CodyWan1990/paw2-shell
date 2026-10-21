@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/privacy_widget.h"
 
-[[nodiscard]] const noctalia::bar::WidgetDefinition<PrivacyWidget::Options>& privacyWidgetDefinition();
+[[nodiscard]] const paw2shell::bar::WidgetDefinition<PrivacyWidget::Options>& privacyWidgetDefinition();

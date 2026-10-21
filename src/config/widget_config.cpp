@@ -9,7 +9,7 @@
 #include <utility>
 #include <vector>
 
-namespace noctalia::config {
+namespace paw2shell::config {
 
   std::optional<WidgetSettingValue> readWidgetSettingValue(const toml::node& node) {
     if (const auto* stringValue = node.as_string()) {
@@ -203,4 +203,4 @@ namespace noctalia::config {
     return wc;
   }
 
-} // namespace noctalia::config
+} // namespace paw2shell::config

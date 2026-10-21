@@ -30,7 +30,7 @@ struct wl_output;
 class ThemeEditorPanel : public Panel {
 public:
   ThemeEditorPanel(
-      noctalia::theme::ThemePresetService* presets, ConfigService* config, ScreenshotService* screenshots,
+      paw2shell::theme::ThemePresetService* presets, ConfigService* config, ScreenshotService* screenshots,
       std::function<wl_output*()> captureOutput, AsyncTextureCache* textures
   );
 
@@ -64,7 +64,7 @@ private:
   static void backToThemes();
   static void resumeEditing();
 
-  noctalia::theme::ThemePresetService* m_presets = nullptr;
+  paw2shell::theme::ThemePresetService* m_presets = nullptr;
   ConfigService* m_config = nullptr;
   ScreenshotService* m_screenshots = nullptr;
   std::function<wl_output*()> m_captureOutput;
@@ -72,7 +72,7 @@ private:
 
   // Kept across close and reopen so picking wallpapers or capturing the
   // desktop does not lose the edit.
-  noctalia::theme::ThemePreset m_draft;
+  paw2shell::theme::ThemePreset m_draft;
   bool m_editingExisting = false;
   bool m_confirmingDelete = false;
   std::vector<themes::PaletteChoice> m_choices;

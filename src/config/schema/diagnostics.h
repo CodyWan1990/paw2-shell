@@ -8,7 +8,7 @@
 #include <utility>
 #include <vector>
 
-namespace noctalia::config::schema {
+namespace paw2shell::config::schema {
 
   // Where a config key was defined. An empty `file` means the position is
   // unknown, e.g. a key no source file sets or a value synthesized in memory.
@@ -189,4 +189,4 @@ namespace noctalia::config::schema {
     return out;
   }
 
-} // namespace noctalia::config::schema
+} // namespace paw2shell::config::schema

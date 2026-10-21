@@ -1,6 +1,6 @@
 #pragma once
 
-namespace noctalia::launcher {
+namespace paw2shell::launcher {
 
   // `noctalia dmenu` — stdin/stdout drop-in. Reads newline-separated candidates from
   // stdin, asks the running shell to present them in the launcher, and prints the
@@ -8,4 +8,4 @@ namespace noctalia::launcher {
   // exits 1. Options: -p <prompt> (optional label, unused by the shell UI today).
   int runDmenuCli(int argc, char** argv);
 
-} // namespace noctalia::launcher
+} // namespace paw2shell::launcher

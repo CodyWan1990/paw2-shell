@@ -26,7 +26,7 @@
 #include <unistd.h>
 #include <vector>
 
-namespace noctalia::config {
+namespace paw2shell::config {
   namespace {
 
     struct ReplayOptions {
@@ -312,7 +312,7 @@ namespace noctalia::config {
       std::println();
       std::println("Run with:");
       std::println(
-          "  NOCTALIA_CONFIG_HOME={} NOCTALIA_STATE_HOME={} {}", StringUtils::shellQuote(configHome.string()),
+          "  PAW2_SHELL_CONFIG_HOME={} PAW2_SHELL_STATE_HOME={} {}", StringUtils::shellQuote(configHome.string()),
           StringUtils::shellQuote(stateHome.string()), StringUtils::shellQuote(argv0)
       );
       return 0;
@@ -476,4 +476,4 @@ namespace noctalia::config {
     return 1;
   }
 
-} // namespace noctalia::config
+} // namespace paw2shell::config

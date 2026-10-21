@@ -222,7 +222,7 @@ const WidgetSettingValue* WidgetConfig::findSetting(const std::string& key) cons
 
 std::string WidgetConfig::getString(const std::string& key, const std::string& fallback) const {
   const auto* value = findSetting(key);
-  const auto decoded = value != nullptr ? noctalia::config::widgetSettingValueAs<std::string>(*value) : std::nullopt;
+  const auto decoded = value != nullptr ? paw2shell::config::widgetSettingValueAs<std::string>(*value) : std::nullopt;
   return decoded.value_or(fallback);
 }
 
@@ -230,25 +230,25 @@ std::vector<std::string>
 WidgetConfig::getStringList(const std::string& key, const std::vector<std::string>& fallback) const {
   const auto* value = findSetting(key);
   const auto decoded =
-      value != nullptr ? noctalia::config::widgetSettingValueAs<std::vector<std::string>>(*value) : std::nullopt;
+      value != nullptr ? paw2shell::config::widgetSettingValueAs<std::vector<std::string>>(*value) : std::nullopt;
   return decoded.value_or(fallback);
 }
 
 std::int64_t WidgetConfig::getInt(const std::string& key, std::int64_t fallback) const {
   const auto* value = findSetting(key);
-  const auto decoded = value != nullptr ? noctalia::config::widgetSettingValueAs<std::int64_t>(*value) : std::nullopt;
+  const auto decoded = value != nullptr ? paw2shell::config::widgetSettingValueAs<std::int64_t>(*value) : std::nullopt;
   return decoded.value_or(fallback);
 }
 
 double WidgetConfig::getDouble(const std::string& key, double fallback) const {
   const auto* value = findSetting(key);
-  const auto decoded = value != nullptr ? noctalia::config::widgetSettingValueAs<double>(*value) : std::nullopt;
+  const auto decoded = value != nullptr ? paw2shell::config::widgetSettingValueAs<double>(*value) : std::nullopt;
   return decoded.value_or(fallback);
 }
 
 bool WidgetConfig::getBool(const std::string& key, bool fallback) const {
   const auto* value = findSetting(key);
-  const auto decoded = value != nullptr ? noctalia::config::widgetSettingValueAs<bool>(*value) : std::nullopt;
+  const auto decoded = value != nullptr ? paw2shell::config::widgetSettingValueAs<bool>(*value) : std::nullopt;
   return decoded.value_or(fallback);
 }
 
@@ -256,7 +256,7 @@ ColorSpec
 WidgetConfig::getColorSpec(const std::string& key, const ColorSpec& fallback, std::string_view context) const {
   const auto* value = findSetting(key);
   const auto decoded = value != nullptr
-      ? noctalia::config::widgetSettingValueAs<ColorSpec>(*value, context.empty() ? std::string_view(key) : context)
+      ? paw2shell::config::widgetSettingValueAs<ColorSpec>(*value, context.empty() ? std::string_view(key) : context)
       : std::nullopt;
   return decoded.value_or(fallback);
 }
@@ -271,7 +271,7 @@ std::optional<ColorSpec> WidgetConfig::getOptionalColorSpec(const std::string& k
       return std::nullopt;
     }
   }
-  return noctalia::config::widgetSettingValueAs<ColorSpec>(*value, context.empty() ? std::string_view(key) : context);
+  return paw2shell::config::widgetSettingValueAs<ColorSpec>(*value, context.empty() ? std::string_view(key) : context);
 }
 
 std::unordered_map<std::string, std::string>
@@ -391,9 +391,9 @@ WidgetBarCapsuleSpec resolveWidgetBarCapsuleSpec(const BarConfig& bar, const Wid
   }
   spec.borderWidth = bar.widgetCapsuleBorderWidth;
   if (widget != nullptr && widget->hasSetting("capsule_border_width")) {
-    spec.borderWidth = noctalia::config::schema::applyRange(
+    spec.borderWidth = paw2shell::config::schema::applyRange(
         static_cast<float>(widget->getDouble("capsule_border_width", static_cast<double>(spec.borderWidth))),
-        noctalia::config::schema::kBarCapsuleBorderWidthRange
+        paw2shell::config::schema::kBarCapsuleBorderWidthRange
     );
   }
   spec.opacity = bar.widgetCapsuleOpacity;

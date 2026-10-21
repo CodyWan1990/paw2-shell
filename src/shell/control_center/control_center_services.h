@@ -34,7 +34,7 @@ class Wallpaper;
 class WeatherService;
 class GammaService;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   class ThemeService;
 }
 struct ControlCenterServices {
@@ -58,7 +58,7 @@ struct ControlCenterServices {
   SystemMonitorService* sysmon = nullptr;
   ScreenTimeService* screenTime = nullptr;
   GammaService* nightLight = nullptr;
-  noctalia::theme::ThemeService* theme = nullptr;
+  paw2shell::theme::ThemeService* theme = nullptr;
   IdleInhibitor* idleInhibitor = nullptr;
   DependencyService* dependencies = nullptr;
   CompositorPlatform* platform = nullptr;

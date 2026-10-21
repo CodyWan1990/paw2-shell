@@ -5,7 +5,7 @@
 #include <string_view>
 #include <vector>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   struct GeneratedPalette;
 
@@ -41,4 +41,4 @@ namespace noctalia::theme {
       std::string_view name, const GeneratedPalette& palette, std::string* errorOut = nullptr
   );
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

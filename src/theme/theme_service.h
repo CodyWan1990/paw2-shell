@@ -20,7 +20,7 @@
 class ConfigService;
 class IpcService;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   class ThemeService {
   public:
@@ -138,4 +138,4 @@ namespace noctalia::theme {
     Timer m_autoTimer;
   };
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

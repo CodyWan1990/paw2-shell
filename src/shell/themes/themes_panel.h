@@ -20,7 +20,7 @@ class Renderer;
 class ScrollView;
 class Segmented;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   class ThemePresetService;
 }
 
@@ -29,7 +29,7 @@ namespace noctalia::theme {
 // without touching the palette. Editing happens in ThemeEditorPanel.
 class ThemesPanel : public Panel {
 public:
-  ThemesPanel(noctalia::theme::ThemePresetService* presets, ConfigService* config, AsyncTextureCache* textures);
+  ThemesPanel(paw2shell::theme::ThemePresetService* presets, ConfigService* config, AsyncTextureCache* textures);
 
   void create() override;
   void onOpen(std::string_view context) override;
@@ -66,7 +66,7 @@ private:
   void setView(View view);
   static void openEditor(std::string_view id);
 
-  noctalia::theme::ThemePresetService* m_presets = nullptr;
+  paw2shell::theme::ThemePresetService* m_presets = nullptr;
   ConfigService* m_config = nullptr;
   AsyncTextureCache* m_textures = nullptr;
 

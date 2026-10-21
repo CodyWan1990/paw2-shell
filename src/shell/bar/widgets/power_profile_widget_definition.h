@@ -4,4 +4,4 @@
 
 #include <variant>
 
-[[nodiscard]] const noctalia::bar::WidgetDefinition<std::monostate>& powerProfileWidgetDefinition();
+[[nodiscard]] const paw2shell::bar::WidgetDefinition<std::monostate>& powerProfileWidgetDefinition();

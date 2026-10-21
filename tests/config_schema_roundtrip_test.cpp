@@ -26,7 +26,7 @@
 #include <sstream>
 #include <string>
 
-using namespace noctalia::config::schema;
+using namespace paw2shell::config::schema;
 
 namespace {
 

@@ -68,7 +68,7 @@ namespace {
   }
 
   bool blurTraceEnabled() {
-    static const bool enabled = SysUtils::isEnvFlagOn("NOCTALIA_BLUR_TRACE");
+    static const bool enabled = SysUtils::isEnvFlagOn("PAW2_SHELL_BLUR_TRACE");
     return enabled;
   }
 
@@ -2760,7 +2760,7 @@ void PanelManager::registerIpc(IpcService& ipc) {
   };
 
   ipc.bind(
-      noctalia::cli::msg::panelToggle,
+      paw2shell::cli::msg::panelToggle,
       [this, parseOpenArgs, unknownPanelError](const std::string& args) -> std::string {
         std::string panelId;
         std::string context;
@@ -2781,7 +2781,7 @@ void PanelManager::registerIpc(IpcService& ipc) {
   );
 
   ipc.bind(
-      noctalia::cli::msg::panelOpen, [this, parseOpenArgs, unknownPanelError](const std::string& args) -> std::string {
+      paw2shell::cli::msg::panelOpen, [this, parseOpenArgs, unknownPanelError](const std::string& args) -> std::string {
         std::string panelId;
         std::string context;
         if (auto error = parseOpenArgs(args, "panel-open", panelId, context)) {
@@ -2805,7 +2805,7 @@ void PanelManager::registerIpc(IpcService& ipc) {
       }
   );
 
-  ipc.bind(noctalia::cli::msg::panelClose, [this, unknownPanelError](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::panelClose, [this, unknownPanelError](const std::string& args) -> std::string {
     const std::string panelId = StringUtils::trim(args);
     if (!panelId.empty() && StringUtils::splitWhitespace(panelId).size() != 1) {
       return "error: panel-close accepts at most one panel id\n";
@@ -2831,13 +2831,13 @@ void PanelManager::registerIpc(IpcService& ipc) {
     return std::format("error: {} accepts no arguments\n", command);
   };
 
-  ipc.bind(noctalia::cli::msg::settingsOpen, [this](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::settingsOpen, [this](const std::string& args) -> std::string {
     openSettingsWindow(std::string(StringUtils::trimLeftView(args)));
     return "ok\n";
   });
 
-  ipc.bind(noctalia::cli::msg::settingsOpenWidget, [this, &ipc](const std::string& args) -> std::string {
-    const auto parts = noctalia::ipc::splitWords(args);
+  ipc.bind(paw2shell::cli::msg::settingsOpenWidget, [this, &ipc](const std::string& args) -> std::string {
+    const auto parts = paw2shell::ipc::splitWords(args);
     std::string barName;
     std::string widgetName;
     if (parts.size() == 2) {
@@ -2865,7 +2865,7 @@ void PanelManager::registerIpc(IpcService& ipc) {
     return "ok\n";
   });
 
-  ipc.bind(noctalia::cli::msg::settingsClose, [this, rejectSettingsArgs](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::settingsClose, [this, rejectSettingsArgs](const std::string& args) -> std::string {
     if (auto error = rejectSettingsArgs(args, "settings-close")) {
       return *error;
     }
@@ -2873,7 +2873,7 @@ void PanelManager::registerIpc(IpcService& ipc) {
     return "ok\n";
   });
 
-  ipc.bind(noctalia::cli::msg::settingsToggle, [this](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::settingsToggle, [this](const std::string& args) -> std::string {
     toggleSettingsWindow(std::string(StringUtils::trimLeftView(args)));
     return "ok\n";
   });

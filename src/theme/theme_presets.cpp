@@ -13,7 +13,7 @@
 #include <sstream>
 #include <system_error>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -317,35 +317,35 @@ namespace noctalia::theme {
   }
 
   void ThemePresetService::registerIpc(IpcService& ipc) {
-    ipc.bind(noctalia::cli::msg::themeList, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeList, [this](const std::string&) -> std::string {
       std::ostringstream out;
       for (const auto& preset : m_presets) {
         out << (preset.id == m_lastAppliedId ? "* " : "  ") << preset.id << '\t' << preset.title << '\n';
       }
       return out.str();
     });
-    ipc.bind(noctalia::cli::msg::themeApply, [this](const std::string& args) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeApply, [this](const std::string& args) -> std::string {
       const ThemePreset* preset = find(args);
       if (preset == nullptr) {
         return "error: no theme matches \"" + StringUtils::trim(args) + "\" (see theme-list)\n";
       }
       return apply(preset->id) ? ok(preset->id) : "error: theme could not be applied\n";
     });
-    ipc.bind(noctalia::cli::msg::themeNext, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeNext, [this](const std::string&) -> std::string {
       return applyAdjacent(1) ? ok(m_lastAppliedId) : "error: no themes saved\n";
     });
-    ipc.bind(noctalia::cli::msg::themePrevious, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themePrevious, [this](const std::string&) -> std::string {
       return applyAdjacent(-1) ? ok(m_lastAppliedId) : "error: no themes saved\n";
     });
-    ipc.bind(noctalia::cli::msg::themeWallpaperNext, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeWallpaperNext, [this](const std::string&) -> std::string {
       return cycleWallpaper(1) ? ok() : "error: the applied theme has no wallpapers\n";
     });
-    ipc.bind(noctalia::cli::msg::themeWallpaperPrevious, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeWallpaperPrevious, [this](const std::string&) -> std::string {
       return cycleWallpaper(-1) ? ok() : "error: the applied theme has no wallpapers\n";
     });
-    ipc.bind(noctalia::cli::msg::themeWallpaperRandom, [this](const std::string&) -> std::string {
+    ipc.bind(paw2shell::cli::msg::themeWallpaperRandom, [this](const std::string&) -> std::string {
       return randomWallpaper() ? ok() : "error: the applied theme has no wallpapers\n";
     });
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

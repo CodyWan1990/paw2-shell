@@ -53,7 +53,7 @@ namespace {
 } // namespace
 
 ThemeEditorPanel::ThemeEditorPanel(
-    noctalia::theme::ThemePresetService* presets, ConfigService* config, ScreenshotService* screenshots,
+    paw2shell::theme::ThemePresetService* presets, ConfigService* config, ScreenshotService* screenshots,
     std::function<wl_output*()> captureOutput, AsyncTextureCache* textures
 )
     : m_presets(presets), m_config(config), m_screenshots(screenshots), m_captureOutput(std::move(captureOutput)),
@@ -209,7 +209,7 @@ void ThemeEditorPanel::onOpen(std::string_view context) {
   if (context != "resume") {
     const auto* existing = m_presets != nullptr ? m_presets->byId(context) : nullptr;
     m_editingExisting = existing != nullptr;
-    m_draft = existing != nullptr ? *existing : noctalia::theme::ThemePreset{};
+    m_draft = existing != nullptr ? *existing : paw2shell::theme::ThemePreset{};
     if (existing == nullptr && m_config != nullptr) {
       // A new theme starts from the look on screen now.
       const auto& theme = m_config->config().theme;

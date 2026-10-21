@@ -590,8 +590,8 @@ void Application::initStyleThemeAndWayland() {
   });
 
   m_themeService.setResolvedCallback([this, lastResolvedThemeMode = std::optional<std::string>{},
-                                      lastGeneratedPalette = std::optional<noctalia::theme::GeneratedPalette>{}](
-                                         const noctalia::theme::GeneratedPalette& generated, std::string_view mode
+                                      lastGeneratedPalette = std::optional<paw2shell::theme::GeneratedPalette>{}](
+                                         const paw2shell::theme::GeneratedPalette& generated, std::string_view mode
                                      ) mutable {
     const std::string resolvedMode(mode);
     const std::string configuredMode(enumToKey(kThemeModes, m_themeService.configuredMode()));
@@ -601,15 +601,15 @@ void Application::initStyleThemeAndWayland() {
     lastGeneratedPalette = generated;
     m_settingsWindow.setResolvedPalette(generated, mode);
     const ::Palette palette =
-        noctalia::theme::mapGeneratedPaletteMode(mode == "light" ? generated.light : generated.dark);
+        paw2shell::theme::mapGeneratedPaletteMode(mode == "light" ? generated.light : generated.dark);
     m_paw2ThemeSync.setColors(palette.primary, palette.surfaceVariant, palette.shadow, palette.surface);
     m_templateApplyService.apply(generated, mode, /*force=*/false, /*paletteChanged=*/colorsChanged);
     if (previousMode.has_value() && *previousMode != resolvedMode) {
       m_hookManager.fire(
           HookKind::ThemeModeChanged,
-          {{"NOCTALIA_THEME_MODE", resolvedMode},
-           {"NOCTALIA_THEME_MODE_PREVIOUS", *previousMode},
-           {"NOCTALIA_THEME_MODE_CONFIGURED", configuredMode}}
+          {{"PAW2_SHELL_THEME_MODE", resolvedMode},
+           {"PAW2_SHELL_THEME_MODE_PREVIOUS", *previousMode},
+           {"PAW2_SHELL_THEME_MODE_CONFIGURED", configuredMode}}
       );
     }
   });
@@ -844,7 +844,7 @@ void Application::initAuxServicesAndHooks() {
     }
     const auto fireWallpaperChangedHook = [this](const std::string& path, const std::string& connector) {
       m_hookManager.fire(
-          HookKind::WallpaperChanged, {{"NOCTALIA_WALLPAPER_PATH", path}, {"NOCTALIA_WALLPAPER_CONNECTOR", connector}}
+          HookKind::WallpaperChanged, {{"PAW2_SHELL_WALLPAPER_PATH", path}, {"PAW2_SHELL_WALLPAPER_CONNECTOR", connector}}
       );
     };
     if (wallpaperChanges.empty()) {

@@ -17,14 +17,14 @@ class WeatherService;
 class HttpClient;
 class ClipboardService;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   class ThemeService;
 }
 struct ShortcutServices {
   INetworkService* network = nullptr;
   BluetoothService* bluetooth = nullptr;
   GammaService* nightLight = nullptr;
-  noctalia::theme::ThemeService* theme = nullptr;
+  paw2shell::theme::ThemeService* theme = nullptr;
   NotificationManager* notifications = nullptr;
   IdleInhibitor* idleInhibitor = nullptr;
   PipeWireService* audio = nullptr;

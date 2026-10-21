@@ -56,7 +56,7 @@ class Wallpaper;
 class WeatherService;
 class ClipboardService;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   class ThemeService;
 }
 class AccountsService;

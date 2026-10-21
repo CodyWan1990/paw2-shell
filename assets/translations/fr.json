@@ -1922,7 +1922,7 @@
             "label": "Lors du changement de mode du thème"
           },
           "wallpaper-changed": {
-            "description": "Commande à exécuter lorsque le fond d’écran change;  fourni NOCTALIA_WALLPAPER_PATH et NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Commande à exécuter lorsque le fond d’écran change;  fourni PAW2_SHELL_WALLPAPER_PATH et PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "Lors du changement de fond d’écran"
           },
           "wifi-disabled": {

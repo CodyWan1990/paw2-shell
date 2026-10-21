@@ -1590,7 +1590,7 @@
             "label": "Przy zmianie motywu"
           },
           "wallpaper-changed": {
-            "description": "Polecenie do uruchomienia gdy zmienia się tapeta; dostarcza NOCTALIA_WALLPAPER_PATH oraz NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Polecenie do uruchomienia gdy zmienia się tapeta; dostarcza PAW2_SHELL_WALLPAPER_PATH oraz PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "Przy zmianie tapety"
           },
           "wifi-disabled": {

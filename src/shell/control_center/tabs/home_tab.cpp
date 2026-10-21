@@ -115,7 +115,7 @@ namespace {
 
   std::string userHostLine() { return std::format("{}@{}", sessionUserName(), hostName()); }
 
-  std::string noctaliaVersionLine() { return std::format("Noctalia {}", noctalia::build_info::displayVersion()); }
+  std::string noctaliaVersionLine() { return std::format("Noctalia {}", paw2shell::build_info::displayVersion()); }
 
   void applyShortcutButtonStyle(Button& button, bool enabled, bool active, float fillOpacity) {
     const bool on = enabled && active;

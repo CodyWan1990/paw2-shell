@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/text_widget.h"
 
-[[nodiscard]] const noctalia::bar::WidgetDefinition<TextWidget::Options>& textWidgetDefinition();
+[[nodiscard]] const paw2shell::bar::WidgetDefinition<TextWidget::Options>& textWidgetDefinition();

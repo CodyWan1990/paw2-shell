@@ -119,7 +119,7 @@ namespace {
     ok = expect(!permissionsError, "sets restrictive kdeglobals permissions") && ok;
 
     std::string error;
-    const bool merged = noctalia::theme::mergeKdeColorScheme(scheme, globals, &error);
+    const bool merged = paw2shell::theme::mergeKdeColorScheme(scheme, globals, &error);
     ok = expect(merged, error) && ok;
     ok = expect(keyValue(globals, "General", "ExistingKey") == "keep", "preserves an unrelated key") && ok;
     ok = expect(keyValue(globals, "General", "ColorScheme") == "Noctalia", "replaces the active scheme") && ok;
@@ -159,7 +159,7 @@ namespace {
     ok = expect(writeFile(globals, original), "writes protected kdeglobals fixture") && ok;
 
     std::string error;
-    ok = expect(!noctalia::theme::mergeKdeColorScheme(scheme, globals, &error), "rejects a malformed scheme") && ok;
+    ok = expect(!paw2shell::theme::mergeKdeColorScheme(scheme, globals, &error), "rejects a malformed scheme") && ok;
     ok = expect(!error.empty(), "reports the malformed scheme error") && ok;
     ok = expect(readFile(globals) == original, "does not overwrite kdeglobals after a parse failure") && ok;
     return ok;
@@ -173,7 +173,7 @@ namespace {
 
     std::string error;
     const bool merged =
-        noctalia::theme::mergeKdeColorScheme(root.path / "missing.colors", root.path / "kdeglobals", &error);
+        paw2shell::theme::mergeKdeColorScheme(root.path / "missing.colors", root.path / "kdeglobals", &error);
     return expect(!merged, "rejects a missing scheme")
         && expect(!error.empty(), "reports the missing scheme error")
         && expect(!std::filesystem::exists(root.path / "kdeglobals"), "does not create kdeglobals for missing input");
@@ -189,7 +189,7 @@ namespace {
     const auto globals = root.path / "kdeglobals";
     bool ok = expect(writeFile(scheme, "# no color groups\n"), "writes empty scheme fixture");
     std::string error;
-    ok = expect(!noctalia::theme::mergeKdeColorScheme(scheme, globals, &error), "rejects an empty scheme") && ok;
+    ok = expect(!paw2shell::theme::mergeKdeColorScheme(scheme, globals, &error), "rejects an empty scheme") && ok;
     ok = expect(!error.empty(), "reports the empty scheme error") && ok;
     ok = expect(!std::filesystem::exists(globals), "does not create kdeglobals for empty input") && ok;
     return ok;

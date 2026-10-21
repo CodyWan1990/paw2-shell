@@ -96,8 +96,8 @@ support.
 - `jemalloc`: recommended on glibc; Meson feature option `-Djemalloc=auto|enabled|disabled`.
   Only used on glibc builds.
 
-Prefix/datadir are baked into the binary via `NOCTALIA_INSTALL_PREFIX` /
-`NOCTALIA_INSTALL_DATADIR`. Install with the same prefix you configured.
+Prefix/datadir are baked into the binary via `PAW2_SHELL_INSTALL_PREFIX` /
+`PAW2_SHELL_INSTALL_DATADIR`. Install with the same prefix you configured.
 
 ### Installed layout
 
@@ -129,7 +129,7 @@ bundle/
 
 Noctalia resolves the asset root in this order:
 
-1. `NOCTALIA_ASSETS_DIR` (a warning is logged if it is set but invalid)
+1. `PAW2_SHELL_ASSETS_DIR` (a warning is logged if it is set but invalid)
 2. `assets/` next to the executable
 3. `assets/` one level above the executable (this is how a `build-debug/`
    binary finds the source tree's `assets/`)
@@ -228,8 +228,8 @@ the freedesktop Notifications name.
 | Data | `$XDG_DATA_HOME/noctalia` (`~/.local/share/noctalia`) |
 | Logs | `$XDG_CACHE_HOME/noctalia` (`~/.cache/noctalia`) |
 
-Override bases with `NOCTALIA_CONFIG_HOME`, `NOCTALIA_STATE_HOME`,
-`NOCTALIA_DATA_HOME` (each still appends `/noctalia`).
+Override bases with `PAW2_SHELL_CONFIG_HOME`, `PAW2_SHELL_STATE_HOME`,
+`PAW2_SHELL_DATA_HOME` (each still appends `/noctalia`).
 
 ## What Noctalia is not
 

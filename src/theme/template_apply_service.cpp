@@ -25,7 +25,7 @@
 #include <utility>
 #include <vector>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -286,7 +286,7 @@ namespace noctalia::theme {
   }
 
   void TemplateApplyService::registerIpc(IpcService& ipc) {
-    ipc.bind(noctalia::cli::msg::templatesApply, [this](const std::string& args) -> std::string {
+    ipc.bind(paw2shell::cli::msg::templatesApply, [this](const std::string& args) -> std::string {
       if (!StringUtils::trim(args).empty()) {
         return "error: usage: templates-apply\n";
       }
@@ -546,4 +546,4 @@ namespace noctalia::theme {
     return m_shutdown || generation != m_nextGeneration;
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

@@ -28,7 +28,7 @@ namespace {
   constexpr std::size_t kMaxLogLineBytes = 8 * 1024;    // 8 KiB
   constexpr std::size_t kBufferedFileLogFlushLines = 64;
   constexpr auto kBufferedFileLogFlushInterval = std::chrono::milliseconds(500);
-  constexpr const char* kLogLevelEnv = "NOCTALIA_LOG_LEVEL";
+  constexpr const char* kLogLevelEnv = "PAW2_SHELL_LOG_LEVEL";
 
   struct CappedLogMessage {
     std::string storage;

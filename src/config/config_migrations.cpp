@@ -10,7 +10,7 @@
 #include <string_view>
 #include <utility>
 
-namespace noctalia::config {
+namespace paw2shell::config {
   namespace {
 
     constexpr int kNegativeBarRadiusMigrationVersion = 1;
@@ -1097,4 +1097,4 @@ namespace noctalia::config {
         || nowEpochSeconds - previousEpochSeconds >= kLegacyConfigReminderIntervalSeconds;
   }
 
-} // namespace noctalia::config
+} // namespace paw2shell::config

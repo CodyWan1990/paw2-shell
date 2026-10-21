@@ -1713,7 +1713,7 @@
             "label": "Při změně režimu motivu"
           },
           "wallpaper-changed": {
-            "description": "Příkaz spuštěný při změně tapety; poskytuje NOCTALIA_WALLPAPER_PATH a NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Příkaz spuštěný při změně tapety; poskytuje PAW2_SHELL_WALLPAPER_PATH a PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "Při změně tapety"
           },
           "wifi-disabled": {

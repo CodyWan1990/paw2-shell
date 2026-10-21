@@ -12,4 +12,4 @@ struct ThemesWidgetOptions {
   bool customImageColorize = false;
 };
 
-[[nodiscard]] const noctalia::bar::WidgetDefinition<ThemesWidgetOptions>& themesWidgetDefinition();
+[[nodiscard]] const paw2shell::bar::WidgetDefinition<ThemesWidgetOptions>& themesWidgetDefinition();

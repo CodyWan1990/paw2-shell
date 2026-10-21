@@ -23,7 +23,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.resolve()
 REPO_DIR = SCRIPT_DIR.parent
-NOCTALIA_BIN = REPO_DIR / "build-debug" / "noctalia"
+PAW2_SHELL_BIN = REPO_DIR / "build-debug" / "noctalia"
 
 # Absolute path into the upstream Python reference.
 PYTHON_THEMING_DIR = Path.home() / "Development/misc/noctalia/noctalia-shell/Scripts/python/src/theming"
@@ -117,7 +117,7 @@ def run_matugen(image: Path, scheme: str) -> dict | None:
 def run_noctalia(image: Path, scheme: str) -> dict | None:
     try:
         out = subprocess.run(
-            [str(NOCTALIA_BIN), "theme", str(image),
+            [str(PAW2_SHELL_BIN), "theme", str(image),
              "--scheme", scheme, "--dark"],
             capture_output=True, text=True, check=True,
         )
@@ -226,8 +226,8 @@ def main() -> int:
     if not args.wallpaper.exists():
         print(f"error: not found: {args.wallpaper}", file=sys.stderr)
         return 1
-    if not NOCTALIA_BIN.exists():
-        print(f"error: noctalia not built: {NOCTALIA_BIN}", file=sys.stderr)
+    if not PAW2_SHELL_BIN.exists():
+        print(f"error: noctalia not built: {PAW2_SHELL_BIN}", file=sys.stderr)
         return 1
 
     has_matugen = False

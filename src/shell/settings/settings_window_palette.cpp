@@ -33,8 +33,8 @@ namespace settings {
 
     std::optional<std::size_t> terminalAnsiIndex(std::string_view token) {
       std::size_t index = 0;
-      for (const auto& group : noctalia::theme::kTerminalAnsiGroupTokenKeys) {
-        for (const auto name : noctalia::theme::kTerminalAnsiColorJsonKeys) {
+      for (const auto& group : paw2shell::theme::kTerminalAnsiGroupTokenKeys) {
+        for (const auto name : paw2shell::theme::kTerminalAnsiColorJsonKeys) {
           if (token == std::format("{}_{}", group.tokenPrefix, name)) {
             return index;
           }
@@ -166,8 +166,8 @@ namespace settings {
 
     void setColors(const std::unordered_map<std::string, std::uint32_t>& colors, std::string_view mode) {
       m_colors.clear();
-      m_colors.reserve(noctalia::theme::kTokenCount);
-      for (const auto token : noctalia::theme::kTokens) {
+      m_colors.reserve(paw2shell::theme::kTokenCount);
+      for (const auto token : paw2shell::theme::kTokens) {
         PaletteColor color{.name = std::string(token), .argb = std::nullopt, .hex = {}};
         if (const auto it = colors.find(color.name); it != colors.end()) {
           color.argb = it->second;
@@ -317,7 +317,7 @@ namespace settings {
 
 } // namespace settings
 
-void SettingsWindow::setResolvedPalette(const noctalia::theme::GeneratedPalette& generated, std::string_view mode) {
+void SettingsWindow::setResolvedPalette(const paw2shell::theme::GeneratedPalette& generated, std::string_view mode) {
   const auto& colors = mode == "light" ? generated.light : generated.dark;
   if (m_templateColorMode == mode && m_templateColors == colors) {
     return;

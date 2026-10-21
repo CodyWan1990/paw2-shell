@@ -2119,7 +2119,7 @@
             "label": "При изменении режима темы"
           },
           "wallpaper-changed": {
-            "description": "Команда, запускаемая при смене обоев; предоставляет NOCTALIA_WALLPAPER_PATH и NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Команда, запускаемая при смене обоев; предоставляет PAW2_SHELL_WALLPAPER_PATH и PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "При смене обоев"
           },
           "wifi-disabled": {

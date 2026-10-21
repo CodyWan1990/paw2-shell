@@ -231,12 +231,12 @@ private:
   ConfigService m_configService;
   HttpClient m_httpClient;
   FileWatcher m_fileWatcher;
-  noctalia::theme::ThemeService m_themeService{m_configService};
-  noctalia::theme::TemplateApplyService m_templateApplyService{m_configService};
-  noctalia::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform, m_configService};
+  paw2shell::theme::ThemeService m_themeService{m_configService};
+  paw2shell::theme::TemplateApplyService m_templateApplyService{m_configService};
+  paw2shell::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform, m_configService};
   // Saved themes. Applying one goes through the same wallpaper and palette paths
   // as `wallpaper-set` and `color-scheme-set`.
-  noctalia::theme::ThemePresetService m_themePresets{
+  paw2shell::theme::ThemePresetService m_themePresets{
       std::filesystem::path(FileUtils::stateDir()) / "themes.json",
       {
           .setWallpaper = [this](const std::string& path) { return m_wallpaper.applyWallpaperImage(std::nullopt, path); },

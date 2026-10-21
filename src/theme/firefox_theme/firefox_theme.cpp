@@ -29,7 +29,7 @@
 #include <unistd.h>
 #include <vector>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   namespace {
 
     namespace css = firefox_theme::css;
@@ -195,8 +195,8 @@ namespace noctalia::theme {
       if (!self.empty()) {
         return self;
       }
-#ifdef NOCTALIA_INSTALL_PREFIX
-      const auto installed = std::filesystem::path(NOCTALIA_INSTALL_PREFIX) / "bin" / "paw2-shell";
+#ifdef PAW2_SHELL_INSTALL_PREFIX
+      const auto installed = std::filesystem::path(PAW2_SHELL_INSTALL_PREFIX) / "bin" / "paw2-shell";
       std::error_code ec;
       if (std::filesystem::is_regular_file(installed, ec)) {
         return installed;
@@ -761,4 +761,4 @@ namespace noctalia::theme {
     return 1;
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

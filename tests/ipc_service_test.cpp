@@ -76,13 +76,13 @@ int main() {
   TEST_CHECK(::setenv("WAYLAND_DISPLAY", kWaylandDisplay, 1) == 0);
 
   IpcService ipc;
-  constexpr noctalia::cli::Command nonMsgCommand{"not-msg", {}, {}, {}, {}, {}, {}, false};
+  constexpr paw2shell::cli::Command nonMsgCommand{"not-msg", {}, {}, {}, {}, {}, {}, false};
   ipc.bind(nonMsgCommand, [](const std::string&) { return "unexpected\n"; });
   TEST_CHECK(!ipc.hasHandler("not-msg"));
 
-  ipc.bind(noctalia::cli::msg::panelToggle, [](const std::string& args) { return "visible:" + args + "\n"; });
+  ipc.bind(paw2shell::cli::msg::panelToggle, [](const std::string& args) { return "visible:" + args + "\n"; });
   ipc.bind(
-      noctalia::cli::msg::status, [](const std::string& args) { return "status:" + args + "\n"; },
+      paw2shell::cli::msg::status, [](const std::string& args) { return "status:" + args + "\n"; },
       IpcService::HandlerOptions{.actionEditorVisibility = IpcService::ActionEditorVisibility::Hidden}
   );
 
@@ -117,7 +117,7 @@ int main() {
   // Action-editor visibility does not affect execution or help output.
   {
     ipc.bind(
-        noctalia::cli::msg::logLevelStatus, [](const std::string&) { return "state\n"; },
+        paw2shell::cli::msg::logLevelStatus, [](const std::string&) { return "state\n"; },
         IpcService::HandlerOptions{.actionEditorVisibility = IpcService::ActionEditorVisibility::Hidden}
     );
     TEST_CHECK(ipc.execute("log-level-status") == "state\n");
@@ -137,7 +137,7 @@ int main() {
   // A cycling command runs like any other, but declares that a scroll flick should move one
   // position rather than one per notch.
   {
-    ipc.bindCycle(noctalia::cli::msg::workspaceSwitch, [](const std::string&) { return "moved\n"; });
+    ipc.bindCycle(paw2shell::cli::msg::workspaceSwitch, [](const std::string&) { return "moved\n"; });
     TEST_CHECK(ipc.execute("workspace-switch next") == "moved\n");
     TEST_CHECK(ipc.handlerCycles("workspace-switch"));
     TEST_CHECK(!ipc.handlerCycles("panel-toggle"));
@@ -178,7 +178,7 @@ int main() {
   TEST_CHECK(help.contains("status"));
   TEST_CHECK(help.contains("Print current state as JSON"));
 
-  ipc.bind(noctalia::cli::msg::panelToggle, [](const std::string&) { return "replaced\n"; });
+  ipc.bind(paw2shell::cli::msg::panelToggle, [](const std::string&) { return "replaced\n"; });
   TEST_CHECK(ipc.execute("panel-toggle") == "replaced\n");
   const std::string updatedHelp = ipc.execute("--help");
   TEST_CHECK(updatedHelp.contains("panel-toggle <id> [context]"));

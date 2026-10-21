@@ -388,7 +388,7 @@ private:
 
 WallpaperPanel::WallpaperPanel(
     WaylandConnection* wayland, ConfigService* config, ThumbnailService* thumbnails, WallpaperScanner* scanner,
-    noctalia::theme::ThemeService* themeService
+    paw2shell::theme::ThemeService* themeService
 )
     : m_wayland(wayland), m_config(config), m_thumbnails(thumbnails), m_scanner(scanner), m_themeService(themeService) {
   if (m_config != nullptr) {
@@ -625,7 +625,7 @@ void WallpaperPanel::create() {
   };
   addPaletteSource(PaletteSource::Builtin, "settings.options.theme.source.presets");
   addPaletteSource(PaletteSource::Wallpaper, "settings.options.theme.source.wallpaper");
-  if (!noctalia::theme::availableCustomPalettes().empty()) {
+  if (!paw2shell::theme::availableCustomPalettes().empty()) {
     addPaletteSource(PaletteSource::Custom, "settings.options.theme.source.custom");
   }
 

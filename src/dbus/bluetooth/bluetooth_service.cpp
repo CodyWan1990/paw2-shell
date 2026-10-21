@@ -498,21 +498,21 @@ void BluetoothService::registerIpc(IpcService& ipc, StateFeedbackCallback stateF
     return "ok\n";
   };
 
-  ipc.bind(noctalia::cli::msg::bluetoothEnable, [setBluetooth](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::bluetoothEnable, [setBluetooth](const std::string& args) -> std::string {
     if (auto err = rejectArgs("bluetooth-enable", args); err.has_value()) {
       return *err;
     }
     return setBluetooth(true);
   });
 
-  ipc.bind(noctalia::cli::msg::bluetoothDisable, [setBluetooth](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::bluetoothDisable, [setBluetooth](const std::string& args) -> std::string {
     if (auto err = rejectArgs("bluetooth-disable", args); err.has_value()) {
       return *err;
     }
     return setBluetooth(false);
   });
 
-  ipc.bind(noctalia::cli::msg::bluetoothToggle, [this, setBluetooth](const std::string& args) -> std::string {
+  ipc.bind(paw2shell::cli::msg::bluetoothToggle, [this, setBluetooth](const std::string& args) -> std::string {
     if (auto err = rejectArgs("bluetooth-toggle", args); err.has_value()) {
       return *err;
     }
@@ -523,7 +523,7 @@ void BluetoothService::registerIpc(IpcService& ipc, StateFeedbackCallback stateF
   });
 
   ipc.bind(
-      noctalia::cli::msg::bluetoothStatus,
+      paw2shell::cli::msg::bluetoothStatus,
       [this](const std::string& args) -> std::string {
         if (auto err = rejectArgs("bluetooth-status", args); err.has_value()) {
           return *err;

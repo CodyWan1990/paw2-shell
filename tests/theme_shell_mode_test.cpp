@@ -30,10 +30,10 @@ namespace {
     }
 
     ConfigService config;
-    noctalia::theme::ThemeService theme(config);
+    paw2shell::theme::ThemeService theme(config);
 
     Resolution result;
-    theme.setResolvedCallback([&result](const noctalia::theme::GeneratedPalette&, std::string_view mode) {
+    theme.setResolvedCallback([&result](const paw2shell::theme::GeneratedPalette&, std::string_view mode) {
       result.appliedMode = std::string(mode);
     });
     theme.apply();
@@ -56,9 +56,9 @@ int main() {
   std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "data");
-  ::setenv("NOCTALIA_CONFIG_HOME", (root / "config").c_str(), 1);
-  ::setenv("NOCTALIA_STATE_HOME", (root / "state").c_str(), 1);
-  ::setenv("NOCTALIA_DATA_HOME", (root / "data").c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", (root / "config").c_str(), 1);
+  ::setenv("PAW2_SHELL_STATE_HOME", (root / "state").c_str(), 1);
+  ::setenv("PAW2_SHELL_DATA_HOME", (root / "data").c_str(), 1);
 
   // ConfigService reads its persisted overrides from <state dir>/settings.toml, the same file
   // the settings GUI writes.

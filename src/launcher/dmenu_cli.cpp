@@ -14,7 +14,7 @@
 #include <sys/un.h>
 #include <unistd.h>
 
-namespace noctalia::launcher {
+namespace paw2shell::launcher {
 
   namespace {
 
@@ -122,4 +122,4 @@ namespace noctalia::launcher {
     return 0;
   }
 
-} // namespace noctalia::launcher
+} // namespace paw2shell::launcher

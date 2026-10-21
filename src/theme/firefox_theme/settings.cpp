@@ -5,7 +5,7 @@
 #include <fstream>
 #include <nlohmann/json.hpp>
 
-namespace noctalia::theme::firefox_theme::settings {
+namespace paw2shell::theme::firefox_theme::settings {
   namespace {
 
     [[nodiscard]] std::filesystem::path configPath() {
@@ -68,4 +68,4 @@ namespace noctalia::theme::firefox_theme::settings {
     return true;
   }
 
-} // namespace noctalia::theme::firefox_theme::settings
+} // namespace paw2shell::theme::firefox_theme::settings

@@ -94,7 +94,7 @@
 #include <filesystem>
 #include <limits>
 #include <malloc.h>
-#ifdef NOCTALIA_USE_JEMALLOC
+#ifdef PAW2_SHELL_USE_JEMALLOC
 #include <jemalloc/jemalloc.h>
 #endif
 #include <optional>
@@ -102,9 +102,9 @@
 #include <string_view>
 #include <utility>
 
-#ifdef NOCTALIA_USE_JEMALLOC
-#define NOCTALIA_STRINGIFY_HELPER(x) #x
-#define NOCTALIA_STRINGIFY(x) NOCTALIA_STRINGIFY_HELPER(x)
+#ifdef PAW2_SHELL_USE_JEMALLOC
+#define PAW2_SHELL_STRINGIFY_HELPER(x) #x
+#define PAW2_SHELL_STRINGIFY(x) PAW2_SHELL_STRINGIFY_HELPER(x)
 #endif
 
 std::atomic<bool> Application::s_shutdownRequested{false};
@@ -190,7 +190,7 @@ Application::~Application() {
 void Application::run(std::function<void()> startupReadyCallback) {
   initLogFile();
   initLogLevelFromEnvironment();
-  kLog.info("paw2-shell {} (noctalia base)", noctalia::build_info::displayVersion());
+  kLog.info("paw2-shell {} (noctalia base)", paw2shell::build_info::displayVersion());
   // Claim the tray watcher name first. The tray UI itself is wired up later.
   // Item callbacks run from deferred work on the main loop, after the shell
   // is initialized.
@@ -207,10 +207,10 @@ void Application::run(std::function<void()> startupReadyCallback) {
 
 #ifdef __GLIBC__
   runStartupPhase("allocator_trim", []() {
-#ifdef NOCTALIA_USE_JEMALLOC
+#ifdef PAW2_SHELL_USE_JEMALLOC
     // jemalloc exports no malloc_trim; purge unused pages in every arena.
     const int purgeResult =
-        mallctl("arena." NOCTALIA_STRINGIFY(MALLCTL_ARENAS_ALL) ".purge", nullptr, nullptr, nullptr, 0);
+        mallctl("arena." PAW2_SHELL_STRINGIFY(MALLCTL_ARENAS_ALL) ".purge", nullptr, nullptr, nullptr, 0);
     if (purgeResult != 0) {
       kLog.warn("failed to purge jemalloc arenas: {}", std::strerror(purgeResult));
     }

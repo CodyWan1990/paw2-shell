@@ -1,7 +1,7 @@
 #include "shell/bar/widgets/sysmon_widget_definition.h"
 
-const noctalia::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinitionContext>& sysmonWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinitionContext>& sysmonWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = SysmonWidget::Options;
 
   static const settings::WidgetSettingVisibility diskStat{
@@ -17,7 +17,7 @@ const noctalia::bar::WidgetDefinition<SysmonWidget::Options, SysmonWidgetDefinit
       showValue.any[0],
   };
 
-  static const noctalia::bar::WidgetDefinition<Options, SysmonWidgetDefinitionContext> definition{
+  static const paw2shell::bar::WidgetDefinition<Options, SysmonWidgetDefinitionContext> definition{
       .type = "sysmon",
       .fields = {
           field<&Options::stat>({

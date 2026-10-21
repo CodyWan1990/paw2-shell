@@ -19,11 +19,11 @@ namespace paths {
     constexpr Logger kLog("paths");
 
     std::filesystem::path installedAssetsRoot() {
-      const std::filesystem::path datadir(NOCTALIA_INSTALL_DATADIR);
+      const std::filesystem::path datadir(PAW2_SHELL_INSTALL_DATADIR);
       if (datadir.is_absolute()) {
         return datadir / FileUtils::kAppDirName / "assets";
       }
-      return std::filesystem::path(NOCTALIA_INSTALL_PREFIX) / datadir / FileUtils::kAppDirName / "assets";
+      return std::filesystem::path(PAW2_SHELL_INSTALL_PREFIX) / datadir / FileUtils::kAppDirName / "assets";
     }
 
     bool isAssetRoot(const std::filesystem::path& root) {
@@ -61,13 +61,13 @@ namespace paths {
     std::vector<std::filesystem::path> assetCandidates() {
       std::vector<std::filesystem::path> candidates;
 
-      if (const char* env = std::getenv("NOCTALIA_ASSETS_DIR"); env != nullptr && env[0] != '\0') {
+      if (const char* env = std::getenv("PAW2_SHELL_ASSETS_DIR"); env != nullptr && env[0] != '\0') {
         const std::filesystem::path overridePath(env);
         if (isAssetRoot(overridePath)) {
           candidates.push_back(overridePath);
           return candidates;
         }
-        kLog.warn("NOCTALIA_ASSETS_DIR is not a valid asset bundle: {}", overridePath.string());
+        kLog.warn("PAW2_SHELL_ASSETS_DIR is not a valid asset bundle: {}", overridePath.string());
       }
 
       if (auto exe = executablePath()) {
@@ -75,7 +75,7 @@ namespace paths {
         appendUnique(candidates, exeDir / "assets");
         appendUnique(candidates, exeDir.parent_path() / "assets");
 
-        const std::filesystem::path datadir(NOCTALIA_INSTALL_DATADIR);
+        const std::filesystem::path datadir(PAW2_SHELL_INSTALL_DATADIR);
         if (!datadir.empty() && !datadir.is_absolute()) {
           appendUnique(candidates, exeDir.parent_path() / datadir / FileUtils::kAppDirName / "assets");
         }

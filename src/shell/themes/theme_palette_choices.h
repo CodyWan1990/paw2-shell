@@ -6,7 +6,7 @@
 #include <string>
 #include <vector>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   struct ThemePreset;
 }
 
@@ -26,6 +26,6 @@ namespace themes {
 
   // The swatches a preset's card shows; empty for a wallpaper-generated palette,
   // whose colours depend on the image.
-  [[nodiscard]] ColorSwatchPreview presetPreview(const noctalia::theme::ThemePreset& preset, ThemeMode mode);
+  [[nodiscard]] ColorSwatchPreview presetPreview(const paw2shell::theme::ThemePreset& preset, ThemeMode mode);
 
 } // namespace themes

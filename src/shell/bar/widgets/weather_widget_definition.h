@@ -3,4 +3,4 @@
 #include "shell/bar/widget_definition.h"
 #include "shell/bar/widgets/weather_widget.h"
 
-[[nodiscard]] const noctalia::bar::WidgetDefinition<WeatherWidget::Options>& weatherWidgetDefinition();
+[[nodiscard]] const paw2shell::bar::WidgetDefinition<WeatherWidget::Options>& weatherWidgetDefinition();

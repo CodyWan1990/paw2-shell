@@ -105,7 +105,7 @@ namespace desktop_settings {
     // Empty value = inherit the shell font.
     WidgetSettingSpec fontFamilySpec() {
       auto spec = baseSpec("font_family", WidgetControlKind::Select, std::string{});
-      spec.schema.type = noctalia::config::schema::WidgetSettingType::String;
+      spec.schema.type = paw2shell::config::schema::WidgetSettingType::String;
       spec.options = settings::buildFontFamilySelectOptions();
       spec.literalLabels = true;
       return spec;
@@ -436,8 +436,8 @@ namespace desktop_settings {
     return specs;
   }
 
-  noctalia::config::schema::WidgetSettingSchema desktopWidgetSettingSchema(std::string_view type) {
-    noctalia::config::schema::WidgetSettingSchema out;
+  paw2shell::config::schema::WidgetSettingSchema desktopWidgetSettingSchema(std::string_view type) {
+    paw2shell::config::schema::WidgetSettingSchema out;
     for (const auto& spec : desktopWidgetSettingSpecs(type)) {
       out.push_back(spec.schema);
     }

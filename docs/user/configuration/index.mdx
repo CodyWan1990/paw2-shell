@@ -13,7 +13,7 @@ For most people, the important rule is simple: put your own configuration in `~/
 
 Your hand-written config lives in:
 
-- `$NOCTALIA_CONFIG_HOME/noctalia/`
+- `$PAW2_SHELL_CONFIG_HOME/noctalia/`
 - `$XDG_CONFIG_HOME/noctalia/`
 - or `~/.config/noctalia/`
 
@@ -39,13 +39,13 @@ You can also split things up if you like tidy dotfiles:
 
 GUI-managed overrides live in:
 
-- `$NOCTALIA_STATE_HOME/noctalia/settings.toml`
+- `$PAW2_SHELL_STATE_HOME/noctalia/settings.toml`
 - `$XDG_STATE_HOME/noctalia/settings.toml`
 - or `~/.local/state/noctalia/settings.toml`
 
 Noctalia writes this file when you change settings through the UI, setup flows, IPC-backed controls, and other runtime actions that need to persist. If the file is a symbolic link, Noctalia writes through to the link target and keeps the link in place.
 
-`NOCTALIA_CONFIG_HOME` and `NOCTALIA_STATE_HOME` have the same "home root" shape as the XDG variables. For example, `NOCTALIA_CONFIG_HOME=/tmp/profile` reads `/tmp/profile/noctalia/`. Use these Noctalia-specific variables when you want a separate shell profile without changing the environment inherited by apps launched from Noctalia.
+`PAW2_SHELL_CONFIG_HOME` and `PAW2_SHELL_STATE_HOME` have the same "home root" shape as the XDG variables. For example, `PAW2_SHELL_CONFIG_HOME=/tmp/profile` reads `/tmp/profile/noctalia/`. Use these Noctalia-specific variables when you want a separate shell profile without changing the environment inherited by apps launched from Noctalia.
 
 ## Including extra files
 
@@ -164,7 +164,7 @@ It comes down to **three storage owners**:
   directory does not remove them.
 
 Every path honors the relevant standard `XDG_CONFIG_HOME` / `XDG_STATE_HOME` / `XDG_DATA_HOME` / `XDG_CACHE_HOME`
-variable (and the `NOCTALIA_CONFIG_HOME` / `NOCTALIA_STATE_HOME` / `NOCTALIA_DATA_HOME` overrides where applicable).
+variable (and the `PAW2_SHELL_CONFIG_HOME` / `PAW2_SHELL_STATE_HOME` / `PAW2_SHELL_DATA_HOME` overrides where applicable).
 
 ## Exporting config
 
@@ -210,7 +210,7 @@ Run the validator to catch problems before they silently take effect:
 noctalia config validate
 ```
 
-With no argument it checks the merged configuration exactly as the shell loads it: every `*.toml` in `~/.config/noctalia/` (or `$NOCTALIA_CONFIG_HOME`), then the `settings.toml` overrides in `~/.local/state/noctalia/`. Pass a directory to validate just that directory's `*.toml` files instead:
+With no argument it checks the merged configuration exactly as the shell loads it: every `*.toml` in `~/.config/noctalia/` (or `$PAW2_SHELL_CONFIG_HOME`), then the `settings.toml` overrides in `~/.local/state/noctalia/`. Pass a directory to validate just that directory's `*.toml` files instead:
 
 ```sh
 noctalia config validate ./my-config-dir

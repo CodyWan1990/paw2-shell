@@ -5,7 +5,7 @@
 #include <array>
 #include <string_view>
 
-namespace noctalia::cli {
+namespace paw2shell::cli {
 
   inline constexpr std::array kConfigValidatePositionals{
       Positional{"path", "Config file or directory; defaults to the active config", {}, false, false, false},
@@ -90,4 +90,4 @@ namespace noctalia::cli {
       "config", "Validate config and support/replay helpers", {}, {}, {}, {}, kConfigSubcommands, false,
   };
 
-} // namespace noctalia::cli
+} // namespace paw2shell::cli

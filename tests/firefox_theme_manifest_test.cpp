@@ -55,7 +55,7 @@ namespace {
 } // namespace
 
 int main() {
-  namespace manifest = noctalia::theme::firefox_theme::manifest;
+  namespace manifest = paw2shell::theme::firefox_theme::manifest;
 
   TempDir temp;
   const auto manifestPath = temp.path() / "pywalfox.json";

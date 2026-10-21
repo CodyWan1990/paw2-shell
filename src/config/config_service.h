@@ -74,11 +74,11 @@ public:
   stateStringArray(std::string_view owner, std::string_view key) const;
   bool setStateStringArray(std::string_view owner, std::string_view key, const std::vector<std::string>& value);
   [[nodiscard]] std::optional<std::string> stateString(std::string_view owner, std::string_view key) const;
-  [[nodiscard]] const noctalia::config::LegacyConfigIssues& legacyConfigIssues() const noexcept {
+  [[nodiscard]] const paw2shell::config::LegacyConfigIssues& legacyConfigIssues() const noexcept {
     return m_legacyConfigIssues;
   }
 
-  // The optional label is used only for opt-in reload profiling (NOCTALIA_PROFILE);
+  // The optional label is used only for opt-in reload profiling (PAW2_SHELL_PROFILE);
   // unlabeled subscribers are reported by registration index.
   void addReloadCallback(ReloadCallback callback, std::string_view label = {});
   void setNotificationManager(NotificationManager* manager);
@@ -188,10 +188,10 @@ private:
   static void
   parseConfigTable(const toml::table& tbl, Config& config, bool logSummary, bool logSchemaDiagnostics = true);
   [[nodiscard]] std::optional<Config> configForOverrides(const toml::table& overrides) const;
-  [[nodiscard]] noctalia::config::schema::Diagnostics diagnosticsForOverrides(const toml::table& overrides) const;
+  [[nodiscard]] paw2shell::config::schema::Diagnostics diagnosticsForOverrides(const toml::table& overrides) const;
   [[nodiscard]] bool validateOverrideMutation(
       const toml::table& candidateOverrides, const toml::table* baselineOverrides = nullptr,
-      const noctalia::config::schema::Diagnostics* candidateDiagnostics = nullptr
+      const paw2shell::config::schema::Diagnostics* candidateDiagnostics = nullptr
   );
   [[nodiscard]] bool overridePathEffectiveInTable(
       const std::vector<std::string>& path, const toml::table& overrides, const Config* parsedWith = nullptr
@@ -214,19 +214,19 @@ private:
   // the on-screen notification puts the location in its title and the text in
   // its body. `message` is "<dotted.path>: <problem>" and never carries a location.
   struct ConfigProblem {
-    noctalia::config::schema::SourceOrigin origin;
+    paw2shell::config::schema::SourceOrigin origin;
     std::string message;
 
     [[nodiscard]] bool empty() const { return message.empty(); }
     // Single-line form for logs and the settings status banner.
     [[nodiscard]] std::string flatten(std::string_view baseDir) const { return origin.prefixedShort(baseDir, message); }
-    [[nodiscard]] static ConfigProblem from(const noctalia::config::schema::Diagnostics::Entry& entry) {
+    [[nodiscard]] static ConfigProblem from(const paw2shell::config::schema::Diagnostics::Entry& entry) {
       return ConfigProblem{entry.origin, entry.path + ": " + entry.message};
     }
   };
 
   void setConfigParseError(ConfigProblem problem);
-  void updateLegacyConfigIssues(noctalia::config::LegacyConfigIssues issues);
+  void updateLegacyConfigIssues(paw2shell::config::LegacyConfigIssues issues);
   void notifyLegacyConfigIssues();
   bool writeOverridesToFile();
   void extractWallpaperFromOverrides();
@@ -266,7 +266,7 @@ private:
   ConfigProblem m_overridesParseError;
   ConfigProblem m_pendingError;             // parse error from initial load, notified once the manager is wired up
   uint32_t m_configErrorNotificationId = 0; // ID of the active config-error notification, 0 if none
-  noctalia::config::LegacyConfigIssues m_legacyConfigIssues;
+  paw2shell::config::LegacyConfigIssues m_legacyConfigIssues;
   std::string m_loggedLegacyIssueFingerprint;
   bool m_legacyReminderPending = false;
   Timer m_legacyReminderTimer;

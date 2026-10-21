@@ -105,8 +105,8 @@ bool IpcService::start() {
   return true;
 }
 
-void IpcService::bind(const noctalia::cli::Command& command, Handler handler, HandlerOptions options) {
-  const noctalia::cli::Command* spec = noctalia::cli::findMsgCommand(command.name);
+void IpcService::bind(const paw2shell::cli::Command& command, Handler handler, HandlerOptions options) {
+  const paw2shell::cli::Command* spec = paw2shell::cli::findMsgCommand(command.name);
   if (spec == nullptr) {
     kLog.error("cannot bind non-msg CLI command '{}'", command.name);
     return;
@@ -117,7 +117,7 @@ void IpcService::bind(const noctalia::cli::Command& command, Handler handler, Ha
       spec->name,
       HandlerEntry{
           .fn = std::move(handler),
-          .argsSpec = noctalia::cli::renderArgsSpec(*spec),
+          .argsSpec = paw2shell::cli::renderArgsSpec(*spec),
           .description = spec->summary,
           .actionEditorVisibility = options.actionEditorVisibility,
           .cycles = false,
@@ -125,7 +125,7 @@ void IpcService::bind(const noctalia::cli::Command& command, Handler handler, Ha
   );
 }
 
-void IpcService::bindCycle(const noctalia::cli::Command& command, Handler handler, HandlerOptions options) {
+void IpcService::bindCycle(const paw2shell::cli::Command& command, Handler handler, HandlerOptions options) {
   bind(command, std::move(handler), options);
   const auto it =
       std::ranges::find_if(m_handlers, [&command](const auto& entry) { return entry.first == command.name; });

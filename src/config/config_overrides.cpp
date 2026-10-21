@@ -280,8 +280,8 @@ namespace {
       resolved.widgetCapsuleOpacity = std::clamp(static_cast<float>(*ovr.widgetCapsuleOpacity), 0.0F, 1.0F);
     }
     if (ovr.widgetCapsuleBorderWidth) {
-      resolved.widgetCapsuleBorderWidth = noctalia::config::schema::applyRange(
-          *ovr.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange
+      resolved.widgetCapsuleBorderWidth = paw2shell::config::schema::applyRange(
+          *ovr.widgetCapsuleBorderWidth, paw2shell::config::schema::kBarCapsuleBorderWidthRange
       );
     }
     if (ovr.hoverHighlight) {
@@ -911,17 +911,17 @@ bool ConfigService::setThemeColorScheme(PaletteSource source, std::string_view v
 
   switch (source) {
   case PaletteSource::Builtin:
-    if (noctalia::theme::findBuiltinPalette(value) == nullptr && !noctalia::theme::presetPaletteExists(value)) {
+    if (paw2shell::theme::findBuiltinPalette(value) == nullptr && !paw2shell::theme::presetPaletteExists(value)) {
       return false;
     }
     break;
   case PaletteSource::Wallpaper:
-    if (!noctalia::theme::schemeFromString(value)) {
+    if (!paw2shell::theme::schemeFromString(value)) {
       return false;
     }
     break;
   case PaletteSource::Custom:
-    if (!std::filesystem::exists(noctalia::theme::customPalettePath(value))) {
+    if (!std::filesystem::exists(paw2shell::theme::customPalettePath(value))) {
       return false;
     }
     break;
@@ -1244,9 +1244,9 @@ void ConfigService::reconcileCapsuleGroupOverrides(toml::table& candidate) const
 
 std::optional<Config> ConfigService::configForOverrides(const toml::table& overrides) const {
   Config parsed;
-  noctalia::config::seedBuiltinWidgets(parsed);
+  paw2shell::config::seedBuiltinWidgets(parsed);
 
-  auto mergeResult = noctalia::config::mergeConfigWithIncludes(m_configDir);
+  auto mergeResult = paw2shell::config::mergeConfigWithIncludes(m_configDir);
   toml::table merged = std::move(mergeResult.merged);
   if (!mergeResult.firstError.empty()) {
     kLog.warn(
@@ -1256,11 +1256,11 @@ std::optional<Config> ConfigService::configForOverrides(const toml::table& overr
   }
 
   toml::table effectiveOverrides = overrides;
-  noctalia::config::schema::Diagnostics migrationDiag;
+  paw2shell::config::schema::Diagnostics migrationDiag;
   if (!effectiveOverrides.empty()) {
-    const auto storedVersion = noctalia::config::storedConfigVersion(effectiveOverrides, migrationDiag);
+    const auto storedVersion = paw2shell::config::storedConfigVersion(effectiveOverrides, migrationDiag);
     if (storedVersion.has_value()) {
-      (void)noctalia::config::applyPendingConfigMigrations(effectiveOverrides, *storedVersion, migrationDiag);
+      (void)paw2shell::config::applyPendingConfigMigrations(effectiveOverrides, *storedVersion, migrationDiag);
     }
   }
   if (migrationDiag.hasErrors()) {
@@ -1268,9 +1268,9 @@ std::optional<Config> ConfigService::configForOverrides(const toml::table& overr
     return std::nullopt;
   }
   deepMerge(merged, effectiveOverrides);
-  merged.erase(noctalia::config::kConfigVersionKey);
-  noctalia::config::LegacyConfigIssues issues;
-  noctalia::config::normalizeLegacyConfig(merged, issues);
+  merged.erase(paw2shell::config::kConfigVersionKey);
+  paw2shell::config::LegacyConfigIssues issues;
+  paw2shell::config::normalizeLegacyConfig(merged, issues);
   if (mergeResult.loadedFiles.empty() && overrides.empty()) {
     parsed.idle.behaviors = defaultIdleBehaviors();
     parsed.bars.push_back(BarConfig{});
@@ -1288,11 +1288,11 @@ std::optional<Config> ConfigService::configForOverrides(const toml::table& overr
   return parsed;
 }
 
-noctalia::config::schema::Diagnostics ConfigService::diagnosticsForOverrides(const toml::table& overrides) const {
-  auto mergeResult = noctalia::config::mergeConfigWithIncludes(m_configDir);
+paw2shell::config::schema::Diagnostics ConfigService::diagnosticsForOverrides(const toml::table& overrides) const {
+  auto mergeResult = paw2shell::config::mergeConfigWithIncludes(m_configDir);
   toml::table merged = std::move(mergeResult.merged);
-  noctalia::config::ConfigOriginIndex origins = std::move(mergeResult.origins);
-  noctalia::config::schema::Diagnostics diagnostics;
+  paw2shell::config::ConfigOriginIndex origins = std::move(mergeResult.origins);
+  paw2shell::config::schema::Diagnostics diagnostics;
   if (!mergeResult.firstError.empty()) {
     diagnostics.fatalAt(std::move(mergeResult.firstErrorOrigin), "syntax", mergeResult.firstError, "config.syntax");
   }
@@ -1302,21 +1302,21 @@ noctalia::config::schema::Diagnostics ConfigService::diagnosticsForOverrides(con
     origins.record(std::filesystem::path(m_overridesPath), overrides);
   }
   if (!effectiveOverrides.empty()) {
-    const auto storedVersion = noctalia::config::storedConfigVersion(effectiveOverrides, diagnostics);
+    const auto storedVersion = paw2shell::config::storedConfigVersion(effectiveOverrides, diagnostics);
     if (storedVersion.has_value()) {
-      (void)noctalia::config::applyPendingConfigMigrations(effectiveOverrides, *storedVersion, diagnostics);
+      (void)paw2shell::config::applyPendingConfigMigrations(effectiveOverrides, *storedVersion, diagnostics);
     }
   }
   deepMerge(merged, effectiveOverrides);
-  merged.erase(noctalia::config::kConfigVersionKey);
-  noctalia::config::LegacyConfigIssues issues;
-  noctalia::config::normalizeLegacyConfig(merged, issues);
+  merged.erase(paw2shell::config::kConfigVersionKey);
+  paw2shell::config::LegacyConfigIssues issues;
+  paw2shell::config::normalizeLegacyConfig(merged, issues);
   for (const auto& issue : issues) {
     diagnostics.warn(issue.path, issue.message, "config.legacy");
   }
   origins.annotate(diagnostics);
 
-  auto semantic = noctalia::config::validateMergedConfig(merged, origins);
+  auto semantic = paw2shell::config::validateMergedConfig(merged, origins);
   diagnostics.entries.insert(
       diagnostics.entries.end(), std::make_move_iterator(semantic.entries.begin()),
       std::make_move_iterator(semantic.entries.end())
@@ -1326,7 +1326,7 @@ noctalia::config::schema::Diagnostics ConfigService::diagnosticsForOverrides(con
 
 bool ConfigService::validateOverrideMutation(
     const toml::table& candidateOverrides, const toml::table* baselineOverrides,
-    const noctalia::config::schema::Diagnostics* candidateDiagnostics
+    const paw2shell::config::schema::Diagnostics* candidateDiagnostics
 ) {
   m_lastMutationError.clear();
   if (!m_overridesParseError.empty()) {
@@ -1337,11 +1337,11 @@ bool ConfigService::validateOverrideMutation(
   try {
     const auto baseline = diagnosticsForOverrides(baselineOverrides != nullptr ? *baselineOverrides : m_overridesTable);
     const auto computedCandidate = candidateDiagnostics == nullptr ? diagnosticsForOverrides(candidateOverrides)
-                                                                   : noctalia::config::schema::Diagnostics{};
+                                                                   : paw2shell::config::schema::Diagnostics{};
     const auto& candidate = candidateDiagnostics != nullptr ? *candidateDiagnostics : computedCandidate;
     const auto fatal = std::ranges::find_if(candidate.entries, [](const auto& entry) {
-      return entry.severity == noctalia::config::schema::Diagnostics::Severity::Error
-          && entry.recoveryScope == noctalia::config::schema::Diagnostics::RecoveryScope::Document;
+      return entry.severity == paw2shell::config::schema::Diagnostics::Severity::Error
+          && entry.recoveryScope == paw2shell::config::schema::Diagnostics::RecoveryScope::Document;
     });
     if (fatal != candidate.entries.end()) {
       m_lastMutationError = fatal->describeShort(m_configDir);
@@ -1751,7 +1751,7 @@ bool ConfigService::validateOverride(
   const auto candidateDiagnostics = diagnosticsForOverrides(candidate);
   const std::string settingPath = overrideCacheKey(path);
   const auto fieldError = std::ranges::find_if(candidateDiagnostics.entries, [&](const auto& entry) {
-    return entry.severity == noctalia::config::schema::Diagnostics::Severity::Error && entry.path == settingPath;
+    return entry.severity == paw2shell::config::schema::Diagnostics::Severity::Error && entry.path == settingPath;
   });
   if (fieldError != candidateDiagnostics.entries.end()) {
     m_lastMutationError = fieldError->describeShort(m_configDir);

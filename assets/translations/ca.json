@@ -1938,7 +1938,7 @@
             "label": "En canviar el mode del tema"
           },
           "wallpaper-changed": {
-            "description": "Ordre a executar quan canvia el fons de pantalla; proporciona NOCTALIA_WALLPAPER_PATH i NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Ordre a executar quan canvia el fons de pantalla; proporciona PAW2_SHELL_WALLPAPER_PATH i PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "En canviar el fons de pantalla"
           },
           "wifi-disabled": {

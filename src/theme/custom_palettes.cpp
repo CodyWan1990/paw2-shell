@@ -18,7 +18,7 @@
 #include <system_error>
 #include <utility>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -359,4 +359,4 @@ namespace noctalia::theme {
     return true;
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

@@ -9,7 +9,7 @@
 class CompositorPlatform;
 class ConfigService;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   // paw2's focus ring, titlebars, window shadows and overview backdrop follow the shell's palette.
   // They are paw2's settings, so they go through Paw2ConfigWriter like any Settings edit: when the
@@ -37,4 +37,4 @@ namespace noctalia::theme {
     std::optional<Color> m_backdrop;
   };
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

@@ -43,7 +43,7 @@ namespace {
     std::filesystem::remove(sentinel);
 
     {
-      noctalia::theme::HookRunner runner(2);
+      paw2shell::theme::HookRunner runner(2);
       for (int i = 0; i < 4; ++i) {
         runner.enqueue("printf x >> " + sentinel.string(), /*generation=*/1);
       }
@@ -61,7 +61,7 @@ namespace {
     std::filesystem::remove(sentinel);
 
     {
-      noctalia::theme::HookRunner runner(2);
+      paw2shell::theme::HookRunner runner(2);
       runner.invalidateBefore(2);
       // Generation 1 is already superseded: the hook must never run.
       runner.enqueue("printf stale > " + sentinel.string(), /*generation=*/1);
@@ -81,7 +81,7 @@ namespace {
     {
       // A single slot occupied by a long hook keeps the rest of the batch queued, so
       // invalidateBefore() has to discard them.
-      noctalia::theme::HookRunner runner(1);
+      paw2shell::theme::HookRunner runner(1);
       runner.enqueue("sleep 0.2", /*generation=*/1);
       runner.enqueue("printf stale > " + sentinel.string(), /*generation=*/1);
       runner.invalidateBefore(2);
@@ -99,7 +99,7 @@ namespace {
     std::filesystem::remove(queued);
 
     {
-      noctalia::theme::HookRunner runner(1);
+      paw2shell::theme::HookRunner runner(1);
       runner.enqueue("sleep 0.2; printf ran > " + running.string(), /*generation=*/1);
       runner.enqueue("printf ran > " + queued.string(), /*generation=*/1);
       runner.requestShutdown();
@@ -120,7 +120,7 @@ namespace {
     std::filesystem::remove(pidFile);
 
     auto cancel = std::make_shared<std::atomic<bool>>(false);
-    auto runner = std::make_unique<noctalia::theme::HookRunner>(1, cancel);
+    auto runner = std::make_unique<paw2shell::theme::HookRunner>(1, cancel);
     // Ignores SIGTERM, so only the SIGKILL escalation can end it.
     runner->enqueue("trap '' TERM; echo $$ > " + pidFile.string() + "; exec sleep 600", /*generation=*/1);
     const pid_t pid = waitForPid(pidFile);

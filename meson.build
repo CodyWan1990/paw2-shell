@@ -1,4 +1,4 @@
-project('noctalia', ['c', 'cpp'],
+project('paw2-shell', ['c', 'cpp'],
   version: files('VERSION'),
   meson_version: '>=1.1',
   default_options: [
@@ -113,7 +113,7 @@ if is_glibc
   jemalloc_dep = dependency('jemalloc', required: jemalloc_option)
   if jemalloc_dep.found()
     jemalloc_deps += [jemalloc_dep]
-    jemalloc_cpp_args += ['-DNOCTALIA_USE_JEMALLOC=1']
+    jemalloc_cpp_args += ['-DPAW2_SHELL_USE_JEMALLOC=1']
   endif
 endif
 
@@ -329,7 +329,7 @@ _protocol_headers += _wlr_ls_h
 alias_target('wayland-protocol-headers', _protocol_headers)
 
 # ── Main sources ──────────────────────────────────────────────────────────────
-_noctalia_sources = files(
+_paw2_shell_sources = files(
   'src/app/application.cpp',
   'src/app/application_dmenu.cpp',
   'src/app/application_events.cpp',
@@ -871,14 +871,14 @@ _noctalia_sources = files(
 )
 
 if sanitize
-  _noctalia_sources += files('src/core/lsan_suppressions.cpp')
+  _paw2_shell_sources += files('src/core/lsan_suppressions.cpp')
 endif
 
 git_program = find_program('git', required: false)
 if git_program.found()
   _git_revision_h = vcs_tag(
     input: 'src/core/git_revision.h.in',
-    output: 'noctalia_git_revision.h',
+    output: 'paw2_shell_git_revision.h',
     command: [git_program, 'describe', '--tags', '--always', '--dirty=-dirty', '--abbrev=12'],
     fallback: 'unknown',
   )
@@ -887,13 +887,13 @@ else
   _git_revision_config.set('VCS_TAG', 'unknown')
   _git_revision_h = configure_file(
     input: 'src/core/git_revision.h.in',
-    output: 'noctalia_git_revision.h',
+    output: 'paw2_shell_git_revision.h',
     configuration: _git_revision_config,
   )
 endif
 
 # ── Include directories ────────────────────────────────────────────────────────
-_noctalia_inc = [
+_paw2_shell_inc = [
   include_directories('src'),
   include_directories('third_party/wuffs', is_system: true),
   # '.' adds both the source root and the corresponding build-dir root, so
@@ -902,7 +902,7 @@ _noctalia_inc = [
 ]
 
 # ── Application library and executable ────────────────────────────────────────
-_noctalia_system_dependencies = [
+_paw2_shell_system_dependencies = [
   sdbus_cpp_dep,
   wayland_client_dep,
   egl_dep,
@@ -942,50 +942,50 @@ _noctalia_system_dependencies = [
   sndfile_dep,
 ] + jemalloc_deps + (dl_dep.found() ? [dl_dep] : [])
 
-_noctalia_dependencies = _noctalia_system_dependencies + [
+_paw2_shell_dependencies = _paw2_shell_system_dependencies + [
   fzy_dep,
   mcu_dep,
 ]
 
-_noctalia_test_dependencies = _noctalia_system_dependencies + [
+_paw2_shell_test_dependencies = _paw2_shell_system_dependencies + [
   _fzy_selective_dep,
   _mcu_selective_dep,
 ]
 
-_noctalia_compile_definitions = [
-  '-DNOCTALIA_INSTALL_PREFIX="' + get_option('prefix') + '"',
-  '-DNOCTALIA_INSTALL_DATADIR="' + get_option('datadir') + '"',
-  '-DNOCTALIA_VERSION="' + meson.project_version() + '"',
+_paw2_shell_compile_definitions = [
+  '-DPAW2_SHELL_INSTALL_PREFIX="' + get_option('prefix') + '"',
+  '-DPAW2_SHELL_INSTALL_DATADIR="' + get_option('datadir') + '"',
+  '-DPAW2_SHELL_VERSION="' + meson.project_version() + '"',
 ] + jemalloc_cpp_args
 
-_noctalia_cpp_args = [
+_paw2_shell_cpp_args = [
   '-Wall', '-Wextra', '-Wno-missing-field-initializers', '-Wpedantic', '-Wconversion', '-Wshadow',
-] + _noctalia_compile_definitions
+] + _paw2_shell_compile_definitions
 
 # Production sources and generated protocols compile once. The shell links the
 # archive whole; tests link it normally so only the objects they exercise enter
 # each test executable.
-noctalia_core_lib = static_library('noctalia_core',
-  sources: _noctalia_sources + _protocol_sources + _protocol_headers + [_git_revision_h],
-  dependencies: _noctalia_dependencies,
-  include_directories: _noctalia_inc,
-  cpp_args: _noctalia_cpp_args,
+paw2_shell_core_lib = static_library('paw2_shell_core',
+  sources: _paw2_shell_sources + _protocol_sources + _protocol_headers + [_git_revision_h],
+  dependencies: _paw2_shell_dependencies,
+  include_directories: _paw2_shell_inc,
+  cpp_args: _paw2_shell_cpp_args,
 )
 
-noctalia_core_dep = declare_dependency(
-  link_with: noctalia_core_lib,
-  dependencies: _noctalia_test_dependencies,
-  include_directories: _noctalia_inc,
-  compile_args: _noctalia_compile_definitions,
+paw2_shell_core_dep = declare_dependency(
+  link_with: paw2_shell_core_lib,
+  dependencies: _paw2_shell_test_dependencies,
+  include_directories: _paw2_shell_inc,
+  compile_args: _paw2_shell_compile_definitions,
   sources: _protocol_headers,
 )
 
-noctalia_exe = executable('paw2-shell',
+paw2_shell_exe = executable('paw2-shell',
   sources: files('src/main.cpp') + _protocol_headers,
-  dependencies: _noctalia_dependencies,
-  include_directories: _noctalia_inc,
-  cpp_args: _noctalia_cpp_args,
-  objects: noctalia_core_lib.extract_all_objects(recursive: false),
+  dependencies: _paw2_shell_dependencies,
+  include_directories: _paw2_shell_inc,
+  cpp_args: _paw2_shell_cpp_args,
+  objects: paw2_shell_core_lib.extract_all_objects(recursive: false),
   install: true,
 )
 
@@ -1154,7 +1154,7 @@ if build_tests
   foreach test_name : _cpp_test_names
     test_exe = executable(test_name + '_test',
       sources: files('tests' / (test_name + '_test.cpp')),
-      dependencies: noctalia_core_dep,
+      dependencies: paw2_shell_core_dep,
       override_options: ['b_ndebug=false'],
     )
     test_args = []
@@ -1168,43 +1168,43 @@ if build_tests
 
   screencopy_connection_isolation_exe = executable('screencopy_connection_isolation_test',
     sources: files('tests/screencopy_connection_isolation_test.cpp') + [_wlr_screencopy_test_server_h],
-    dependencies: [noctalia_core_dep, wayland_server_dep],
+    dependencies: [paw2_shell_core_dep, wayland_server_dep],
     override_options: ['b_ndebug=false'],
   )
   test('screencopy_connection_isolation', screencopy_connection_isolation_exe)
 
   idle_manager_exe = executable('idle_manager_test',
     sources: files('tests/idle_manager_test.cpp') + [_idle_test_server_h],
-    dependencies: [noctalia_core_dep, wayland_server_dep],
+    dependencies: [paw2_shell_core_dep, wayland_server_dep],
     override_options: ['b_ndebug=false'],
   )
   test('idle_manager', idle_manager_exe)
 
   brightness_service_exe = executable('brightness_service_test',
     sources: files('tests/brightness_service_test.cpp'),
-    dependencies: [noctalia_core_dep, wayland_server_dep],
+    dependencies: [paw2_shell_core_dep, wayland_server_dep],
     override_options: ['b_ndebug=false'],
   )
   test('brightness_service', brightness_service_exe, timeout: 60)
 
   upower_integration_exe = executable('upower_charge_limit_integration_test',
     sources: files('tests/upower_charge_limit_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: paw2_shell_core_dep,
     override_options: ['b_ndebug=false'],
   )
   secret_collection_probe_integration_exe = executable('secret_collection_probe_integration_test',
     sources: files('tests/secret_collection_probe_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: paw2_shell_core_dep,
     override_options: ['b_ndebug=false'],
   )
   tray_registration_integration_exe = executable('tray_registration_integration_test',
     sources: files('tests/tray_registration_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: paw2_shell_core_dep,
     override_options: ['b_ndebug=false'],
   )
   fingerprint_integration_exe = executable('fingerprint_authenticator_integration_test',
     sources: files('tests/fingerprint_authenticator_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: paw2_shell_core_dep,
     override_options: ['b_ndebug=false'],
   )
   dbus_run_session = find_program('dbus-run-session', required: false)
@@ -1243,7 +1243,7 @@ if build_tests
 
   bluetooth_property_integration_exe = executable('bluetooth_property_integration_test',
     sources: files('tests/bluetooth_property_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: paw2_shell_core_dep,
     override_options: ['b_ndebug=false'],
   )
   if dbus_run_session.found()
@@ -1260,7 +1260,7 @@ if build_tests
 
   notification_reply_integration_exe = executable('notification_reply_integration_test',
     sources: files('tests/notification_reply_integration_test.cpp'),
-    dependencies: noctalia_core_dep,
+    dependencies: paw2_shell_core_dep,
     override_options: ['b_ndebug=false'],
   )
   if dbus_run_session.found()
@@ -1272,15 +1272,15 @@ if build_tests
   endif
 
   config_validate_env = environment()
-  config_validate_env.set('NOCTALIA_CONFIG_HOME', meson.current_source_dir() / 'tests/config_validate/config-home')
-  config_validate_env.set('NOCTALIA_STATE_HOME', meson.current_source_dir() / 'tests/config_validate/state-home')
-  config_validate_env.set('NOCTALIA_DATA_HOME', meson.current_source_dir() / 'tests/config_validate/data-home')
+  config_validate_env.set('PAW2_SHELL_CONFIG_HOME', meson.current_source_dir() / 'tests/config_validate/config-home')
+  config_validate_env.set('PAW2_SHELL_STATE_HOME', meson.current_source_dir() / 'tests/config_validate/state-home')
+  config_validate_env.set('PAW2_SHELL_DATA_HOME', meson.current_source_dir() / 'tests/config_validate/data-home')
 
   sh_program = find_program('sh')
   test('config_validate_cli',
     sh_program,
-    args: ['tests/config_validate_cli_test.sh', noctalia_exe.full_path()],
-    depends: noctalia_exe,
+    args: ['tests/config_validate_cli_test.sh', paw2_shell_exe.full_path()],
+    depends: paw2_shell_exe,
     workdir: meson.current_source_dir(),
     env: config_validate_env,
   )

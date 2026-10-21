@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <tuple>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -431,4 +431,4 @@ namespace noctalia::theme {
     return terminal;
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

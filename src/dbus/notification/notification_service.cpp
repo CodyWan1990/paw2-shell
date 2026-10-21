@@ -585,5 +585,5 @@ void NotificationService::emitNotificationReplied(
 }
 
 std::tuple<std::string, std::string, std::string, std::string> NotificationService::onGetServerInformation() {
-  return {"noctalia", "noctalia-dev", NOCTALIA_VERSION, "1.2"};
+  return {"noctalia", "noctalia-dev", PAW2_SHELL_VERSION, "1.2"};
 }

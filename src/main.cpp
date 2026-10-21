@@ -26,7 +26,7 @@
 #include <unistd.h>
 
 #ifdef __GLIBC__
-#ifdef NOCTALIA_USE_JEMALLOC
+#ifdef PAW2_SHELL_USE_JEMALLOC
 #include <jemalloc/jemalloc.h>
 #else
 #include <malloc.h>
@@ -37,7 +37,7 @@ namespace {
 
   enum class SpawnResult { Parent, Error };
 
-  constexpr const char* kDaemonPipeEnv = "NOCTALIA_DAEMON_PIPE_FD";
+  constexpr const char* kDaemonPipeEnv = "PAW2_SHELL_DAEMON_PIPE_FD";
   int g_daemonPipe = -1;
 
   void closeFd(int& fd) {
@@ -130,12 +130,12 @@ namespace {
 
   int runTopLevelFlag(const char* flag) {
     if (std::strcmp(flag, "--version") == 0 || std::strcmp(flag, "-v") == 0) {
-      const std::string version = noctalia::build_info::displayVersion();
+      const std::string version = paw2shell::build_info::displayVersion();
       std::println("paw2-shell {}", version);
       return 0;
     }
     if (std::strcmp(flag, "--help") == 0 || std::strcmp(flag, "-h") == 0) {
-      std::print("{}", noctalia::cli::renderHelp(noctalia::cli::kRootCmd, "paw2-shell"));
+      std::print("{}", paw2shell::cli::renderHelp(paw2shell::cli::kRootCmd, "paw2-shell"));
       return 0;
     }
     return -1;
@@ -241,7 +241,7 @@ namespace {
 
 } // namespace
 
-#ifdef NOCTALIA_USE_JEMALLOC
+#ifdef PAW2_SHELL_USE_JEMALLOC
 // jemalloc reads this before its first allocation; the background thread runs
 // decay even while the shell is idle.
 const char* malloc_conf = "background_thread:true,narenas:2,dirty_decay_ms:1000,muzzy_decay_ms:5000,lg_tcache_max:12";
@@ -249,7 +249,7 @@ const char* malloc_conf = "background_thread:true,narenas:2,dirty_decay_ms:1000,
 
 int main(int argc, char* argv[]) {
 
-#if defined(__GLIBC__) && !defined(NOCTALIA_USE_JEMALLOC)
+#if defined(__GLIBC__) && !defined(PAW2_SHELL_USE_JEMALLOC)
   mallopt(M_ARENA_MAX, 2);
 #endif
 
@@ -274,23 +274,23 @@ int main(int argc, char* argv[]) {
   }
 
   if (argc >= 2) {
-    if (noctalia::theme::isFirefoxNativeMessagingLaunch(argc, argv))
-      return noctalia::theme::runFirefoxNativeMessagingHost();
+    if (paw2shell::theme::isFirefoxNativeMessagingLaunch(argc, argv))
+      return paw2shell::theme::runFirefoxNativeMessagingHost();
     if (std::strcmp(argv[1], "completions") == 0)
-      return noctalia::cli::runCompletionsCli(argc, argv);
+      return paw2shell::cli::runCompletionsCli(argc, argv);
     if (std::strcmp(argv[1], "firefox-theme") == 0)
-      return noctalia::theme::runFirefoxThemeCli(argc, argv);
+      return paw2shell::theme::runFirefoxThemeCli(argc, argv);
     if (std::strcmp(argv[1], "theme") == 0)
-      return noctalia::theme::runCli(argc, argv);
+      return paw2shell::theme::runCli(argc, argv);
     if (std::strcmp(argv[1], "msg") == 0)
-      return noctalia::ipc::runCli(argc, argv);
+      return paw2shell::ipc::runCli(argc, argv);
     // Internal mode for PAM authentication after re-exec.
     if (std::strcmp(argv[1], "pam-helper") == 0)
       return PamAuthenticator::runHelperMode(argc, argv);
     if (std::strcmp(argv[1], "config") == 0)
-      return noctalia::config::runCli(argc, argv);
+      return paw2shell::config::runCli(argc, argv);
     if (std::strcmp(argv[1], "dmenu") == 0)
-      return noctalia::launcher::runDmenuCli(argc, argv);
+      return paw2shell::launcher::runDmenuCli(argc, argv);
   }
 
   for (int i = 1; i < argc; ++i) {

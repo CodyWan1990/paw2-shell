@@ -2,7 +2,7 @@
 
 #include <string>
 
-namespace noctalia::launcher {
+namespace paw2shell::launcher {
 
   struct DmenuSocketPathResult {
     std::string path;
@@ -11,4 +11,4 @@ namespace noctalia::launcher {
 
   [[nodiscard]] DmenuSocketPathResult resolveDmenuSocketPath();
 
-} // namespace noctalia::launcher
+} // namespace paw2shell::launcher

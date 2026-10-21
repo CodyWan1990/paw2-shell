@@ -2177,7 +2177,7 @@
             "label": "Ao Mudar o Modo do Tema"
           },
           "wallpaper-changed": {
-            "description": "Comando para executar quando o papel de parede mudar; fornece NOCTALIA_WALLPAPER_PATH e NOCTALIA_WALLPAPER_CONNECTOR",
+            "description": "Comando para executar quando o papel de parede mudar; fornece PAW2_SHELL_WALLPAPER_PATH e PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "Ao Mudar o Papel de Parede"
           },
           "wifi-disabled": {

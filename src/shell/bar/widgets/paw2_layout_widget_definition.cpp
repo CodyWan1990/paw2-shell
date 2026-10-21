@@ -1,10 +1,10 @@
 #include "shell/bar/widgets/paw2_layout_widget_definition.h"
 
-const noctalia::bar::WidgetDefinition<Paw2LayoutWidget::Options>& paw2LayoutWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<Paw2LayoutWidget::Options>& paw2LayoutWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = Paw2LayoutWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "paw2_layout",
       .fields =
           {

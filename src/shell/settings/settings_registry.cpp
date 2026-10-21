@@ -69,8 +69,8 @@ namespace settings {
 
     // What the dead zone does for a gesture nobody has bound, shown as the row's placeholder so an
     // empty field never reads as "does nothing".
-    [[nodiscard]] std::string deadZoneDefault(noctalia::bar::Gesture gesture) {
-      for (const auto& binding : noctalia::bar::deadZoneGestureDefaults()) {
+    [[nodiscard]] std::string deadZoneDefault(paw2shell::bar::Gesture gesture) {
+      for (const auto& binding : paw2shell::bar::deadZoneGestureDefaults()) {
         if (binding.gesture == gesture) {
           return std::string(binding.action);
         }
@@ -128,7 +128,7 @@ namespace settings {
     // one source. `integerValue` (write as int64) stays explicit: it is a UI/write
     // choice, not implied by the range's numeric type (e.g. transition_duration).
     template <typename V, typename T>
-    SliderSetting sliderFor(V value, const noctalia::config::schema::Range<T>& range, bool integerValue) {
+    SliderSetting sliderFor(V value, const paw2shell::config::schema::Range<T>& range, bool integerValue) {
       return SliderSetting{
           static_cast<double>(value), static_cast<double>(range.min.value()), static_cast<double>(range.max.value()),
           static_cast<double>(range.step.value()), integerValue
@@ -136,7 +136,7 @@ namespace settings {
     }
 
     template <typename V, typename T>
-    StepperSetting stepperFor(V value, const noctalia::config::schema::Range<T>& range, std::string suffix = {}) {
+    StepperSetting stepperFor(V value, const paw2shell::config::schema::Range<T>& range, std::string suffix = {}) {
       return StepperSetting{
           .value = static_cast<int>(value),
           .minValue = static_cast<int>(range.min.value()),
@@ -1025,7 +1025,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "interface", "appearance.corner-roundness", {"shell", "corner_radius_scale"},
-        sliderFor(cfg.shell.cornerRadiusScale, noctalia::config::schema::kCornerRadiusScaleRange, false),
+        sliderFor(cfg.shell.cornerRadiusScale, paw2shell::config::schema::kCornerRadiusScaleRange, false),
         "rounded corners radius"
     ));
     entries.push_back(keyedEntry(
@@ -1087,12 +1087,12 @@ namespace settings {
     entries.push_back(makeEntry(
         SettingsSection::Appearance, "shadows", tr("settings.schema.shared.shadow-alpha.label"),
         tr("settings.schema.appearance.global-shadow-alpha.description"), {"shell", "shadow", "alpha"},
-        sliderFor(cfg.shell.shadow.alpha, noctalia::config::schema::kUnitRange, false), "shadow opacity", true
+        sliderFor(cfg.shell.shadow.alpha, paw2shell::config::schema::kUnitRange, false), "shadow opacity", true
     ));
     // One size for every shadow: the shell's surfaces and, while paw2 shares its config, its windows.
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "shadows", "appearance.global-shadow-size", {"shell", "shadow", "size"},
-        sliderFor(cfg.shell.shadow.size, noctalia::config::schema::kShadowSizeRange, true),
+        sliderFor(cfg.shell.shadow.size, paw2shell::config::schema::kShadowSizeRange, true),
         "shadow size blur reach drop window dock bar panel"
     ));
     entries.push_back(keyedEntry(
@@ -1110,14 +1110,14 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "motion", "appearance.animation-speed", {"shell", "animation", "speed"},
-        sliderFor(cfg.shell.animation.speed, noctalia::config::schema::kAnimationSpeedRange, false), "motion"
+        sliderFor(cfg.shell.animation.speed, paw2shell::config::schema::kAnimationSpeedRange, false), "motion"
     ));
     if (paw2) {
       appendPaw2DesktopThemeEntries(entries, *paw2);
     }
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "accessibility", "appearance.ui-scale", {"accessibility", "ui_scale"},
-        sliderFor(cfg.accessibility.uiScale, noctalia::config::schema::kScaleRange, false), "size scale text panels"
+        sliderFor(cfg.accessibility.uiScale, paw2shell::config::schema::kScaleRange, false), "size scale text panels"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "accessibility", "accessibility.high-contrast", {"accessibility", "high_contrast"},
@@ -1286,13 +1286,13 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Wallpaper, "transition", "wallpaper.transition-duration", {"wallpaper", "transition_duration"},
         sliderFor(
-            cfg.wallpaper.transitionDurationMs, noctalia::config::schema::kWallpaperTransitionDurationRange, true
+            cfg.wallpaper.transitionDurationMs, paw2shell::config::schema::kWallpaperTransitionDurationRange, true
         ),
         "fade animation"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Wallpaper, "transition", "wallpaper.edge-smoothness", {"wallpaper", "edge_smoothness"},
-        sliderFor(cfg.wallpaper.edgeSmoothness, noctalia::config::schema::kUnitRange, false), "transition feathering",
+        sliderFor(cfg.wallpaper.edgeSmoothness, paw2shell::config::schema::kUnitRange, false), "transition feathering",
         true
     ));
     entries.push_back(keyedEntry(
@@ -1307,7 +1307,7 @@ namespace settings {
         SettingsSection::Wallpaper, "automation", "wallpaper.automation-interval",
         {"wallpaper", "automation", "interval_seconds"},
         stepperFor(
-            cfg.wallpaper.automation.intervalSeconds, noctalia::config::schema::kWallpaperAutomationIntervalRange, "s"
+            cfg.wallpaper.automation.intervalSeconds, paw2shell::config::schema::kWallpaperAutomationIntervalRange, "s"
         ),
         "rotate slideshow"
     ));
@@ -1330,7 +1330,7 @@ namespace settings {
         "theme templates"
     ));
     {
-      const auto availableTemplates = noctalia::theme::availableTemplates();
+      const auto availableTemplates = paw2shell::theme::availableTemplates();
       std::vector<SelectOption> templateOptions;
       templateOptions.reserve(availableTemplates.size());
       for (const auto& t : availableTemplates) {
@@ -1339,7 +1339,7 @@ namespace settings {
                 .value = t.id,
                 .label = t.displayName,
                 .description = t.category,
-                .tooltip = noctalia::theme::formatTemplateTooltip(t)
+                .tooltip = paw2shell::theme::formatTemplateTooltip(t)
             }
         );
       }
@@ -1444,56 +1444,56 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "layout", "dock.icon-size", path("icon_size"),
-          sliderFor(dock.iconSize, noctalia::config::schema::kDockIconSizeRange, true), "apps"
+          sliderFor(dock.iconSize, paw2shell::config::schema::kDockIconSizeRange, true), "apps"
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "layout", tr("settings.schema.shared.main-axis-padding.label"),
           tr("settings.schema.dock.main-axis-padding.description"), path("main_axis_padding"),
-          sliderFor(dock.mainAxisPadding, noctalia::config::schema::kDockPaddingRange, true), "inset"
+          sliderFor(dock.mainAxisPadding, paw2shell::config::schema::kDockPaddingRange, true), "inset"
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "layout", tr("settings.schema.shared.cross-axis-padding.label"),
           tr("settings.schema.dock.cross-axis-padding.description"), path("cross_axis_padding"),
-          sliderFor(dock.crossAxisPadding, noctalia::config::schema::kDockPaddingRange, true), "inset"
+          sliderFor(dock.crossAxisPadding, paw2shell::config::schema::kDockPaddingRange, true), "inset"
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "layout", "dock.item-spacing", path("item_spacing"),
-          sliderFor(dock.itemSpacing, noctalia::config::schema::kDockItemSpacingRange, true), "gap"
+          sliderFor(dock.itemSpacing, paw2shell::config::schema::kDockItemSpacingRange, true), "gap"
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "layout", tr("settings.schema.shared.ends-margin.label"),
           tr("settings.schema.dock.ends-margin.description"), path("margin_ends"),
-          sliderFor(dock.marginEnds, noctalia::config::schema::kDockMarginEndsRange, true), "gap inset"
+          sliderFor(dock.marginEnds, paw2shell::config::schema::kDockMarginEndsRange, true), "gap inset"
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "layout", tr("settings.schema.shared.edge-margin.label"),
           tr("settings.schema.dock.edge-margin.description"), path("margin_edge"),
-          sliderFor(dock.marginEdge, noctalia::config::schema::kDockMarginEdgeRange, true), "gap inset"
+          sliderFor(dock.marginEdge, paw2shell::config::schema::kDockMarginEdgeRange, true), "gap inset"
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "shape", tr("settings.schema.shared.corner-radius.label"),
           tr("settings.schema.dock.corner-radius.description"), path("radius"),
-          sliderFor(dock.radius, noctalia::config::schema::kDockRadiusRange, true), "rounded"
+          sliderFor(dock.radius, paw2shell::config::schema::kDockRadiusRange, true), "rounded"
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "shape", tr("settings.schema.shared.corner-top-left.label"),
           tr("settings.schema.dock.corner-top-left.description"), path("radius_top_left"),
-          sliderFor(dock.radiusTopLeft, noctalia::config::schema::kDockRadiusRange, true), "rounded corner", true
+          sliderFor(dock.radiusTopLeft, paw2shell::config::schema::kDockRadiusRange, true), "rounded corner", true
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "shape", tr("settings.schema.shared.corner-top-right.label"),
           tr("settings.schema.dock.corner-top-right.description"), path("radius_top_right"),
-          sliderFor(dock.radiusTopRight, noctalia::config::schema::kDockRadiusRange, true), "rounded corner", true
+          sliderFor(dock.radiusTopRight, paw2shell::config::schema::kDockRadiusRange, true), "rounded corner", true
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "shape", tr("settings.schema.shared.corner-bottom-left.label"),
           tr("settings.schema.dock.corner-bottom-left.description"), path("radius_bottom_left"),
-          sliderFor(dock.radiusBottomLeft, noctalia::config::schema::kDockRadiusRange, true), "rounded corner", true
+          sliderFor(dock.radiusBottomLeft, paw2shell::config::schema::kDockRadiusRange, true), "rounded corner", true
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "shape", tr("settings.schema.shared.corner-bottom-right.label"),
           tr("settings.schema.dock.corner-bottom-right.description"), path("radius_bottom_right"),
-          sliderFor(dock.radiusBottomRight, noctalia::config::schema::kDockRadiusRange, true), "rounded corner", true
+          sliderFor(dock.radiusBottomRight, paw2shell::config::schema::kDockRadiusRange, true), "rounded corner", true
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "shape", "dock.concave-edge-corners", path("concave_edge_corners"),
@@ -1506,12 +1506,12 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "shape", "dock.border-width", path("border_width"),
-          sliderFor(dock.borderWidth, noctalia::config::schema::kDockBorderWidthRange, false), "outline stroke", true
+          sliderFor(dock.borderWidth, paw2shell::config::schema::kDockBorderWidthRange, false), "outline stroke", true
       ));
       entries.push_back(makeEntry(
           SettingsSection::Dock, "effects", tr("settings.schema.shared.background-opacity.label"),
           tr("settings.schema.dock.background-opacity.description"), path("background_opacity"),
-          sliderFor(dock.backgroundOpacity, noctalia::config::schema::kUnitRange, false),
+          sliderFor(dock.backgroundOpacity, paw2shell::config::schema::kUnitRange, false),
           "alpha transparency translucent opacity"
       ));
       entries.push_back(makeEntry(
@@ -1525,7 +1525,7 @@ namespace settings {
           OptionalStepperSetting{
               .value = dock.shadowSize,
               .minValue = 0,
-              .maxValue = static_cast<int>(noctalia::config::schema::kShadowSizeRange.max.value()),
+              .maxValue = static_cast<int>(paw2shell::config::schema::kShadowSizeRange.max.value()),
               .step = 1,
               .fallbackValue = cfg.shell.shadow.size,
               .unsetLabel = tr("common.states.inherit"),
@@ -1549,24 +1549,24 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "focus-styling", "dock.magnification-scale", path("magnification_scale"),
-          sliderFor(dock.magnificationScale, noctalia::config::schema::kDockMagnificationScaleRange, false),
+          sliderFor(dock.magnificationScale, paw2shell::config::schema::kDockMagnificationScaleRange, false),
           "magnify zoom"
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "focus-styling", "dock.active-icon-scale", path("active_scale"),
-          sliderFor(dock.activeScale, noctalia::config::schema::kDockActiveScaleRange, false), "focused", true
+          sliderFor(dock.activeScale, paw2shell::config::schema::kDockActiveScaleRange, false), "focused", true
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "focus-styling", "dock.inactive-icon-scale", path("inactive_scale"),
-          sliderFor(dock.inactiveScale, noctalia::config::schema::kDockInactiveScaleRange, false), "unfocused", true
+          sliderFor(dock.inactiveScale, paw2shell::config::schema::kDockInactiveScaleRange, false), "unfocused", true
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "focus-styling", "dock.active-icon-opacity", path("active_opacity"),
-          sliderFor(dock.activeOpacity, noctalia::config::schema::kUnitRange, false), "focused alpha", true
+          sliderFor(dock.activeOpacity, paw2shell::config::schema::kUnitRange, false), "focused alpha", true
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "focus-styling", "dock.inactive-icon-opacity", path("inactive_opacity"),
-          sliderFor(dock.inactiveOpacity, noctalia::config::schema::kUnitRange, false), "unfocused alpha", true
+          sliderFor(dock.inactiveOpacity, paw2shell::config::schema::kUnitRange, false), "unfocused alpha", true
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "pinned-apps", "dock.pinned-apps", path("pinned"), ListSetting{.items = dock.pinned},
@@ -1614,7 +1614,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Panels, "effects", "panels.border-width", {"shell", "panel", "border_width"},
-        sliderFor(cfg.shell.panel.borderWidth, noctalia::config::schema::kPanelBorderWidthRange, false),
+        sliderFor(cfg.shell.panel.borderWidth, paw2shell::config::schema::kPanelBorderWidthRange, false),
         "outline border width thickness"
     ));
     entries.push_back(makeEntry(
@@ -1712,7 +1712,7 @@ namespace settings {
         "launcher layout simple full classic minimal compact toolbar tabs"
     ));
     {
-      auto width = sliderFor(cfg.shell.launcher.width, noctalia::config::schema::kLauncherWidthRange, true);
+      auto width = sliderFor(cfg.shell.launcher.width, paw2shell::config::schema::kLauncherWidthRange, true);
       width.valueSuffix = "px";
       auto e = keyedEntry(
           SettingsSection::Launcher, "launcher", "panels.launcher-width", {"shell", "launcher", "width"},
@@ -1879,7 +1879,7 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Panels, "clipboard", "shell.clipboard-history-max-entries",
         {"shell", "clipboard_history_max_entries"},
-        stepperFor(cfg.shell.clipboardHistoryMaxEntries, noctalia::config::schema::kClipboardHistoryMaxEntriesRange),
+        stepperFor(cfg.shell.clipboardHistoryMaxEntries, paw2shell::config::schema::kClipboardHistoryMaxEntriesRange),
         "clipboard history limit entries", false, clipboardOn
     ));
     entries.push_back(keyedEntry(
@@ -1968,7 +1968,7 @@ namespace settings {
     ));
     {
       SliderSetting width =
-          sliderFor(cfg.controlCenter.width, noctalia::config::schema::kControlCenterWidthRange, true);
+          sliderFor(cfg.controlCenter.width, paw2shell::config::schema::kControlCenterWidthRange, true);
       width.valueSuffix = "px";
       entries.push_back(keyedEntry(
           SettingsSection::ControlCenter, "layout", "panels.control-center-width", {"control_center", "width"},
@@ -2031,7 +2031,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Desktop, "screen-corners", "desktop.screen-corners-size", {"shell", "screen_corners", "size"},
-        sliderFor(cfg.shell.screenCorners.size, noctalia::config::schema::kScreenCornersSizeRange, true),
+        sliderFor(cfg.shell.screenCorners.size, paw2shell::config::schema::kScreenCornersSizeRange, true),
         "screen corners radius"
     ));
 
@@ -2041,7 +2041,7 @@ namespace settings {
     ));
     {
       auto delay = sliderFor(
-          static_cast<std::int64_t>(cfg.hotCorners.delayMs), noctalia::config::schema::kHotCornersDelayMsRange, true
+          static_cast<std::int64_t>(cfg.hotCorners.delayMs), paw2shell::config::schema::kHotCornersDelayMsRange, true
       );
       delay.valueSuffix = "ms";
       SettingEntry e = keyedEntry(
@@ -2191,7 +2191,7 @@ namespace settings {
           SettingsSection::Security, "lock-screen", "lockscreen.transition-duration",
           {"lockscreen", "transition_duration"},
           sliderFor(
-              cfg.lockscreen.transitionDurationMs, noctalia::config::schema::kLockscreenTransitionDurationRange, true
+              cfg.lockscreen.transitionDurationMs, paw2shell::config::schema::kLockscreenTransitionDurationRange, true
           ),
           "lock screen transition animation duration"
       );
@@ -2200,7 +2200,7 @@ namespace settings {
 
       auto edgeSmoothness = keyedEntry(
           SettingsSection::Security, "lock-screen", "lockscreen.edge-smoothness", {"lockscreen", "edge_smoothness"},
-          sliderFor(cfg.lockscreen.edgeSmoothness, noctalia::config::schema::kUnitRange, false),
+          sliderFor(cfg.lockscreen.edgeSmoothness, paw2shell::config::schema::kUnitRange, false),
           "lock screen transition feathering", true
       );
       edgeSmoothness.visibleWhen = lockscreenOn;
@@ -2228,12 +2228,12 @@ namespace settings {
     }
     entries.push_back(keyedEntry(
         SettingsSection::Security, "lock-screen", "lockscreen.blur-intensity", {"lockscreen", "blur_intensity"},
-        sliderFor(cfg.lockscreen.blurIntensity, noctalia::config::schema::kUnitRange, false), "lock screen blur", false,
+        sliderFor(cfg.lockscreen.blurIntensity, paw2shell::config::schema::kUnitRange, false), "lock screen blur", false,
         lockscreenOn
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Security, "lock-screen", "lockscreen.tint-intensity", {"lockscreen", "tint_intensity"},
-        sliderFor(cfg.lockscreen.tintIntensity, noctalia::config::schema::kUnitRange, false), "lock screen tint", false,
+        sliderFor(cfg.lockscreen.tintIntensity, paw2shell::config::schema::kUnitRange, false), "lock screen tint", false,
         lockscreenOn
     ));
     entries.push_back(keyedEntry(
@@ -2395,12 +2395,12 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-hide-delay", {"osd", "hide_delay_ms"},
-        stepperFor(cfg.osd.hideDelayMs, noctalia::config::schema::kOsdHideDelayMsRange, "ms"),
+        stepperFor(cfg.osd.hideDelayMs, paw2shell::config::schema::kOsdHideDelayMsRange, "ms"),
         "hud overlay popup timeout duration visible"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-scale", {"osd", "scale"},
-        sliderFor(cfg.osd.scale, noctalia::config::schema::kScaleRange, false),
+        sliderFor(cfg.osd.scale, paw2shell::config::schema::kScaleRange, false),
         "hud overlay volume brightness size scale multiplier"
     ));
     entries.push_back(keyedEntry(
@@ -2415,7 +2415,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-background-opacity", {"osd", "background_opacity"},
-        sliderFor(cfg.osd.backgroundOpacity, noctalia::config::schema::kUnitRange, false),
+        sliderFor(cfg.osd.backgroundOpacity, paw2shell::config::schema::kUnitRange, false),
         "hud overlay popup alpha transparency translucent opacity"
     ));
     entries.push_back(keyedEntry(
@@ -2428,7 +2428,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Osd, "osd", "shell.osd-border-width", {"osd", "border_width"},
-        sliderFor(cfg.osd.borderWidth, noctalia::config::schema::kOsdBorderWidthRange, false),
+        sliderFor(cfg.osd.borderWidth, paw2shell::config::schema::kOsdBorderWidthRange, false),
         "outline border width thickness"
     ));
     entries.push_back(keyedEntry(
@@ -2522,7 +2522,7 @@ namespace settings {
       if (env.systemBatteryAvailable) {
         entries.push_back(keyedEntry(
             SettingsSection::System, "battery", "system.battery-warning-threshold", {"battery", "warning_threshold"},
-            sliderFor(cfg.battery.warningThreshold, noctalia::config::schema::kBatteryWarningThresholdRange, true),
+            sliderFor(cfg.battery.warningThreshold, paw2shell::config::schema::kBatteryWarningThresholdRange, true),
             "battery low warning threshold notification"
         ));
       }
@@ -2596,7 +2596,7 @@ namespace settings {
 
       // One dual-thumb range row per metric: low thumb = activity threshold, high thumb = critical.
       auto addThresholdPair = [&](std::string_view baseKey, std::string_view statLabelKey, double activityValue,
-                                  double criticalValue, noctalia::sysmon::ThresholdProfile profile, bool integerValue,
+                                  double criticalValue, paw2shell::sysmon::ThresholdProfile profile, bool integerValue,
                                   std::string valueSuffix) {
         const std::vector<std::string> activityPath = {
             "system", "monitor", std::string(baseKey) + "_activity_threshold"
@@ -2626,64 +2626,64 @@ namespace settings {
         entries.push_back(std::move(entry));
       };
 
-      using noctalia::sysmon::Stat;
+      using paw2shell::sysmon::Stat;
       addThresholdPair(
           "cpu_usage", "settings.schema.services.system-monitor.stats.cpu-usage", mon.cpuUsageActivityThreshold,
-          mon.cpuUsageCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::CpuUsage), true, "%"
+          mon.cpuUsageCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::CpuUsage), true, "%"
       );
       addThresholdPair(
           "cpu_temp", "settings.schema.services.system-monitor.stats.cpu-temp", mon.cpuTempActivityThreshold,
-          mon.cpuTempCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::CpuTemp), true, "°C"
+          mon.cpuTempCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::CpuTemp), true, "°C"
       );
       addThresholdPair(
           "cpu_freq", "settings.schema.services.system-monitor.stats.cpu-freq", mon.cpuFreqActivityThreshold,
-          mon.cpuFreqCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::CpuFreq), false, "GHz"
+          mon.cpuFreqCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::CpuFreq), false, "GHz"
       );
       addThresholdPair(
           "gpu_usage", "settings.schema.services.system-monitor.stats.gpu-usage", mon.gpuUsageActivityThreshold,
-          mon.gpuUsageCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::GpuUsage), true, "%"
+          mon.gpuUsageCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::GpuUsage), true, "%"
       );
       addThresholdPair(
           "gpu_temp", "settings.schema.services.system-monitor.stats.gpu-temp", mon.gpuTempActivityThreshold,
-          mon.gpuTempCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::GpuTemp), true, "°C"
+          mon.gpuTempCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::GpuTemp), true, "°C"
       );
       addThresholdPair(
           "gpu_vram", "settings.schema.services.system-monitor.stats.gpu-vram", mon.gpuVramActivityThreshold,
-          mon.gpuVramCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::GpuVram), true, "%"
+          mon.gpuVramCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::GpuVram), true, "%"
       );
       addThresholdPair(
           "ram_pct", "settings.schema.services.system-monitor.stats.ram-usage", mon.ramPctActivityThreshold,
-          mon.ramPctCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::RamPct), true, "%"
+          mon.ramPctCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::RamPct), true, "%"
       );
       addThresholdPair(
           "swap_pct", "settings.schema.services.system-monitor.stats.swap-usage", mon.swapPctActivityThreshold,
-          mon.swapPctCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::SwapPct), true, "%"
+          mon.swapPctCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::SwapPct), true, "%"
       );
       addThresholdPair(
           "disk_used_pct", "settings.schema.services.system-monitor.stats.disk-used-pct",
           mon.diskUsedPctActivityThreshold, mon.diskUsedPctCriticalThreshold,
-          noctalia::sysmon::thresholdProfile(Stat::DiskUsedPct), true, "%"
+          paw2shell::sysmon::thresholdProfile(Stat::DiskUsedPct), true, "%"
       );
       addThresholdPair(
           "disk_used", "settings.schema.services.system-monitor.stats.disk-used", mon.diskUsedActivityThreshold,
-          mon.diskUsedCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::DiskUsed), true, "%"
+          mon.diskUsedCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::DiskUsed), true, "%"
       );
       addThresholdPair(
           "disk_free_pct", "settings.schema.services.system-monitor.stats.disk-free-pct",
           mon.diskFreePctActivityThreshold, mon.diskFreePctCriticalThreshold,
-          noctalia::sysmon::thresholdProfile(Stat::DiskFreePct), true, "%"
+          paw2shell::sysmon::thresholdProfile(Stat::DiskFreePct), true, "%"
       );
       addThresholdPair(
           "disk_free", "settings.schema.services.system-monitor.stats.disk-free", mon.diskFreeActivityThreshold,
-          mon.diskFreeCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::DiskFree), true, "%"
+          mon.diskFreeCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::DiskFree), true, "%"
       );
       addThresholdPair(
           "net_rx", "settings.schema.services.system-monitor.stats.network-rx", mon.netRxActivityThreshold,
-          mon.netRxCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::NetRx), false, "MB/s"
+          mon.netRxCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::NetRx), false, "MB/s"
       );
       addThresholdPair(
           "net_tx", "settings.schema.services.system-monitor.stats.network-tx", mon.netTxActivityThreshold,
-          mon.netTxCriticalThreshold, noctalia::sysmon::thresholdProfile(Stat::NetTx), false, "MB/s"
+          mon.netTxCriticalThreshold, paw2shell::sysmon::thresholdProfile(Stat::NetTx), false, "MB/s"
       );
     }
 
@@ -2769,7 +2769,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Location, "weather", "services.weather-refresh-interval", {"weather", "refresh_minutes"},
-        sliderFor(cfg.weather.refreshMinutes, noctalia::config::schema::kRefreshMinutesRange, true), "forecast", false,
+        sliderFor(cfg.weather.refreshMinutes, paw2shell::config::schema::kRefreshMinutesRange, true), "forecast", false,
         weatherOn
     ));
 
@@ -2820,7 +2820,7 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Calendar, "calendar-reminders", "services.calendar-reminder-lead",
         {"calendar", "reminders", "default_lead_minutes"},
-        sliderFor(cfg.calendar.reminders.defaultLeadMinutes, noctalia::config::schema::kReminderLeadMinutesRange, true),
+        sliderFor(cfg.calendar.reminders.defaultLeadMinutes, paw2shell::config::schema::kReminderLeadMinutesRange, true),
         "calendar reminder lead minutes before default", false, remindersOn
     ));
     entries.push_back(keyedEntry(
@@ -2835,7 +2835,7 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Calendar, "calendar-accounts", "services.calendar-refresh-interval",
         {"calendar", "refresh_minutes"},
-        sliderFor(cfg.calendar.refreshMinutes, noctalia::config::schema::kRefreshMinutesRange, true), "calendar sync",
+        sliderFor(cfg.calendar.refreshMinutes, paw2shell::config::schema::kRefreshMinutesRange, true), "calendar sync",
         false, calendarOn
     ));
 
@@ -2865,7 +2865,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Services, "audio", "services.sound-volume", {"audio", "sound_volume"},
-        sliderFor(cfg.audio.soundVolume, noctalia::config::schema::kUnitRange, false), "sound"
+        sliderFor(cfg.audio.soundVolume, paw2shell::config::schema::kUnitRange, false), "sound"
     ));
     std::vector<SelectOption> soundThemeOptions;
     for (const auto& [value, label] : SoundPlayer::availableThemes()) {
@@ -2905,7 +2905,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Power, "session-panel", "power.session-grid-columns", {"shell", "session", "grid_columns"},
-        stepperFor(cfg.shell.session.gridColumns, noctalia::config::schema::kSessionGridColumnsRange),
+        stepperFor(cfg.shell.session.gridColumns, paw2shell::config::schema::kSessionGridColumnsRange),
         "session panel grid columns per row", false, [](const Config& c) { return c.shell.session.grid; }
     ));
     entries.push_back(keyedEntry(
@@ -3045,10 +3045,10 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Notifications, "toasts", "notifications.scale", {"notification", "scale"},
-        sliderFor(cfg.notification.scale, noctalia::config::schema::kScaleRange, false), "toast size scale"
+        sliderFor(cfg.notification.scale, paw2shell::config::schema::kScaleRange, false), "toast size scale"
     ));
     {
-      SliderSetting width = sliderFor(cfg.notification.width, noctalia::config::schema::kNotificationWidthRange, true);
+      SliderSetting width = sliderFor(cfg.notification.width, paw2shell::config::schema::kNotificationWidthRange, true);
       width.valueSuffix = "px";
       entries.push_back(keyedEntry(
           SettingsSection::Notifications, "toasts", "notifications.width", {"notification", "width"}, std::move(width),
@@ -3078,7 +3078,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Notifications, "toasts", "notifications.toast-opacity", {"notification", "background_opacity"},
-        sliderFor(cfg.notification.backgroundOpacity, noctalia::config::schema::kUnitRange, false),
+        sliderFor(cfg.notification.backgroundOpacity, paw2shell::config::schema::kUnitRange, false),
         "popup alpha transparency translucent opacity"
     ));
     entries.push_back(keyedEntry(
@@ -3091,7 +3091,7 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Notifications, "toasts", "notifications.border-width", {"notification", "border_width"},
-        sliderFor(cfg.notification.borderWidth, noctalia::config::schema::kNotificationToastBorderWidthRange, false),
+        sliderFor(cfg.notification.borderWidth, paw2shell::config::schema::kNotificationToastBorderWidthRange, false),
         "outline border width thickness"
     ));
     entries.push_back(keyedEntry(
@@ -3183,7 +3183,7 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           section, "general", "bar.auto-hide-delay", path("auto_hide_delay_ms"),
-          stepperFor(eff.autoHideDelayMs, noctalia::config::schema::kBarAutoHideDelayMsRange, "ms"),
+          stepperFor(eff.autoHideDelayMs, paw2shell::config::schema::kBarAutoHideDelayMsRange, "ms"),
           "autohide delay wait", false, whenBar([](const BarConfig& b) { return b.autoHide && !b.smartAutoHide; })
       ));
       entries.push_back(keyedEntry(
@@ -3209,7 +3209,7 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           section, "layout", "bar.font-scale", path("font_scale"),
-          sliderFor(eff.fontScale, noctalia::config::schema::kBarFontScaleRange, false), "text zoom size"
+          sliderFor(eff.fontScale, paw2shell::config::schema::kBarFontScaleRange, false), "text zoom size"
       ));
       entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.shared.ends-margin.label"),
@@ -3383,7 +3383,7 @@ namespace settings {
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-border-width", path("capsule_border_width"),
-          sliderFor(eff.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange, false),
+          sliderFor(eff.widgetCapsuleBorderWidth, paw2shell::config::schema::kBarCapsuleBorderWidthRange, false),
           "pill outline width", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
@@ -3406,8 +3406,8 @@ namespace settings {
       ));
       // One row per gesture, from the same closed set widget actions use. An unset row shows what it falls
       // back to (the bar's action on an override page, else the built-in default) as its placeholder.
-      for (const auto gesture : noctalia::bar::allGestures()) {
-        const std::string key(noctalia::bar::gestureConfigKey(gesture));
+      for (const auto gesture : paw2shell::bar::allGestures()) {
+        const std::string key(paw2shell::bar::gestureConfigKey(gesture));
         const auto& ownActions = ovr != nullptr ? ovr->deadZone.actions : std::optional(bar.deadZone.actions);
         std::string configured;
         if (ownActions.has_value()) {
@@ -3419,7 +3419,7 @@ namespace settings {
         auto gesturePath = path("dead_zone");
         gesturePath.insert(gesturePath.end(), {"actions", key});
         entries.push_back(makeEntry(
-            section, "dead-zone", tr(std::string(noctalia::bar::gestureLabelKey(gesture))),
+            section, "dead-zone", tr(std::string(paw2shell::bar::gestureLabelKey(gesture))),
             tr("settings.schema.bar.dead-zone-action.description"), std::move(gesturePath),
             GestureActionSetting{
                 .gestureKey = key,
@@ -3565,7 +3565,7 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Paw2Displays, "brightness", "services.minimum-brightness",
         {"brightness", "minimum_brightness"},
-        sliderFor(cfg.brightness.minimumBrightness, noctalia::config::schema::kUnitRange, false), "floor clamp"
+        sliderFor(cfg.brightness.minimumBrightness, paw2shell::config::schema::kUnitRange, false), "floor clamp"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Paw2Displays, "brightness", "services.sync-monitor-brightness",
@@ -3662,7 +3662,7 @@ namespace settings {
         verified = true;
         const Logger log("settings");
         const auto verify = [&](const std::vector<std::string>& path, std::string_view what) {
-          if (!path.empty() && !noctalia::config::schema::isKnownConfigPath(path)) {
+          if (!path.empty() && !paw2shell::config::schema::isKnownConfigPath(path)) {
             std::string dotted;
             for (const auto& seg : path) {
               dotted += (dotted.empty() ? "" : ".") + seg;

@@ -57,7 +57,7 @@ struct wl_output;
 struct wl_surface;
 struct zwp_keyboard_shortcuts_inhibitor_v1;
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
   struct GeneratedPalette;
 }
 
@@ -98,7 +98,7 @@ public:
   [[nodiscard]] bool onPointerEvent(const PointerEvent& event);
   void onKeyboardEvent(const KeyboardEvent& event);
   void onThemeChanged();
-  void setResolvedPalette(const noctalia::theme::GeneratedPalette& generated, std::string_view mode);
+  void setResolvedPalette(const paw2shell::theme::GeneratedPalette& generated, std::string_view mode);
   void onFontChanged();
   void requestRedraw();
   void onExternalOptionsChanged();

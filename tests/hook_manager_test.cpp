@@ -25,8 +25,8 @@ namespace {
 } // namespace
 
 int main() {
-  constexpr const char* kPathName = "NOCTALIA_WALLPAPER_PATH";
-  constexpr const char* kConnectorName = "NOCTALIA_WALLPAPER_CONNECTOR";
+  constexpr const char* kPathName = "PAW2_SHELL_WALLPAPER_PATH";
+  constexpr const char* kConnectorName = "PAW2_SHELL_WALLPAPER_CONNECTOR";
 
   ::unsetenv(kPathName);
   ::unsetenv(kConnectorName);

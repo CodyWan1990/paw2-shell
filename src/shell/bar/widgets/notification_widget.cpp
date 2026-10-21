@@ -46,7 +46,7 @@ void NotificationWidget::create() {
 
 // hide_when_no_unread would pull the widget out from under the pointer the moment the panel it
 // just opened marks everything read. The latch clears itself once that panel closes.
-void NotificationWidget::onGestureDispatch(noctalia::bar::Gesture gesture, const noctalia::bar::WidgetAction& action) {
+void NotificationWidget::onGestureDispatch(paw2shell::bar::Gesture gesture, const paw2shell::bar::WidgetAction& action) {
   (void)gesture;
   (void)action;
   m_openedPanelByClick = true;

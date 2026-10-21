@@ -398,7 +398,7 @@ namespace FileUtils {
   }
 
   [[nodiscard]] inline std::string configDir() {
-    const char* noctalia = std::getenv("NOCTALIA_CONFIG_HOME");
+    const char* noctalia = std::getenv("PAW2_SHELL_CONFIG_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
       return std::string(noctalia) + "/" + kAppDirName;
     }
@@ -407,7 +407,7 @@ namespace FileUtils {
   }
 
   [[nodiscard]] inline std::string stateDir() {
-    const char* noctalia = std::getenv("NOCTALIA_STATE_HOME");
+    const char* noctalia = std::getenv("PAW2_SHELL_STATE_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
       return std::string(noctalia) + "/" + kAppDirName;
     }
@@ -423,7 +423,7 @@ namespace FileUtils {
   }
 
   [[nodiscard]] inline std::string dataDir() {
-    const char* noctalia = std::getenv("NOCTALIA_DATA_HOME");
+    const char* noctalia = std::getenv("PAW2_SHELL_DATA_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
       return std::string(noctalia) + "/" + kAppDirName;
     }

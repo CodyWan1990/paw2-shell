@@ -6,7 +6,7 @@
 #include <array>
 #include <string_view>
 
-namespace noctalia::cli {
+namespace paw2shell::cli {
 
   inline constexpr std::array<std::string_view, 9> kBuiltinPaletteNames{
       "Ayu", "Catppuccin", "Dracula", "Eldritch", "Gruvbox", "Kanagawa", "Nord", "Rosé Pine", "Tokyo-Night",
@@ -929,4 +929,4 @@ namespace noctalia::cli {
     return nullptr;
   }
 
-} // namespace noctalia::cli
+} // namespace paw2shell::cli

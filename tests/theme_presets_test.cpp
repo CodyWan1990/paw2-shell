@@ -8,8 +8,8 @@
 #include <utility>
 #include <vector>
 
-using noctalia::theme::ThemePreset;
-using noctalia::theme::ThemePresetService;
+using paw2shell::theme::ThemePreset;
+using paw2shell::theme::ThemePresetService;
 
 namespace {
 

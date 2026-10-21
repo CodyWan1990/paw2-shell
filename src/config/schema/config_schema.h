@@ -5,7 +5,7 @@
 // Per-section field schemas: the single source of truth for reading, writing,
 // and validating each config section. Field order is the config_export::serialize
 // emission order.
-namespace noctalia::config::schema {
+namespace paw2shell::config::schema {
 
   const Schema<AudioConfig>& audioSchema();
   const Schema<WeatherConfig>& weatherSchema();
@@ -64,4 +64,4 @@ namespace noctalia::config::schema {
   // ConfigService dependency.
   [[nodiscard]] bool isKnownConfigPath(const std::vector<std::string>& path);
 
-} // namespace noctalia::config::schema
+} // namespace paw2shell::config::schema

@@ -15,7 +15,7 @@
 
 struct WidgetConfig;
 
-namespace noctalia::bar {
+namespace paw2shell::bar {
 
   // Reserved first tokens in the action grammar. They can never be IPC command names, or a
   // binding would resolve to two different things; tests/ipc_service_test.cpp asserts this.
@@ -92,4 +92,4 @@ namespace noctalia::bar {
   // Reads an `actions` sub-table off a widget config entry, or nullptr when absent.
   [[nodiscard]] const WidgetActionBindings::ActionTable* findActionTable(const WidgetConfig* config);
 
-} // namespace noctalia::bar
+} // namespace paw2shell::bar

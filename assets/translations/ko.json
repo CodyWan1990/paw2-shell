@@ -2007,7 +2007,7 @@
             "label": "테마 모드 변경 시"
           },
           "wallpaper-changed": {
-            "description": "배경 화면이 변경될 때 실행할 명령어. NOCTALIA_WALLPAPER_PATH 및 NOCTALIA_WALLPAPER_CONNECTOR를 제공합니다",
+            "description": "배경 화면이 변경될 때 실행할 명령어. PAW2_SHELL_WALLPAPER_PATH 및 PAW2_SHELL_WALLPAPER_CONNECTOR를 제공합니다",
             "label": "배경 화면 변경 시"
           },
           "wifi-disabled": {

@@ -5,7 +5,7 @@
 #include <array>
 #include <string_view>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -1016,4 +1016,4 @@ namespace noctalia::theme {
     return generated;
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

@@ -27,7 +27,7 @@ namespace {
 
 void registerSessionIpc(IpcService& ipc, SessionActionRunner& runner, LockScreen& lockScreen, ConfigService& config) {
   const auto dispatch = [&runner, &lockScreen, &config](const std::string& args) -> std::string {
-    const auto parts = noctalia::ipc::splitWords(args);
+    const auto parts = paw2shell::ipc::splitWords(args);
     if (parts.empty()) {
       return "error: session requires <lock|suspend|lock-and-suspend|logout|reboot|shutdown>\n";
     }
@@ -60,5 +60,5 @@ void registerSessionIpc(IpcService& ipc, SessionActionRunner& runner, LockScreen
     return "ok\n";
   };
 
-  ipc.bind(noctalia::cli::msg::session, dispatch);
+  ipc.bind(paw2shell::cli::msg::session, dispatch);
 }

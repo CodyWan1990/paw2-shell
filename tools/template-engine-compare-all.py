@@ -21,7 +21,7 @@ from pathlib import Path
 
 SCRIPT_DIR = Path(__file__).parent.resolve()
 REPO_DIR = SCRIPT_DIR.parent
-NOCTALIA_BIN = REPO_DIR / "build-debug" / "noctalia"
+PAW2_SHELL_BIN = REPO_DIR / "build-debug" / "noctalia"
 PYTHON_PROCESSOR = (
     Path.home() / "Development/misc/noctalia/noctalia-shell/Scripts/python/src/theming/template-processor.py"
 )
@@ -52,7 +52,7 @@ def render_cpp(theme_json: Path, scheme: str, template_in: Path, output: Path, d
     try:
         subprocess.run(
             [
-                str(NOCTALIA_BIN),
+                str(PAW2_SHELL_BIN),
                 "theme",
                 "--theme-json",
                 str(theme_json),
@@ -91,8 +91,8 @@ def main() -> int:
     if not args.templates_root.exists():
         print(f"error: templates root not found: {args.templates_root}", file=sys.stderr)
         return 1
-    if not NOCTALIA_BIN.exists():
-        print(f"error: noctalia binary not found: {NOCTALIA_BIN}", file=sys.stderr)
+    if not PAW2_SHELL_BIN.exists():
+        print(f"error: noctalia binary not found: {PAW2_SHELL_BIN}", file=sys.stderr)
         return 1
     if not args.predefined_scheme_json.exists():
         print(f"error: predefined scheme json not found: {args.predefined_scheme_json}", file=sys.stderr)

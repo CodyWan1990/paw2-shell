@@ -4,7 +4,7 @@
 #include <string>
 #include <string_view>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   inline constexpr std::string_view kFirefoxThemePostAction = "firefox-theme";
 
@@ -32,4 +32,4 @@ namespace noctalia::theme {
   // CLI: noctalia firefox-theme <install|uninstall|update|dark|light|auto|host|...>
   int runFirefoxThemeCli(int argc, char* argv[]);
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

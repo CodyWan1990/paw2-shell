@@ -63,8 +63,8 @@ int main() {
   std::filesystem::create_directories(configDir);
   std::filesystem::create_directories(stateHome);
   std::filesystem::create_directories(cacheHome);
-  ::setenv("NOCTALIA_CONFIG_HOME", configHome.c_str(), 1);
-  ::setenv("NOCTALIA_STATE_HOME", stateHome.c_str(), 1);
+  ::setenv("PAW2_SHELL_CONFIG_HOME", configHome.c_str(), 1);
+  ::setenv("PAW2_SHELL_STATE_HOME", stateHome.c_str(), 1);
   ::setenv("XDG_CACHE_HOME", cacheHome.c_str(), 1);
 
   {

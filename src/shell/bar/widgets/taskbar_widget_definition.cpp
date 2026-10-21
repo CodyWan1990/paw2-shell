@@ -33,11 +33,11 @@ namespace {
 
 } // namespace
 
-const noctalia::bar::WidgetDefinition<TaskbarWidgetOptions>& taskbarWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<TaskbarWidgetOptions>& taskbarWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = TaskbarWidgetOptions;
 
-  static const noctalia::bar::WidgetDefinition<Options>
+  static const paw2shell::bar::WidgetDefinition<Options>
       definition{
           .type = "taskbar",
           .fields =

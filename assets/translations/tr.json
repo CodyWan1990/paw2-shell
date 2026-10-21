@@ -1958,7 +1958,7 @@
             "label": "Tema Modu Değiştiğinde"
           },
           "wallpaper-changed": {
-            "description": "Duvar kağıdı değiştiğinde çalıştırılacak komut; ortam değişkeni olarak NOCTALIA_WALLPAPER_PATH ve NOCTALIA_WALLPAPER_CONNECTOR sağlar",
+            "description": "Duvar kağıdı değiştiğinde çalıştırılacak komut; ortam değişkeni olarak PAW2_SHELL_WALLPAPER_PATH ve PAW2_SHELL_WALLPAPER_CONNECTOR sağlar",
             "label": "Duvar Kağıdı Değiştiğinde"
           },
           "wifi-disabled": {

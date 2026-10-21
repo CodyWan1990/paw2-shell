@@ -222,7 +222,7 @@ namespace {
       const std::string path = "/org/freedesktop/UPower/devices/battery_" + id;
       batteries.push_back(
           std::make_unique<FakeBattery>(
-              *connection, path, "NOCTALIA_TEST_" + id, std::move(model), powerSupply, registerChargeMethod,
+              *connection, path, "PAW2_SHELL_TEST_" + id, std::move(model), powerSupply, registerChargeMethod,
               unregisterBeforeFirstIntrospection
           )
       );
@@ -269,7 +269,7 @@ namespace {
       }
       std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
-    noctalia::test::failCheck("timed out waiting for D-Bus state");
+    paw2shell::test::failCheck("timed out waiting for D-Bus state");
   }
 
   const UPowerDeviceInfo* findBattery(const UPowerService& service, const std::string& path) {

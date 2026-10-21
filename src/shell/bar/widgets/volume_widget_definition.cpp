@@ -1,10 +1,10 @@
 #include "shell/bar/widgets/volume_widget_definition.h"
 
-const noctalia::bar::WidgetDefinition<VolumeWidget::Options>& volumeWidgetDefinition() {
-  using noctalia::bar::field;
+const paw2shell::bar::WidgetDefinition<VolumeWidget::Options>& volumeWidgetDefinition() {
+  using paw2shell::bar::field;
   using Options = VolumeWidget::Options;
 
-  static const noctalia::bar::WidgetDefinition<Options> definition{
+  static const paw2shell::bar::WidgetDefinition<Options> definition{
       .type = "volume",
       .fields =
           {

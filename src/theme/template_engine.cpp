@@ -37,7 +37,7 @@
 #include <variant>
 #include <vector>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   namespace {
 
@@ -1758,4 +1758,4 @@ namespace noctalia::theme {
     return ok;
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

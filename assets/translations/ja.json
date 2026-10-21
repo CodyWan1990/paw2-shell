@@ -1836,7 +1836,7 @@
             "label": "テーマモード変更時"
           },
           "wallpaper-changed": {
-            "description": "壁紙変更時に実行するコマンド。NOCTALIA_WALLPAPER_PATHとNOCTALIA_WALLPAPER_CONNECTORが利用できます。",
+            "description": "壁紙変更時に実行するコマンド。PAW2_SHELL_WALLPAPER_PATHとPAW2_SHELL_WALLPAPER_CONNECTORが利用できます。",
             "label": "壁紙変更時"
           },
           "wifi-disabled": {

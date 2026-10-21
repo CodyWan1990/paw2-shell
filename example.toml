@@ -540,7 +540,7 @@ enabled = false
 # started           = "notify-send 'Noctalia' 'Shell started'"
 # wallpaper_changed = []
 # colors_changed    = []
-# theme_mode_changed = "notify-send 'Noctalia' \"Theme mode: $NOCTALIA_THEME_MODE\""
+# theme_mode_changed = "notify-send 'Noctalia' \"Theme mode: $PAW2_SHELL_THEME_MODE\""
 # session_locked    = []
 # session_unlocked  = []
 # logging_out       = []
@@ -550,9 +550,9 @@ enabled = false
 # wifi_disabled     = []
 # bluetooth_enabled  = []
 # bluetooth_disabled = []
-# battery_state_changed   = "notify-send 'Power' \"Battery: $NOCTALIA_BATTERY_STATE\""
-# battery_under_threshold = "notify-send 'Power' \"Battery at ${NOCTALIA_BATTERY_PERCENT}%\""
-# power_profile_changed   = "notify-send 'Power' \"Profile: $NOCTALIA_POWER_PROFILE\""
+# battery_state_changed   = "notify-send 'Power' \"Battery: $PAW2_SHELL_BATTERY_STATE\""
+# battery_under_threshold = "notify-send 'Power' \"Battery at ${PAW2_SHELL_BATTERY_PERCENT}%\""
+# power_profile_changed   = "notify-send 'Power' \"Profile: $PAW2_SHELL_POWER_PROFILE\""
 # Per-widget looks (paw2-shell). `style` is a preset - none | underline | box | capsule -
 # drawn in the widget's `color`; any explicit capsule_* key still overrides it.
 # [widget.clock]

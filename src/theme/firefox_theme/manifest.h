@@ -5,7 +5,7 @@
 #include <string>
 #include <string_view>
 
-namespace noctalia::theme::firefox_theme::manifest {
+namespace paw2shell::theme::firefox_theme::manifest {
 
   inline constexpr std::string_view kExtensionId = "pywalfox@frewacom.org";
   inline constexpr std::string_view kName = "pywalfox";
@@ -28,4 +28,4 @@ namespace noctalia::theme::firefox_theme::manifest {
       std::string* error = nullptr
   );
 
-} // namespace noctalia::theme::firefox_theme::manifest
+} // namespace paw2shell::theme::firefox_theme::manifest

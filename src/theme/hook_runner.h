@@ -9,7 +9,7 @@
 #include <mutex>
 #include <string>
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   // Runs template hooks concurrently with bounded parallelism. The runner owns no
   // threads: each hook is spawned through process::runAsync and reports completion
@@ -65,4 +65,4 @@ namespace noctalia::theme {
     std::shared_ptr<State> m_state;
   };
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

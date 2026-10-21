@@ -82,7 +82,7 @@ RAW_UI_LITERAL_RE = re.compile(
 HAS_I18N = re.compile(r"i18n::tr(?:p)?\s*\(")
 IGNORE_LINE_MARK = re.compile(r"//\s*check-i18n:ignore-line\b|//\s*i18n:ignore-line\b")
 SKIP_LINE_HINT = re.compile(
-    r"(assert\s*\(|static_assert\s*\(|\bkLog\w*\.|\buiAssert|\bLogger\b|\bstd::cerr\b|\bspdlog::|\bNOCTALIA_DEBUG\b|\bthrow\b)",
+    r"(assert\s*\(|static_assert\s*\(|\bkLog\w*\.|\buiAssert|\bLogger\b|\bstd::cerr\b|\bspdlog::|\bPAW2_SHELL_DEBUG\b|\bthrow\b)",
 )
 
 # Any "..." literal on a code line (after stripping // comments); used for wide scan

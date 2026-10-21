@@ -5,7 +5,7 @@
 #include "compositors/paw2/paw2_runtime.h"
 #include "config/config_service.h"
 
-namespace noctalia::theme {
+namespace paw2shell::theme {
 
   Paw2ThemeSync::Paw2ThemeSync(CompositorPlatform& platform, ConfigService& config)
       : m_platform(platform), m_config(config) {
@@ -52,4 +52,4 @@ namespace noctalia::theme {
     writer.set("overview.backdrop_color", formatRgbHex(*m_backdrop));
   }
 
-} // namespace noctalia::theme
+} // namespace paw2shell::theme

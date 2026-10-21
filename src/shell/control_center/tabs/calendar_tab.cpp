@@ -263,13 +263,13 @@ void CalendarTab::doLayout(Renderer& renderer, float contentWidth, float bodyHei
       || state.current.month != m_lastCurrentMonth
       || state.current.day != m_lastToday;
 
-  if (m_monthSlideAnimId != 0 && !m_startMonthSlideIn) {
+  if (m_slide.slidingOut()) {
     m_ui.rootLayout->layout(renderer);
     calendar_view::layoutEventLinkOverlays(m_eventListState);
     return;
   }
 
-  if (!sizeChanged && !displayChanged && !todayChanged && !m_eventsDirty && !m_startMonthSlideIn) {
+  if (!sizeChanged && !displayChanged && !todayChanged && !m_eventsDirty && !m_slide.pendingSlideIn()) {
     return;
   }
   m_eventsDirty = false;
@@ -284,15 +284,15 @@ void CalendarTab::doLayout(Renderer& renderer, float contentWidth, float bodyHei
 
   rebuild();
   if (m_ui.grid != nullptr) {
-    if (m_monthSlideAnimId == 0 && !m_startMonthSlideIn) {
+    if (m_slide.idle()) {
       m_ui.grid->setPosition(0.0F, 0.0F);
       m_ui.grid->setOpacity(1.0F);
     }
     m_ui.grid->layout(renderer);
   }
-  if (m_startMonthSlideIn && m_ui.gridViewport != nullptr) {
-    m_startMonthSlideIn = false;
-    beginSlideIn();
+  if (m_slide.pendingSlideIn() && m_ui.grid != nullptr) {
+    m_ui.grid->setPosition(0.0F, 0.0F);
+    m_slide.slideIn(m_ui.grid, m_ui.gridViewport);
   }
   m_ui.rootLayout->layout(renderer);
   calendar_view::layoutEventLinkOverlays(m_eventListState);
@@ -320,7 +320,7 @@ void CalendarTab::setActive(bool active) {
 }
 
 void CalendarTab::focusToday() {
-  cancelMonthSlide();
+  m_slide.cancel(m_ui.grid);
   const calendar_view::State state = calendar_view::stateForOffset(0);
   m_monthOffset = 0;
   m_selectedYear = state.current.year;
@@ -333,7 +333,7 @@ void CalendarTab::focusToday() {
 
 void CalendarTab::onClose() {
   m_eventFadeTimer.stop();
-  cancelMonthSlide();
+  m_slide.cancel(m_ui.grid);
   m_ui = {};
   m_eventListState.linkOverlays.clear();
   m_selectedYear = std::numeric_limits<int>::min();
@@ -353,111 +353,15 @@ void CalendarTab::changeMonthBy(int delta) {
     return;
   }
 
-  cancelMonthSlide();
-
-  AnimationManager* animations = m_ui.gridViewport != nullptr ? m_ui.gridViewport->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.grid == nullptr) {
+  const auto swap = [this, delta]() {
     m_monthOffset += delta;
     m_lastDisplayYear = std::numeric_limits<int>::min();
     m_lastDisplayMonth = -1;
     PanelManager::instance().refresh();
-    return;
+  };
+  if (!m_slide.slideOut(m_ui.grid, m_ui.gridViewport, delta, swap)) {
+    swap();
   }
-
-  beginSlideOut(delta);
-}
-
-void CalendarTab::cancelMonthSlide() {
-  if (m_monthSlideAnimId != 0 && m_ui.gridViewport != nullptr) {
-    if (AnimationManager* animations = m_ui.gridViewport->animationManager(); animations != nullptr) {
-      animations->cancel(m_monthSlideAnimId);
-    }
-    m_monthSlideAnimId = 0;
-  }
-  m_pendingMonthDelta = 0;
-  m_startMonthSlideIn = false;
-  if (m_ui.grid != nullptr) {
-    m_ui.grid->setPosition(0.0F, 0.0F);
-    m_ui.grid->setOpacity(1.0F);
-  }
-}
-
-void CalendarTab::applyMonthSlide(float progress, bool slidingIn) {
-  if (m_ui.grid == nullptr || m_ui.gridViewport == nullptr) {
-    return;
-  }
-
-  const float travel = m_ui.gridViewport->width();
-  if (travel <= 0.0F) {
-    return;
-  }
-
-  const auto direction = static_cast<float>(m_monthSlideDirection);
-  if (slidingIn) {
-    m_ui.grid->setPosition(direction * travel * (1.0F - progress), 0.0F);
-    m_ui.grid->setOpacity(0.7F + 0.3F * progress);
-  } else {
-    m_ui.grid->setPosition(-direction * travel * progress, 0.0F);
-    m_ui.grid->setOpacity(1.0F - 0.3F * progress);
-  }
-}
-
-void CalendarTab::beginSlideOut(int delta) {
-  AnimationManager* animations = m_ui.gridViewport != nullptr ? m_ui.gridViewport->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.grid == nullptr) {
-    m_monthOffset += delta;
-    m_lastDisplayYear = std::numeric_limits<int>::min();
-    m_lastDisplayMonth = -1;
-    PanelManager::instance().refresh();
-    return;
-  }
-
-  m_monthSlideDirection = delta > 0 ? 1 : -1;
-  m_pendingMonthDelta = delta;
-
-  PanelManager::instance().requestFrameTick();
-  m_monthSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyMonthSlide(progress, false);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_monthSlideAnimId = 0;
-        m_monthOffset += m_pendingMonthDelta;
-        m_pendingMonthDelta = 0;
-        m_lastDisplayYear = std::numeric_limits<int>::min();
-        m_lastDisplayMonth = -1;
-        m_startMonthSlideIn = true;
-        PanelManager::instance().refresh();
-      },
-      m_ui.gridViewport
-  );
-}
-
-void CalendarTab::beginSlideIn() {
-  AnimationManager* animations = m_ui.gridViewport != nullptr ? m_ui.gridViewport->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.grid == nullptr) {
-    return;
-  }
-
-  applyMonthSlide(0.0F, true);
-  PanelManager::instance().requestFrameTick();
-  m_monthSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyMonthSlide(progress, true);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_monthSlideAnimId = 0;
-        if (m_ui.grid != nullptr) {
-          m_ui.grid->setPosition(0.0F, 0.0F);
-          m_ui.grid->setOpacity(1.0F);
-        }
-      },
-      m_ui.gridViewport
-  );
 }
 
 void CalendarTab::rebuild() {

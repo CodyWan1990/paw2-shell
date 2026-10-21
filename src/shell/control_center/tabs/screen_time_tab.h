@@ -1,6 +1,7 @@
 #pragma once
 
 #include "render/animation/animation_manager.h"
+#include "shell/control_center/slide_transition.h"
 #include "shell/control_center/tab.h"
 #include "ui/signal.h"
 
@@ -37,9 +38,6 @@ private:
   void layoutChart(Renderer& renderer);
   void layoutAppRows(Renderer& renderer);
   void beginRangeSlideOut(int nextRangeDays);
-  void beginRangeSlideIn();
-  void applyRangeSlide(float progress, bool slidingIn);
-  void cancelRangeSlide();
   void syncEnabledUi();
   void syncDayLabelHover();
   void openDayDetail(std::size_t bucketIndex);
@@ -52,12 +50,7 @@ private:
   std::string m_detailDayKey;
   std::vector<std::string> m_bucketDayKeys;
   std::string m_lastSnapshotKey;
-  int m_rangeSlideDirection = 0;
-  int m_pendingRangeDays = 1;
-  bool m_startRangeSlideIn = false;
-  AnimationManager::Id m_rangeSlideAnimId = 0;
-  float m_scrollBaseX = 0.0F;
-  float m_scrollBaseY = 0.0F;
+  SlideTransition m_slide;
 
   // Scene nodes owned by root(); onClose() drops them all at once.
   struct Ui {

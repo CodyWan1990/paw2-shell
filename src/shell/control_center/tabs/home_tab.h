@@ -50,7 +50,6 @@ public:
 
   std::unique_ptr<Flex> create() override;
   std::unique_ptr<Flex> createHeaderActions() override;
-  void onFrameTick(float deltaMs) override;
   void setActive(bool active) override;
   void onClose() override;
 
@@ -160,8 +159,6 @@ private:
   std::string m_mediaLastPlaybackStatus;
   std::int64_t m_mediaPositionUs = 0;
   std::chrono::steady_clock::time_point m_mediaPositionSampleAt;
-  std::chrono::steady_clock::time_point m_nextRealtimeUpdateAt;
-  std::chrono::steady_clock::time_point m_lastRealtimeMprisPollAt;
   Timer m_progressTimer;
   // Keeps the home tab clock ticking while the panel is open and idle; the clock
   // otherwise only refreshes when an unrelated service forces a redraw.

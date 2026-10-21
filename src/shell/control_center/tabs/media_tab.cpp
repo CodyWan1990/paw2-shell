@@ -656,8 +656,6 @@ void MediaTab::setActive(bool active) {
     m_positionSampleAt = {};
     m_positionTrackSignature.clear();
     m_progressSettleUntil = {};
-    m_nextRealtimeUpdateAt = {};
-    m_lastRealtimeMprisPollAt = {};
   }
   if (becameActive && m_mpris != nullptr) {
     m_positionSampleAt = {};
@@ -689,8 +687,6 @@ void MediaTab::onClose() {
   m_pendingSeekUs = -1;
   m_progressSettleUntil = {};
   m_positionTrackSignature.clear();
-  m_nextRealtimeUpdateAt = {};
-  m_lastRealtimeMprisPollAt = {};
 }
 
 bool MediaTab::dismissTransientUi() {

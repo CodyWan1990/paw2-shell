@@ -2,6 +2,7 @@
 
 #include "core/timer_manager.h"
 #include "render/animation/animation_manager.h"
+#include "shell/control_center/slide_transition.h"
 #include "shell/control_center/tab.h"
 #include "ui/controls/calendar_view.h"
 
@@ -26,10 +27,6 @@ public:
 private:
   void focusToday();
   void changeMonthBy(int delta);
-  void cancelMonthSlide();
-  void beginSlideOut(int delta);
-  void beginSlideIn();
-  void applyMonthSlide(float progress, bool slidingIn);
   void doLayout(Renderer& renderer, float contentWidth, float bodyHeight) override;
   void doUpdate(Renderer& renderer) override;
   void rebuild();
@@ -73,10 +70,7 @@ private:
   int m_lastCurrentYear = std::numeric_limits<int>::min();
   int m_lastCurrentMonth = -1;
   int m_lastToday = -1;
-  int m_monthSlideDirection = 0;
-  int m_pendingMonthDelta = 0;
-  bool m_startMonthSlideIn = false;
-  AnimationManager::Id m_monthSlideAnimId = 0;
+  SlideTransition m_slide;
   bool m_showEventsCard = true;
   bool m_showWeekNumbers = false;
   Timer m_eventFadeTimer;

@@ -392,99 +392,15 @@ std::unique_ptr<Flex> WeatherTab::create() {
   return tab;
 }
 
-void WeatherTab::cancelForecastSlide() {
-  const bool wasAnimating = m_forecastSlideAnimId != 0;
-  if (wasAnimating && m_ui.forecastColumn != nullptr) {
-    AnimationManager* animations = m_ui.forecastColumn->animationManager();
-    if (animations != nullptr) {
-      animations->cancel(m_forecastSlideAnimId);
-    }
-    m_forecastSlideAnimId = 0;
-  }
-  m_startForecastSlideIn = false;
-  if (wasAnimating && m_forecastRowsContainer != nullptr) {
-    m_forecastRowsContainer->setPosition(m_forecastRowsBaseX, m_forecastRowsBaseY);
-    m_forecastRowsContainer->setOpacity(1.0F);
-  }
-}
-
-void WeatherTab::applyForecastSlide(float progress, bool slidingIn) {
-  if (m_forecastRowsContainer == nullptr || m_ui.forecastColumn == nullptr) {
-    return;
-  }
-
-  const float travel = m_ui.forecastColumn->width();
-  if (travel <= 0.0F) {
-    return;
-  }
-
-  const auto direction = static_cast<float>(m_forecastSlideDirection);
-  const float baseX = m_forecastRowsBaseX;
-  const float baseY = m_forecastRowsBaseY;
-  if (slidingIn) {
-    m_forecastRowsContainer->setPosition(baseX + direction * travel * (1.0F - progress), baseY);
-    m_forecastRowsContainer->setOpacity(0.7F + 0.3F * progress);
-  } else {
-    m_forecastRowsContainer->setPosition(baseX - direction * travel * progress, baseY);
-    m_forecastRowsContainer->setOpacity(1.0F - 0.3F * progress);
-  }
-}
-
 void WeatherTab::beginForecastSlideOut(ForecastView nextView) {
-  cancelForecastSlide();
-
-  AnimationManager* animations = m_ui.forecastColumn != nullptr ? m_ui.forecastColumn->animationManager() : nullptr;
-  if (animations == nullptr || m_forecastRowsContainer == nullptr) {
+  const auto swap = [this, nextView]() {
     m_forecastView = nextView;
     PanelManager::instance().refresh();
-    return;
+  };
+  const int direction = nextView == ForecastView::Hourly ? 1 : -1;
+  if (!m_slide.slideOut(m_forecastRowsContainer, m_ui.forecastColumn, direction, swap)) {
+    swap();
   }
-
-  m_forecastRowsBaseX = m_forecastRowsContainer->x();
-  m_forecastRowsBaseY = m_forecastRowsContainer->y();
-  m_forecastSlideDirection = nextView == ForecastView::Hourly ? 1 : -1;
-  m_pendingForecastView = nextView;
-
-  PanelManager::instance().requestFrameTick();
-  m_forecastSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyForecastSlide(progress, false);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_forecastSlideAnimId = 0;
-        m_forecastView = m_pendingForecastView;
-        m_startForecastSlideIn = true;
-        PanelManager::instance().refresh();
-      },
-      m_ui.forecastColumn
-  );
-}
-
-void WeatherTab::beginForecastSlideIn() {
-  AnimationManager* animations = m_ui.forecastColumn != nullptr ? m_ui.forecastColumn->animationManager() : nullptr;
-  if (animations == nullptr || m_forecastRowsContainer == nullptr) {
-    return;
-  }
-
-  applyForecastSlide(0.0F, true);
-  PanelManager::instance().requestFrameTick();
-  m_forecastSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyForecastSlide(progress, true);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_forecastSlideAnimId = 0;
-        if (m_forecastRowsContainer != nullptr) {
-          m_forecastRowsContainer->setPosition(m_forecastRowsBaseX, m_forecastRowsBaseY);
-          m_forecastRowsContainer->setOpacity(1.0F);
-        }
-      },
-      m_ui.forecastColumn
-  );
 }
 
 void WeatherTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
@@ -492,7 +408,7 @@ void WeatherTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeig
     return;
   }
 
-  const bool slidingOut = m_forecastSlideAnimId != 0 && !m_startForecastSlideIn;
+  const bool slidingOut = m_slide.slidingOut();
   const float scale = contentScale();
 
   if (slidingOut) {
@@ -658,13 +574,8 @@ void WeatherTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeig
     );
   }
 
-  if (m_startForecastSlideIn) {
-    m_startForecastSlideIn = false;
-    if (m_forecastRowsContainer != nullptr) {
-      m_forecastRowsBaseX = m_forecastRowsContainer->x();
-      m_forecastRowsBaseY = m_forecastRowsContainer->y();
-    }
-    beginForecastSlideIn();
+  if (m_slide.pendingSlideIn()) {
+    m_slide.slideIn(m_forecastRowsContainer, m_ui.forecastColumn);
   }
 }
 

@@ -646,6 +646,8 @@ _noctalia_sources = files(
   'src/shell/desktop/widgets/plugin_desktop_widget.cpp',
   'src/shell/desktop/widgets/desktop_weather_widget.cpp',
   'src/shell/clipboard/clipboard_panel.cpp',
+  'src/shell/control_center/pressable_list_row.cpp',
+  'src/shell/control_center/slide_transition.cpp',
   'src/shell/control_center/tabs/calendar_tab.cpp',
   'src/shell/control_center/tabs/audio_tab.cpp',
   'src/shell/control_center/tabs/bluetooth_tab.cpp',

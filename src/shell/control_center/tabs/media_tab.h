@@ -106,7 +106,5 @@ private:
   std::chrono::steady_clock::time_point m_positionSampleAt;
   std::optional<MprisPlayerInfo> m_lastActiveSnapshot;
   std::chrono::steady_clock::time_point m_lastActiveSeenAt;
-  std::chrono::steady_clock::time_point m_nextRealtimeUpdateAt;
-  std::chrono::steady_clock::time_point m_lastRealtimeMprisPollAt;
   Timer m_progressTimer;
 };

@@ -485,108 +485,23 @@ std::unique_ptr<Flex> ScreenTimeTab::create() {
   return tab;
 }
 
-void ScreenTimeTab::cancelRangeSlide() {
-  const bool wasAnimating = m_rangeSlideAnimId != 0;
-  if (wasAnimating && m_ui.root != nullptr) {
-    AnimationManager* animations = m_ui.root->animationManager();
-    if (animations != nullptr) {
-      animations->cancel(m_rangeSlideAnimId);
-    }
-    m_rangeSlideAnimId = 0;
-  }
-  m_startRangeSlideIn = false;
-  if (wasAnimating && m_ui.scroll != nullptr) {
-    m_ui.scroll->setPosition(m_scrollBaseX, m_scrollBaseY);
-    m_ui.scroll->setOpacity(1.0F);
-  }
-}
-
-void ScreenTimeTab::applyRangeSlide(float progress, bool slidingIn) {
-  if (m_ui.scroll == nullptr || m_ui.root == nullptr) {
-    return;
-  }
-
-  const float travel = m_ui.root->width();
-  if (travel <= 0.0F) {
-    return;
-  }
-
-  const auto direction = static_cast<float>(m_rangeSlideDirection);
-  const float baseX = m_scrollBaseX;
-  const float baseY = m_scrollBaseY;
-  if (slidingIn) {
-    m_ui.scroll->setPosition(baseX + direction * travel * (1.0F - progress), baseY);
-    m_ui.scroll->setOpacity(0.7F + 0.3F * progress);
-  } else {
-    m_ui.scroll->setPosition(baseX - direction * travel * progress, baseY);
-    m_ui.scroll->setOpacity(1.0F - 0.3F * progress);
-  }
-}
-
 void ScreenTimeTab::beginRangeSlideOut(int nextRangeDays) {
   if (nextRangeDays == m_rangeDays && m_detailDayKey.empty()) {
     return;
   }
 
   m_detailDayKey.clear();
-  cancelRangeSlide();
-
-  AnimationManager* animations = m_ui.root != nullptr ? m_ui.root->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.scroll == nullptr) {
+  const auto swap = [this, nextRangeDays]() {
     m_rangeDays = nextRangeDays;
     PanelManager::instance().refresh();
-    return;
+  };
+  if (!m_slide.slideOut(m_ui.scroll, m_ui.root, nextRangeDays > m_rangeDays ? 1 : -1, swap)) {
+    swap();
   }
-
-  m_scrollBaseX = m_ui.scroll->x();
-  m_scrollBaseY = m_ui.scroll->y();
-  m_rangeSlideDirection = nextRangeDays > m_rangeDays ? 1 : -1;
-  m_pendingRangeDays = nextRangeDays;
-
-  PanelManager::instance().requestFrameTick();
-  m_rangeSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyRangeSlide(progress, false);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_rangeSlideAnimId = 0;
-        m_rangeDays = m_pendingRangeDays;
-        m_startRangeSlideIn = true;
-        PanelManager::instance().refresh();
-      },
-      m_ui.root
-  );
-}
-
-void ScreenTimeTab::beginRangeSlideIn() {
-  AnimationManager* animations = m_ui.root != nullptr ? m_ui.root->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.scroll == nullptr) {
-    return;
-  }
-
-  applyRangeSlide(0.0F, true);
-  PanelManager::instance().requestFrameTick();
-  m_rangeSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyRangeSlide(progress, true);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_rangeSlideAnimId = 0;
-        if (m_ui.scroll != nullptr) {
-          m_ui.scroll->setPosition(m_scrollBaseX, m_scrollBaseY);
-          m_ui.scroll->setOpacity(1.0F);
-        }
-      },
-      m_ui.root
-  );
 }
 
 void ScreenTimeTab::onClose() {
-  cancelRangeSlide();
+  m_slide.cancel(m_ui.scroll);
   m_ui = {};
   m_bucketColumns = {};
   m_appRows = {};
@@ -638,8 +553,7 @@ void ScreenTimeTab::doLayout(Renderer& renderer, float contentWidth, float bodyH
     return;
   }
 
-  const bool slidingOut = m_rangeSlideAnimId != 0 && !m_startRangeSlideIn;
-  if (slidingOut) {
+  if (m_slide.slidingOut()) {
     m_ui.root->layout(renderer);
     return;
   }
@@ -652,13 +566,8 @@ void ScreenTimeTab::doLayout(Renderer& renderer, float contentWidth, float bodyH
   layoutAppRows(renderer);
   syncDayLabelHover();
 
-  if (m_startRangeSlideIn) {
-    m_startRangeSlideIn = false;
-    if (m_ui.scroll != nullptr) {
-      m_scrollBaseX = m_ui.scroll->x();
-      m_scrollBaseY = m_ui.scroll->y();
-    }
-    beginRangeSlideIn();
+  if (m_slide.pendingSlideIn()) {
+    m_slide.slideIn(m_ui.scroll, m_ui.root);
   }
 }
 
@@ -667,8 +576,7 @@ void ScreenTimeTab::doUpdate(Renderer& renderer) {
     return;
   }
 
-  const bool slidingOut = m_rangeSlideAnimId != 0 && !m_startRangeSlideIn;
-  if (slidingOut) {
+  if (m_slide.slidingOut()) {
     return;
   }
 

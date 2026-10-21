@@ -668,18 +668,6 @@ std::unique_ptr<Flex> NotificationsTab::create() {
               return;
             }
 
-            cancelFilterSlide();
-            AnimationManager* animations = m_ui.list != nullptr ? m_ui.list->animationManager() : nullptr;
-            if (animations == nullptr || m_ui.list == nullptr) {
-              m_filterIndex = idx;
-              m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
-              if (m_ui.list != nullptr) {
-                m_ui.list->scrollView().setScrollOffset(0.0F);
-              }
-              PanelManager::instance().requestLayout();
-              return;
-            }
-
             beginFilterSlideOut(idx);
           },
       })
@@ -767,25 +755,19 @@ void NotificationsTab::doLayout(Renderer& renderer, float contentWidth, float bo
     return;
   }
 
-  if (!filterSlideOutActive()) {
+  if (!m_slide.slidingOut()) {
     refreshDataSnapshot();
   }
   m_ui.root->setSize(contentWidth, bodyHeight);
   m_ui.root->layout(renderer);
 
-  if (m_ui.list != nullptr && m_filterSlideAnimId == 0 && !m_startFilterSlideIn) {
-    m_filterSlideBaseX = m_ui.list->x();
-    m_filterSlideBaseY = m_ui.list->y();
-  }
-
-  if (m_startFilterSlideIn && m_ui.list != nullptr) {
-    m_startFilterSlideIn = false;
-    beginFilterSlideIn();
+  if (m_slide.pendingSlideIn()) {
+    m_slide.slideIn(m_ui.list, m_ui.root);
   }
 }
 
 void NotificationsTab::doUpdate(Renderer& renderer) {
-  if (filterSlideOutActive()) {
+  if (m_slide.slidingOut()) {
     return;
   }
   if (refreshDataSnapshot() && m_ui.root != nullptr) {
@@ -794,7 +776,7 @@ void NotificationsTab::doUpdate(Renderer& renderer) {
 }
 
 void NotificationsTab::onClose() {
-  cancelFilterSlide();
+  m_slide.cancel(m_ui.list);
   if (m_ui.list != nullptr) {
     m_ui.list->setAdapter(nullptr);
   }
@@ -805,118 +787,20 @@ void NotificationsTab::onClose() {
   m_lastSerial = 0;
   m_lastRelativeTimeSlot = -1;
   m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
-  m_pendingFilterIndex = std::numeric_limits<std::size_t>::max();
-  m_startFilterSlideIn = false;
-  m_filterSlideDirection = 0;
-  m_filterSlideBaseX = 0.0F;
-  m_filterSlideBaseY = 0.0F;
-}
-
-void NotificationsTab::cancelFilterSlide() {
-  if (m_filterSlideAnimId != 0 && m_ui.list != nullptr) {
-    if (AnimationManager* animations = m_ui.list->animationManager(); animations != nullptr) {
-      animations->cancel(m_filterSlideAnimId);
-    }
-    m_filterSlideAnimId = 0;
-  }
-  m_pendingFilterIndex = std::numeric_limits<std::size_t>::max();
-  m_startFilterSlideIn = false;
-  m_filterSlideDirection = 0;
-  if (m_ui.list != nullptr) {
-    m_ui.list->setPosition(m_filterSlideBaseX, m_filterSlideBaseY);
-    m_ui.list->setOpacity(1.0F);
-  }
-}
-
-bool NotificationsTab::filterSlideOutActive() const { return m_filterSlideAnimId != 0 && !m_startFilterSlideIn; }
-
-void NotificationsTab::applyFilterSlide(float progress, bool slidingIn) {
-  if (m_ui.list == nullptr || m_ui.root == nullptr) {
-    return;
-  }
-
-  const float travel = m_ui.root->width();
-  if (travel <= 0.0F) {
-    return;
-  }
-
-  const auto direction = static_cast<float>(m_filterSlideDirection);
-  if (slidingIn) {
-    m_ui.list->setPosition(m_filterSlideBaseX + direction * travel * (1.0F - progress), m_filterSlideBaseY);
-    m_ui.list->setOpacity(0.7F + 0.3F * progress);
-  } else {
-    m_ui.list->setPosition(m_filterSlideBaseX - direction * travel * progress, m_filterSlideBaseY);
-    m_ui.list->setOpacity(1.0F - 0.3F * progress);
-  }
 }
 
 void NotificationsTab::beginFilterSlideOut(std::size_t nextIndex) {
-  AnimationManager* animations = m_ui.list != nullptr ? m_ui.list->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.list == nullptr) {
+  const auto swap = [this, nextIndex]() {
     m_filterIndex = nextIndex;
     m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
     if (m_ui.list != nullptr) {
       m_ui.list->scrollView().setScrollOffset(0.0F);
     }
     PanelManager::instance().requestLayout();
-    return;
+  };
+  if (!m_slide.slideOut(m_ui.list, m_ui.root, nextIndex > m_filterIndex ? 1 : -1, swap)) {
+    swap();
   }
-
-  m_pendingFilterIndex = nextIndex;
-  m_filterSlideDirection = nextIndex > m_filterIndex ? 1 : -1;
-  m_filterSlideBaseX = m_ui.list->x();
-  m_filterSlideBaseY = m_ui.list->y();
-
-  PanelManager::instance().requestFrameTick();
-  m_filterSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyFilterSlide(progress, false);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_filterSlideAnimId = 0;
-        if (m_pendingFilterIndex != std::numeric_limits<std::size_t>::max()) {
-          m_filterIndex = m_pendingFilterIndex;
-        }
-        m_pendingFilterIndex = std::numeric_limits<std::size_t>::max();
-        m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
-        if (m_ui.list != nullptr) {
-          m_ui.list->scrollView().setScrollOffset(0.0F);
-        }
-        m_startFilterSlideIn = true;
-        PanelManager::instance().requestLayout();
-      },
-      m_ui.list
-  );
-}
-
-void NotificationsTab::beginFilterSlideIn() {
-  AnimationManager* animations = m_ui.list != nullptr ? m_ui.list->animationManager() : nullptr;
-  if (animations == nullptr || m_ui.list == nullptr) {
-    return;
-  }
-
-  m_filterSlideBaseX = m_ui.list->x();
-  m_filterSlideBaseY = m_ui.list->y();
-
-  applyFilterSlide(0.0F, true);
-  PanelManager::instance().requestFrameTick();
-  m_filterSlideAnimId = animations->animate(
-      0.0F, 1.0F, static_cast<float>(Style::animFast), Easing::EaseOutCubic,
-      [this](float progress) {
-        applyFilterSlide(progress, true);
-        PanelManager::instance().requestRedraw();
-      },
-      [this]() {
-        m_filterSlideAnimId = 0;
-        if (m_ui.list != nullptr) {
-          m_ui.list->setPosition(m_filterSlideBaseX, m_filterSlideBaseY);
-          m_ui.list->setOpacity(1.0F);
-        }
-      },
-      m_ui.list
-  );
 }
 
 void NotificationsTab::clearAllNotifications() {

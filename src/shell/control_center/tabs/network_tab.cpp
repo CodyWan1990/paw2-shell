@@ -8,6 +8,7 @@
 #include "i18n/i18n.h"
 #include "render/core/renderer.h"
 #include "render/scene/input_area.h"
+#include "shell/control_center/pressable_list_row.h"
 #include "shell/panel/panel_manager.h"
 #include "ui/builders.h"
 #include "ui/palette.h"
@@ -234,21 +235,14 @@ namespace {
 
 } // namespace
 
-class AccessPointRow : public Flex {
+class AccessPointRow : public control_center::PressableListRow {
 public:
   AccessPointRow(
       float scale, AccessPointInfo ap, bool saved, std::function<void(const AccessPointInfo&)> onActivate,
       std::function<void(const AccessPointInfo&)> onForget
   )
-      : m_ap(std::move(ap)), m_onActivate(std::move(onActivate)), m_onForget(std::move(onForget)) {
-    setDirection(FlexDirection::Horizontal);
-    setAlign(FlexAlign::Center);
-    setGap(Style::spaceSm * scale);
-    setPadding(Style::spaceSm * scale, Style::spaceMd * scale);
-    setMinHeight(kRowMinHeight * scale);
-    setRadius(Style::scaledRadiusMd(scale));
-    setFill(colorSpecFromRole(ColorRole::Surface));
-    clearBorder();
+      : PressableListRow(scale, kRowMinHeight), m_ap(std::move(ap)), m_onActivate(std::move(onActivate)),
+        m_onForget(std::move(onForget)) {
 
     addChild(
         ui::glyph({
@@ -310,43 +304,16 @@ public:
     }
     addChild(std::move(action));
 
-    auto area = ui::inputArea({});
-    area->setPropagateEvents(true);
-    area->setOnEnter([this](const InputArea::PointerData& /*data*/) { applyState(); });
-    area->setOnLeave([this]() { applyState(); });
-    area->setOnPress([this](const InputArea::PointerData& /*data*/) { applyState(); });
-    area->setOnClick([this](const InputArea::PointerData& /*data*/) {
-      if (m_onActivate) {
-        m_onActivate(m_ap);
-      }
-    });
-    m_inputArea = static_cast<InputArea*>(addChild(std::move(area)));
-
-    applyState();
-    m_paletteConn = paletteChanged().connect([this] { applyState(); });
+    addHitArea(
+        m_title,
+        [this]() {
+          if (m_onActivate) {
+            m_onActivate(m_ap);
+          }
+        },
+        m_actionButton
+    );
   }
-
-  void doLayout(Renderer& renderer) override {
-    if (m_inputArea == nullptr) {
-      return;
-    }
-    m_inputArea->setVisible(false);
-    Flex::doLayout(renderer);
-    m_inputArea->setVisible(true);
-    m_inputArea->setPosition(0.0F, 0.0F);
-    m_inputArea->setSize(width(), height());
-    if (m_actionButton != nullptr) {
-      const float areaWidth = std::max(0.0F, m_actionButton->x() - gap());
-      m_inputArea->setSize(areaWidth, height());
-    }
-    applyState();
-  }
-
-  LayoutSize doMeasure(Renderer& renderer, const LayoutConstraints& constraints) override {
-    return measureByLayout(renderer, constraints);
-  }
-
-  void doArrange(Renderer& renderer, const LayoutRect& rect) override { arrangeByLayout(renderer, rect); }
 
   [[nodiscard]] const std::string& ssid() const noexcept { return m_ap.ssid; }
 
@@ -366,56 +333,25 @@ public:
   }
 
 private:
-  void applyState() {
-    const bool hov = m_inputArea != nullptr && m_inputArea->hovered();
-    const bool pressed = m_inputArea != nullptr && m_inputArea->pressed();
-    if (pressed) {
-      setFill(colorSpecFromRole(ColorRole::Primary));
-      setBorder(colorSpecFromRole(ColorRole::Primary), Style::borderWidth);
-      if (m_title != nullptr) {
-        m_title->setColor(colorSpecFromRole(ColorRole::OnPrimary));
-      }
-    } else {
-      setFill(colorSpecFromRole(ColorRole::Surface));
-      if (hov) {
-        setBorder(colorSpecFromRole(ColorRole::Hover), Style::borderWidth);
-      } else {
-        clearBorder();
-      }
-      if (m_title != nullptr) {
-        m_title->setColor(colorSpecFromRole(ColorRole::OnSurface));
-      }
-    }
-  }
-
   AccessPointInfo m_ap;
   std::function<void(const AccessPointInfo&)> m_onActivate;
   std::function<void(const AccessPointInfo&)> m_onForget;
   Label* m_title = nullptr;
   Button* m_actionButton = nullptr;
-  InputArea* m_inputArea = nullptr;
   Glyph* m_signalGlyph = nullptr;
   Label* m_signalValue = nullptr;
-  Signal<>::ScopedConnection m_paletteConn;
 };
 
 namespace {
 
-  class VpnConnectionRow : public Flex {
+  class VpnConnectionRow : public control_center::PressableListRow {
   public:
     VpnConnectionRow(
         float scale, VpnConnectionInfo vpn, std::function<void(const VpnConnectionInfo&)> onActivate,
         std::function<void(const VpnConnectionInfo&)> onDeactivate
     )
-        : m_vpn(std::move(vpn)), m_onActivate(std::move(onActivate)), m_onDeactivate(std::move(onDeactivate)) {
-      setDirection(FlexDirection::Horizontal);
-      setAlign(FlexAlign::Center);
-      setGap(Style::spaceSm * scale);
-      setPadding(Style::spaceSm * scale, Style::spaceMd * scale);
-      setMinHeight(kRowMinHeight * scale);
-      setRadius(Style::scaledRadiusMd(scale));
-      setFill(colorSpecFromRole(ColorRole::Surface));
-      clearBorder();
+        : PressableListRow(scale, kRowMinHeight), m_vpn(std::move(vpn)), m_onActivate(std::move(onActivate)),
+          m_onDeactivate(std::move(onDeactivate)) {
 
       addChild(
           ui::label({
@@ -452,39 +388,8 @@ namespace {
           })
       );
 
-      auto area = ui::inputArea({});
-      area->setPropagateEvents(true);
-      area->setOnEnter([this](const InputArea::PointerData& /*data*/) { applyState(); });
-      area->setOnLeave([this]() { applyState(); });
-      area->setOnPress([this](const InputArea::PointerData& /*data*/) { applyState(); });
-      area->setOnClick([this](const InputArea::PointerData& /*data*/) { triggerAction(); });
-      m_inputArea = static_cast<InputArea*>(addChild(std::move(area)));
-
-      applyState();
-      m_paletteConn = paletteChanged().connect([this] { applyState(); });
+      addHitArea(m_title, [this]() { triggerAction(); }, m_actionButton);
     }
-
-    void doLayout(Renderer& renderer) override {
-      if (m_inputArea == nullptr) {
-        return;
-      }
-      m_inputArea->setVisible(false);
-      Flex::doLayout(renderer);
-      m_inputArea->setVisible(true);
-      m_inputArea->setPosition(0.0F, 0.0F);
-      m_inputArea->setSize(width(), height());
-      if (m_actionButton != nullptr) {
-        const float areaWidth = std::max(0.0F, m_actionButton->x() - gap());
-        m_inputArea->setSize(areaWidth, height());
-      }
-      applyState();
-    }
-
-    LayoutSize doMeasure(Renderer& renderer, const LayoutConstraints& constraints) override {
-      return measureByLayout(renderer, constraints);
-    }
-
-    void doArrange(Renderer& renderer, const LayoutRect& rect) override { arrangeByLayout(renderer, rect); }
 
   private:
     void triggerAction() {
@@ -499,36 +404,12 @@ namespace {
       }
     }
 
-    void applyState() {
-      const bool hov = m_inputArea != nullptr && m_inputArea->hovered();
-      const bool pressed = m_inputArea != nullptr && m_inputArea->pressed();
-      if (pressed) {
-        setFill(colorSpecFromRole(ColorRole::Primary));
-        setBorder(colorSpecFromRole(ColorRole::Primary), Style::borderWidth);
-        if (m_title != nullptr) {
-          m_title->setColor(colorSpecFromRole(ColorRole::OnPrimary));
-        }
-        return;
-      }
-      setFill(colorSpecFromRole(ColorRole::Surface));
-      if (hov) {
-        setBorder(colorSpecFromRole(ColorRole::Hover), Style::borderWidth);
-      } else {
-        clearBorder();
-      }
-      if (m_title != nullptr) {
-        m_title->setColor(colorSpecFromRole(ColorRole::OnSurface));
-      }
-    }
-
     VpnConnectionInfo m_vpn;
     std::function<void(const VpnConnectionInfo&)> m_onActivate;
     std::function<void(const VpnConnectionInfo&)> m_onDeactivate;
     Label* m_title = nullptr;
     Button* m_checkButton = nullptr;
     Button* m_actionButton = nullptr;
-    InputArea* m_inputArea = nullptr;
-    Signal<>::ScopedConnection m_paletteConn;
   };
 
 } // namespace
@@ -538,14 +419,7 @@ namespace {
 class CellularRow : public Flex {
 public:
   CellularRow(float scale, CellularModemInfo modem) : m_modem(std::move(modem)) {
-    setDirection(FlexDirection::Horizontal);
-    setAlign(FlexAlign::Center);
-    setGap(Style::spaceSm * scale);
-    setPadding(Style::spaceSm * scale, Style::spaceMd * scale);
-    setMinHeight(kRowMinHeight * scale);
-    setRadius(Style::scaledRadiusMd(scale));
-    setFill(colorSpecFromRole(ColorRole::Surface));
-    clearBorder();
+    control_center::applyListRowStyle(*this, scale, kRowMinHeight);
 
     addChild(
         ui::glyph({
@@ -871,8 +745,6 @@ std::unique_ptr<Flex> NetworkTab::create() {
   tab->addChild(std::move(listScroll));
   return tab;
 }
-
-std::unique_ptr<Flex> NetworkTab::createHeaderActions() { return nullptr; }
 
 void NetworkTab::setActive(bool active) {
   if (m_active == active) {

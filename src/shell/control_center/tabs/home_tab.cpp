@@ -1235,16 +1235,12 @@ void HomeTab::doUpdate(Renderer& renderer) {
   sync(renderer);
 }
 
-void HomeTab::onFrameTick(float /*deltaMs*/) {}
-
 void HomeTab::setActive(bool active) {
   const bool becameActive = active && !m_active;
   m_active = active;
   if (!active) {
     m_progressTimer.stop();
     m_clockTimer.stop();
-    m_nextRealtimeUpdateAt = {};
-    m_lastRealtimeMprisPollAt = {};
     m_mediaPositionBusName.clear();
     m_mediaPositionTrackId.clear();
     m_mediaPositionTrackSignature.clear();
@@ -1305,8 +1301,6 @@ void HomeTab::onClose() {
   m_mediaLastPlaybackStatus.clear();
   m_mediaPositionUs = 0;
   m_mediaPositionSampleAt = {};
-  m_nextRealtimeUpdateAt = {};
-  m_lastRealtimeMprisPollAt = {};
   // Keep Shortcut instances alive; drop only the UI pointers destroyed with the scene.
   for (auto& pad : m_shortcutPads) {
     if (pad.shortcut != nullptr) {

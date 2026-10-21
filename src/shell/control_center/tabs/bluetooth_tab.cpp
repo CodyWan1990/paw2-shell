@@ -513,8 +513,6 @@ std::unique_ptr<Flex> BluetoothTab::create() {
   return tab;
 }
 
-std::unique_ptr<Flex> BluetoothTab::createHeaderActions() { return nullptr; }
-
 void BluetoothTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
   if (m_ui.rootLayout == nullptr) {
     return;

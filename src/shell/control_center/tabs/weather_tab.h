@@ -2,6 +2,7 @@
 
 #include "render/animation/animation_manager.h"
 #include "render/core/render_styles.h"
+#include "shell/control_center/slide_transition.h"
 #include "shell/control_center/tab.h"
 
 #include <array>
@@ -36,9 +37,6 @@ private:
   void doUpdate(Renderer& renderer) override;
   void sync(Renderer& renderer);
   void beginForecastSlideOut(ForecastView nextView);
-  void beginForecastSlideIn();
-  void applyForecastSlide(float progress, bool slidingIn);
-  void cancelForecastSlide();
   void setForecastVisibleRowCount(std::size_t count);
   void syncDailyForecast(Renderer& renderer, const WeatherSnapshot& snapshot);
   void syncHourlyForecast(Renderer& renderer, const WeatherSnapshot& snapshot);
@@ -96,11 +94,6 @@ private:
   std::array<InputArea*, kForecastRowCount> m_forecastHitAreas{};
   EffectType m_activeEffect = EffectType::None;
   ForecastView m_forecastView = ForecastView::Daily;
-  int m_forecastSlideDirection = 0;
-  ForecastView m_pendingForecastView = ForecastView::Daily;
-  bool m_startForecastSlideIn = false;
-  AnimationManager::Id m_forecastSlideAnimId = 0;
-  float m_forecastRowsBaseX = 0.0F;
-  float m_forecastRowsBaseY = 0.0F;
+  SlideTransition m_slide;
   float m_shaderTime = 0.0F;
 };

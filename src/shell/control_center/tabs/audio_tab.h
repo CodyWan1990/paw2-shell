@@ -55,6 +55,11 @@ private:
     Select* effectsProfileSelect = nullptr;
     Timer volumeDebounceTimer;
     bool syncing = false;
+    // Slider value waiting to be sent, throttled while the slider is dragged.
+    std::uint32_t pendingId = 0;
+    float pendingVolume = -1.0F;
+    float lastSentVolume = -1.0F;
+    std::chrono::steady_clock::time_point lastCommitAt;
   };
 
   struct DeviceMenuModel {
@@ -84,6 +89,7 @@ private:
   void flushPendingProgramVolumes(bool force = false);
   [[nodiscard]] float sliderMaxPercent() const;
   void flushPendingVolumes(bool force = false);
+  void flushDeviceVolume(DeviceVolumeCardState& card, bool input, bool force);
 
   void openDeviceMenu(DeviceVolumeCardState& card, const DeviceMenuModel& menu);
   void openProgramRoutingMenu(Node* anchor, std::uint32_t programStreamId);
@@ -124,14 +130,6 @@ private:
   std::string m_lastInputListKey;
   float m_lastSinkVolume = -1.0F;
   float m_lastSourceVolume = -1.0F;
-  std::uint32_t m_pendingSinkId = 0;
-  std::uint32_t m_pendingSourceId = 0;
-  float m_pendingSinkVolume = -1.0F;
-  float m_pendingSourceVolume = -1.0F;
-  float m_lastSentSinkVolume = -1.0F;
-  float m_lastSentSourceVolume = -1.0F;
-  std::chrono::steady_clock::time_point m_lastSinkCommitAt;
-  std::chrono::steady_clock::time_point m_lastSourceCommitAt;
   Timer m_programSinkDebounceTimer;
   std::uint32_t m_pendingProgramSinkId = 0;
   float m_pendingProgramSinkVolume = -1.0F;

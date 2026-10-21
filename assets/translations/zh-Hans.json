@@ -846,20 +846,8 @@
       "battery-low-body": "{device}：剩余 {percent}%",
       "battery-low-title": "电量低",
       "calendar": "日历",
-      "calendar-credential-locked-body": "请解锁 Secret Service 使用的密钥环，然后在“设置”中重试。使用 GNOME Keyring 时，需要将可自动解锁的密钥环（如 Login）设为默认。",
-      "calendar-credential-locked-title": "日历密钥环已锁定",
       "calendar-digest-more": "+{count} 项",
       "calendar-digest-title": "全天日程",
-      "calendar-google-connect-browser-failed": "无法启动用于 Google 授权的浏览器。请检查默认浏览器或 xdg-open 设置。",
-      "calendar-google-connect-credential-store-failed": "授权已完成，但无法保存刷新令牌。请解锁或启动 Secret Service，然后重新连接。",
-      "calendar-google-connect-expired": "Google 授权在登录完成前已过期。请重新发起连接。",
-      "calendar-google-connect-failed-title": "Google 日历连接失败",
-      "calendar-google-connect-missing-account": "没有找到与“{account}”匹配的已配置 Google 日历账户。",
-      "calendar-google-connect-rate-limited": "Google 授权暂时受到频率限制。请稍等片刻后重试。",
-      "calendar-google-connect-result-failed": "无法完成 Google 授权。请重新发起连接。",
-      "calendar-google-connect-start-failed": "无法启动 Google 授权。请检查网络连接并重试。",
-      "calendar-google-connect-start-http": "无法启动 Google 授权。OAuth 代理返回了 HTTP {status}。",
-      "calendar-google-connect-timeout": "Google 授权超时。准备好登录时，请重新发起连接。",
       "calendar-reminder-catchup-body": "另有 {count} 个日程即将开始",
       "calendar-reminder-catchup-title": "更多即将开始的日程",
       "calendar-reminder-in": "{minutes} 分钟后开始 · {time}",
@@ -1031,14 +1019,12 @@
       "password-save-error": "无法保存日历账户密码。",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS URL",
         "vdir": "本地（vdir）"
       },
       "provider-label": "提供方",
       "save": "保存",
-      "save-connect": "保存并连接",
       "save-error": "无法保存日历账户。",
       "secret-cleanup-error": "无法保存账户，且无法恢复或清理其密钥环凭据。请解锁 Secret Service 后重试。",
       "secret-service-cancelled": "Secret Service 解锁提示已取消。请在准备好解锁时重试。",
@@ -2676,11 +2662,7 @@
         },
         "calendar-edit": {
           "button": "编辑",
-          "button-reconnect": "重新连接",
-          "button-retry": "重试",
-          "description": "更新日历账户",
-          "description-locked": "刷新令牌位于已锁定的密钥环中；请解锁密钥环后重试",
-          "description-reconnect": "未找到 Google 授权信息；请重新连接此账户"
+          "description": "更新日历账户"
         },
         "calendar-event-date-format": {
           "description": "日历视图中日程列表上方的日期格式",

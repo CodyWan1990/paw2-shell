@@ -341,8 +341,7 @@ void Application::retrySecretServiceConsumers(bool defaultCollectionUnlocked) {
   }
   const calendar::CredentialState calendarCredentialState = m_calendarService.credentialState();
   const bool calendarRetryNeeded = calendarCredentialState == calendar::CredentialState::Unavailable
-      || calendarCredentialState == calendar::CredentialState::DeniedOrLocked
-      || m_calendarService.hasMissingRefreshTokens();
+      || calendarCredentialState == calendar::CredentialState::DeniedOrLocked;
   if (!m_calendarCredentialAutoRetried && calendarRetryNeeded) {
     m_calendarCredentialAutoRetried = true;
     kLog.info("secret service is running; reopening calendar credentials");

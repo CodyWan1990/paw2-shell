@@ -34,7 +34,7 @@ namespace calendar {
   inline constexpr std::chrono::seconds kLateGrace{5 * 60};
 
   // Drops negative and over-long leads, sorts ascending, deduplicates, truncates to
-  // kMaxRemindersPerEvent. Applied by every producer (iCal, Google, cache) so downstream code can
+  // kMaxRemindersPerEvent. Applied by every producer (iCal, cache) so downstream code can
   // assume the invariant.
   void normalizeReminderLeads(std::vector<std::int32_t>& leads);
 

@@ -695,10 +695,6 @@
       "battery-low-body": "{device}: {percent}% kvar",
       "battery-low-title": "Batterinivå låg",
       "calendar": "Kalender",
-      "calendar-google-connect-expired": "Google auktorisering gick ut innan inloggning blev klart. Påbörja kopplingen på nytt.",
-      "calendar-google-connect-failed-title": "Google Kalender koppling misslyckades",
-      "calendar-google-connect-missing-account": "Inget konfigurerat Google Kalender konto matchar \"{account}\".",
-      "calendar-google-connect-result-failed": "Kunde inte avsluta Google auktorisering. Påbörja kopplingen på nytt.",
       "greeter-sync": "Noctalia Greeter",
       "keybind-app": "Noctalia",
       "launcher-usage-reset": "Launcher",
@@ -807,12 +803,10 @@
       "password-save-error": "Kunde inte spara kalenderkontolösenord.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud"
       },
       "provider-label": "Leverantör",
       "save": "Spara",
-      "save-connect": "Spara och anslut",
       "save-error": "Kunde inte spara kalenderkonto.",
       "username-label": "Användarnamn",
       "username-placeholder": "namn@exempel.se"

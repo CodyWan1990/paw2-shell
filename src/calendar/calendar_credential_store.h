@@ -39,7 +39,6 @@ namespace calendar {
 
   enum class CredentialKind {
     Password,
-    RefreshToken,
   };
 
   struct LegacyCredential {
@@ -67,21 +66,14 @@ namespace calendar {
     void retryMigration(CredentialMigration migration, StatusCallback callback = {});
 
     void lookupPassword(const std::string& accountId, LookupCallback callback);
-    void lookupRefreshToken(const std::string& accountId, LookupCallback callback);
     void storePassword(const std::string& accountId, security::SecureBuffer value, StatusCallback callback);
-    void storeRefreshToken(const std::string& accountId, security::SecureBuffer value, StatusCallback callback);
     void erasePassword(const std::string& accountId, StatusCallback callback);
-    void eraseRefreshToken(const std::string& accountId, StatusCallback callback);
     void eraseAccount(const std::string& accountId, StatusCallback callback);
     void retainAccounts(const std::unordered_set<std::string>& accountIds);
 
     void setChangeCallback(ChangeCallback callback);
     [[nodiscard]] CredentialState state() const noexcept { return m_state; }
     [[nodiscard]] bool migrationPending() const noexcept { return m_migrationPending; }
-    [[nodiscard]] bool refreshTokenMissing(const std::string& accountId) const;
-    [[nodiscard]] bool refreshTokenLocked(const std::string& accountId) const;
-    [[nodiscard]] bool anyRefreshTokenMissing() const;
-    [[nodiscard]] bool anyRefreshTokenLocked() const;
 
   private:
     struct MigrationContext;
@@ -91,8 +83,6 @@ namespace calendar {
     static CredentialState stateForStatus(security::SecretStoreStatus status);
 
     void setState(CredentialState state, bool migrationPending, bool forceNotify = false);
-    bool
-    updateRefreshTokenStatus(CredentialKind kind, const std::string& accountId, security::SecretStoreStatus status);
     void runMigration(CredentialMigration migration, StatusCallback callback);
     void storeNextMigrationCredential(const std::shared_ptr<MigrationContext>& context);
     void lookup(CredentialKind kind, const std::string& accountId, LookupCallback callback);
@@ -106,8 +96,6 @@ namespace calendar {
     bool m_migrationPending = false;
     ChangeCallback m_changeCallback;
     std::unordered_map<std::string, std::shared_ptr<security::SecureBuffer>> m_passwords;
-    std::unordered_map<std::string, std::shared_ptr<security::SecureBuffer>> m_refreshTokens;
-    std::unordered_map<std::string, security::SecretStoreStatus> m_refreshTokenStatuses;
   };
 
 } // namespace calendar

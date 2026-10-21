@@ -751,18 +751,6 @@
       "battery-low-body": "{device}: נותרו {percent}%",
       "battery-low-title": "סוללה נמוכה",
       "calendar": "לוח שנה",
-      "calendar-credential-locked-body": "יש לפתוח את הנעילה של צרור המפתחות המשמש את Secret Service, ולאחר מכן לנסות שוב בהגדרות. ב־GNOME Keyring, יש להגדיר צרור מפתחות שנפתח אוטומטית, כמו Login, כברירת מחדל.",
-      "calendar-credential-locked-title": "צרור המפתחות של היומן נעול",
-      "calendar-google-connect-browser-failed": "לא ניתן היה להפעיל את הדפדפן לצורך אימות Google. יש לבדוק את דפדפן ברירת המחדל או את הגדרות xdg-open.",
-      "calendar-google-connect-credential-store-failed": "ההרשאה הושלמה, אך לא ניתן היה לשמור את ה-refresh token. יש לבטל את הנעילה או להפעיל את Secret Service, ולאחר מכן להתחבר שוב.",
-      "calendar-google-connect-expired": "ההרשאה מ-Google פגה לפני שההתחברות הסתיימה. יש להתחיל את החיבור מחדש.",
-      "calendar-google-connect-failed-title": "החיבור ליומן גוגל נכשל",
-      "calendar-google-connect-missing-account": "חשבון יומן Google שהוגדר לא תאם ל-\"{account}\".",
-      "calendar-google-connect-rate-limited": "ההרשאה מול גוגל מוגבלת זמנית. המתינו מעט ונסו שוב.",
-      "calendar-google-connect-result-failed": "לא ניתן היה להשלים את ההרשאה מול Google. יש להתחיל את החיבור מחדש.",
-      "calendar-google-connect-start-failed": "לא ניתן היה להתחיל את אימות Google. נא לבדוק את חיבור הרשת ולנסות שוב.",
-      "calendar-google-connect-start-http": "לא ניתן להתחיל את אימות Google. מתווך ה-OAuth החזיר HTTP {status}.",
-      "calendar-google-connect-timeout": "פג תוקף האישור של Google. התחל את החיבור מחדש כשתהיה מוכן להתחבר.",
       "config-migration-body": "יש לעדכן את {path} בקובץ המקור. Noctalia מיישמת החלפה זו באופן זמני בלבד. יש להריץ את noctalia config validate כדי להציג רשימה של כל השינויים הנדרשים.",
       "config-migration-title": "נדרש עדכון תצורה",
       "dbus-disabled": "התראות DBus מושבתות",
@@ -915,13 +903,11 @@
       "password-save-error": "לא ניתן היה לשמור את סיסמת חשבון לוח השנה.",
       "provider": {
         "custom": "CalDAV",
-        "google": "גוגל",
         "icloud": "iCloud",
         "ics": "כתובת ICS"
       },
       "provider-label": "ספק",
       "save": "שמור",
-      "save-connect": "שמור והתחבר",
       "save-error": "לא ניתן היה לשמור את חשבון לוח השנה.",
       "secret-cleanup-error": "לא ניתן היה לשמור את החשבון, וכן לא ניתן היה לשחזר או לנקות את פרטי ההזדהות שלו ממחזיק המפתחות. נסה שוב לאחר שחרור הנעילה של Secret Service.",
       "secret-service-cancelled": "ההנחיה של Secret Service בוטלה. נסה שוב כשתהיה מוכן לבטל את הנעילה.",
@@ -2439,11 +2425,7 @@
         },
         "calendar-edit": {
           "button": "עריכה",
-          "button-reconnect": "התחבר מחדש",
-          "button-retry": "נסה שוב",
-          "description": "עדכן את חשבון היומן הזה",
-          "description-locked": "אסימון הרענון נמצא בתוך מחזיק מפתחות נעול; בטל את נעילת מחזיק המפתחות ונסה שוב",
-          "description-reconnect": "אימות Google חסר; התחבר מחדש לחשבון זה"
+          "description": "עדכן את חשבון היומן הזה"
         },
         "calendar-event-date-format": {
           "description": "פורמט התאריך המוצג בכרטיס האירוע עבור התאריך הנבחר",

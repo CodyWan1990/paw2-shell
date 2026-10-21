@@ -208,8 +208,8 @@ namespace {
     });
     input.credentials.push_back({
         .accountId = "work",
-        .kind = calendar::CredentialKind::RefreshToken,
-        .value = secret("refresh-token"),
+        .kind = calendar::CredentialKind::Password,
+        .value = secret("work-password"),
     });
     input.finalize = [&finalized]() {
       finalized = true;
@@ -234,7 +234,7 @@ namespace {
     ok = expect(credentials.state() == calendar::CredentialState::Ready, "credential state is not ready") && ok;
     ok = expect(!credentials.migrationPending(), "completed migration remained pending") && ok;
     ok = expect(fake->value("calendar/personal/password") == "app-password", "password was not migrated") && ok;
-    ok = expect(fake->value("calendar/work/refresh-token") == "refresh-token", "refresh token was not migrated") && ok;
+    ok = expect(fake->value("calendar/work/password") == "work-password", "second password was not migrated") && ok;
 
     const std::size_t callsBeforeLookup = fake->calls();
     std::string loaded;
@@ -274,7 +274,7 @@ namespace {
     credentials.retryMigration(migration(retryFinalized), [&status](SecretStoreStatus value) { status = value; });
     ok = dispatchOne(secretStore) && ok; // availability probe
     ok = dispatchOne(secretStore) && ok; // idempotent password replacement
-    ok = dispatchOne(secretStore) && ok; // refresh token
+    ok = dispatchOne(secretStore) && ok; // second account's password
     ok = expect(status == SecretStoreStatus::Success, "migration retry did not complete") && ok;
     ok = expect(retryFinalized, "migration retry did not finalize state") && ok;
     ok = expect(!credentials.migrationPending(), "migration retry remained pending") && ok;
@@ -290,124 +290,8 @@ namespace {
     credentials.eraseAccount("missing", [&status](SecretStoreStatus value) { status = value; });
 
     bool ok = dispatchOne(secretStore);
-    ok = dispatchOne(secretStore) && ok;
     ok = expect(status == SecretStoreStatus::NotFound, "missing account erase returned an error") && ok;
-    ok = expect(fake->calls() == 2, "account erase did not check both credential kinds") && ok;
-    return ok;
-  }
-
-  bool missingRefreshTokenSignalsReconnectState() {
-    auto backend = std::make_unique<FakeBackend>();
-    security::SecretStore secretStore(std::move(backend));
-    calendar::CalendarCredentialStore credentials(secretStore);
-    calendar::CredentialMigration complete;
-    complete.complete = true;
-    credentials.initialize(std::move(complete));
-
-    std::size_t changes = 0;
-    credentials.setChangeCallback([&changes]() { ++changes; });
-    std::optional<SecretStoreStatus> status;
-    credentials.lookupRefreshToken(
-        "personal", [&status](SecretStoreStatus value, calendar::CalendarCredentialStore::Secret) { status = value; }
-    );
-
-    bool ok = dispatchOne(secretStore);
-    ok = expect(status == SecretStoreStatus::NotFound, "missing refresh token status was lost") && ok;
-    ok = expect(credentials.refreshTokenMissing("personal"), "missing refresh token was not exposed") && ok;
-    ok = expect(changes == 1, "missing refresh token did not notify consumers") && ok;
-
-    status.reset();
-    credentials.storeRefreshToken("personal", secret("replacement-token"), [&status](SecretStoreStatus value) {
-      status = value;
-    });
-    ok = dispatchOne(secretStore) && ok;
-    ok = expect(status == SecretStoreStatus::Success, "replacement refresh token was not stored") && ok;
-    ok = expect(!credentials.refreshTokenMissing("personal"), "stored refresh token still requires reconnect") && ok;
-    ok = expect(changes == 2, "stored refresh token did not clear reconnect state") && ok;
-    return ok;
-  }
-
-  bool missingRefreshTokenIsRetried() {
-    auto backend = std::make_unique<FakeBackend>();
-    auto* fake = backend.get();
-    security::SecretStore secretStore(std::move(backend));
-    calendar::CalendarCredentialStore credentials(secretStore);
-    calendar::CredentialMigration complete;
-    complete.complete = true;
-    credentials.initialize(std::move(complete));
-
-    std::optional<SecretStoreStatus> status;
-    credentials.lookupRefreshToken(
-        "personal", [&status](SecretStoreStatus value, calendar::CalendarCredentialStore::Secret) { status = value; }
-    );
-    bool ok = dispatchOne(secretStore);
-    ok = expect(status == SecretStoreStatus::NotFound, "initial missing refresh token status was lost") && ok;
-    ok = expect(credentials.refreshTokenMissing("personal"), "initial missing refresh token was not exposed") && ok;
-
-    fake->seed("calendar/personal/refresh-token", "late-token");
-    status.reset();
-    std::string loaded;
-    credentials.lookupRefreshToken(
-        "personal", [&status, &loaded](SecretStoreStatus value, calendar::CalendarCredentialStore::Secret secretValue) {
-          status = value;
-          loaded = stringValue(secretValue);
-        }
-    );
-    ok = expect(!status.has_value(), "missing refresh token lookup reused stale negative cache") && ok;
-    if (!status.has_value()) {
-      ok = dispatchOne(secretStore) && ok;
-    }
-    ok = expect(status == SecretStoreStatus::Success, "refresh token retry did not recover") && ok;
-    ok = expect(loaded == "late-token", "refresh token retry returned the wrong value") && ok;
-    ok = expect(!credentials.refreshTokenMissing("personal"), "successful retry did not clear missing state") && ok;
-
-    const std::size_t callsBeforeCachedLookup = fake->calls();
-    credentials.lookupRefreshToken(
-        "personal", [&status, &loaded](SecretStoreStatus value, calendar::CalendarCredentialStore::Secret secretValue) {
-          status = value;
-          loaded = stringValue(secretValue);
-        }
-    );
-    ok = expect(status == SecretStoreStatus::Success && loaded == "late-token", "recovered token was not cached") && ok;
-    ok = expect(fake->calls() == callsBeforeCachedLookup, "positive refresh token cache hit the backend") && ok;
-    return ok;
-  }
-
-  bool lockedRefreshTokenIsReportedAndRecovers() {
-    auto backend = std::make_unique<FakeBackend>();
-    auto* fake = backend.get();
-    fake->setLookupStatus(SecretStoreStatus::DeniedOrLocked);
-    security::SecretStore secretStore(std::move(backend));
-    calendar::CalendarCredentialStore credentials(secretStore);
-    calendar::CredentialMigration complete;
-    complete.complete = true;
-    credentials.initialize(std::move(complete));
-
-    std::size_t changes = 0;
-    credentials.setChangeCallback([&changes]() { ++changes; });
-    std::optional<SecretStoreStatus> status;
-    credentials.lookupRefreshToken(
-        "personal", [&status](SecretStoreStatus value, calendar::CalendarCredentialStore::Secret) { status = value; }
-    );
-
-    bool ok = dispatchOne(secretStore);
-    ok = expect(status == SecretStoreStatus::DeniedOrLocked, "locked refresh token status was lost") && ok;
-    ok = expect(credentials.refreshTokenLocked("personal"), "locked refresh token was not exposed") && ok;
-    ok = expect(credentials.anyRefreshTokenLocked(), "aggregate locked refresh token state was not exposed") && ok;
-    ok = expect(!credentials.refreshTokenMissing("personal"), "locked refresh token was reported as missing") && ok;
-    ok = expect(changes == 1, "locked refresh token did not notify consumers") && ok;
-
-    fake->setLookupStatus(std::nullopt);
-    fake->seed("calendar/personal/refresh-token", "unlocked-token");
-    status.reset();
-    credentials.lookupRefreshToken(
-        "personal", [&status](SecretStoreStatus value, calendar::CalendarCredentialStore::Secret) { status = value; }
-    );
-    ok = dispatchOne(secretStore) && ok;
-    ok = expect(status == SecretStoreStatus::Success, "unlocked refresh token did not recover") && ok;
-    ok = expect(!credentials.refreshTokenLocked("personal"), "successful lookup did not clear locked state") && ok;
-    ok = expect(!credentials.anyRefreshTokenLocked(), "aggregate locked state did not clear") && ok;
-    ok = expect(changes == 2, "unlock recovery did not notify consumers") && ok;
+    ok = expect(fake->calls() == 1, "account erase did not check the password") && ok;
     return ok;
   }
 
@@ -486,9 +370,6 @@ int main() {
   ok = migrationSuccessAndCache() && ok;
   ok = interruptedMigrationRetriesIdempotently() && ok;
   ok = accountEraseTreatsMissingAsSuccess() && ok;
-  ok = missingRefreshTokenSignalsReconnectState() && ok;
-  ok = missingRefreshTokenIsRetried() && ok;
-  ok = lockedRefreshTokenIsReportedAndRecovers() && ok;
   ok = completedMigrationDoesNotReadLegacyInput() && ok;
   ok = credentialFileReadIsStrict() && ok;
   return ok ? 0 : 1;

@@ -12,7 +12,7 @@ namespace calendar {
   //
   // When dedupe is true, an occurrence that appears in more than one calendar is collapsed to a
   // single entry. This covers two calendars in one account that both hold the event as well as the
-  // same calendar reached through two accounts (say a Google account and a CalDAV account).
+  // same calendar reached through two accounts (say an iCal feed and a CalDAV account).
   // Provider event ids differ between backends and between calendars, so identity is the visible
   // shape of the occurrence: start, end, the all-day flag, and the title.
   //

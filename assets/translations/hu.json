@@ -725,16 +725,6 @@
       "battery-low-body": "{device}: {percent}% van hátra",
       "battery-low-title": "Alacsony akkumulátorszint",
       "calendar": "Naptár",
-      "calendar-google-connect-browser-failed": "Nem sikerült böngészőt indítani a Google-hitelesítéshez. Ellenőrizd az alapértelmezett böngészőt vagy az xdg-open beállításait.",
-      "calendar-google-connect-credential-store-failed": "A hitelesítés sikeresen lezárult, de a frissítési token mentése nem sikerült. Oldd fel a zárolást, vagy indítsd el a Secret Service-t, majd próbáld meg újra a csatlakozást.",
-      "calendar-google-connect-expired": "A Google-hitelesítés lejárt, mielőtt a bejelentkezés befejeződött volna. Kezdd újra a kapcsolódást.",
-      "calendar-google-connect-failed-title": "Google Calendar kapcsolat sikertelen",
-      "calendar-google-connect-missing-account": "Nincs konfigurált Google naptárfiók, ami egyezne ezzel: „{account}”.",
-      "calendar-google-connect-rate-limited": "A Google-hitelesítés átmenetileg korlátozva van. Várj egy kicsit, majd próbáld újra.",
-      "calendar-google-connect-result-failed": "Nem sikerült a Google-hitelesítés. Indítsd újra a kapcsolódást.",
-      "calendar-google-connect-start-failed": "Nem sikerült elindítani a Google-hitelesítést. Ellenőrizd a hálózati kapcsolatodat, majd próbáld újra.",
-      "calendar-google-connect-start-http": "Nem sikerült elindítani a Google-hitelesítést. Az OAuth bróker HTTP {status} kóddal tért vissza.",
-      "calendar-google-connect-timeout": "A Google-hitelesítés túllépte az időkorlátot. Indítsd újra a kapcsolódást, amikor készen állsz a bejelentkezésre.",
       "config-migration-body": "A régi konfiguráció átvitel alatt áll a memóriában, beleértve a {path} elemet is. Frissítsd a forráskonfigurációt. A „Beállítások” menüpont és a noctalia beállítások érvényesítése megmutatja, mit kell kicserélni.",
       "config-migration-title": "A beállítások frissítésére van szükség",
       "dbus-disabled": "D-Bus értesítések letiltva",
@@ -886,13 +876,11 @@
       "password-save-error": "Nem sikerült menteni a naptárfiók jelszavát.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS URL"
       },
       "provider-label": "Szolgáltató",
       "save": "Mentés",
-      "save-connect": "Mentés és csatlakozás",
       "save-error": "Nem sikerült menteni a naptárfiókot.",
       "secret-cleanup-error": "A fiókot nem sikerült elmenteni, és a kulcstartóban tárolt hitelesítő adatait sem sikerült visszaállítani vagy törölni. Próbáld meg újra a Secret Service feloldása után.",
       "secret-service-cancelled": "A Secret Service kérése meg lett szakítva. Próbáld meg újra, amikor készen állsz a feloldásra.",
@@ -2336,8 +2324,6 @@
         },
         "calendar-edit": {
           "button": "Szerkesztés",
-          "button-reconnect": "Újracsatlakozás",
-          "button-retry": "Újra",
           "description": "Frissítsd ezt a naptárfiókot"
         },
         "calendar-event-date-format": {

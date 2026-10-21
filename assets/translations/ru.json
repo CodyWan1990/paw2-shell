@@ -854,20 +854,8 @@
       "battery-low-body": "{device}: осталось {percent}%",
       "battery-low-title": "Батарея разряжена",
       "calendar": "Календарь",
-      "calendar-credential-locked-body": "Разблокируйте связку ключей, используемую Secret Service, затем повторите попытку в Настройках. Если используется GNOME Keyring, сделайте связкой по умолчанию ту, которая разблокируется автоматически (например, «Вход» / Login).",
-      "calendar-credential-locked-title": "Связка ключей календаря заблокирована",
       "calendar-digest-more": "+ещё {count}",
       "calendar-digest-title": "Весь день сегодня",
-      "calendar-google-connect-browser-failed": "Не удалось открыть браузер для авторизации Google. Проверьте браузер по умолчанию или настройку xdg-open.",
-      "calendar-google-connect-credential-store-failed": "Авторизация успешно завершена, но не удалось сохранить токен обновления. Разблокируйте или запустите Secret Service, после чего подключитесь снова.",
-      "calendar-google-connect-expired": "Авторизация Google не была завершена вовремя. Запустите подключение снова.",
-      "calendar-google-connect-failed-title": "Не удалось подключиться к Календарю Google",
-      "calendar-google-connect-missing-account": "Ни одна настроенная учётная запись календаря Google не совпала с \"{account}\".",
-      "calendar-google-connect-rate-limited": "Авторизация Google временно ограничена. Подождите немного и повторите попытку.",
-      "calendar-google-connect-result-failed": "Не удалось завершить авторизацию Google. Запустите подключение снова.",
-      "calendar-google-connect-start-failed": "Не удалось запустить авторизацию Google. Проверьте подключение к сети и повторите попытку.",
-      "calendar-google-connect-start-http": "Не удалось запустить авторизацию Google. Брокер OAuth вернул HTTP {status}.",
-      "calendar-google-connect-timeout": "Истекло время ожидания авторизации Google. Запустите подключение снова, когда будете готовы войти.",
       "calendar-reminder-catchup-body": "Скоро начнётся ещё {count} событий.",
       "calendar-reminder-catchup-title": "Ещё предстоящие события",
       "calendar-reminder-in": "Начнётся через {minutes} мин · {time}",
@@ -1030,14 +1018,12 @@
       "password-save-error": "Не удалось сохранить пароль учётной записи календаря.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS URL",
         "vdir": "Локально (vdir)"
       },
       "provider-label": "Провайдер",
       "save": "Сохранить",
-      "save-connect": "Сохранить и подключить",
       "save-error": "Не удалось сохранить учётную запись календаря.",
       "secret-cleanup-error": "Не удалось сохранить аккаунт, а его учётные данные в связке ключей не удалось восстановить или удалить. Повторите попытку после разблокировки Secret Service.",
       "secret-service-cancelled": "Запрос Secret Service был отменён. Повторите попытку, когда будете готовы выполнить разблокировку.",
@@ -2660,11 +2646,7 @@
         },
         "calendar-edit": {
           "button": "Редактировать",
-          "button-reconnect": "Переподключиться",
-          "button-retry": "Повторить",
-          "description": "Обновить эту учётную запись календаря",
-          "description-locked": "Токен обновления находится в заблокированной связке ключей; разблокируйте связку ключей и повторите попытку",
-          "description-reconnect": "Авторизация Google отсутствует; подключите эту учётную запись снова"
+          "description": "Обновить эту учётную запись календаря"
         },
         "calendar-event-date-format": {
           "description": "Формат даты в списке событий календаря",

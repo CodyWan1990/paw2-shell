@@ -786,20 +786,8 @@
       "battery-low-body": "{device}: {percent}% 남음",
       "battery-low-title": "배터리 부족",
       "calendar": "캘린더",
-      "calendar-credential-locked-body": "시크릿 서비스에서 사용하는 키링을 잠금 해제한 후 설정에서 다시 시도합니다. GNOME Keyring을 사용하는 경우 로그인과 같이 자동으로 잠금 해제되는 키링을 기본값으로 사용하세요.",
-      "calendar-credential-locked-title": "캘린더 키링이 잠겨있습니다",
       "calendar-digest-more": "+{count}개 더",
       "calendar-digest-title": "오늘 하루 종일",
-      "calendar-google-connect-browser-failed": "Google 인증을 위한 브라우저를 실행할 수 없습니다. 기본 브라우저 또는 xdg-open 설정을 확인하세요.",
-      "calendar-google-connect-credential-store-failed": "갱신 토큰을 저장할 수 없습니다. Secret Service를 잠금 해제하거나 시작한 후 다시 시도하세요.",
-      "calendar-google-connect-expired": "로그인을 완료하기 전에 Google 인증이 만료되었습니다. 다시 시도하세요.",
-      "calendar-google-connect-failed-title": "Google 캘린더 연결 실패",
-      "calendar-google-connect-missing-account": "설정된 Google 캘린더 계정 중 \\\"{account}\\\"와 일치하는 항목이 없습니다.",
-      "calendar-google-connect-rate-limited": "Google 인증이 일시적으로 제한 중입니다. 잠시 후 다시 시도하세요.",
-      "calendar-google-connect-result-failed": "Google 인증을 완료할 수 없습니다. 다시 시도하세요.",
-      "calendar-google-connect-start-failed": "Google 인증을 시작할 수 없습니다. 네트워크 연결을 확인하고 다시 시도하세요.",
-      "calendar-google-connect-start-http": "Google 인증을 시작할 수 없습니다. OAuth 브로커가 HTTP {status}를 반환했습니다.",
-      "calendar-google-connect-timeout": "Google 인증 시간이 초과되었습니다. 다시 시도하세요.",
       "calendar-reminder-open": "열기",
       "calendar-reminder-untitled": "제목 없는 이벤트",
       "calendar-reminder-with-location": "{when}\n{location}",
@@ -955,14 +943,12 @@
       "password-save-error": "캘린더 계정 비밀번호를 저장할 수 없습니다.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS URL",
         "vdir": "로컬 (vdir)"
       },
       "provider-label": "제공업체",
       "save": "저장",
-      "save-connect": "저장 및 연결",
       "save-error": "캘린더 계정을 저장할 수 없습니다.",
       "secret-cleanup-error": "계정을 저장할 수 없었으며, 키링 자격 증명을 복원하거나 정리할 수도 없었습니다. Secret Service를 잠금 해제한 후 다시 시도하세요.",
       "secret-service-cancelled": "Secret Service 프롬프트가 취소되었습니다. 잠금 해제할 준비가 되면 다시 시도하세요.",
@@ -2475,10 +2461,7 @@
         },
         "calendar-edit": {
           "button": "편집",
-          "button-reconnect": "재연결",
-          "button-retry": "다시 시도",
-          "description": "이 캘린더 계정 업데이트",
-          "description-reconnect": "Google 인증 정보가 누락되었습니다. 계정을 다시 연결해 주세요"
+          "description": "이 캘린더 계정 업데이트"
         },
         "calendar-event-date-format": {
           "description": "선택된 날짜의 이벤트 카드에 표시되는 날짜 형식",

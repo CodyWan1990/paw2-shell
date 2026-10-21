@@ -876,20 +876,8 @@
       "battery-low-body": "{device}: {percent}% rimanente",
       "battery-low-title": "Batteria scarica",
       "calendar": "Calendario",
-      "calendar-credential-locked-body": "Sblocca il portachiavi utilizzato dal Secret Service, quindi riprova in Impostazioni. Con GNOME Keyring, imposta come predefinito un portachiavi sbloccato automaticamente al Login.",
-      "calendar-credential-locked-title": "Il portachiavi del calendario è bloccato",
       "calendar-digest-more": "+{count} altro",
       "calendar-digest-title": "Tutto il giorno oggi",
-      "calendar-google-connect-browser-failed": "Impossibile avviare un browser per l'autorizzazione Google. Controlla il browser predefinito o la configurazione di xdg-open.",
-      "calendar-google-connect-credential-store-failed": "Autorizzazione completata, ma non è stato possibile salvare il token di aggiornamento. Sblocca o avvia il Secret Service, quindi connettiti di nuovo.",
-      "calendar-google-connect-expired": "L'autorizzazione Google è scaduta prima del completamento dell'accesso. Avvia di nuovo la connessione.",
-      "calendar-google-connect-failed-title": "Connessione a Google Calendar non riuscita",
-      "calendar-google-connect-missing-account": "Nessun account calendario Google configurato corrisponde a \"{account}\".",
-      "calendar-google-connect-rate-limited": "L'autorizzazione Google è temporaneamente limitata. Attendi un po', poi riprova.",
-      "calendar-google-connect-result-failed": "Impossibile completare l'autorizzazione Google. Avvia di nuovo la connessione.",
-      "calendar-google-connect-start-failed": "Impossibile avviare l'autorizzazione Google. Controlla la connessione di rete e riprova.",
-      "calendar-google-connect-start-http": "Impossibile avviare l'autorizzazione Google. Il broker OAuth ha restituito HTTP {status}.",
-      "calendar-google-connect-timeout": "Autorizzazione Google scaduta. Avvia di nuovo la connessione quando sei pronto ad accedere.",
       "calendar-reminder-catchup-body": "{count} altri eventi inizieranno presto.",
       "calendar-reminder-catchup-title": "Altri eventi in programma",
       "calendar-reminder-in": "Inizia tra {minutes} min · {time}",
@@ -1061,14 +1049,12 @@
       "password-save-error": "Impossibile salvare la password dell'account calendario.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS URL",
         "vdir": "Locale (vdir)"
       },
       "provider-label": "Provider",
       "save": "Salva",
-      "save-connect": "Salva e connetti",
       "save-error": "Impossibile salvare l'account calendario.",
       "secret-cleanup-error": "Non è stato possibile salvare l'account e le relative credenziali del portachiavi non possono essere ripristinate o ripulite. Riprova dopo aver sbloccato il Secret Service.",
       "secret-service-cancelled": "Il prompt del Secret Service è stato annullato. Riprova quando sei pronto per sbloccarlo.",
@@ -2765,11 +2751,7 @@
         },
         "calendar-edit": {
           "button": "Modifica",
-          "button-reconnect": "Riconnetti",
-          "button-retry": "Riprova",
-          "description": "Aggiorna questo account calendario",
-          "description-locked": "Il refresh token si trova in un portachiavi bloccato; sbloccare il portachiavi e riprovare",
-          "description-reconnect": "Manca l'autorizzazione di Google; riconnetti questo account"
+          "description": "Aggiorna questo account calendario"
         },
         "calendar-event-date-format": {
           "description": "Il formato della data mostrato sopra l'elenco degli eventi nelle visualizzazioni del calendario",

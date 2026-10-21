@@ -714,7 +714,6 @@
       "battery-low-body": "{device}：剩餘 {percent}%",
       "battery-low-title": "電量不足",
       "calendar": "行事曆",
-      "calendar-google-connect-browser-failed": "未找到可用於 Google 授權的瀏覽器。請檢查預設瀏覽器或 xdg-open 配置。",
       "config-migration-title": "需要更新配置",
       "dbus-disabled": "DBus 通知已停用",
       "desktop-widgets-editor": "桌面小工具編輯器",
@@ -864,13 +863,11 @@
       "password-save-error": "無法儲存行事曆帳號密碼",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS 連結"
       },
       "provider-label": "供應商",
       "save": "儲存",
-      "save-connect": "儲存並連結",
       "save-error": "無法儲存行事曆帳號",
       "secret-cleanup-error": "此帳號資料無法儲存，且密碼管理器中憑證無法恢復或清除。請解鎖 Secret Service 後再試。",
       "secret-service-cancelled": "此 Secret Service 解鎖提示已取消。請在準備好後解鎖重試。",

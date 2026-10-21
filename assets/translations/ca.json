@@ -734,18 +734,6 @@
       "battery-low-body": "{device}: {percent}% restant",
       "battery-low-title": "Bateria baixa",
       "calendar": "Calendari",
-      "calendar-credential-locked-body": "Desbloca l'anell de claus utilitzat pel Secret Service i torna-ho a provar a Configuració. Amb GNOME Keyring, defineix com a predeterminat un anell de claus que es desbloqui automàticament, com Login.",
-      "calendar-credential-locked-title": "L'anell de claus del calendari està bloquejat",
-      "calendar-google-connect-browser-failed": "No s'ha pogut obrir el navegador per a l'autorització de Google. Comprova el navegador per defecte o la configuració xdg-open.",
-      "calendar-google-connect-credential-store-failed": "S'ha completat l'autorització, però no s'ha pogut desar el testimoni de renovació (refresh token). Desbloca o inicia el Secret Service i torna a connectar.",
-      "calendar-google-connect-expired": "L'autorització de Google ha caducat abans de finalitzar l'inici de sessió. Torna a iniciar la connexió.",
-      "calendar-google-connect-failed-title": "Ha fallat la connexió del Calendari de Google",
-      "calendar-google-connect-missing-account": "No s'ha trobat cap compte de Google Calendar configurat que coincideixi amb \"{account}\".",
-      "calendar-google-connect-rate-limited": "L'autorització de Google està temporalment limitada. Espera una mica i torna-ho a provar.",
-      "calendar-google-connect-result-failed": "No s'ha pogut finalitzar l'autorització de Google. Torna a iniciar la connexió.",
-      "calendar-google-connect-start-failed": "No s'ha pogut iniciar l'autorització de Google. Comprova la connexió de xarxa i torna-ho a provar.",
-      "calendar-google-connect-start-http": "No s'ha pogut iniciar l'autorització de Google. El broker OAuth ha retornat HTTP {status}.",
-      "calendar-google-connect-timeout": "L'autorització de Google ha superat el temps d'espera. Torna a iniciar la connexió quan estiguis preparat per iniciar sessió.",
       "config-migration-body": "Actualitza {path} al fitxer font. Noctalia només aplica aquest canvi temporalment. Executa noctalia config validate per veure tots els canvis necessaris.",
       "config-migration-title": "Cal actualitzar la configuració",
       "dbus-disabled": "Notificacions DBus desactivades",
@@ -898,13 +886,11 @@
       "password-save-error": "No s'ha pogut desar la contrasenya del compte de calendari.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "URL ICS"
       },
       "provider-label": "Proveïdor",
       "save": "Desa",
-      "save-connect": "Desa i connecta",
       "save-error": "No s'ha pogut desar el compte de calendari.",
       "secret-cleanup-error": "No s'ha pogut desar el compte, i la seva credencial de l'anell de claus no s'ha pogut restaurar ni netejar. Torna-ho a provar després de desbloquejar el Secret Service.",
       "secret-service-cancelled": "S'ha cancel·lat la sol·licitud del Secret Service. Torna-ho a provar quan estiguis a punt per desbloquejar-lo.",
@@ -2418,11 +2404,7 @@
         },
         "calendar-edit": {
           "button": "Edita",
-          "button-reconnect": "Torna a connectar",
-          "button-retry": "Torna-ho a provar",
-          "description": "Actualitza aquest compte de calendari",
-          "description-locked": "El testimoni de renovació és en un anell de claus bloquejat; desbloca l'anell de claus i torna-ho a provar",
-          "description-reconnect": "Falta l'autorització de Google; torna a connectar aquest compte"
+          "description": "Actualitza aquest compte de calendari"
         },
         "calendar-event-date-format": {
           "description": "El format de data que es mostra per als esdeveniments del calendari a les vistes de calendari",

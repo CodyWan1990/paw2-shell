@@ -2837,7 +2837,7 @@ namespace settings {
     const SettingVisibility calendarOn = [](const Config& c) { return c.calendar.enabled; };
     entries.push_back(keyedEntry(
         SettingsSection::Calendar, "general", "services.calendar", {"calendar", "enabled"},
-        ToggleSetting{cfg.calendar.enabled}, "calendar events caldav google"
+        ToggleSetting{cfg.calendar.enabled}, "calendar events caldav"
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Calendar, "general", "services.calendar-event-date-format", {"calendar", "event_date_format"},

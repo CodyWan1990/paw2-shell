@@ -842,20 +842,8 @@
       "battery-low-body": "{device}：残り{percent}%",
       "battery-low-title": "電池残量が少なくなっています",
       "calendar": "カレンダー",
-      "calendar-credential-locked-body": "Secret Serviceで使用するキーリングのロックを解除してから、設定でもう一度お試しください。GNOME Keyringを使用している場合は、「Login」など自動的にロック解除されるキーリングを既定に設定してください。",
-      "calendar-credential-locked-title": "カレンダーのキーリングがロックされています",
       "calendar-digest-more": "他{count}件",
       "calendar-digest-title": "今日の終日予定",
-      "calendar-google-connect-browser-failed": "Google認証用のブラウザーを起動できませんでした。既定のブラウザーまたはxdg-openの設定を確認してください。",
-      "calendar-google-connect-credential-store-failed": "認証は完了しましたが、更新トークンを保存できませんでした。Secret Serviceのロックを解除するか起動してから、もう一度接続してください。",
-      "calendar-google-connect-expired": "サインインが完了する前にGoogle認証の有効期限が切れました。もう一度接続を開始してください。",
-      "calendar-google-connect-failed-title": "Googleカレンダーに接続できませんでした",
-      "calendar-google-connect-missing-account": "設定済みのGoogleカレンダーアカウントに「{account}」と一致するものがありません。",
-      "calendar-google-connect-rate-limited": "Google認証は一時的に制限されています。しばらく待ってから、もう一度お試しください。",
-      "calendar-google-connect-result-failed": "Google認証を完了できませんでした。もう一度接続を開始してください",
-      "calendar-google-connect-start-failed": "Googleの認証を開始できませんでした。ネットワーク接続を確認して、もう一度お試しください。",
-      "calendar-google-connect-start-http": "Google認証を開始できませんでした。OAuthブローカーからHTTP {status}が返されました。",
-      "calendar-google-connect-timeout": "Googleの認証がタイムアウトしました。サインインする準備ができたら、もう一度接続を開始してください。",
       "calendar-reminder-catchup-body": "まもなく開始する予定が他に{count}件あります。",
       "calendar-reminder-catchup-title": "今後の予定をさらに表示",
       "calendar-reminder-in": "{minutes}分後に開始・{time}",
@@ -1015,14 +1003,12 @@
       "password-save-error": "カレンダーアカウントのパスワードを保存できませんでした。",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICSのURL",
         "vdir": "ローカル（vdir）"
       },
       "provider-label": "提供元",
       "save": "保存",
-      "save-connect": "保存して接続",
       "save-error": "カレンダーアカウントを保存できませんでした。",
       "secret-cleanup-error": "アカウントを保存できず、キーリングの認証情報も復元または削除できませんでした。Secret Serviceのロックを解除してから、もう一度お試しください。",
       "secret-service-cancelled": "Secret Serviceの認証要求がキャンセルされました。ロックを解除できる状態になってから、もう一度お試しください。",
@@ -2323,11 +2309,7 @@
         },
         "calendar-edit": {
           "button": "編集",
-          "button-reconnect": "再接続",
-          "button-retry": "再試行",
-          "description": "このカレンダーアカウントを更新する",
-          "description-locked": "更新トークンはロックされたキーリング内にあります。キーリングのロックを解除して、もう一度お試しください",
-          "description-reconnect": "Google認証がありません。このアカウントを再接続してください"
+          "description": "このカレンダーアカウントを更新する"
         },
         "calendar-event-date-format": {
           "description": "カレンダー表示で予定一覧の上に表示する日付形式",

@@ -751,18 +751,6 @@
       "battery-low-body": "{device}: {percent}% verbleibend",
       "battery-low-title": "Akkustand niedrig",
       "calendar": "Kalender",
-      "calendar-credential-locked-body": "Entsperre den vom Secret Service verwendeten Schlüsselbund und versuche es dann in den Einstellungen erneut. Mit GNOME Keyring mache einen automatisch entsperrten Schlüsselbund wie Login zum Standard.",
-      "calendar-credential-locked-title": "Kalender-Schlüsselbund ist gesperrt",
-      "calendar-google-connect-browser-failed": "Es konnte kein Browser für die Google-Autorisierung gestartet werden. Überprüfe deinen Standardbrowser oder die xdg-open-Konfiguration.",
-      "calendar-google-connect-credential-store-failed": "Autorisierung abgeschlossen, aber das Refresh-Token konnte nicht gespeichert werden. Entsperre oder starte den Secret Service, dann verbinde dich erneut.",
-      "calendar-google-connect-expired": "Die Google-Autorisierung ist vor Abschluss der Anmeldung abgelaufen. Starte die Verbindung erneut.",
-      "calendar-google-connect-failed-title": "Verbindung mit Google Kalender fehlgeschlagen",
-      "calendar-google-connect-missing-account": "Kein konfiguriertes Google Kalender-Konto stimmte mit „{account}“ überein.",
-      "calendar-google-connect-rate-limited": "Die Google-Autorisierung ist vorübergehend ratenbegrenzt. Warte kurz und versuche es dann erneut.",
-      "calendar-google-connect-result-failed": "Die Google-Autorisierung konnte nicht abgeschlossen werden. Starte die Verbindung erneut.",
-      "calendar-google-connect-start-failed": "Die Google-Autorisierung konnte nicht gestartet werden. Überprüfe deine Netzwerkverbindung und versuche es erneut.",
-      "calendar-google-connect-start-http": "Die Google-Autorisierung konnte nicht gestartet werden. Der OAuth-Broker gab HTTP {status} zurück.",
-      "calendar-google-connect-timeout": "Bei der Google-Autorisierung ist eine Zeitüberschreitung aufgetreten. Starte die Verbindung erneut, wenn du bereit bist, dich anzumelden.",
       "config-migration-body": "Aktualisiere {path} in der Quelldatei. Noctalia wendet diesen Ersatz nur vorübergehend an. Führe noctalia config validate aus, um alle erforderlichen Änderungen aufzulisten.",
       "config-migration-title": "Konfigurationsupdate erforderlich",
       "dbus-disabled": "DBus-Benachrichtigungen deaktiviert",
@@ -915,13 +903,11 @@
       "password-save-error": "Kalenderkonto-Passwort konnte nicht gespeichert werden.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS-URL"
       },
       "provider-label": "Anbieter",
       "save": "Speichern",
-      "save-connect": "Speichern und verbinden",
       "save-error": "Kalenderkonto konnte nicht gespeichert werden.",
       "secret-cleanup-error": "Das Konto konnte nicht gespeichert werden und die Schlüsselbund-Anmeldedaten konnten nicht wiederhergestellt oder bereinigt werden. Versuche es erneut nach dem Entsperren des Secret Service.",
       "secret-service-cancelled": "Die Secret-Service-Anfrage wurde abgebrochen. Versuche es erneut, wenn du bereit bist, ihn zu entsperren.",
@@ -2439,11 +2425,7 @@
         },
         "calendar-edit": {
           "button": "Bearbeiten",
-          "button-reconnect": "Neu verbinden",
-          "button-retry": "Erneut versuchen",
-          "description": "Aktualisiere dieses Kalenderkonto",
-          "description-locked": "Das Refresh-Token befindet sich in einem gesperrten Schlüsselbund; entsperre den Schlüsselbund und versuche es erneut",
-          "description-reconnect": "Google-Autorisierung fehlt; verbinde dieses Konto neu"
+          "description": "Aktualisiere dieses Kalenderkonto"
         },
         "calendar-event-date-format": {
           "description": "Das Datumsformat, das in der Ereigniskarte für das ausgewählte Datum angezeigt wird",

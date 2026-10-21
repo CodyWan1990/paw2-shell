@@ -107,7 +107,7 @@ void ExternalIpService::probeNow() {
   const std::string key = wanProbeKey(s);
   const std::weak_ptr<int> alive = m_lifetime;
   HttpRequest req;
-  req.url = "https://api.noctalia.dev/ip";
+  req.url = "https://api.ipify.org";
   // A pooled keep-alive connection predating a VPN/route change would answer
   // via the old path and report the stale address.
   req.freshConnection = true;

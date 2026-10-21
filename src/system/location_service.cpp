@@ -183,7 +183,7 @@ void LocationService::startGeolocate() {
   const auto path = transportCacheDir() / "geolocate.json";
   const std::uint64_t serial = ++m_requestSerial;
   m_requestKind = RequestKind::Geolocate;
-  m_httpClient.download("https://api.noctalia.dev/geolocate", path, [this, path, serial](bool success) {
+  m_httpClient.download("https://ipapi.co/json/", path, [this, path, serial](bool success) {
     handleResponse(path, true, success, serial);
   });
 }
@@ -192,7 +192,8 @@ void LocationService::startAddressGeocode() {
   std::error_code ec;
   std::filesystem::create_directories(transportCacheDir(), ec);
   const auto path = transportCacheDir() / "geocode.json";
-  const std::string url = "https://api.noctalia.dev/geocode?city=" + StringUtils::urlEncode(m_config.address);
+  const std::string url = "https://geocoding-api.open-meteo.com/v1/search?count=1&format=json&name="
+      + StringUtils::urlEncode(m_config.address);
   const std::uint64_t serial = ++m_requestSerial;
   m_requestKind = RequestKind::GeocodeAddress;
   m_httpClient.download(url, path, [this, path, serial](bool success) {
@@ -219,11 +220,22 @@ void LocationService::handleResponse(
 
   try {
     std::ifstream file(path);
-    const auto json = nlohmann::json::parse(file);
-    const double latitude = readNumber(json, "lat");
-    const double longitude = readNumber(json, "lng");
-    const std::string name = autoLocated ? readString(json, "city") : readString(json, "name");
-    const std::string country = readString(json, "country");
+    const auto response = nlohmann::json::parse(file);
+    // ipapi.co answers with the place itself, or {"error": true, "reason": ...}.
+    // Open-Meteo geocoding answers with {"results": [place, ...]}, and leaves
+    // "results" out when nothing matched.
+    if (readBool(response, "error")) {
+      throw std::runtime_error("ipapi.co: " + readString(response, "reason"));
+    }
+    const auto results = response.find("results");
+    if (!autoLocated && (results == response.end() || !results->is_array() || results->empty())) {
+      throw std::runtime_error("no place matches the address");
+    }
+    const nlohmann::json& place = autoLocated ? response : results->front();
+    const double latitude = readNumber(place, "latitude");
+    const double longitude = readNumber(place, "longitude");
+    const std::string name = readString(place, autoLocated ? "city" : "name");
+    const std::string country = readString(place, autoLocated ? "country_name" : "country");
 
     m_latitude = latitude;
     m_longitude = longitude;

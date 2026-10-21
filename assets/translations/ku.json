@@ -630,12 +630,10 @@
       "password-save-error": "Nikarebû borînpeyva jimarê salnameyê tomar bike.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud"
       },
       "provider-label": "Peydakar",
       "save": "Tomar bike",
-      "save-connect": "Tomar bike û girê bide",
       "save-error": "Nikarebû borînpeyva jimarê salnameyê tomar bike.",
       "server-url-label": "Girêdana rajekarê",
       "username-label": "Navê bikarhêner",

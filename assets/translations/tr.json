@@ -753,18 +753,6 @@
       "battery-low-body": "{device}: {percent}% kaldı",
       "battery-low-title": "Düşük Pil",
       "calendar": "Takvim",
-      "calendar-credential-locked-body": "Secret Service tarafından kullanılan anahtarlığın kilidini açın, ardından Ayarlar'da tekrar deneyin. GNOME Anahtarlığı kullanıyorsanız, Oturum Açma gibi otomatik açılan bir anahtarlığı varsayılan yapın.",
-      "calendar-credential-locked-title": "Takvim anahtarlığı kilitli",
-      "calendar-google-connect-browser-failed": "Google yetkilendirmesi için tarayıcı açılamadı. Varsayılan tarayıcınızı veya xdg-open ayarlarınızı kontrol edin.",
-      "calendar-google-connect-credential-store-failed": "Yetkilendirme tamamlandı, ancak yenileme belirteci kaydedilemedi. Secret Service kilidini açın veya başlatın, ardından tekrar bağlanın.",
-      "calendar-google-connect-expired": "Giriş işlemi tamamlanmadan Google yetkilendirmesinin süresi doldu. Bağlantıyı tekrar başlatın.",
-      "calendar-google-connect-failed-title": "Google Takvim bağlantısı başarısız oldu",
-      "calendar-google-connect-missing-account": "\"{account}\" ile eşleşen yapılandırılmış bir Google takvim hesabı bulunamadı.",
-      "calendar-google-connect-rate-limited": "Google yetkilendirmesi geçici olarak hız sınırına takıldı. Biraz bekleyip tekrar deneyin.",
-      "calendar-google-connect-result-failed": "Google yetkilendirmesi tamamlanamadı. Bağlantıyı tekrar başlatın.",
-      "calendar-google-connect-start-failed": "Google yetkilendirmesi başlatılamadı. Ağ bağlantınızı kontrol edin ve tekrar deneyin.",
-      "calendar-google-connect-start-http": "Google yetkilendirmesi başlatılamadı. OAuth aracısı HTTP {status} döndürdü.",
-      "calendar-google-connect-timeout": "Google yetkilendirmesi zaman aşımına uğradı. Oturum açmaya hazır olduğunuzda bağlantıyı tekrar başlatın.",
       "config-migration-body": "Kaynak dosyadaki {path} konumunu güncelleyin. Noctalia bu değişimi sadece geçici olarak uyguluyor. Gerekli tüm değişiklikleri listelemek için noctalia config validate komutunu çalıştırın.",
       "config-migration-title": "Yapılandırma güncellemesi gerekiyor",
       "dbus-disabled": "DBus bildirimleri devre dışı",
@@ -917,13 +905,11 @@
       "password-save-error": "Takvim hesabı şifresi kaydedilemedi.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS URL"
       },
       "provider-label": "Sağlayıcı",
       "save": "Kaydet",
-      "save-connect": "Kaydet ve Bağlan",
       "save-error": "Takvim hesabı kaydedilemedi.",
       "secret-cleanup-error": "Hesap kaydedilemedi ve anahtarlık kimlik bilgisi geri yüklenemedi ya da temizlenemedi. Secret Service kilidini açtıktan sonra tekrar deneyin.",
       "secret-service-cancelled": "Secret Service istemi iptal edildi. Kilidi açmaya hazır olduğunuzda tekrar deneyin.",
@@ -2434,11 +2420,7 @@
         },
         "calendar-edit": {
           "button": "Düzenle",
-          "button-reconnect": "Yeniden Bağlan",
-          "button-retry": "Yeniden Dene",
-          "description": "Bu takvim hesabını güncelle",
-          "description-locked": "Yenileme jetonu kilitli bir anahtarlıkta; anahtarlığın kilidini açın ve tekrar deneyin",
-          "description-reconnect": "Google yetkilendirmesi eksik; bu hesaba yeniden bağlanın"
+          "description": "Bu takvim hesabını güncelle"
         },
         "calendar-event-date-format": {
           "description": "Seçili tarih için etkinlik kartında gösterilen tarih biçimi",

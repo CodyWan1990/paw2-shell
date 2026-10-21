@@ -846,20 +846,8 @@
       "battery-low-body": "{device}: {percent}% restante",
       "battery-low-title": "Batería baja",
       "calendar": "Calendario",
-      "calendar-credential-locked-body": "Desbloquea el keyring utilizado por el Servicio Secreto y, a continuación, vuelve a intentarlo en la configuración. En GNOME Keyring, establece como predeterminado un llavero que se desbloquee automáticamente, como el de «Inicio de sesión» (Login).",
-      "calendar-credential-locked-title": "El keyring del calendario está bloqueado",
       "calendar-digest-more": "+{count} más",
       "calendar-digest-title": "Todo el día de hoy",
-      "calendar-google-connect-browser-failed": "No se pudo iniciar ningún navegador para la autorización de Google. Compruebe su navegador predeterminado o la configuración de xdg-open.",
-      "calendar-google-connect-credential-store-failed": "Autorización completada, pero el nuevo token no se puede guardar. Desbloquea o inicia el Almacén de Credenciales, y luego conecta de nuevo.",
-      "calendar-google-connect-expired": "La autorización de Google caducó antes de que finalizara el inicio de sesión. Vuelva a iniciar la conexión.",
-      "calendar-google-connect-failed-title": "Conexion fallida con Google Calendar",
-      "calendar-google-connect-missing-account": "Ninguna cuenta de Google Calendar configurada coincide con «{account}».",
-      "calendar-google-connect-rate-limited": "La autorización de Google está temporalmente limitada. Espera un poco y vuelve a intentarlo.",
-      "calendar-google-connect-result-failed": "No se pudo completar la autorización de Google. Inicia la conexión de nuevo.",
-      "calendar-google-connect-start-failed": "No se pudo iniciar la autorización de Google. Comprueba tu conexión a internet e inténtalo de nuevo.",
-      "calendar-google-connect-start-http": "No se pudo iniciar la autorización de Google. El intermediario de OAuth devolvió HTTP {status}.",
-      "calendar-google-connect-timeout": "La autorización de Google expiró. Inicie la conexión nuevamente cuando esté listo para iniciar sesión.",
       "calendar-reminder-catchup-body": "{count} Los eventos comenzaran pronto.",
       "calendar-reminder-catchup-title": "Más eventos próximos",
       "calendar-reminder-in": "Comienza en {minutes} min · {time}",
@@ -1022,14 +1010,12 @@
       "password-save-error": "No se pudo guardar la contraseña de la cuenta de calendario.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "URL de ICS",
         "vdir": "Local (vdir)"
       },
       "provider-label": "Proveedor",
       "save": "Guardar",
-      "save-connect": "Guardar y Conectar",
       "save-error": "No se pudo guardar la cuenta de calendario.",
       "secret-cleanup-error": "La cuenta no se puede guardar, y su credencial no se puede restaurar ni borrar. Reinténtalo después de desbloquear el Almacén de Credenciales.",
       "secret-service-cancelled": "El prompt del Almacén de Credenciales se ha cancelado. Reinténtalo de nuevo cuando estés preparado para desbloquearlo.",
@@ -2655,11 +2641,7 @@
         },
         "calendar-edit": {
           "button": "Editar",
-          "button-reconnect": "Reconectar",
-          "button-retry": "Reintentar",
-          "description": "Actualizar esta cuenta de calendario",
-          "description-locked": "El token de actualización se encuentra en un keyring bloqueado; desbloquee el keyring y vuelva a intentarlo",
-          "description-reconnect": "Se ha perdido la autorización de Google; reconecta esta cuenta"
+          "description": "Actualizar esta cuenta de calendario"
         },
         "calendar-event-date-format": {
           "description": "El formato de fecha que se muestra para los eventos del calendario en las vistas de calendario",

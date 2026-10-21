@@ -757,18 +757,6 @@
       "battery-low-body": "{device}: {percent} % att",
       "battery-low-title": "Lågt batteri",
       "calendar": "Kalender",
-      "calendar-credential-locked-body": "Lås opp lykelringen bruka av Løyndomstenesta, og prøv att i Innstillingar. Med GNOME Keyring må du gjera ein lykelring som låser seg opp automatisk til standardvalet, til dømes Login.",
-      "calendar-credential-locked-title": "Kalenderlykelringen er låst",
-      "calendar-google-connect-browser-failed": "Ingen nettlesaropnar kunne opna for å køyra Google-sanning. Sjå etter standardlesaren eller oppsettet for xdg-open.",
-      "calendar-google-connect-credential-store-failed": "Sanning ferdig, men oppattnyingsteiknet kunne ikkje lagrast. Lås opp eller byrja Løyndomstenesta, og kopla til att.",
-      "calendar-google-connect-expired": "Google-sanning gjekk ut før innskrivinga var ferdig. Du må byrja koplinga å nyo.",
-      "calendar-google-connect-failed-title": "Kunne ikkje kopla til Google Calendar",
-      "calendar-google-connect-missing-account": "Ingen tilmåta Google Calendar-konto svara til \"{account}\".",
-      "calendar-google-connect-rate-limited": "Google-sanning har mellombels lastgrense. Bia litt, og prøv att.",
-      "calendar-google-connect-result-failed": "Vann ikkje verta ferdig med Google-sanning. Du må byrja koplinga å nyo.",
-      "calendar-google-connect-start-failed": "Kunne ikkje byrja Google-sanninga. Sjå etter nettverktilkoplinga og prøv å nyo.",
-      "calendar-google-connect-start-http": "Kunne ikkje byrja Google-sanninga. OAuth-handsamaren svara med HTTP {status}.",
-      "calendar-google-connect-timeout": "Google-sanning gjekk ut. Byrja koplinga å nyo når du vil skriva deg inn.",
       "config-migration-body": "Oppdater {path} i brunnfila. Noctalia legg til dette utbytet berre mellombels. Køyr noctalia config validate for å sjå alle dei naudsynlege brigda.",
       "config-migration-title": "Tilmåtinga krev oppdatering",
       "dbus-disabled": "DBus-varsel avslegne",
@@ -921,13 +909,11 @@
       "password-save-error": "Kunne ikkje lagra lykelordet til kalenderkontoen.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "ICS-URL"
       },
       "provider-label": "Leverandør",
       "save": "Lagra",
-      "save-connect": "Lagra og kopla til",
       "save-error": "Kunne ikkje lagra kalenderkonto.",
       "secret-cleanup-error": "Noctalia kunne ikkje lagra kontoen, og kunne ikkje skipa innskrivingsdata på lykelringen opp att eller retta opp i han. Prøv atter når du har låst opp Løyndomstenesta.",
       "secret-service-cancelled": "Leieteksten for Løyndomstenesta vart avbroten. Prøv att når du er klar til å låsa henne opp.",
@@ -2431,11 +2417,7 @@
         },
         "calendar-edit": {
           "button": "Brigda",
-          "button-reconnect": "Kopla til att",
-          "button-retry": "Prøv att",
-          "description": "Oppdater denne kalenderkontoen",
-          "description-locked": "Oppattnyingsteiknet ligg i ein låst lykelring; lås han opp og prøv att",
-          "description-reconnect": "Google-sanning vantar; kopla til kontoen att."
+          "description": "Oppdater denne kalenderkontoen"
         },
         "calendar-event-date-format": {
           "description": "Datoformatet vist på arrangementskortet på dagen du vel",

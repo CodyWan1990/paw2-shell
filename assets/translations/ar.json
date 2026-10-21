@@ -764,18 +764,6 @@
       "battery-low-body": "{device}: متبقي {percent}%",
       "battery-low-title": "البطارية منخفضة",
       "calendar": "التقويم",
-      "calendar-credential-locked-body": "افتح حلقة المفاتيح المستخدمة بواسطة خدمة الأسرار، ثم أعد المحاولة من الإعدادات. مع GNOME Keyring، اجعل حلقة المفاتيح تُفتح تلقائياً مثل Login هي الافتراضية.",
-      "calendar-credential-locked-title": "حلقة المفاتيح التقويم مقفلة",
-      "calendar-google-connect-browser-failed": "تعذر تشغيل المتصفح للمصادقة مع Google. تحقق من المتصفح الافتراضي أو إعدادات xdg-open.",
-      "calendar-google-connect-credential-store-failed": "اكتملت المصادقة، ولكن تعذر حفظ رمز التحديث. افتح خدمة الأسرار أو شغّله، ثم أعد الاتصال.",
-      "calendar-google-connect-expired": "انتهت صلاحية مصادقة Google قبل إتمام التسجيل. ابدأ الاتصال مجدداً.",
-      "calendar-google-connect-failed-title": "فشل الاتصال بتقويم Google",
-      "calendar-google-connect-missing-account": "لا يوجد حساب تقويم Google مكوّن يطابق \"{account}\".",
-      "calendar-google-connect-rate-limited": "المصادقة مع Google محدودة مؤقتاً. انتظر قليلاً ثم حاول مجدداً.",
-      "calendar-google-connect-result-failed": "تعذر إنهاء مصادقة Google. ابدأ الاتصال مجدداً.",
-      "calendar-google-connect-start-failed": "تعذر بدء مصادقة Google. تحقق من اتصال الشبكة وحاول مجدداً.",
-      "calendar-google-connect-start-http": "تعذر بدء مصادقة Google. أعاد وسيط OAuth الخطأ HTTP {status}.",
-      "calendar-google-connect-timeout": "انتهت مهلة مصادقة Google. ابدأ الاتصال مجدداً عندما تكون مستعداً للتسجيل.",
       "config-migration-body": "حدّث {path} في الملف المصدر. يطبّق Noctalia هذا الاستبدال مؤقتاً فقط. شغّل noctalia config validate لعرض جميع التغييرات المطلوبة.",
       "config-migration-title": "يلزم تحديث الإعدادات",
       "dbus-disabled": "إشعارات D-Bus معطلة",
@@ -931,14 +919,12 @@
       "password-save-error": "تعذر حفظ كلمة مرور حساب التقويم.",
       "provider": {
         "custom": "CalDAV",
-        "google": "Google",
         "icloud": "iCloud",
         "ics": "رابط ICS",
         "vdir": "محلي (vdir)"
       },
       "provider-label": "المزود",
       "save": "حفظ",
-      "save-connect": "حفظ واتصال",
       "save-error": "تعذر حفظ حساب التقويم.",
       "secret-cleanup-error": "تعذر حفظ الحساب، كما تعذر استعادة بيانات اعتماد حلقة المفاتيح أو تنظيفها. أعد المحاولة بعد فتح خدمة الأسرار.",
       "secret-service-cancelled": "تم إلغاء مطالبة خدمة الأسرار. أعد المحاولة عندما تكون مستعداً لفتحه.",
@@ -2465,11 +2451,7 @@
         },
         "calendar-edit": {
           "button": "تعديل",
-          "button-reconnect": "إعادة الاتصال",
-          "button-retry": "إعادة المحاولة",
-          "description": "تحديث حساب التقويم هذا",
-          "description-locked": "رمز التحديث موجود في حلقة المفاتيح مقفلة؛ افتح حلقة المفاتيح وأعد المحاولة",
-          "description-reconnect": "مصادقة Google مفقودة؛ أعد الاتصال بهذا الحساب"
+          "description": "تحديث حساب التقويم هذا"
         },
         "calendar-event-date-format": {
           "description": "تنسيق التاريخ الذي يظهر أعلى قائمة الأحداث في طرق عرض التقويم",

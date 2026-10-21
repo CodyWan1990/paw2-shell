@@ -1365,11 +1365,10 @@ enum class CalendarCredentialSource : std::uint8_t {
 };
 
 struct CalendarConfig {
-  // A single connected account. Google refresh tokens and Secret Service-backed CalDAV passwords
-  // are not stored here. id must be [a-z0-9_] because it identifies durable credential records.
+  // A single connected account. Secret Service-backed CalDAV passwords are not stored here. id must be [a-z0-9_] because it identifies durable credential records.
   struct Account {
     std::string id;
-    std::string type; // "google" | "caldav" | "ics" | "vdir"
+    std::string type; // "caldav" | "ics" | "vdir"
     std::string displayName;
     std::string color;                  // optional "#rrggbb" override
     std::string provider;               // "icloud" | "custom" (caldav only)
@@ -1386,7 +1385,7 @@ struct CalendarConfig {
   // Event reminder notifications. Gated by CalendarConfig::enabled.
   struct Reminders {
     bool enabled = true;
-    // Honor per-event reminders (VALARM triggers, Google reminder overrides). When false, every
+    // Honor per-event reminders (VALARM triggers). When false, every
     // event uses defaultLeadMinutes instead.
     bool useEventReminders = true;
     // Fallback lead for events that carry no reminder of their own. 0 = notify at event start.

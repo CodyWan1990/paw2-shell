@@ -301,6 +301,12 @@ namespace settings {
     bool advanced = false;
     std::string searchText;
     SettingVisibility visibleWhen; // empty = always visible
+
+    // While building a registry: entries.push_back(makeEntry(...).shownWhen(pred)).
+    [[nodiscard]] SettingEntry&& shownWhen(SettingVisibility predicate) && {
+      visibleWhen = std::move(predicate);
+      return std::move(*this);
+    }
   };
 
   // Runtime conditions that gate optional sections (e.g. compositor-specific features).
@@ -342,7 +348,6 @@ namespace settings {
   );
   [[nodiscard]] std::string normalizedSettingQuery(std::string_view query);
   [[nodiscard]] bool matchesNormalizedSettingQuery(const SettingEntry& entry, std::string_view normalizedQuery);
-  [[nodiscard]] bool matchesSettingQuery(const SettingEntry& entry, std::string_view query);
   [[nodiscard]] bool isBarMonitorOverrideSettingPath(const std::vector<std::string>& path);
   [[nodiscard]] bool isDockMonitorOverrideSettingPath(const std::vector<std::string>& path);
   [[nodiscard]] bool settingEntryMatchesBarNavigation(

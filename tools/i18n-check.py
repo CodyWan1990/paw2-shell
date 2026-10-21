@@ -48,6 +48,9 @@ DEFAULT_RAW_ROOTS = ("src/ui", "src/shell")
 TR_RE = re.compile(r'i18n::tr\s*\(\s*"([^"]+)"')
 # i18n::trp("a.b.c", count, ...) → also requires "a.b.c-plural" when plural branch exists
 TRP_RE = re.compile(r'i18n::trp\s*\(\s*"([^"]+)"')
+# keyedEntry(section, group, "a.b", ...) in the settings registry reads
+# settings.schema.a.b.label and settings.schema.a.b.description.
+KEYED_ENTRY_RE = re.compile(r'keyedEntry\(\s*[^,]+,\s*[^,]+,\s*"([^"]+)"')
 
 # Any string literal that looks like a dotted i18n key (for indirect-usage scan)
 KEY_LITERAL_RE = re.compile(r'"([a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+(?:-plural)?)"')
@@ -136,6 +139,8 @@ def iter_source_files(src: Path, extensions: tuple[str, ...], excludes: set[Path
 def collect_tr_keys(text: str) -> tuple[set[str], set[str]]:
     """Returns (tr_keys, trp_base_keys)."""
     tr_keys = set(TR_RE.findall(text))
+    for key in KEYED_ENTRY_RE.findall(text):
+        tr_keys.update({f"settings.schema.{key}.label", f"settings.schema.{key}.description"})
     trp_bases = set(TRP_RE.findall(text))
     return tr_keys, trp_bases
 
@@ -327,6 +332,8 @@ def collect_key_literals(text: str) -> tuple[set[str], set[str]]:
     prefixes: set[str] = set()
     for m in KEY_LITERAL_RE.finditer(text):
         exact.add(m.group(1))
+    for key in KEYED_ENTRY_RE.findall(text):
+        exact.update({f"settings.schema.{key}.label", f"settings.schema.{key}.description"})
     # Also capture prefix-style literals like "foo.bar." (ends with dot)
     for m in re.finditer(r'"([a-z][a-z0-9-]*(?:\.[a-z][a-z0-9-]*)+\.)"', text):
         prefixes.add(m.group(1))

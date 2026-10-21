@@ -211,7 +211,12 @@ namespace {
     const security::SecretId id{.scope = "calendar", .owner = "personal", .name = "refresh-token"};
     const auto attributes = security::secretStoreAttributes(id);
     bool ok = true;
-    ok = expect(security::SecretStoreSchemaName == "dev.noctalia.Secret", "schema name changed") && ok;
+    ok = expect(security::SecretStoreSchemaName == "dev.paw2.Shell.Secret", "schema name changed") && ok;
+    ok = expect(
+             security::LegacySecretStoreSchemaName == "dev.noctalia.Secret",
+             "the pre-rename schema must stay readable for migration"
+         )
+        && ok;
     ok = expect(attributes.application == std::string(FileUtils::kAppDirName), "application attribute changed") && ok;
     ok = expect(attributes.scope == "calendar", "scope attribute changed") && ok;
     ok = expect(attributes.owner == "personal", "owner attribute changed") && ok;

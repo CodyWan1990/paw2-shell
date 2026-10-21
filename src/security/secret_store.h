@@ -13,7 +13,9 @@
 
 namespace security {
 
-  inline constexpr std::string_view SecretStoreSchemaName = "dev.noctalia.Secret";
+  inline constexpr std::string_view SecretStoreSchemaName = "dev.paw2.Shell.Secret";
+  // Schema name before paw2-shell left Noctalia; read once per secret and copied over.
+  inline constexpr std::string_view LegacySecretStoreSchemaName = "dev.noctalia.Secret";
 
   struct SecretId {
     std::string scope;

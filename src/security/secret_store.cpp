@@ -104,9 +104,9 @@ namespace security {
       };
     }
 
-    const SecretSchema& schema() {
-      static const SecretSchema value = {
-          SecretStoreSchemaName.data(),
+    SecretSchema makeSchema(const char* name) {
+      return {
+          name,
           SECRET_SCHEMA_NONE,
           {
               {"application", SECRET_SCHEMA_ATTRIBUTE_STRING},
@@ -117,6 +117,16 @@ namespace security {
               {nullptr, SECRET_SCHEMA_ATTRIBUTE_STRING},
           },
       };
+    }
+
+    const SecretSchema& schema() {
+      static const SecretSchema value = makeSchema(SecretStoreSchemaName.data());
+      return value;
+    }
+
+    // Secrets stored before the rename. Lookups fall back to it and copy what they find.
+    const SecretSchema& legacySchema() {
+      static const SecretSchema value = makeSchema(LegacySecretStoreSchemaName.data());
       return value;
     }
 
@@ -328,7 +338,46 @@ namespace security {
 
       SecretStoreBackendResult
       lookup(const SecretStoreAttributes& attributes, SecretStoreCancellation& cancellation) override {
-        return withCancellable(cancellation, [&attributes](GCancellable* cancellable) {
+        SecretStoreBackendResult result = lookupIn(schema(), attributes, cancellation);
+        if (result.status != SecretStoreStatus::NotFound) {
+          return result;
+        }
+        SecretStoreBackendResult legacy = lookupIn(legacySchema(), attributes, cancellation);
+        if (legacy.status != SecretStoreStatus::Success) {
+          return result;
+        }
+        // Copy it under the current schema; the old item stays until the secret is erased.
+        (void)withCancellable(cancellation, [&attributes, &legacy](GCancellable* cancellable) {
+          auto table = makeAttributes(attributes);
+          const auto bytes = legacy.value.bytes();
+          SecretValuePtr value(
+              secret_value_new(
+                  bytes.empty() ? "" : reinterpret_cast<const char*>(bytes.data()), static_cast<gssize>(bytes.size()),
+                  "application/octet-stream"
+              ),
+              &secret_value_unref
+          );
+          GError* rawError = nullptr;
+          const std::string label = "paw2-shell " + attributes.scope + " " + attributes.name;
+          if (secret_password_storev_binary_sync(
+                  &schema(), table.get(), SECRET_COLLECTION_DEFAULT, label.c_str(), value.get(), cancellable,
+                  &rawError
+              )
+              == 0) {
+            ErrorPtr error(rawError, &g_error_free);
+            kLog.warn("could not copy a secret to the paw2-shell schema; it stays readable from the old one");
+          }
+          return SecretStoreBackendResult{.status = SecretStoreStatus::Success};
+        });
+        return legacy;
+      }
+
+    private:
+      static SecretStoreBackendResult lookupIn(
+          const SecretSchema& schemaToSearch, const SecretStoreAttributes& attributes,
+          SecretStoreCancellation& cancellation
+      ) {
+        return withCancellable(cancellation, [&schemaToSearch, &attributes](GCancellable* cancellable) {
           auto table = makeAttributes(attributes);
           const auto loadUnlocked = [cancellable](
                                         const SecretItemListPtr& items, bool& lockedItemFound
@@ -394,7 +443,7 @@ namespace security {
           rawError = nullptr;
           const auto inspectFlags = static_cast<SecretSearchFlags>(SECRET_SEARCH_ALL);
           SecretItemListPtr items(
-              secret_service_search_sync(service.get(), &schema(), table.get(), inspectFlags, cancellable, &rawError)
+              secret_service_search_sync(service.get(), &schemaToSearch, table.get(), inspectFlags, cancellable, &rawError)
           );
           error.reset(rawError);
           if (error != nullptr) {
@@ -432,7 +481,7 @@ namespace security {
           rawError = nullptr;
           const auto unlockFlags = static_cast<SecretSearchFlags>(SECRET_SEARCH_ALL | SECRET_SEARCH_UNLOCK);
           SecretItemListPtr unlockedItems(
-              secret_service_search_sync(service.get(), &schema(), table.get(), unlockFlags, cancellable, &rawError)
+              secret_service_search_sync(service.get(), &schemaToSearch, table.get(), unlockFlags, cancellable, &rawError)
           );
           error.reset(rawError);
           if (error == nullptr) {
@@ -467,6 +516,7 @@ namespace security {
         });
       }
 
+    public:
       SecretStoreBackendResult store(
           const SecretStoreAttributes& attributes, std::span<const std::uint8_t> bytes, const std::string& label,
           SecretStoreCancellation& cancellation
@@ -503,6 +553,17 @@ namespace security {
           GError* rawError = nullptr;
           const gboolean erased = secret_password_clearv_sync(&schema(), table.get(), cancellable, &rawError);
           ErrorPtr error(rawError, &g_error_free);
+          // Drop the pre-rename copy too, or the next lookup would bring the secret back.
+          GError* rawLegacyError = nullptr;
+          const gboolean erasedLegacy =
+              secret_password_clearv_sync(&legacySchema(), table.get(), cancellable, &rawLegacyError);
+          ErrorPtr legacyError(rawLegacyError, &g_error_free);
+          if (erased == 0 && erasedLegacy != 0 && error == nullptr) {
+            return SecretStoreBackendResult{
+                .status = SecretStoreStatus::Success,
+                .errorCategory = SecretStoreErrorCategory::None,
+            };
+          }
           if (erased != 0) {
             return SecretStoreBackendResult{
                 .status = SecretStoreStatus::Success,

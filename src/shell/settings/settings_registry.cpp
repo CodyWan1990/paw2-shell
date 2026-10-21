@@ -418,31 +418,55 @@ namespace settings {
       );
     }
 
-    // One row of a paw2 page. Its path is {"paw2", <paw2's dotted path, split>}, and its text lives
-    // under settings.schema.paw2.<dotted path>.
-    SettingEntry makePaw2Entry(
-        SettingsSection section, std::string group, std::string_view dottedPath, SettingControl control,
-        std::string tags = {}, bool advanced = false
-    ) {
-      std::vector<std::string> path{"paw2"};
-      std::string key = "settings.schema.paw2";
-      std::size_t start = 0;
-      while (start <= dottedPath.size()) {
-        const auto dot = dottedPath.find('.', start);
-        const auto part =
-            dottedPath.substr(start, dot == std::string_view::npos ? std::string_view::npos : dot - start);
-        path.emplace_back(part);
-        key += "." + i18n::keySegment(part);
-        if (dot == std::string_view::npos) {
-          break;
+    // Rows of a paw2 page. A row's path is {"paw2", <paw2's dotted path, split>}, its text lives under
+    // settings.schema.paw2.<dotted path>, and toggles and sliders read their value from that same path.
+    // `visible` = false hides a row that only matters while another value is on (blur strength while
+    // blur is off); paw2's values are not in Config, so the registry is rebuilt when they change.
+    class Paw2Rows {
+    public:
+      Paw2Rows(std::vector<SettingEntry>& entries, const Paw2Values& paw2, SettingsSection section, std::string group)
+          : m_entries(entries), m_paw2(paw2), m_section(section), m_group(std::move(group)) {}
+
+      void setGroup(std::string group) { m_group = std::move(group); }
+
+      void
+      add(std::string_view dottedPath, SettingControl control, std::string_view tags, bool advanced = false,
+          bool visible = true) {
+        std::vector<std::string> path{"paw2"};
+        std::string key = "settings.schema.paw2";
+        for (const auto& part : compositors::paw2::splitPath(dottedPath)) {
+          key += "." + i18n::keySegment(part);
+          path.push_back(part);
         }
-        start = dot + 1;
+        m_entries.push_back(makeEntry(
+            m_section, m_group, i18n::tr(key + ".label"), i18n::tr(key + ".description"), std::move(path),
+            std::move(control), "paw2 compositor " + std::string(tags), advanced,
+            visible ? SettingVisibility{} : SettingVisibility{[](const Config&) { return false; }}
+        ));
       }
-      return makeEntry(
-          section, std::move(group), i18n::tr(key + ".label"), i18n::tr(key + ".description"), std::move(path),
-          std::move(control), "paw2 compositor " + tags, advanced
-      );
-    }
+
+      // Returns the toggle's value, for rows that depend on it.
+      bool toggle(std::string_view dottedPath, bool fallback, std::string_view tags, bool visible = true) {
+        const bool on = m_paw2.boolean(dottedPath, fallback);
+        add(dottedPath, ToggleSetting{on}, tags, false, visible);
+        return on;
+      }
+
+      void slider(
+          std::string_view dottedPath, double fallback, double min, double max, double step, std::string_view tags,
+          bool advanced = false, bool visible = true
+      ) {
+        const bool integer = step >= 1.0;
+        add(dottedPath, SliderSetting{m_paw2.number(dottedPath, fallback), min, max, step, integer}, tags, advanced,
+            visible);
+      }
+
+    private:
+      std::vector<SettingEntry>& m_entries;
+      const Paw2Values& m_paw2;
+      SettingsSection m_section;
+      std::string m_group;
+    };
 
     [[nodiscard]] SelectSetting
     paw2Select(std::string_view baseKey, std::span<const std::string_view> values, std::string selected) {
@@ -688,143 +712,52 @@ namespace settings {
       }
     }
 
-    // Pushes a paw2 row; `visible` hides one that only matters while another value is on, e.g.
-    // blur strength while blur is off.
-    void pushPaw2Entry(std::vector<SettingEntry>& entries, SettingEntry entry, bool visible = true) {
-      if (!visible) {
-        entry.visibleWhen = [](const Config&) { return false; };
-      }
-      entries.push_back(std::move(entry));
-    }
-
     // paw2's look sits on the Appearance page beside the shell's: each helper below fills one of
     // that page's groups, and is called where the group sits.
 
     void appendPaw2WindowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      constexpr auto section = SettingsSection::Appearance;
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "windows", "appearance.gaps", SliderSetting{paw2.number("appearance.gaps", 0), 0, 64, 1, true},
-              "gaps spacing margin"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "windows", "appearance.focus_ring_width",
-              SliderSetting{paw2.number("appearance.focus_ring_width", 0), 0, 16, 1, true}, "focus ring border width"
-          )
-      );
-
+      Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "windows");
+      rows.slider("appearance.gaps", 0, 0, 64, 1, "gaps spacing margin");
+      rows.slider("appearance.focus_ring_width", 0, 0, 16, 1, "focus ring border width");
       // paw2 draws these for apps that let it; GTK apps keep their own header bars.
-      const bool titlebarsOn = paw2.boolean("appearance.titlebars", false);
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "windows", "appearance.titlebars", ToggleSetting{titlebarsOn},
-              "titlebar title bar decorations close button float server side"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "windows", "appearance.titlebar_height",
-              SliderSetting{paw2.number("appearance.titlebar_height", 24), 16, 48, 1, true}, "titlebar height size",
-              true
-          ),
-          titlebarsOn
-      );
+      const bool titlebarsOn =
+          rows.toggle("appearance.titlebars", false, "titlebar title bar decorations close button float server side");
+      rows.slider("appearance.titlebar_height", 24, 16, 48, 1, "titlebar height size", true, titlebarsOn);
     }
 
     void appendPaw2ShadowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      constexpr auto section = SettingsSection::Appearance;
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "shadows", "appearance.shadow_radius",
-              SliderSetting{paw2.number("appearance.shadow_radius", 0), 0, 64, 1, true}, "window shadow drop size"
-          )
-      );
+      Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "shadows");
+      rows.slider("appearance.shadow_radius", 0, 0, 64, 1, "window shadow drop size");
     }
 
     void appendPaw2TransparencyEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      constexpr auto section = SettingsSection::Appearance;
-      const bool transparencyOn = paw2.boolean("appearance.transparency", false);
-      const bool blurOn = paw2.boolean("appearance.blur", false);
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "transparency", "appearance.transparency", ToggleSetting{transparencyOn},
-              "transparency translucent"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "transparency", "appearance.opacity",
-              SliderSetting{paw2.number("appearance.opacity", 1.0), 0.1, 1.0, 0.05, false}, "window opacity alpha"
-          ),
-          transparencyOn
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "transparency", "appearance.blur", ToggleSetting{blurOn}, "blur backdrop frosted bar dock panel"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "transparency", "appearance.blur_radius",
-              SliderSetting{paw2.number("appearance.blur_radius", 0), 0, 64, 1, true}, "blur radius strength"
-          ),
-          blurOn
-      );
+      Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "transparency");
+      const bool transparencyOn = rows.toggle("appearance.transparency", false, "transparency translucent");
+      rows.slider("appearance.opacity", 1.0, 0.1, 1.0, 0.05, "window opacity alpha", false, transparencyOn);
+      const bool blurOn = rows.toggle("appearance.blur", false, "blur backdrop frosted bar dock panel");
+      rows.slider("appearance.blur_radius", 0, 0, 64, 1, "blur radius strength", false, blurOn);
     }
 
     void appendPaw2DesktopThemeEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      constexpr auto section = SettingsSection::Appearance;
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "desktop-theme", "theme.cursor_theme",
-              paw2ThemePicker(DesktopThemeKind::Cursor, paw2.text("theme.cursor_theme")), "cursor pointer theme"
-          )
+      Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "desktop-theme");
+      rows.add(
+          "theme.cursor_theme", paw2ThemePicker(DesktopThemeKind::Cursor, paw2.text("theme.cursor_theme")),
+          "cursor pointer theme"
       );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "desktop-theme", "theme.cursor_size",
-              SliderSetting{paw2.number("theme.cursor_size", 24), 8, 96, 1, true}, "cursor pointer size"
-          )
+      rows.slider("theme.cursor_size", 24, 8, 96, 1, "cursor pointer size");
+      rows.add(
+          "theme.icon_theme", paw2ThemePicker(DesktopThemeKind::Icon, paw2.text("theme.icon_theme")), "icon theme"
       );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "desktop-theme", "theme.icon_theme",
-              paw2ThemePicker(DesktopThemeKind::Icon, paw2.text("theme.icon_theme")), "icon theme"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "desktop-theme", "theme.gtk_theme",
-              paw2ThemePicker(DesktopThemeKind::Gtk, paw2.text("theme.gtk_theme")), "gtk theme"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "desktop-theme", "theme.qt_style",
-              TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"}, "qt style kvantum"
-          )
+      rows.add("theme.gtk_theme", paw2ThemePicker(DesktopThemeKind::Gtk, paw2.text("theme.gtk_theme")), "gtk theme");
+      rows.add(
+          "theme.qt_style", TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"},
+          "qt style kvantum"
       );
     }
 
     // What stays on the paw2 page: how windows behave rather than how they look.
     void appendPaw2BehaviourEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      constexpr auto section = SettingsSection::Paw2;
+      Paw2Rows rows(entries, paw2, SettingsSection::Paw2, "paw2-tiling");
       constexpr std::array<std::string_view, 4> kLayouts{"scrolling", "dwindle", "master_stack", "monocle"};
       ListSetting layouts{.items = paw2.list("layout.enabled_layouts", {kLayouts.begin(), kLayouts.end()})};
       for (const auto layout : kLayouts) {
@@ -835,65 +768,26 @@ namespace settings {
             }
         );
       }
-      pushPaw2Entry(
-          entries, makePaw2Entry(section, "paw2-tiling", "layout.enabled_layouts", std::move(layouts), "cycle layouts")
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-tiling", "layout.column_width",
-              SliderSetting{paw2.number("layout.column_width", 0.6), 0.1, 1.0, 0.05, false}, "column width scrolling"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-tiling", "layout.center_focused_column",
-              ToggleSetting{paw2.boolean("layout.center_focused_column", false)}, "center viewport scrolling"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-tiling", "layout.tab_grouping", ToggleSetting{paw2.boolean("layout.tab_grouping", false)},
-              "tabs tab bar group"
-          )
-      );
+      rows.add("layout.enabled_layouts", std::move(layouts), "cycle layouts");
+      rows.slider("layout.column_width", 0.6, 0.1, 1.0, 0.05, "column width scrolling");
+      rows.toggle("layout.center_focused_column", false, "center viewport scrolling");
+      rows.toggle("layout.tab_grouping", false, "tabs tab bar group");
 
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-overview", "overview.zoom",
-              SliderSetting{paw2.number("overview.zoom", 0.5), 0.2, 0.75, 0.05, false}, "overview zoom size"
-          )
-      );
+      rows.setGroup("paw2-overview");
+      rows.slider("overview.zoom", 0.5, 0.2, 0.75, 0.05, "overview zoom size");
       constexpr std::array<std::string_view, 5> kScratchpadPositions{"centered", "top", "bottom", "left", "right"};
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-overview", "overview.scratchpad_position",
-              paw2Select(
-                  "settings.schema.paw2.overview.scratchpad-position.options", kScratchpadPositions,
-                  paw2.text("overview.scratchpad_position", "centered")
-              ),
-              "overview scratchpad strip position"
-          )
+      rows.add(
+          "overview.scratchpad_position",
+          paw2Select(
+              "settings.schema.paw2.overview.scratchpad-position.options", kScratchpadPositions,
+              paw2.text("overview.scratchpad_position", "centered")
+          ),
+          "overview scratchpad strip position"
       );
 
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-input", "input.focus_follows_mouse",
-              ToggleSetting{paw2.boolean("input.focus_follows_mouse", false)}, "focus follows mouse pointer hover"
-          )
-      );
-      pushPaw2Entry(
-          entries,
-          makePaw2Entry(
-              section, "paw2-input", "input.middle_click_paste",
-              ToggleSetting{paw2.boolean("input.middle_click_paste", true)}, "middle click paste primary selection"
-          )
-      );
+      rows.setGroup("paw2-input");
+      rows.toggle("input.focus_follows_mouse", false, "focus follows mouse pointer hover");
+      rows.toggle("input.middle_click_paste", true, "middle click paste primary selection");
     }
 
   } // namespace

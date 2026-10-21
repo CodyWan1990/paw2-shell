@@ -582,21 +582,6 @@ void Application::initStyleThemeAndWayland() {
       },
       "community-palette-sync"
   );
-  m_communityTemplateService.setReadyCallback([this]() {
-    if (m_configService.config().theme.templates.enableCommunityTemplates) {
-      m_themeService.onConfigReload();
-      m_settingsWindow.onExternalOptionsChanged();
-    }
-  });
-  m_communityTemplateService.sync(m_configService.config().theme.templates);
-  m_configService.addReloadCallback(
-      [this]() {
-        if (m_configService.lastChange().theme) {
-          m_communityTemplateService.sync(m_configService.config().theme.templates);
-        }
-      },
-      "community-template-sync"
-  );
 
   // i18n has no dependencies on other services and must be ready before any
   // UI construction reads a translated string.

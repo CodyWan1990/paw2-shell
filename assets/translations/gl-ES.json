@@ -1049,7 +1049,6 @@
         "built-in": "Integrado",
         "capsules": "Cápsulas",
         "clipboard": "Portapapeis",
-        "community": "Comunidade",
         "control-center": "Centro de control",
         "dead-zone": "Zona morta",
         "directories": "Directorios",
@@ -2564,19 +2563,10 @@
           "empty": "Non hai modelos integrados dispoñibles.",
           "label": "Modelos integrados"
         },
-        "community-ids": {
-          "description": "Activa ou desactiva os modelos da comunidade gardados na caché para renderizalos en cada cambio de tema",
-          "empty": "Aínda non hai modelos da comunidade dispoñibles. Activa os modelos da comunidade e actualiza primeiro o catálogo.",
-          "label": "Modelos da comunidade"
-        },
         "dynamic-output": "A ruta de saída resólvese cando se aplica o modelo",
         "enable-builtins": {
           "description": "Usa o catálogo incluído de modelos de tema para aplicacións",
           "label": "Activar modelos integrados"
-        },
-        "enable-community-templates": {
-          "description": "Descarga e aplica modelos do catálogo da comunidade",
-          "label": "Activar modelos da comunidade"
         }
       },
       "wallpaper": {

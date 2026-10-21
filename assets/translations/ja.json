@@ -1146,7 +1146,6 @@
         "built-in": "内蔵",
         "calendar-accounts": "アカウント",
         "clipboard": "クリップボード",
-        "community": "コミュニティ",
         "control-center": "コントロールセンター",
         "home": "ホーム",
         "hot-corners": "ホットコーナー",
@@ -2773,16 +2772,9 @@
           "empty": "利用可能な内蔵テンプレートはありません。",
           "label": "内蔵テンプレート"
         },
-        "community-ids": {
-          "description": "テーマ変更時に適用するコミュニティテンプレートを参照して有効化します",
-          "empty": "利用可能なコミュニティテンプレートはまだありません。先にコミュニティテンプレートを有効にして、カタログを更新してください。"
-        },
         "enable-builtins": {
           "description": "アプリ用テーマテンプレートの同梱カタログを使用します",
           "label": "内蔵テンプレートを有効化"
-        },
-        "enable-community-templates": {
-          "description": "コミュニティカタログからテンプレートをダウンロードして適用"
         }
       },
       "wallpaper": {

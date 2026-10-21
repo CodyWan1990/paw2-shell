@@ -1335,7 +1335,6 @@
         "calendar-reminders": "Reminders",
         "capsules": "Capsules",
         "clipboard": "Clipboard",
-        "community": "Community",
         "control-center": "Control Center",
         "dead-zone": "Dead Zone",
         "directories": "Directories",
@@ -3724,19 +3723,10 @@
           "empty": "No built-in templates are available.",
           "label": "Built-In Templates"
         },
-        "community-ids": {
-          "description": "Browse and enable community templates applied on each theme change",
-          "empty": "No community templates are available yet. Enable community templates and refresh the catalog first.",
-          "label": "Community Templates"
-        },
         "dynamic-output": "Output path is resolved when the template is applied",
         "enable-builtins": {
           "description": "Use the bundled catalog of theme templates for apps",
           "label": "Enable Built-In Templates"
-        },
-        "enable-community-templates": {
-          "description": "Download and apply templates from the community catalog",
-          "label": "Enable Community Templates"
         }
       },
       "wallpaper": {
@@ -3854,20 +3844,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Browse Templates",
-        "categories": "Categories",
-        "category-all": "All",
-        "empty": "No templates match your filters",
-        "enabled-count": "{count} enabled",
-        "filter-all": "All",
-        "filter-enabled": "Enabled",
-        "results-count": "{count} templates",
-        "search-placeholder": "Search templates…",
-        "sort-category-asc": "Sort by category (A-Z)",
-        "sort-category-desc": "Sort by category (Z-A)",
-        "sort-name-asc": "Sort by name (A-Z)",
-        "sort-name-desc": "Sort by name (Z-A)",
-        "title": "Community Templates"
+        "filter-all": "All"
       }
     },
     "widgets": {
@@ -5111,7 +5088,6 @@
         "launcher": "Currency exchange rate fetching will not work.",
         "location": "Weather and location lookups will not work.",
         "security": "External IP lookup and telemetry will not work.",
-        "template-store": "Community template downloads will not work.",
         "templates": "Community template downloads and updates will not work.",
         "title": "Offline Mode"
       },

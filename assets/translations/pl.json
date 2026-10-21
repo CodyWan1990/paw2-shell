@@ -988,7 +988,6 @@
         "built-in": "wbudowane",
         "capsules": "kapsułki",
         "clipboard": "schowek",
-        "community": "społeczność",
         "control-center": "centrum sterowania",
         "directories": "katalogi",
         "effects": "efekty",
@@ -2204,18 +2203,9 @@
           "empty": "Brak dostępnych wbudowanych szablonów.",
           "label": "Wbudowane szablony"
         },
-        "community-ids": {
-          "description": "Przeglądaj i wybieraj szablony społeczności stosowane przy każdej zmianie motywu",
-          "empty": "Brak dostępnych szablonów społeczności. Najpierw włącz szablony społeczności i odśwież katalog.",
-          "label": "Szablony społeczności"
-        },
         "enable-builtins": {
           "description": "Użyj wbudowanego katalogu szablonów motywu dla aplikacji",
           "label": "Włącz wbudowane szablony"
-        },
-        "enable-community-templates": {
-          "description": "Pobierz i zastosuj szablony z katalogu społeczności",
-          "label": "Włącz szablony społeczności"
         }
       },
       "wallpaper": {

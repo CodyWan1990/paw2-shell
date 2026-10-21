@@ -1142,7 +1142,6 @@
         "built-in": "Integrat",
         "capsules": "Càpsules",
         "clipboard": "Porta-retalls",
-        "community": "Comunitat",
         "control-center": "Centre de control",
         "dead-zone": "Zona morta",
         "directories": "Directoris",
@@ -2902,19 +2901,10 @@
           "empty": "No hi ha plantilles integrades disponibles.",
           "label": "Plantilles integrades"
         },
-        "community-ids": {
-          "description": "Explora i activa plantilles de la comunitat aplicades a cada canvi de tema",
-          "empty": "Encara no hi ha plantilles de la comunitat disponibles. Activa les plantilles de la comunitat i actualitza el catàleg primer.",
-          "label": "Plantilles de la comunitat"
-        },
         "dynamic-output": "El camí de sortida es resol quan s'aplica la plantilla",
         "enable-builtins": {
           "description": "Utilitza el catàleg integrat de plantilles de tema per a aplicacions",
           "label": "Activa les plantilles integrades"
-        },
-        "enable-community-templates": {
-          "description": "Descarrega i aplica plantilles del catàleg de la comunitat",
-          "label": "Activa les plantilles de la comunitat"
         }
       },
       "wallpaper": {
@@ -3032,20 +3022,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Explora les plantilles",
-        "categories": "Categories",
-        "category-all": "Totes",
-        "empty": "Cap plantilla coincideix amb els filtres",
-        "enabled-count": "{count} activades",
-        "filter-all": "Totes",
-        "filter-enabled": "Activades",
-        "results-count": "{count} plantilles",
-        "search-placeholder": "Cerca plantilles…",
-        "sort-category-asc": "Ordena per categoria (A-Z)",
-        "sort-category-desc": "Ordena per categoria (Z-A)",
-        "sort-name-asc": "Ordena per nom (A-Z)",
-        "sort-name-desc": "Ordena per nom (Z-A)",
-        "title": "Plantilles de la comunitat"
+        "filter-all": "Totes"
       }
     },
     "widgets": {
@@ -3769,7 +3746,6 @@
         "launcher": "L'obtenció de taxes de canvi de moneda no funcionarà.",
         "location": "Les consultes de temps i ubicació no funcionaran.",
         "security": "La consulta d'IP externa i la telemetria no funcionaran.",
-        "template-store": "Les descàrregues de plantilles de la comunitat no funcionaran.",
         "templates": "Les descàrregues i actualitzacions de plantilles de la comunitat no funcionaran.",
         "title": "Mode fora de línia"
       },

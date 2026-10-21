@@ -963,10 +963,6 @@
       }
     },
     "templates": {
-      "store": {
-        "sort-name-asc": "Sortera namn (A-Z)",
-        "sort-name-desc": "Sortera namn (Z-A)"
-      }
     },
     "widgets": {
       "map-placeholders": {

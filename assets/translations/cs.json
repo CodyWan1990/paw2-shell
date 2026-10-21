@@ -1015,7 +1015,6 @@
         "built-in": "Vestavěné",
         "capsules": "Kapsle",
         "clipboard": "Schránka",
-        "community": "Komunita",
         "control-center": "Ovládací centrum",
         "dead-zone": "Mrtvá zóna",
         "directories": "Složky",
@@ -2457,18 +2456,9 @@
           "empty": "Nejsou k dispozici žádné vestavěné šablony.",
           "label": "Vestavěné šablony"
         },
-        "community-ids": {
-          "description": "Přepnout uložené komunitní šablony pro vykreslení při každé změně motivu",
-          "empty": "Zatím nejsou k dispozici žádné komunitní šablony. Nejprve povolte komunitní šablony a obnovte katalog.",
-          "label": "Komunitní šablony"
-        },
         "enable-builtins": {
           "description": "Použít vestavěný katalog šablon motivů pro aplikace",
           "label": "Povolit vestavěné šablony"
-        },
-        "enable-community-templates": {
-          "description": "Stahovat a aplikovat šablony z komunitního katalogu",
-          "label": "Povolit komunitní šablony"
         }
       },
       "wallpaper": {

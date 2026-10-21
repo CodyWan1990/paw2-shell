@@ -1311,7 +1311,6 @@
         "calendar-reminders": "Promemoria",
         "capsules": "Capsule",
         "clipboard": "Appunti",
-        "community": "Community",
         "control-center": "Centro di controllo",
         "dead-zone": "Zona morta",
         "directories": "Directory",
@@ -3357,19 +3356,10 @@
           "empty": "Nessun template integrato disponibile.",
           "label": "Template integrati"
         },
-        "community-ids": {
-          "description": "Sfoglia e attiva i template della community applicati a ogni modifica del tema",
-          "empty": "Non ci sono template della community disponibili. Prima abilita i template della community e aggiorna il catalogo.",
-          "label": "Template della community"
-        },
         "dynamic-output": "Il percorso di output viene risolto quando viene applicato il template",
         "enable-builtins": {
           "description": "Usa i template dei temi inclusi per le app",
           "label": "Abilita template integrati"
-        },
-        "enable-community-templates": {
-          "description": "Scarica e applica template dal catalogo della community",
-          "label": "Abilita i template della community"
         }
       },
       "wallpaper": {
@@ -3487,20 +3477,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Sfoglia template",
-        "categories": "Categorie",
-        "category-all": "Tutti",
-        "empty": "Nessun template corrisponde ai tuoi filtri",
-        "enabled-count": "{count} abilitati",
-        "filter-all": "Tutti",
-        "filter-enabled": "Abilitato",
-        "results-count": "{count} template",
-        "search-placeholder": "Cerca template…",
-        "sort-category-asc": "Ordina per categoria (Z-A)",
-        "sort-category-desc": "Ordina per categoria (Z-A)",
-        "sort-name-asc": "Sort by name (Z-A)",
-        "sort-name-desc": "Sort by name (Z-A)",
-        "title": "Template della comunità"
+        "filter-all": "Tutti"
       }
     },
     "widgets": {
@@ -4715,7 +4692,6 @@
         "launcher": "Il recupero del tasso di cambio valuta non funzionerà.",
         "location": "Le ricerche su meteo e posizione non funzioneranno.",
         "security": "La ricerca dell'IP esterno e la telemetria non funzioneranno.",
-        "template-store": "I download dei template della community non funzioneranno.",
         "templates": "I download e gli aggiornamenti dei template della community non funzioneranno.",
         "title": "Modalità offline"
       },

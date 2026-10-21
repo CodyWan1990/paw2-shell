@@ -1159,7 +1159,6 @@
         "built-in": "מובנה",
         "capsules": "קפסולות",
         "clipboard": "לוח גזירים",
-        "community": "קהילה",
         "control-center": "מרכז הבקרה",
         "dead-zone": "אזור מת",
         "directories": "ספריות",
@@ -2923,19 +2922,10 @@
           "empty": "אין תבניות מובנות זמינות.",
           "label": "תבניות מובנות"
         },
-        "community-ids": {
-          "description": "עיין והפעל תבניות קהילה שיוחלו בכל שינוי ערכת נושא",
-          "empty": "עדיין אין תבניות קהילה זמינות. הפעל תבניות קהילה ורענן את הקטלוג תחילה.",
-          "label": "תבניות קהילה"
-        },
         "dynamic-output": "נתיב הפלט מיושב כאשר התבנית מוחלת",
         "enable-builtins": {
           "description": "השתמש בקטלוג תבניות העיצוב המצורף עבור אפליקציות",
           "label": "הפעל תבניות מובנות"
-        },
-        "enable-community-templates": {
-          "description": "הורד והחל תבניות מקטלוג הקהילה",
-          "label": "הפעל תבניות קהילה"
         }
       },
       "wallpaper": {
@@ -3053,20 +3043,7 @@
     },
     "templates": {
       "store": {
-        "browse": "עיון בתבניות",
-        "categories": "קטגוריות",
-        "category-all": "הכל",
-        "empty": "אף תבנית לא תואמת למסננים שלך",
-        "enabled-count": "{count} מופעלים",
-        "filter-all": "הכל",
-        "filter-enabled": "מופעל",
-        "results-count": "{count} תבניות",
-        "search-placeholder": "חפש תבניות…",
-        "sort-category-asc": "מיין לפי קטגוריה (א-ת)",
-        "sort-category-desc": "מיין לפי קטגוריה (ת-א)",
-        "sort-name-asc": "מיין לפי שם (א-ת)",
-        "sort-name-desc": "מיין לפי שם (ת-א)",
-        "title": "תבניות קהילה"
+        "filter-all": "הכל"
       }
     },
     "widgets": {
@@ -3798,7 +3775,6 @@
         "launcher": "קבלת שער החליפין לא תעבוד.",
         "location": "חיפושי מזג אוויר ומיקום לא יעבדו.",
         "security": "בדיקת IP חיצוני וטלמטריה לא יעבדו.",
-        "template-store": "הורדות תבניות מהקהילה לא יעבדו.",
         "templates": "הורדות ועדכונים של תבניות מהקהילה לא יעבדו.",
         "title": "מצב לא מקוון"
       },

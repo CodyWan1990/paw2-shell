@@ -1349,8 +1349,6 @@ namespace settings {
     // Templates
     const auto builtInTemplatesOn =
         SettingVisibility{[](const Config& c) { return c.theme.templates.enableBuiltinTemplates; }};
-    const auto communityTemplatesOn =
-        SettingVisibility{[](const Config& c) { return c.theme.templates.enableCommunityTemplates; }};
     entries.push_back(keyedEntry(
         SettingsSection::Templates, "built-in", "templates.enable-builtins",
         {"theme", "templates", "enable_builtin_templates"}, ToggleSetting{cfg.theme.templates.enableBuiltinTemplates},
@@ -1382,28 +1380,6 @@ namespace settings {
       e.visibleWhen = builtInTemplatesOn;
       entries.push_back(std::move(e));
     }
-    entries.push_back(keyedEntry(
-        SettingsSection::Templates, "community", "templates.enable-community-templates",
-        {"theme", "templates", "enable_community_templates"},
-        ToggleSetting{cfg.theme.templates.enableCommunityTemplates}, "theme templates community"
-    ));
-    {
-      const std::size_t enabledCount = cfg.theme.templates.communityIds.size();
-      auto e = makeEntry(
-          SettingsSection::Templates, "community", tr("settings.schema.templates.community-ids.label"),
-          enabledCount == 0 ? tr("settings.schema.templates.community-ids.description")
-                            : tr("settings.templates.store.enabled-count", "count", std::to_string(enabledCount)),
-          {},
-          ButtonSetting{
-              .label = tr("settings.templates.store.browse"),
-              .glyph = "apps",
-          },
-          "theme templates community apps discord fuzzel vscode walker store browse"
-      );
-      e.visibleWhen = communityTemplatesOn;
-      entries.push_back(std::move(e));
-    }
-
     // Dock and per-monitor dock pages share the same controls. Override pages display effective values while
     // writing to their own table, so untouched fields continue to inherit from the global dock.
     const auto addDockSettings = [&](const DockConfig& dock, std::vector<std::string> root,

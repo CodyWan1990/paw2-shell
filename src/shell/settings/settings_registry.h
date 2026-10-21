@@ -321,7 +321,6 @@ namespace settings {
     std::vector<SelectOption> batteryDeviceOptions;
     std::unordered_map<std::string, int> batteryWarningThresholds;
     std::vector<SelectOption> customPalettes;
-    std::vector<SelectOption> communityTemplates;
     std::vector<SelectOption> fontFamilies;
     std::string shellAvatarPath;
     std::vector<std::string> keyboardLayoutNames;

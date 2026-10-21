@@ -1272,7 +1272,6 @@
         "calendar-reminders": "Recordatorios",
         "capsules": "Cápsulas",
         "clipboard": "Portapapeles",
-        "community": "Comunidad",
         "control-center": "Centro de Control",
         "dead-zone": "Zona muerta",
         "directories": "Directorios",
@@ -3243,19 +3242,10 @@
           "empty": "No hay plantillas integradas disponibles.",
           "label": "Plantillas integradas"
         },
-        "community-ids": {
-          "description": "Explorar y habilitar las plantillas de la comunidad que se aplican en cada cambio de tema",
-          "empty": "Aún no hay plantillas de la comunidad disponibles. Activa las plantillas de la comunidad y actualiza primero el catálogo.",
-          "label": "Plantillas de la comunidad"
-        },
         "dynamic-output": "La ruta de salida se resuelve al aplicar la plantilla",
         "enable-builtins": {
           "description": "Usar el catálogo incluido de plantillas de tema para aplicaciones",
           "label": "Activar plantillas integradas"
-        },
-        "enable-community-templates": {
-          "description": "Descargar y aplicar plantillas del catálogo de la comunidad",
-          "label": "Activar plantillas de la comunidad"
         }
       },
       "wallpaper": {
@@ -3373,20 +3363,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Explorar plantillas",
-        "categories": "Categorías",
-        "category-all": "Todo",
-        "empty": "Ninguna plantilla coincide con tus filtros",
-        "enabled-count": "{count} habilitado",
-        "filter-all": "Todo",
-        "filter-enabled": "Habilitado",
-        "results-count": "{count} plantillas",
-        "search-placeholder": "Buscar plantillas…",
-        "sort-category-asc": "Ordenar por categoría (A-Z)",
-        "sort-category-desc": "Ordenar por categoría (Z-A)",
-        "sort-name-asc": "Ordenar por nombre (A-Z)",
-        "sort-name-desc": "Ordenar por nombre (Z-A)",
-        "title": "Plantillas de la comunidad"
+        "filter-all": "Todo"
       }
     },
     "widgets": {
@@ -4597,7 +4574,6 @@
         "launcher": "La obtención del tipo de cambio no funcionará.",
         "location": "Las búsquedas de información meteorológica y ubicación no funcionarán.",
         "security": "La búsqueda de IP externa y la telemetría no funcionarán.",
-        "template-store": "Las descargas de plantillas de la comunidad no funcionarán.",
         "templates": "Las descargas y actualizaciones de plantillas de la comunidad no funcionarán.",
         "title": "Modo sin conexión"
       },

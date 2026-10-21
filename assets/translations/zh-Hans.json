@@ -1281,7 +1281,6 @@
         "calendar-reminders": "提醒",
         "capsules": "胶囊",
         "clipboard": "剪贴板",
-        "community": "社区",
         "control-center": "控制中心",
         "dead-zone": "空白区域",
         "directories": "目录",
@@ -3264,19 +3263,10 @@
           "empty": "暂无可用的内置模板。",
           "label": "内置模板"
         },
-        "community-ids": {
-          "description": "浏览并启用每次更换主题时渲染的社区模板",
-          "empty": "暂无可用的社区模板。请先启用社区模板并刷新目录。",
-          "label": "社区模板"
-        },
         "dynamic-output": "输出路径将在应用模板时确定",
         "enable-builtins": {
           "description": "使用内置的应用主题模板目录",
           "label": "启用内置模板"
-        },
-        "enable-community-templates": {
-          "description": "下载并应用来自社区目录的模板",
-          "label": "启用社区模板"
         }
       },
       "wallpaper": {
@@ -3394,20 +3384,7 @@
     },
     "templates": {
       "store": {
-        "browse": "浏览模板",
-        "categories": "类别",
-        "category-all": "全部",
-        "empty": "没有符合当前筛选条件的模板",
-        "enabled-count": "已启用 {count} 项",
-        "filter-all": "全部",
-        "filter-enabled": "已启用",
-        "results-count": "{count} 个模板",
-        "search-placeholder": "搜索模板…",
-        "sort-category-asc": "按类别排序（A-Z）",
-        "sort-category-desc": "按类别排序（Z-A）",
-        "sort-name-asc": "按名称排序（A-Z）",
-        "sort-name-desc": "按名称排序（Z-A）",
-        "title": "社区模板"
+        "filter-all": "全部"
       }
     },
     "widgets": {
@@ -4622,7 +4599,6 @@
         "launcher": "无法获取货币汇率。",
         "location": "无法查询天气和位置。",
         "security": "无法查询外部 IP 或发送遥测数据。",
-        "template-store": "无法下载社区模板。",
         "templates": "无法下载和更新社区模板。",
         "title": "离线模式"
       },

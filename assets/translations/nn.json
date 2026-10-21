@@ -1165,7 +1165,6 @@
         "built-in": "Innebygd",
         "capsules": "Piller",
         "clipboard": "Utklippstavle",
-        "community": "Samfunn",
         "control-center": "Styrerom",
         "dead-zone": "Daudsone",
         "directories": "Mapper",
@@ -2915,19 +2914,10 @@
           "empty": "Ingen innebygde malar er tilgjengelege.",
           "label": "Innebygde malar"
         },
-        "community-ids": {
-          "description": "Leita etter og slå av / på malar frå samfunnet til å verta teikna med hamskifte",
-          "empty": "Ingen malar frå samfunnet er tilgjengelege enno. Slå på malar frå samfunnet og nya katalogen opp att fyrst.",
-          "label": "Malar frå samfunnet"
-        },
         "dynamic-output": "Utdatabanen er funnen når malen er gjeven",
         "enable-builtins": {
           "description": "Bruk den samanbundne katalogen med hammalar til appar",
           "label": "Slå på innebygde malar"
-        },
-        "enable-community-templates": {
-          "description": "Lasta ned og bruka malar frå samfunnskatalogen",
-          "label": "Slå på malar frå samfunnet"
         }
       },
       "wallpaper": {
@@ -3045,20 +3035,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Leita i malar",
-        "categories": "Klasser",
-        "category-all": "Alle",
-        "empty": "Ingen malar samsvarar vilkåra dine",
-        "enabled-count": "{count} påslegne",
-        "filter-all": "Alle",
-        "filter-enabled": "Påslegne",
-        "results-count": "{count} malar",
-        "search-placeholder": "Leita i malar ...",
-        "sort-category-asc": "Sorter etter klasse (A-Å)",
-        "sort-category-desc": "Sorter etter klasse (Å-A)",
-        "sort-name-asc": "Sorter etter namn (A-Å)",
-        "sort-name-desc": "Sorter etter namn (Å-A)",
-        "title": "Malar frå samfunnet"
+        "filter-all": "Alle"
       }
     },
     "widgets": {
@@ -3765,7 +3742,6 @@
         "launcher": "Noctalia kjem ikkje til å kunna henta valutakurs.",
         "location": "Vêr og stadfinning kjem ikkje til å verka.",
         "security": "Ekstern IP-finning og telemetri kjem ikkje til å verka.",
-        "template-store": "Nedlasting av malar frå samfunnet kjem ikkje til å verka.",
         "templates": "Nedlasting og oppdatering av malar frå samfunnet kjem ikkje til å verka.",
         "title": "Avnetes-modus"
       },

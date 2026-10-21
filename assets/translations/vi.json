@@ -1155,7 +1155,6 @@
         "built-in": "Tích hợp sẵn",
         "capsules": "Viên nang",
         "clipboard": "Bảng tạm",
-        "community": "Cộng đồng",
         "control-center": "Trung tâm điều khiển",
         "dead-zone": "Vùng chết",
         "directories": "Thư mục",
@@ -2712,18 +2711,9 @@
           "empty": "Không có mẫu tích hợp nào có sẵn.",
           "label": "Các mẫu tích hợp sẵn"
         },
-        "community-ids": {
-          "description": "Bật/tắt việc kết xuất các mẫu giao diện cộng đồng đã lưu vào bộ nhớ đệm mỗi khi thay đổi chủ đề",
-          "empty": "Hiện chưa có mẫu cộng đồng nào khả dụng. Vui lòng bật mẫu cộng đồng và làm mới danh mục trước.",
-          "label": "Mẫu cộng đồng"
-        },
         "enable-builtins": {
           "description": "Dùng thư viện mẫu giao diện đi kèm cho các ứng dụng.",
           "label": "Bật Templates tích hợp sẵn"
-        },
-        "enable-community-templates": {
-          "description": "Tải xuống và áp dụng các mẫu từ danh mục cộng đồng",
-          "label": "Bật mẫu cộng đồng"
         }
       },
       "wallpaper": {

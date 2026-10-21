@@ -1159,7 +1159,6 @@
         "built-in": "Integriert",
         "capsules": "Kapseln",
         "clipboard": "Zwischenablage",
-        "community": "Community",
         "control-center": "Kontrollzentrum",
         "dead-zone": "Leerer Bereich",
         "directories": "Verzeichnisse",
@@ -2923,19 +2922,10 @@
           "empty": "Keine integrierten Templates verfügbar.",
           "label": "Integrierte Templates"
         },
-        "community-ids": {
-          "description": "Durchsuche und aktiviere Community-Templates, die bei jedem Theme-Wechsel angewendet werden",
-          "empty": "Noch keine Community-Templates verfügbar. Aktiviere zuerst Community-Templates und aktualisiere den Katalog.",
-          "label": "Community-Templates"
-        },
         "dynamic-output": "Ausgabepfad wird beim Anwenden des Templates aufgelöst",
         "enable-builtins": {
           "description": "Verwende den integrierten Katalog mit Theme-Templates für Apps",
           "label": "Integrierte Templates aktivieren"
-        },
-        "enable-community-templates": {
-          "description": "Lade Templates aus dem Community-Katalog herunter und wende sie an",
-          "label": "Community-Templates aktivieren"
         }
       },
       "wallpaper": {
@@ -3053,20 +3043,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Templates durchsuchen",
-        "categories": "Kategorien",
-        "category-all": "Alle",
-        "empty": "Keine Templates entsprechen deinen Filtern",
-        "enabled-count": "{count} aktiviert",
-        "filter-all": "Alle",
-        "filter-enabled": "Aktiviert",
-        "results-count": "{count} Templates",
-        "search-placeholder": "Templates suchen…",
-        "sort-category-asc": "Nach Kategorie sortieren (A-Z)",
-        "sort-category-desc": "Nach Kategorie sortieren (Z-A)",
-        "sort-name-asc": "Nach Name sortieren (A-Z)",
-        "sort-name-desc": "Nach Name sortieren (Z-A)",
-        "title": "Community-Templates"
+        "filter-all": "Alle"
       }
     },
     "widgets": {
@@ -3798,7 +3775,6 @@
         "launcher": "Das Abrufen von Währungskursen wird nicht funktionieren.",
         "location": "Wetter- und Standortabfragen werden nicht funktionieren.",
         "security": "Externe IP-Abfrage und Telemetrie werden nicht funktionieren.",
-        "template-store": "Community-Template-Downloads werden nicht funktionieren.",
         "templates": "Community-Template-Downloads und -Aktualisierungen werden nicht funktionieren.",
         "title": "Offline-Modus"
       },

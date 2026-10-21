@@ -1736,8 +1736,6 @@ struct ThemeConfig {
   struct TemplatesConfig {
     bool enableBuiltinTemplates = true;
     std::vector<std::string> builtinIds;
-    bool enableCommunityTemplates = true;
-    std::vector<std::string> communityIds;
     std::vector<TemplateColorConfig> customColors;
     std::vector<UserTemplateConfig> userTemplates;
 

@@ -1176,7 +1176,6 @@
         "built-in": "Intégré",
         "capsules": "Capsules",
         "clipboard": "Presse-papiers",
-        "community": "Communauté",
         "control-center": "Centre de contrôle",
         "dead-zone": "Zone inactive",
         "directories": "Dossiers",
@@ -2752,18 +2751,9 @@
           "empty": "Aucun modèle intégré disponible.",
           "label": "Modèles intégrés"
         },
-        "community-ids": {
-          "description": "Parcourir et activer les modèles communautaires appliqués à chaque changement de thème",
-          "empty": "Aucun modèle communautaire disponible pour le moment. Activez les modèles communautaires et actualisez le catalogue.",
-          "label": "Modèles communautaires"
-        },
         "enable-builtins": {
           "description": "Utilise le catalogue intégré de modèles de thème pour les applications",
           "label": "Activer les modèles intégrés"
-        },
-        "enable-community-templates": {
-          "description": "Télécharge et applique les modèles du catalogue communautaire",
-          "label": "Activer les modèles communautaires"
         }
       },
       "wallpaper": {
@@ -3180,7 +3170,6 @@
       "native-title": "Paramètres Noctalia",
       "no-results": "Pas de paramètre trouvé",
       "offline-mode-notice": {
-        "template-store": "Les téléchargements des modèles de la communauté ne vont pas fonctionner. ",
         "templates": "Les téléchargements des modèles de la communauté et des mises à jour ne vont pas fonctionner. ",
         "title": "Mode hors connexion"
       },

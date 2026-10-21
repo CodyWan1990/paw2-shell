@@ -1161,7 +1161,6 @@
         "built-in": "Dahili",
         "capsules": "Kapsüller",
         "clipboard": "Pano",
-        "community": "Topluluk",
         "control-center": "Kontrol Merkezi",
         "dead-zone": "Ölü Bölge",
         "directories": "Dizinler",
@@ -2918,19 +2917,10 @@
           "empty": "Kullanılabilir dahili şablon yok.",
           "label": "Dahili Şablonlar"
         },
-        "community-ids": {
-          "description": "Her tema değişikliğinde uygulanan topluluk şablonlarına göz at ve etkinleştir",
-          "empty": "Henüz kullanılabilir topluluk şablonu yok. Önce topluluk şablonlarını etkinleştirin ve kataloğu yenileyin.",
-          "label": "Topluluk Şablonları"
-        },
         "dynamic-output": "Şablon uygulandığında çıktı yolu çözümlenir",
         "enable-builtins": {
           "description": "Uygulamalar için paketlenmiş tema şablonları kataloğunu kullanın",
           "label": "Dahili Şablonları Etkinleştir"
-        },
-        "enable-community-templates": {
-          "description": "Topluluk kataloğundan şablonları indirin ve uygulayın",
-          "label": "Topluluk Şablonlarını Etkinleştir"
         }
       },
       "wallpaper": {
@@ -3048,20 +3038,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Şablonlara Göz At",
-        "categories": "Kategoriler",
-        "category-all": "Tümü",
-        "empty": "Filtrelerinizle eşleşen şablon yok",
-        "enabled-count": "{count} etkin",
-        "filter-all": "Tümü",
-        "filter-enabled": "Etkin Olanlar",
-        "results-count": "{count} şablon",
-        "search-placeholder": "Şablonları ara…",
-        "sort-category-asc": "Kategoriye göre sırala (A-Z)",
-        "sort-category-desc": "Kategoriye göre sırala (Z-A)",
-        "sort-name-asc": "İsme göre sırala (A-Z)",
-        "sort-name-desc": "İsme göre sırala (Z-A)",
-        "title": "Topluluk Şablonları"
+        "filter-all": "Tümü"
       }
     },
     "widgets": {
@@ -3790,7 +3767,6 @@
         "launcher": "Döviz kuru çekimi çalışmayacak.",
         "location": "Hava durumu ve konum sorgulamaları çalışmayacak.",
         "security": "Harici IP sorgulama ve telemetri çalışmayacak.",
-        "template-store": "Topluluk şablonu indirmeleri çalışmayacak.",
         "templates": "Topluluk şablonu indirmeleri ve güncellemeleri çalışmayacak.",
         "title": "Çevrimdışı Mod"
       },

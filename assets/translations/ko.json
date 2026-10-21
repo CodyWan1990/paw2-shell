@@ -1200,7 +1200,6 @@
         "calendar-reminders": "리마인더",
         "capsules": "캡슐",
         "clipboard": "클립보드",
-        "community": "커뮤니티",
         "control-center": "제어 센터",
         "dead-zone": "비활성 영역",
         "directories": "디렉토리",
@@ -2969,19 +2968,10 @@
           "empty": "사용 가능한 기본 제공 템플릿이 없습니다.",
           "label": "기본 제공 템플릿"
         },
-        "community-ids": {
-          "description": "각 테마 변경 시 렌더링할 캐시된 커뮤니티 템플릿 전환",
-          "empty": "아직 사용 가능한 커뮤니티 템플릿이 없습니다. 커뮤니티 템플릿을 활성화하고 카탈로그를 먼저 새로 고침하세요.",
-          "label": "커뮤니티 템플릿"
-        },
         "dynamic-output": "출력 경로는 템플릿이 적용될 때 확인됩니다",
         "enable-builtins": {
           "description": "앱용 번들 테마 템플릿 카탈로그 사용",
           "label": "기본 제공 템플릿 활성화"
-        },
-        "enable-community-templates": {
-          "description": "커뮤니티 카탈로그에서 템플릿 다운로드 및 적용",
-          "label": "커뮤니티 템플릿 활성화"
         }
       },
       "wallpaper": {
@@ -3099,20 +3089,7 @@
     },
     "templates": {
       "store": {
-        "browse": "템플릿 탐색",
-        "categories": "카테고리",
-        "category-all": "모두",
-        "empty": "필터와 일치하는 템플릿이 없습니다",
-        "enabled-count": "{count}개 활성화됨",
-        "filter-all": "모두",
-        "filter-enabled": "활성화됨",
-        "results-count": "{count}개 템플릿",
-        "search-placeholder": "템플릿 검색...",
-        "sort-category-asc": "카테고리순 정렬 (A-Z)",
-        "sort-category-desc": "카테고리순 정렬 (Z-A)",
-        "sort-name-asc": "이름순 정렬 (A-Z)",
-        "sort-name-desc": "이름순 정렬 (Z-A)",
-        "title": "커뮤니티 템플릿"
+        "filter-all": "모두"
       }
     },
     "widgets": {
@@ -3894,7 +3871,6 @@
         "launcher": "환율 가져오기가 작동하지 않습니다.",
         "location": "날씨 및 위치 조회가 작동하지 않습니다.",
         "security": "외부 IP 조회 및 텔레메트리 전송이 작동하지 않습니다.",
-        "template-store": "커뮤니티 템플릿 다운로드가 작동하지 않습니다.",
         "templates": "커뮤니티 템플릿 다운로드 및 업데이트가 작동하지 않습니다.",
         "title": "오프라인 모드"
       },

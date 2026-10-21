@@ -1120,7 +1120,6 @@
         "built-in": "Beépített",
         "capsules": "Kapszulák",
         "clipboard": "Vágólap",
-        "community": "Közösség",
         "control-center": "Vezérlőközpont",
         "dead-zone": "Holt zóna",
         "directories": "Könyvtárak",
@@ -2803,19 +2802,10 @@
           "empty": "Nincsenek beépített sablonok elérhetők.",
           "label": "Beépített sablonok"
         },
-        "community-ids": {
-          "description": "A gyorsítótárazott közösségi sablonok renderelésének be/ki kapcsolása minden téma módosításakor",
-          "empty": "Még nem érhetők el közösségi sablonok. Először engedélyezd a közösségi sablonokat, és frissítsd a katalógust.",
-          "label": "Közösségi Sablonok"
-        },
         "dynamic-output": "A kimeneti útvonal a sablon alkalmazásakor kerül meghatározásra",
         "enable-builtins": {
           "description": "Használd az alkalmazásokhoz mellékelt téma sablonok katalógusát",
           "label": "Beépített sablonok bekapcsolása"
-        },
-        "enable-community-templates": {
-          "description": "Tölts le és alkalmazz sablonokat a közösségi katalógusból",
-          "label": "Közösségi sablonok engedélyezése"
         }
       },
       "wallpaper": {
@@ -2924,11 +2914,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Sablonok böngészése",
-        "categories": "Kategóriák",
-        "category-all": "Összes",
-        "filter-all": "Összes",
-        "filter-enabled": "Engedélyezve"
+        "filter-all": "Összes"
       }
     },
     "widgets": {

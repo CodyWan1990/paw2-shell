@@ -1311,7 +1311,6 @@
         "calendar-reminders": "Lembretes",
         "capsules": "Cápsulas",
         "clipboard": "Área de Transferência",
-        "community": "Comunidade",
         "control-center": "Central de Controle",
         "dead-zone": "Zona Morta",
         "directories": "Diretórios",
@@ -3357,19 +3356,10 @@
           "empty": "Nenhum modelo integrado disponível.",
           "label": "Modelos Integrados"
         },
-        "community-ids": {
-          "description": "Navegar e habilitar modelos de comunidade aplicados em cada mudança de tema",
-          "empty": "Ainda não há modelos da comunidade disponíveis. Primeiro, habilite os modelos de comunidade e atualize o catálogo.",
-          "label": "Modelos da Comunidade"
-        },
         "dynamic-output": "Caminho de saída é resolvido quando o tema é aplicado",
         "enable-builtins": {
           "description": "Usa o catálogo de modelos de temas integrados para apps",
           "label": "Habilitar Modelos Integrados"
-        },
-        "enable-community-templates": {
-          "description": "Baixa e aplica modelos do catálogo da comunidade",
-          "label": "Habilitar Modelos da Comunidade"
         }
       },
       "wallpaper": {
@@ -3487,20 +3477,7 @@
     },
     "templates": {
       "store": {
-        "browse": "Navegar pelos modelos",
-        "categories": "Categorias",
-        "category-all": "Todas",
-        "empty": "Não há modelos semelhantes ao seu filtro",
-        "enabled-count": "{count} habilitados",
-        "filter-all": "Todos",
-        "filter-enabled": "Habilitado",
-        "results-count": "{count} modelos",
-        "search-placeholder": "Busque modelos...",
-        "sort-category-asc": "Ordenar por categoria (A-Z)",
-        "sort-category-desc": "Ordenar por categoria (Z-A)",
-        "sort-name-asc": "Ordenar por nome (A-Z)",
-        "sort-name-desc": "Ordenar por nome (Z-A)",
-        "title": "Modelos da Comunidade"
+        "filter-all": "Todos"
       }
     },
     "widgets": {
@@ -4715,7 +4692,6 @@
         "launcher": "A busca de taxas de câmbio não funcionará.",
         "location": "As consultas de clima e localização não funcionarão.",
         "security": "A consulta de IP externo e a telemetria não funcionarão.",
-        "template-store": "O download de modelos da comunidade não funcionará.",
         "templates": "Os download e atualizações de modelos da comunidade não funcionarão.",
         "title": "Modo Off-line"
       },

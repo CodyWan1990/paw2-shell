@@ -1203,7 +1203,6 @@
         "built-in": "Убудавана",
         "capsules": "Капсулы",
         "clipboard": "Буфер абмену",
-        "community": "Супольнасць",
         "control-center": "Цэнтр кіравання",
         "dead-zone": "Мёртвая зона",
         "directories": "Каталогі",
@@ -1919,7 +1918,6 @@
     },
     "templates": {
       "store": {
-        "category-all": "Усе",
         "filter-all": "Усе"
       }
     },

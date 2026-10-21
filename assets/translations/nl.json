@@ -1000,7 +1000,6 @@
         "built-in": "Ingebouwd",
         "capsules": "Capsules",
         "clipboard": "Klembord",
-        "community": "Community",
         "control-center": "Controlecentrum",
         "directories": "Mappen",
         "effects": "Effecten",
@@ -2257,18 +2256,9 @@
           "empty": "Geen ingebouwde sjablonen beschikbaar.",
           "label": "Ingebouwde sjablonen"
         },
-        "community-ids": {
-          "description": "Schakel gecachte community-sjablonen in om bij elke themawijziging te renderen",
-          "empty": "Er zijn nog geen community-sjablonen beschikbaar. Schakel community-sjablonen in en vernieuw eerst de catalogus.",
-          "label": "Community-sjablonen"
-        },
         "enable-builtins": {
           "description": "Gebruik de ingebouwde catalogus met themasjablonen voor apps",
           "label": "Ingebouwde sjablonen inschakelen"
-        },
-        "enable-community-templates": {
-          "description": "Download en pas sjablonen toe uit de community-catalogus",
-          "label": "Community-sjablonen inschakelen"
         }
       },
       "wallpaper": {

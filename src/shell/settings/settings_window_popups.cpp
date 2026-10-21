@@ -17,9 +17,7 @@
 #include "shell/settings/settings_control_factory.h"
 #include "shell/settings/settings_registry.h"
 #include "shell/settings/settings_window.h"
-#include "shell/settings/template_store_content.h"
 #include "shell/settings/widget_settings_registry.h"
-#include "theme/community_templates.h"
 #include "ui/builders.h"
 #include "ui/controls/button.h"
 #include "ui/controls/context_menu.h"
@@ -1722,67 +1720,6 @@ void SettingsWindow::openCapsuleGroupEditor(std::vector<std::string> laneListPat
       settings::buildCapsuleGroupBody(body, m_editorSheetListPath, ctx);
     });
   });
-}
-
-void SettingsWindow::openCommunityTemplateStore() {
-  if (!prepareEditorSheet()) {
-    return;
-  }
-
-  const float scale = uiScale();
-  auto catalog = noctalia::theme::CommunityTemplateService::availableTemplates();
-  std::unordered_set<std::string> selectedIds(
-      m_config->config().theme.templates.communityIds.begin(), m_config->config().theme.templates.communityIds.end()
-  );
-
-  auto storeContent = std::make_shared<settings::TemplateStoreContent>(
-      std::move(catalog), std::move(selectedIds), m_config,
-      settings::TemplateStoreCallbacks{
-          .setSelected = [this](
-                             std::vector<std::string> ids
-                         ) { setSettingOverride({"theme", "templates", "community_ids"}, std::move(ids)); },
-          .scale = scale,
-      }
-  );
-
-  storeContent->setOnRebuildNeeded([this]() {
-    if (m_editorSheetModal != nullptr) {
-      m_editorSheetModal->rebuildBody();
-    }
-  });
-
-  m_editorSheetModal->open(
-      settings::SettingsSheetRequest{
-          .sheetTitle = i18n::tr("settings.templates.store.title"),
-          .removeAction = nullptr,
-          .createHeaderAction = nullptr,
-          .populateSheetBody =
-              [storeContent, this, scale](Flex& body) {
-                if (m_renderContext == nullptr) {
-                  return;
-                }
-                if (m_config != nullptr && m_config->config().shell.offlineMode) {
-                  body.addChild(
-                      settings::makeOfflineModeNotice(
-                          scale, i18n::tr("settings.window.offline-mode-notice.template-store")
-                      )
-                  );
-                }
-                storeContent->populateBody(body, m_surface->renderTarget().renderer());
-              },
-          .scale = scale,
-          .minWidth = 720.0F,
-          .maxWidth = 1000.0F,
-          .parentFraction = 0.85F,
-          .fillParentHeight = true,
-          .scrollableBody = false,
-          .preDispatchKeyboard =
-              [storeContent, this](const KeyboardEvent& event) {
-                InputArea* focused = m_editorSheetModal != nullptr ? m_editorSheetModal->focusedArea() : nullptr;
-                return storeContent->handleKeyEvent(event.sym, event.modifiers, event.pressed, event.preedit, focused);
-              },
-      }
-  );
 }
 
 void SettingsWindow::closeWidgetInspectorPopup() {

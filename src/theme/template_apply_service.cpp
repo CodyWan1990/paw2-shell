@@ -7,7 +7,6 @@
 #include "core/log.h"
 #include "core/process/process.h"
 #include "ipc/ipc_service.h"
-#include "theme/community_templates.h"
 #include "theme/hook_runner.h"
 #include "theme/template_engine.h"
 #include "util/file_utils.h"
@@ -350,29 +349,6 @@ namespace noctalia::theme {
       const std::filesystem::path builtinConfig = builtinTemplateConfigPath();
       if (!builtinEngine.processConfigFile(builtinConfig)) {
         kLog.warn("failed to apply built-in templates from {}", builtinConfig.string());
-      }
-    }
-
-    if (request.templates.enableCommunityTemplates
-        && !request.templates.communityIds.empty()
-        && !requestSuperseded(request.generation)) {
-      for (const auto& id : request.templates.communityIds) {
-        if (requestSuperseded(request.generation))
-          return;
-        if (!isSafeCommunityTemplateId(id)) {
-          kLog.warn("skipping unsafe community template id '{}'", id);
-          continue;
-        }
-
-        const std::filesystem::path communityConfig = communityTemplateConfigPath(id);
-        if (!std::filesystem::exists(communityConfig)) {
-          kLog.warn("community template '{}' is not cached yet", id);
-          continue;
-        }
-        TemplateEngine communityEngine(TemplateEngine::makeThemeData(request.palette), options);
-        if (!communityEngine.processConfigFile(communityConfig)) {
-          kLog.warn("failed to apply community template '{}' from {}", id, communityConfig.string());
-        }
       }
     }
 

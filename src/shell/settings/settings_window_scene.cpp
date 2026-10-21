@@ -30,7 +30,6 @@
 #include "system/dependency_service.h"
 #include "theme/builtin_templates.h"
 #include "theme/community_palettes.h"
-#include "theme/community_templates.h"
 #include "theme/custom_palettes.h"
 #include "ui/builders.h"
 #include "ui/controls/select_dropdown_popup.h"
@@ -794,16 +793,6 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
         }
     );
   }
-  for (const auto& t : noctalia::theme::CommunityTemplateService::availableTemplates()) {
-    env.communityTemplates.push_back(
-        settings::SelectOption{
-            .value = t.id,
-            .label = t.displayName,
-            .description = t.category,
-            .tooltip = noctalia::theme::formatTemplateTooltip(t)
-        }
-    );
-  }
   static const std::vector<settings::SelectOption> kFontFamilies = discoverFontFamilyOptions();
   env.fontFamilies = kFontFamilies;
   const auto allBatteryDeviceOptions = upowerBatteryDeviceOptions(m_upower);
@@ -1479,12 +1468,6 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
       if (auto* button = std::get_if<settings::ButtonSetting>(&entry.control)) {
         button->action = [this]() { DeferredCall::callLater([this]() { openPaletteInspector(); }); };
       }
-    }
-    if (entry.section != settings::SettingsSection::Templates || entry.group != "community") {
-      continue;
-    }
-    if (auto* button = std::get_if<settings::ButtonSetting>(&entry.control)) {
-      button->action = [this]() { openCommunityTemplateStore(); };
     }
   }
 

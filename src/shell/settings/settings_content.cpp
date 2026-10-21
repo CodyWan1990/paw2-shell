@@ -202,49 +202,9 @@ namespace settings {
 
     SettingsControlFactory factory(ctx);
 
-    const auto makeRow = [&](Flex& section, const SettingEntry& entry, std::unique_ptr<Node> control) {
-      factory.makeRow(section, entry, std::move(control));
-    };
-
-    const auto makeToggle = [&](bool checked, bool enabled, std::vector<std::string> path,
-                                std::optional<bool> clearWhenValue = std::nullopt) {
-      return factory.makeToggle(checked, enabled, std::move(path), clearWhenValue);
-    };
-
-    const auto makeSelect = [&](const SelectSetting& setting, std::vector<std::string> path) -> std::unique_ptr<Node> {
-      return factory.makeSelect(setting, std::move(path));
-    };
-
-    const auto makeSlider =
-        [&](double value, double minValue, double maxValue, double step, std::vector<std::string> path,
-            bool integerValue = false, std::string valueSuffix = {},
-            std::function<std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>>(double)> linkedCommit =
-                {},
-            SliderSetting::InvertSlot invertSlot = SliderSetting::InvertSlot::None,
-            bool invertEnabled = true) -> std::unique_ptr<Node> {
-      return factory.makeSlider(
-          value, minValue, maxValue, step, std::move(path), integerValue, std::move(linkedCommit),
-          std::move(valueSuffix), invertSlot, invertEnabled
-      );
-    };
-
-    const auto makeRangeSlider = [&](const RangeSliderSetting& setting,
-                                     const std::vector<std::string>& lowPath) -> std::unique_ptr<Node> {
-      return factory.makeRangeSlider(setting, lowPath);
-    };
-
-    const auto makeText = [&](const std::string& value, const std::string& placeholder, std::vector<std::string> path,
-                              float width = 0.0F) {
-      return factory.makeText(value, placeholder, std::move(path), width);
-    };
-
-    const auto makeTextWithPathBrowse = [&](const TextSetting& setting, const std::vector<std::string>& path) {
-      return factory.makePathBrowse(setting, path);
-    };
-
     const auto makeGlyphText = [&](const TextSetting& setting, std::vector<std::string> path) -> std::unique_ptr<Node> {
       auto wrap = ui::row({.align = FlexAlign::Center, .gap = Style::spaceSm * scale});
-      wrap->addChild(makeText(setting.value, setting.placeholder, path, setting.width));
+      wrap->addChild(factory.makeText(setting.value, setting.placeholder, path, setting.width));
 
       auto pickerButton = ui::button({
           .glyph = "apps",
@@ -274,40 +234,10 @@ namespace settings {
       return wrap;
     };
 
-    const auto makeOptionalNumber = [&](const OptionalNumberSetting& setting, std::vector<std::string> path) {
-      return factory.makeOptionalNumber(setting, std::move(path));
-    };
-
-    const auto makeStepper = [&](const StepperSetting& setting, std::vector<std::string> path) {
-      return factory.makeStepper(setting, std::move(path));
-    };
-
-    const auto makeOptionalStepper = [&](const OptionalStepperSetting& setting, std::vector<std::string> path) {
-      return factory.makeOptionalStepper(setting, std::move(path));
-    };
-
-    const auto makeColorSpecPicker = [&](const ColorSpecPickerSetting& setting,
-                                         std::vector<std::string> path) -> std::unique_ptr<Node> {
-      return factory.makeColorSpecPicker(setting, std::move(path));
-    };
-
-    const auto makeSearchPickerButton = [&](const SettingEntry& entry,
-                                            const SearchPickerSetting& setting) -> std::unique_ptr<Node> {
-      return factory.makeSearchPicker(setting, entry.title, entry.path);
-    };
-
-    const auto makeCollectionBlock = [&](const SettingEntry& entry, bool overridden, bool reserveTitleHeight = false,
-                                         bool titleMaxTwoLines = false, bool fillWidth = false, bool flexGrow = false,
-                                         bool compactTitleDescription = false) {
-      return factory.makeCollectionBlock(
-          entry, overridden, reserveTitleHeight, titleMaxTwoLines, fillWidth, flexGrow, compactTitleDescription
-      );
-    };
-
     const auto makeMultiSelectBlock = [&](Flex& section, const SettingEntry& entry, const MultiSelectSetting& setting) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
 
-      auto block = makeCollectionBlock(entry, overridden);
+      auto block = factory.makeCollectionBlock(entry, overridden);
 
       auto checkRow = ui::row(
           {.align = FlexAlign::Center,
@@ -376,7 +306,7 @@ namespace settings {
                                            const TemplateGridSetting& setting) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
 
-      auto block = makeCollectionBlock(entry, overridden, false, false, false, false, true);
+      auto block = factory.makeCollectionBlock(entry, overridden, false, false, false, false, true);
 
       if (setting.options.empty()) {
         block->addChild(makeSettingSubtitleLabel(setting.emptyText, scale));
@@ -604,7 +534,7 @@ namespace settings {
                                           const KeybindListSetting& keybinds) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
 
-      auto block = makeCollectionBlock(entry, false, true, true, true, true, true);
+      auto block = factory.makeCollectionBlock(entry, false, true, true, true, true, true);
       block->setClipChildren(true);
       block->setMinWidth(0.0F);
       block->setGap(Style::spaceXs * scale);
@@ -744,7 +674,7 @@ namespace settings {
                                            const ShortcutListSetting& shortcuts) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
 
-      auto block = makeCollectionBlock(entry, overridden);
+      auto block = factory.makeCollectionBlock(entry, overridden);
 
       std::vector<std::string> itemTypes;
       itemTypes.reserve(shortcuts.items.size());
@@ -793,24 +723,45 @@ namespace settings {
       section.addChild(std::move(block));
     };
 
-    const auto makeSessionActionsInlineBlock = [&](Flex& section, const SettingEntry& entry,
-                                                   const SessionPanelActionsSetting& sa) {
+    // An editable list of config rows (session actions, idle behaviours, notification filters). Each row
+    // shows a summary, up/down buttons when the order matters, an editor button and an enabled toggle;
+    // an add button closes the list. `commit` stores *state.
+    struct RowListSpec {
+      std::function<std::string(std::size_t)> summary;
+      std::function<void(std::size_t, Label*)> onSummaryLabel;
+      std::function<void(std::size_t)> openEntry;
+      std::function<void()> onAdd;
+      std::string tabFocusPrefix;
+      std::string addLabel;
+      bool reorderable = true;
+    };
+    const auto makeRowListBlock = [&]<typename Row>(
+                                      Flex& section, const SettingEntry& entry,
+                                      const std::shared_ptr<std::vector<Row>>& state,
+                                      const std::function<void()>& commit, const RowListSpec& spec
+                                  ) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
-
-      auto block = makeCollectionBlock(entry, overridden);
-
-      const std::vector<SelectOption> kindOptions = settings::sessionActionKindOptions();
-
-      auto state = std::make_shared<std::vector<SessionPanelActionConfig>>(sa.items);
-      if (ctx.bindSessionActionsEditState) {
-        ctx.bindSessionActionsEditState(state);
-      }
-      const auto commit = [setOverride = ctx.setOverride, path = entry.path, state, req = ctx.requestContentRebuild]() {
-        setOverride(path, *state);
-        req();
+      auto block = factory.makeCollectionBlock(entry, overridden);
+      const auto reorderButton = [&](std::string glyph, std::size_t idx, bool up) {
+        return ui::button({
+            .glyph = std::move(glyph),
+            .glyphSize = Style::fontSizeBody * scale,
+            .enabled = up ? idx > 0 : idx + 1 < state->size(),
+            .variant = ButtonVariant::Ghost,
+            .minWidth = Style::controlHeightSm * scale,
+            .minHeight = Style::controlHeight * scale,
+            .padding = Style::spaceXs * scale,
+            .radius = Style::scaledRadiusMd(scale),
+            .onClick = [state, rowIndex = idx, up, commit]() {
+              const std::size_t other = up ? rowIndex - 1 : rowIndex + 1;
+              if ((up && rowIndex == 0) || rowIndex >= state->size() || other >= state->size()) {
+                return;
+              }
+              std::swap((*state)[other], (*state)[rowIndex]);
+              commit();
+            },
+        });
       };
-
-      const float iconBtnH = Style::controlHeight * scale;
 
       for (std::size_t idx = 0; idx < state->size(); ++idx) {
         auto row = ui::row({
@@ -821,123 +772,121 @@ namespace settings {
         });
 
         Label* summaryLabel = nullptr;
-        auto summary = ui::label({
-            .out = &summaryLabel,
-            .text = sessionActionRowSummary(kindOptions, (*state)[idx]),
-            .fontSize = Style::fontSizeBody * scale,
-            .color = colorSpecFromRole(ColorRole::OnSurface),
-            .flexGrow = 1.0F,
-        });
-        if (ctx.registerSessionActionSummaryLabel) {
-          ctx.registerSessionActionSummaryLabel(idx, summaryLabel);
+        row->addChild(
+            ui::label({
+                .out = &summaryLabel,
+                .text = spec.summary(idx),
+                .fontSize = Style::fontSizeBody * scale,
+                .color = colorSpecFromRole(ColorRole::OnSurface),
+                .flexGrow = 1.0F,
+            })
+        );
+        if (spec.onSummaryLabel) {
+          spec.onSummaryLabel(idx, summaryLabel);
         }
-        row->addChild(std::move(summary));
 
-        auto reorder = ui::row({.align = FlexAlign::Center, .gap = Style::spaceXs * scale});
+        if (spec.reorderable) {
+          row->addChild(
+              ui::row(
+                  {.align = FlexAlign::Center, .gap = Style::spaceXs * scale}, reorderButton("chevron-up", idx, true),
+                  reorderButton("chevron-down", idx, false)
+              )
+          );
+        }
 
-        auto upBtn = ui::button({
-            .glyph = "chevron-up",
-            .glyphSize = Style::fontSizeBody * scale,
-            .enabled = idx > 0,
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = iconBtnH,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
-            .onClick = [state, rowIndex = idx, commit]() {
-              if (rowIndex == 0 || rowIndex >= state->size()) {
-                return;
-              }
-              std::swap((*state)[rowIndex - 1], (*state)[rowIndex]);
-              commit();
-            },
-        });
-        reorder->addChild(std::move(upBtn));
-
-        auto downBtn = ui::button({
-            .glyph = "chevron-down",
-            .glyphSize = Style::fontSizeBody * scale,
-            .enabled = idx + 1 < state->size(),
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = iconBtnH,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
-            .onClick = [state, rowIndex = idx, commit]() {
-              if (rowIndex + 1 >= state->size()) {
-                return;
-              }
-              std::swap((*state)[rowIndex + 1], (*state)[rowIndex]);
-              commit();
-            },
-        });
-        reorder->addChild(std::move(downBtn));
-        row->addChild(std::move(reorder));
-
-        auto entrySettings = ui::button({
-            .glyph = "settings",
-            .glyphSize = Style::fontSizeCaption * scale,
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusSm(scale),
-            .onClick = [openEntry = ctx.openSessionActionEntryEditor, rowIndex = idx]() {
-              if (openEntry) {
-                openEntry(rowIndex);
-              }
-            },
-        });
-        row->addChild(std::move(entrySettings));
-
-        auto enabledToggle = ui::toggle({
-            .checked = (*state)[idx].enabled,
-            .scale = scale,
-            .onChange =
-                [state, rowIndex = idx, commit](bool v) {
-                  (*state)[rowIndex].enabled = v;
-                  commit();
+        row->addChild(
+            ui::button({
+                .glyph = "settings",
+                .glyphSize = Style::fontSizeCaption * scale,
+                .variant = ButtonVariant::Ghost,
+                .minWidth = Style::controlHeightSm * scale,
+                .minHeight = Style::controlHeightSm * scale,
+                .padding = Style::spaceXs * scale,
+                .radius = Style::scaledRadiusSm(scale),
+                .onClick = [openEntry = spec.openEntry, rowIndex = idx]() {
+                  if (openEntry) {
+                    openEntry(rowIndex);
+                  }
                 },
-            .configure = [idx](
-                             Toggle& toggle
-                         ) { toggle.setTabFocusKey("settings.session-actions." + std::to_string(idx) + ".enabled"); },
-        });
-        row->addChild(std::move(enabledToggle));
+            })
+        );
+
+        row->addChild(
+            ui::toggle({
+                .checked = (*state)[idx].enabled,
+                .scale = scale,
+                .onChange =
+                    [state, rowIndex = idx, commit](bool v) {
+                      (*state)[rowIndex].enabled = v;
+                      commit();
+                    },
+                .configure = [key = spec.tabFocusPrefix + std::to_string(idx) + ".enabled"](
+                                 Toggle& toggle
+                             ) { toggle.setTabFocusKey(key); },
+            })
+        );
 
         block->addChild(std::move(row));
       }
 
-      auto addBtn = ui::button({
-          .text = i18n::tr("settings.session-actions.add"),
-          .glyph = "add",
-          .fontSize = Style::fontSizeBody * scale,
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
-          .minHeight = Style::controlHeight * scale,
-          .paddingV = Style::spaceSm * scale,
-          .paddingH = Style::spaceMd * scale,
-          .radius = Style::scaledRadiusMd(scale),
-          .onClick = [state, commit]() {
-            state->push_back(
-                SessionPanelActionConfig{
-                    .action = "command",
-                    .command = "notify-send 'Noctalia' 'Custom session entry'",
+      block->addChild(
+          ui::button({
+              .text = spec.addLabel,
+              .glyph = "add",
+              .fontSize = Style::fontSizeBody * scale,
+              .glyphSize = Style::fontSizeBody * scale,
+              .variant = ButtonVariant::Default,
+              .minHeight = Style::controlHeight * scale,
+              .paddingV = Style::spaceSm * scale,
+              .paddingH = Style::spaceMd * scale,
+              .radius = Style::scaledRadiusMd(scale),
+              .onClick = [onAdd = spec.onAdd]() {
+                if (onAdd) {
+                  onAdd();
                 }
-            );
-            commit();
-          },
-      });
-      block->addChild(std::move(addBtn));
+              },
+          })
+      );
 
       section.addChild(std::move(block));
     };
 
+    const auto makeSessionActionsInlineBlock = [&](Flex& section, const SettingEntry& entry,
+                                                   const SessionPanelActionsSetting& sa) {
+      auto state = std::make_shared<std::vector<SessionPanelActionConfig>>(sa.items);
+      if (ctx.bindSessionActionsEditState) {
+        ctx.bindSessionActionsEditState(state);
+      }
+      const auto commit = [setOverride = ctx.setOverride, path = entry.path, state, req = ctx.requestContentRebuild]() {
+        setOverride(path, *state);
+        req();
+      };
+      makeRowListBlock(
+          section, entry, state, commit,
+          RowListSpec{
+              .summary = [state, kindOptions = settings::sessionActionKindOptions()](
+                             std::size_t idx
+                         ) { return sessionActionRowSummary(kindOptions, (*state)[idx]); },
+              .onSummaryLabel = ctx.registerSessionActionSummaryLabel,
+              .openEntry = ctx.openSessionActionEntryEditor,
+              .onAdd =
+                  [state, commit]() {
+                    state->push_back(
+                        SessionPanelActionConfig{
+                            .action = "command",
+                            .command = "notify-send 'Noctalia' 'Custom session entry'",
+                        }
+                    );
+                    commit();
+                  },
+              .tabFocusPrefix = "settings.session-actions.",
+              .addLabel = i18n::tr("settings.session-actions.add"),
+          }
+      );
+    };
+
     const auto makeIdleBehaviorsInlineBlock = [&](Flex& section, const SettingEntry& entry,
                                                   const IdleBehaviorsSetting& idle) {
-      const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
-
-      auto block = makeCollectionBlock(entry, overridden);
-
       auto state = std::make_shared<std::vector<IdleBehaviorConfig>>(idle.items);
       normalizeIdleBehaviorNames(*state);
       const auto commit = [setOverride = ctx.setOverride, path = entry.path, state, req = ctx.requestContentRebuild]() {
@@ -945,125 +894,21 @@ namespace settings {
         setOverride(path, *state);
         req();
       };
-
-      const float iconBtnH = Style::controlHeight * scale;
-      for (std::size_t idx = 0; idx < state->size(); ++idx) {
-        auto row = ui::row({
-            .align = FlexAlign::Center,
-            .justify = FlexJustify::SpaceBetween,
-            .gap = Style::spaceSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-        });
-
-        auto summary = ui::label({
-            .text = idleBehaviorRowSummary((*state)[idx]),
-            .fontSize = Style::fontSizeBody * scale,
-            .color = colorSpecFromRole(ColorRole::OnSurface),
-            .flexGrow = 1.0F,
-        });
-        row->addChild(std::move(summary));
-
-        auto reorder = ui::row({.align = FlexAlign::Center, .gap = Style::spaceXs * scale});
-
-        auto upBtn = ui::button({
-            .glyph = "chevron-up",
-            .glyphSize = Style::fontSizeBody * scale,
-            .enabled = idx > 0,
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = iconBtnH,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
-            .onClick = [state, rowIndex = idx, commit]() {
-              if (rowIndex == 0 || rowIndex >= state->size()) {
-                return;
-              }
-              std::swap((*state)[rowIndex - 1], (*state)[rowIndex]);
-              commit();
-            },
-        });
-        reorder->addChild(std::move(upBtn));
-
-        auto downBtn = ui::button({
-            .glyph = "chevron-down",
-            .glyphSize = Style::fontSizeBody * scale,
-            .enabled = idx + 1 < state->size(),
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = iconBtnH,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusMd(scale),
-            .onClick = [state, rowIndex = idx, commit]() {
-              if (rowIndex + 1 >= state->size()) {
-                return;
-              }
-              std::swap((*state)[rowIndex + 1], (*state)[rowIndex]);
-              commit();
-            },
-        });
-        reorder->addChild(std::move(downBtn));
-        row->addChild(std::move(reorder));
-
-        auto entrySettings = ui::button({
-            .glyph = "settings",
-            .glyphSize = Style::fontSizeCaption * scale,
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusSm(scale),
-            .onClick = [openEntry = ctx.openIdleBehaviorEntryEditor, rowIndex = idx]() {
-              if (openEntry) {
-                openEntry(rowIndex);
-              }
-            },
-        });
-        row->addChild(std::move(entrySettings));
-
-        auto enabledToggle = ui::toggle({
-            .checked = (*state)[idx].enabled,
-            .scale = scale,
-            .onChange =
-                [state, rowIndex = idx, commit](bool v) {
-                  (*state)[rowIndex].enabled = v;
-                  commit();
-                },
-            .configure = [idx](
-                             Toggle& toggle
-                         ) { toggle.setTabFocusKey("settings.idle.behavior." + std::to_string(idx) + ".enabled"); },
-        });
-        row->addChild(std::move(enabledToggle));
-
-        block->addChild(std::move(row));
-      }
-
-      auto addBtn = ui::button({
-          .text = i18n::tr("settings.idle.behavior.add"),
-          .glyph = "add",
-          .fontSize = Style::fontSizeBody * scale,
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
-          .minHeight = Style::controlHeight * scale,
-          .paddingV = Style::spaceSm * scale,
-          .paddingH = Style::spaceMd * scale,
-          .radius = Style::scaledRadiusMd(scale),
-          .onClick = [openCreate = ctx.openIdleBehaviorCreateEditor]() {
-            if (openCreate) {
-              openCreate();
-            }
-          },
-      });
-      block->addChild(std::move(addBtn));
-
-      section.addChild(std::move(block));
+      makeRowListBlock(
+          section, entry, state, commit,
+          RowListSpec{
+              .summary = [state](std::size_t idx) { return idleBehaviorRowSummary((*state)[idx]); },
+              .onSummaryLabel = {},
+              .openEntry = ctx.openIdleBehaviorEntryEditor,
+              .onAdd = ctx.openIdleBehaviorCreateEditor,
+              .tabFocusPrefix = "settings.idle.behavior.",
+              .addLabel = i18n::tr("settings.idle.behavior.add"),
+          }
+      );
     };
 
     const auto makeNotificationFiltersInlineBlock = [&](Flex& section, const SettingEntry& entry,
                                                         const NotificationFiltersSetting& filters) {
-      const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
-
-      auto block = makeCollectionBlock(entry, overridden);
-
       auto state = std::make_shared<std::vector<NotificationFilterConfig>>(filters.items);
       normalizeNotificationFilterNames(*state);
       const auto commit = [setOverride = ctx.setOverride, path = entry.path, state, req = ctx.requestContentRebuild]() {
@@ -1071,76 +916,18 @@ namespace settings {
         setOverride(path, *state);
         req();
       };
-
-      for (std::size_t idx = 0; idx < state->size(); ++idx) {
-        auto row = ui::row({
-            .align = FlexAlign::Center,
-            .justify = FlexJustify::SpaceBetween,
-            .gap = Style::spaceSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-        });
-
-        auto summary = ui::label({
-            .text = notificationFilterRowSummary((*state)[idx]),
-            .fontSize = Style::fontSizeBody * scale,
-            .color = colorSpecFromRole(ColorRole::OnSurface),
-            .flexGrow = 1.0F,
-        });
-        row->addChild(std::move(summary));
-
-        auto entrySettings = ui::button({
-            .glyph = "settings",
-            .glyphSize = Style::fontSizeCaption * scale,
-            .variant = ButtonVariant::Ghost,
-            .minWidth = Style::controlHeightSm * scale,
-            .minHeight = Style::controlHeightSm * scale,
-            .padding = Style::spaceXs * scale,
-            .radius = Style::scaledRadiusSm(scale),
-            .onClick = [openEntry = ctx.openNotificationFilterEntryEditor, rowIndex = idx]() {
-              if (openEntry) {
-                openEntry(rowIndex);
-              }
-            },
-        });
-        row->addChild(std::move(entrySettings));
-
-        auto enabledToggle = ui::toggle({
-            .checked = (*state)[idx].enabled,
-            .scale = scale,
-            .onChange =
-                [state, rowIndex = idx, commit](bool v) {
-                  (*state)[rowIndex].enabled = v;
-                  commit();
-                },
-            .configure =
-                [idx](Toggle& toggle) {
-                  toggle.setTabFocusKey("settings.notifications.filter." + std::to_string(idx) + ".enabled");
-                },
-        });
-        row->addChild(std::move(enabledToggle));
-
-        block->addChild(std::move(row));
-      }
-
-      auto addBtn = ui::button({
-          .text = i18n::tr("settings.notifications.filter.add"),
-          .glyph = "add",
-          .fontSize = Style::fontSizeBody * scale,
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
-          .minHeight = Style::controlHeight * scale,
-          .paddingV = Style::spaceSm * scale,
-          .paddingH = Style::spaceMd * scale,
-          .radius = Style::scaledRadiusMd(scale),
-          .onClick = [openCreate = ctx.openNotificationFilterCreateEditor]() {
-            if (openCreate) {
-              openCreate();
-            }
-          },
-      });
-      block->addChild(std::move(addBtn));
-
-      section.addChild(std::move(block));
+      makeRowListBlock(
+          section, entry, state, commit,
+          RowListSpec{
+              .summary = [state](std::size_t idx) { return notificationFilterRowSummary((*state)[idx]); },
+              .onSummaryLabel = {},
+              .openEntry = ctx.openNotificationFilterEntryEditor,
+              .onAdd = ctx.openNotificationFilterCreateEditor,
+              .tabFocusPrefix = "settings.notifications.filter.",
+              .addLabel = i18n::tr("settings.notifications.filter.add"),
+              .reorderable = false,
+          }
+      );
     };
 
     const auto makeControl = [&](const SettingEntry& entry) -> std::unique_ptr<Node> {
@@ -1148,30 +935,30 @@ namespace settings {
           [&](const auto& control) -> std::unique_ptr<Node> {
             using T = std::decay_t<decltype(control)>;
             if constexpr (std::is_same_v<T, ToggleSetting>) {
-              return makeToggle(control.checked, control.enabled, entry.path);
+              return factory.makeToggle(control.checked, control.enabled, entry.path);
             } else if constexpr (std::is_same_v<T, SelectSetting>) {
-              return makeSelect(control, entry.path);
+              return factory.makeSelect(control, entry.path);
             } else if constexpr (std::is_same_v<T, SliderSetting>) {
-              return makeSlider(
+              return factory.makeSlider(
                   control.value, control.minValue, control.maxValue, control.step, entry.path, control.integerValue,
-                  control.valueSuffix, control.linkedCommit, control.invertSlot, control.invertEnabled
+                  control.linkedCommit, control.valueSuffix, control.invertSlot, control.invertEnabled
               );
             } else if constexpr (std::is_same_v<T, RangeSliderSetting>) {
-              return makeRangeSlider(control, entry.path);
+              return factory.makeRangeSlider(control, entry.path);
             } else if constexpr (std::is_same_v<T, TextSetting>) {
               if (isDockLauncherIconPath(entry.path)) {
                 return makeGlyphText(control, entry.path);
               }
               if (control.browseMode != TextSettingBrowseMode::None) {
-                return makeTextWithPathBrowse(control, entry.path);
+                return factory.makePathBrowse(control, entry.path);
               }
-              return makeText(control.value, control.placeholder, entry.path, control.width);
+              return factory.makeText(control.value, control.placeholder, entry.path, control.width);
             } else if constexpr (std::is_same_v<T, OptionalNumberSetting>) {
-              return makeOptionalNumber(control, entry.path);
+              return factory.makeOptionalNumber(control, entry.path);
             } else if constexpr (std::is_same_v<T, OptionalStepperSetting>) {
-              return makeOptionalStepper(control, entry.path);
+              return factory.makeOptionalStepper(control, entry.path);
             } else if constexpr (std::is_same_v<T, StepperSetting>) {
-              return makeStepper(control, entry.path);
+              return factory.makeStepper(control, entry.path);
             } else if constexpr (std::is_same_v<T, SearchPickerSetting>) {
               return nullptr;
             } else if constexpr (std::is_same_v<T, MultiSelectSetting>) {
@@ -1218,7 +1005,7 @@ namespace settings {
                   .onClick = control.action,
               });
             } else if constexpr (std::is_same_v<T, ColorSpecPickerSetting>) {
-              return makeColorSpecPicker(control, entry.path);
+              return factory.makeColorSpecPicker(control, entry.path);
             } else if constexpr (std::is_same_v<T, GestureActionSetting>) {
               return factory.makeGestureActionRow(control, entry.title, entry.path);
             }
@@ -1454,13 +1241,13 @@ namespace settings {
         } else if (const auto* filters = std::get_if<NotificationFiltersSetting>(&entry.control)) {
           makeNotificationFiltersInlineBlock(*activeGroupBody, entry, *filters);
         } else if (const auto* picker = std::get_if<SearchPickerSetting>(&entry.control)) {
-          makeRow(*activeGroupBody, entry, makeSearchPickerButton(entry, *picker));
+          factory.makeRow(*activeGroupBody, entry, factory.makeSearchPicker(*picker, entry.title, entry.path));
         } else if (const auto* multi = std::get_if<MultiSelectSetting>(&entry.control)) {
           makeMultiSelectBlock(*activeGroupBody, entry, *multi);
         } else if (const auto* templates = std::get_if<TemplateGridSetting>(&entry.control)) {
           makeTemplateGridBlock(*activeGroupBody, entry, *templates);
         } else {
-          makeRow(*activeGroupBody, entry, makeControl(entry));
+          factory.makeRow(*activeGroupBody, entry, makeControl(entry));
         }
         ++visibleEntries;
       }

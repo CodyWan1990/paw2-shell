@@ -69,7 +69,6 @@
 #include "system/screen_time_service.h"
 #include "system/weather_poll_source.h"
 #include "system/weather_service.h"
-#include "theme/community_palettes.h"
 #include "theme/paw2_theme_sync.h"
 #include "theme/theme_presets.h"
 #include "util/file_utils.h"
@@ -232,8 +231,7 @@ private:
   ConfigService m_configService;
   HttpClient m_httpClient;
   FileWatcher m_fileWatcher;
-  noctalia::theme::CommunityPaletteService m_communityPaletteService{m_httpClient};
-  noctalia::theme::ThemeService m_themeService{m_configService, m_httpClient};
+  noctalia::theme::ThemeService m_themeService{m_configService};
   noctalia::theme::TemplateApplyService m_templateApplyService{m_configService};
   noctalia::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform, m_configService};
   // Saved themes. Applying one goes through the same wallpaper and palette paths

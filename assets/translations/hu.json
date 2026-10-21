@@ -1346,8 +1346,6 @@
           "light": "Világos"
         },
         "source": {
-          "built-in": "Beépített",
-          "community": "Közösség",
           "custom": "Egyéni",
           "wallpaper": "Háttérkép"
         }

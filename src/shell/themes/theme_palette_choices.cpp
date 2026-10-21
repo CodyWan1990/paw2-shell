@@ -2,7 +2,6 @@
 
 #include "i18n/i18n.h"
 #include "theme/builtin_palettes.h"
-#include "theme/community_palettes.h"
 #include "theme/custom_palettes.h"
 #include "theme/theme_presets.h"
 #include "ui/palette.h"
@@ -55,15 +54,12 @@ namespace themes {
       return previewOf(palette.preview.dark);
     }
 
-    std::vector<PaletteChoice> fromAvailable(
-        const std::vector<noctalia::theme::AvailablePalette>& palettes, ThemeMode mode, PaletteSource source
-    ) {
+    std::vector<PaletteChoice>
+    fromAvailable(const std::vector<noctalia::theme::AvailablePalette>& palettes, ThemeMode mode) {
       std::vector<PaletteChoice> choices;
       choices.reserve(palettes.size());
       for (const auto& palette : palettes) {
-        choices.push_back(
-            {.value = palette.name, .label = palette.name, .preview = previewOf(palette, mode), .source = source}
-        );
+        choices.push_back({.value = palette.name, .label = palette.name, .preview = previewOf(palette, mode)});
       }
       return choices;
     }
@@ -72,21 +68,18 @@ namespace themes {
 
   std::vector<PaletteChoice> paletteChoices(PaletteSource source, ThemeMode mode) {
     switch (source) {
-    case PaletteSource::Builtin:
-    case PaletteSource::Community: {
+    case PaletteSource::Builtin: {
       std::vector<PaletteChoice> choices;
       for (const auto& palette : noctalia::theme::builtinPalettes()) {
         choices.push_back({
             .value = std::string(palette.name),
             .label = std::string(palette.name),
             .preview = previewOf(mode == ThemeMode::Light ? palette.light.palette : palette.dark.palette),
-            .source = PaletteSource::Builtin,
         });
       }
-      // A community palette named like a builtin one would be unreachable, so
-      // the builtin keeps the name.
-      for (auto& choice :
-           fromAvailable(noctalia::theme::availableCommunityPalettes(), mode, PaletteSource::Community)) {
+      // A shipped preset named like a compiled one would be unreachable, so the
+      // compiled one keeps the name.
+      for (auto& choice : fromAvailable(noctalia::theme::availablePresetPalettes(), mode)) {
         if (!std::ranges::contains(choices, choice.value, &PaletteChoice::value)) {
           choices.push_back(std::move(choice));
         }
@@ -100,16 +93,13 @@ namespace themes {
       std::vector<PaletteChoice> choices;
       for (const auto scheme : kWallpaperSchemes) {
         choices.push_back(
-            {.value = std::string(scheme),
-             .label = i18n::tr("theme.scheme." + std::string(scheme)),
-             .preview = {},
-             .source = PaletteSource::Wallpaper}
+            {.value = std::string(scheme), .label = i18n::tr("theme.scheme." + std::string(scheme)), .preview = {}}
         );
       }
       return choices;
     }
     case PaletteSource::Custom:
-      return fromAvailable(noctalia::theme::availableCustomPalettes(), mode, PaletteSource::Custom);
+      return fromAvailable(noctalia::theme::availableCustomPalettes(), mode);
     }
     return {};
   }

@@ -1530,8 +1530,6 @@
           "follow": "Seguir"
         },
         "source": {
-          "built-in": "Integrado",
-          "community": "Comunidad",
           "custom": "Personalizado",
           "wallpaper": "Fondo de Pantalla"
         }

@@ -1180,8 +1180,6 @@
           "light": "Licht"
         },
         "source": {
-          "built-in": "Ingebouwd",
-          "community": "Community",
           "custom": "Aangepast",
           "wallpaper": "Achtergrond"
         }

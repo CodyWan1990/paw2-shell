@@ -1622,8 +1622,6 @@
           "follow": "Follow"
         },
         "source": {
-          "built-in": "Built-In",
-          "community": "Community",
           "custom": "Custom",
           "presets": "Presets",
           "wallpaper": "Wallpaper"
@@ -2059,7 +2057,7 @@
           "label": "Popup Shadows"
         },
         "preset-palette": {
-          "description": "Choose a built-in or community palette",
+          "description": "Choose a preset palette",
           "label": "Preset",
           "search-placeholder": "Search presets…"
         },
@@ -3940,11 +3938,11 @@
             "label": "Print clipboard text"
           },
           "color-scheme-get": {
-            "description": "Print active color scheme: <source> <name> (source is builtin, wallpaper, community, or custom)",
+            "description": "Print active color scheme: <source> <name> (source is builtin, wallpaper, or custom)",
             "label": "Get color scheme"
           },
           "color-scheme-set": {
-            "description": "Set palette source and selection in settings.toml (builtin name, wallpaper generator scheme, community id, or custom scheme folder name)",
+            "description": "Set palette source and selection in settings.toml (preset name, wallpaper generator scheme, or custom palette name)",
             "label": "Set color scheme"
           },
           "config-reload": {

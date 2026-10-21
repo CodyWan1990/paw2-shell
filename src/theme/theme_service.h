@@ -18,7 +18,6 @@
 #include <thread>
 
 class ConfigService;
-class HttpClient;
 class IpcService;
 
 namespace noctalia::theme {
@@ -30,7 +29,7 @@ namespace noctalia::theme {
     // scheme run in. Shell-facing consumers read resolvedShellMode()/isLightMode().
     using ResolvedCallback = std::function<void(const GeneratedPalette&, std::string_view)>;
 
-    ThemeService(ConfigService& config, HttpClient& httpClient);
+    explicit ThemeService(ConfigService& config);
     ~ThemeService();
 
     ThemeService(const ThemeService&) = delete;
@@ -97,13 +96,10 @@ namespace noctalia::theme {
     void startTransition(const Palette& target);
     void finishTransition(bool deferResolvedCallback);
     void tickTransition();
-    void startCommunityDownload(const std::string& name);
     void rescheduleAutoTimer();
     [[nodiscard]] bool hasAutoMode() const noexcept;
 
     ConfigService& m_config;
-    HttpClient& m_httpClient;
-    std::string m_inflightCommunityName;
 
     // Memoized wallpaper palette (see resolveWallpaperGenerated); any key mismatch re-decodes.
     std::optional<GeneratedPalette> m_wallpaperCacheGenerated;

@@ -279,47 +279,23 @@ namespace settings {
       return select;
     }
 
-    // Builtin and community palettes share one "Presets" segment; the preset
-    // picker records which of the two the chosen palette is.
-    SelectSetting paletteSourceSelect(PaletteSource source) {
-      return asSegmented(plainSelect(
-          {{"builtin", "settings.options.theme.source.presets"},
-           {"wallpaper", "settings.options.theme.source.wallpaper"},
-           {"custom", "settings.options.theme.source.custom"}},
-          themes::isPresetSource(source) ? "builtin" : enumToKey(kPaletteSources, source)
-      ));
-    }
-
-    // Every builtin and community palette in one searchable list. Picking one
-    // stores its name under the field its source reads, and switches to that
-    // source.
+    // Every preset - compiled or shipped as JSON - in one searchable list.
     SearchPickerSetting presetPalettePicker(const ThemeConfig& theme) {
       SearchPickerSetting picker{
-          .selectedValue = theme.source == PaletteSource::Community ? theme.communityPalette : theme.builtinPalette,
+          .selectedValue = theme.builtinPalette,
           .placeholder = i18n::tr("settings.schema.appearance.preset-palette.search-placeholder"),
           .emptyText = i18n::tr("ui.controls.search-picker.empty"),
       };
-      std::unordered_map<std::string, PaletteSource> sources;
       for (auto& choice : themes::paletteChoices(PaletteSource::Builtin, theme.mode)) {
-        sources.emplace(choice.value, choice.source);
-        picker.options.push_back(SelectOption{
-            .value = choice.value,
-            .label = std::move(choice.label),
-            .description = i18n::tr(
-                choice.source == PaletteSource::Community ? "settings.options.theme.source.community"
-                                                          : "settings.options.theme.source.built-in"
-            ),
-            .preview = std::move(choice.preview),
-        });
+        picker.options.push_back(
+            SelectOption{
+                .value = choice.value,
+                .label = std::move(choice.label),
+                .description = {},
+                .preview = std::move(choice.preview),
+            }
+        );
       }
-      picker.groupedCommit = [sources = std::move(sources)](std::string_view value, const std::vector<std::string>&) {
-        const auto it = sources.find(std::string(value));
-        const PaletteSource source = it != sources.end() ? it->second : PaletteSource::Builtin;
-        return std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>>{
-            {{"theme", "source"}, std::string(enumToKey(kPaletteSources, source))},
-            {{"theme", source == PaletteSource::Community ? "community_palette" : "builtin"}, std::string(value)},
-        };
-      };
       return picker;
     }
 
@@ -994,13 +970,12 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "theme", "appearance.palette-source", {"theme", "source"},
-        paletteSourceSelect(cfg.theme.source), "palette colors presets"
+        asSegmented(enumSelect(kPaletteSources, cfg.theme.source)), "palette colors presets"
     ));
-    if (themes::isPresetSource(cfg.theme.source)) {
+    if (cfg.theme.source == PaletteSource::Builtin) {
       entries.push_back(keyedEntry(
-          SettingsSection::Appearance, "theme", "appearance.preset-palette",
-          {"theme", cfg.theme.source == PaletteSource::Community ? "community_palette" : "builtin"},
-          presetPalettePicker(cfg.theme), "preset builtin community palette colors"
+          SettingsSection::Appearance, "theme", "appearance.preset-palette", {"theme", "builtin"},
+          presetPalettePicker(cfg.theme), "preset builtin palette colors"
       ));
     } else if (cfg.theme.source == PaletteSource::Wallpaper) {
       entries.push_back(keyedEntry(

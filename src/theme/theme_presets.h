@@ -20,7 +20,7 @@ namespace noctalia::theme {
     std::string id;
     std::string title;
     PaletteSource source = PaletteSource::Builtin;
-    // Builtin, community or custom palette name; unused for the wallpaper source.
+    // Preset or custom palette name; unused for the wallpaper source.
     std::string palette;
     // Generator scheme, used only by the wallpaper source.
     std::string wallpaperScheme = "m3-content";

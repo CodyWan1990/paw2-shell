@@ -1642,14 +1642,12 @@ std::string_view hookKindKey(HookKind kind);
 enum class PaletteSource : std::uint8_t {
   Builtin = 0,
   Wallpaper = 1,
-  Community = 2,
-  Custom = 3,
+  Custom = 2,
 };
 
 constexpr EnumOption<PaletteSource> kPaletteSources[] = {
-    {PaletteSource::Builtin, "builtin", "settings.options.theme.source.built-in"},
+    {PaletteSource::Builtin, "builtin", "settings.options.theme.source.presets"},
     {PaletteSource::Wallpaper, "wallpaper", "settings.options.theme.source.wallpaper"},
-    {PaletteSource::Community, "community", "settings.options.theme.source.community"},
     {PaletteSource::Custom, "custom", "settings.options.theme.source.custom"},
 };
 
@@ -1670,7 +1668,6 @@ struct WallpaperFavorite {
   std::optional<ThemeMode> themeMode;
   std::optional<PaletteSource> paletteSource;
   std::string builtinPalette;
-  std::string communityPalette;
   std::string customPalette;
   std::string wallpaperScheme;
 
@@ -1744,7 +1741,6 @@ struct ThemeConfig {
 
   PaletteSource source = PaletteSource::Builtin;
   std::string builtinPalette = "Tokyo-Night";
-  std::string communityPalette = "Oxocarbon";
   std::string customPalette;
   std::string wallpaperScheme = "m3-content";
   ThemeMode mode = ThemeMode::Dark;

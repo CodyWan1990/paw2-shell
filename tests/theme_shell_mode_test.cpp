@@ -3,7 +3,6 @@
 
 #include "config/config_service.h"
 #include "core/deferred_call.h"
-#include "net/http_client.h"
 #include "tests/test_check.h"
 #include "theme/theme_service.h"
 #include "util/app_dir_name.h"
@@ -31,8 +30,7 @@ namespace {
     }
 
     ConfigService config;
-    HttpClient http;
-    noctalia::theme::ThemeService theme(config, http);
+    noctalia::theme::ThemeService theme(config);
 
     Resolution result;
     theme.setResolvedCallback([&result](const noctalia::theme::GeneratedPalette&, std::string_view mode) {

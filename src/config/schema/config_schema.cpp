@@ -1199,7 +1199,6 @@ namespace noctalia::config::schema {
     static const Schema<ThemeConfig> s = {
         enumField(&ThemeConfig::source, "source", kPaletteSources),
         field(&ThemeConfig::builtinPalette, "builtin"),
-        field(&ThemeConfig::communityPalette, "community_palette"),
         field(&ThemeConfig::customPalette, "custom_palette"),
         field(&ThemeConfig::wallpaperScheme, "wallpaper_scheme"),
         enumField(&ThemeConfig::mode, "mode", kThemeModes),

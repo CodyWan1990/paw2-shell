@@ -51,6 +51,23 @@ Bundled in `third_party/` and built from source:
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)** — Material 3 palette generation (Apache-2.0)
 - **[Wuffs](https://github.com/google/wuffs)** — Memory-safe image decoders (Apache-2.0)
 
+## Palette Presets
+
+The presets in `assets/palettes/` are built from each project's published colours:
+
+- **[Tokyo Night](https://github.com/folke/tokyonight.nvim)** by folke — Storm, Moon and Day (Apache-2.0)
+- **[Catppuccin](https://github.com/catppuccin/catppuccin)** — Macchiato, Frappé and Latte (MIT)
+- **[Rosé Pine](https://github.com/rose-pine/rose-pine-theme)** — main, Moon and Dawn (MIT)
+- **[Gruvbox Material](https://github.com/sainnhe/gruvbox-material)** by sainnhe (MIT)
+- **[Everforest](https://github.com/sainnhe/everforest)** by sainnhe (MIT)
+- **[Kanagawa](https://github.com/rebelot/kanagawa.nvim)** by rebelot — Dragon and Lotus (MIT)
+- **[Solarized](https://github.com/altercation/solarized)** by Ethan Schoonover (MIT)
+- **[Flexoki](https://github.com/kepano/flexoki)** by Steph Ango (MIT)
+- **[Oxocarbon](https://github.com/nyoom-engineering/oxocarbon.nvim)** (MIT)
+- **[One Dark / One Light](https://github.com/atom/atom)** from Atom (MIT)
+- **[GitHub](https://github.com/primer/primitives)** from Primer (MIT)
+- **[Tomorrow](https://github.com/chriskempson/tomorrow-theme)** by Chris Kempson (MIT)
+
 ## System Integration
 
 External tools Noctalia integrates with at runtime when present:

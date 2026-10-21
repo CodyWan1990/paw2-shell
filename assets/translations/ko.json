@@ -1440,8 +1440,6 @@
           "light": "밝음"
         },
         "source": {
-          "built-in": "기본 제공",
-          "community": "커뮤니티",
           "custom": "사용자 정의",
           "wallpaper": "배경화면"
         }

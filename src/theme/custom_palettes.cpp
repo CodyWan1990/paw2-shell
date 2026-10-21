@@ -1,5 +1,6 @@
 #include "theme/custom_palettes.h"
 
+#include "core/files/resource_paths.h"
 #include "theme/fixed_palette.h"
 #include "util/file_utils.h"
 
@@ -94,6 +95,30 @@ namespace noctalia::theme {
       } catch (const std::exception&) {
         return {};
       }
+    }
+
+    // Every *.json palette directly in `dir`, by name.
+    std::vector<AvailablePalette> palettesIn(const std::filesystem::path& dir) {
+      if (dir.empty()) {
+        return {};
+      }
+      std::error_code ec;
+      if (!std::filesystem::is_directory(dir, ec) || ec) {
+        return {};
+      }
+      std::vector<AvailablePalette> out;
+      for (const auto& entry : std::filesystem::directory_iterator(dir, ec)) {
+        if (ec || !entry.is_regular_file(ec) || ec) {
+          continue;
+        }
+        const auto& path = entry.path();
+        if (path.extension() != ".json") {
+          continue;
+        }
+        out.push_back(AvailablePalette{.name = path.stem().string(), .preview = palettePreviewFromFile(path)});
+      }
+      std::ranges::sort(out, {}, &AvailablePalette::name);
+      return out;
     }
 
     std::string renderColorToHex(const ::Color& color) {
@@ -221,29 +246,18 @@ namespace noctalia::theme {
     return customPaletteDir() / (std::string(name) + ".json");
   }
 
-  std::vector<AvailablePalette> availableCustomPalettes() {
-    const auto dir = customPaletteDir();
-    if (dir.empty()) {
-      return {};
-    }
-    std::error_code ec;
-    if (!std::filesystem::is_directory(dir, ec) || ec) {
-      return {};
-    }
-    std::vector<AvailablePalette> out;
-    for (const auto& entry : std::filesystem::directory_iterator(dir, ec)) {
-      if (ec || !entry.is_regular_file(ec) || ec) {
-        continue;
-      }
-      const auto& path = entry.path();
-      if (path.extension() != ".json") {
-        continue;
-      }
-      out.push_back(AvailablePalette{.name = path.stem().string(), .preview = palettePreviewFromFile(path)});
-    }
-    std::ranges::sort(out, {}, &AvailablePalette::name);
-    return out;
+  std::filesystem::path presetPalettePath(std::string_view name) {
+    return paths::assetPath("palettes") / (std::string(name) + ".json");
   }
+
+  bool presetPaletteExists(std::string_view name) {
+    std::error_code ec;
+    return !name.empty() && std::filesystem::is_regular_file(presetPalettePath(name), ec);
+  }
+
+  std::vector<AvailablePalette> availablePresetPalettes() { return palettesIn(paths::assetPath("palettes")); }
+
+  std::vector<AvailablePalette> availableCustomPalettes() { return palettesIn(customPaletteDir()); }
 
   std::string suggestCustomPaletteName(std::string_view wallpaperPath, std::string_view scheme) {
     std::string base;

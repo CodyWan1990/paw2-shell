@@ -113,7 +113,6 @@ namespace {
     favorite.themeMode = theme.mode;
     favorite.paletteSource = theme.source;
     favorite.builtinPalette = theme.builtinPalette;
-    favorite.communityPalette = theme.communityPalette;
     favorite.customPalette = theme.customPalette;
     favorite.wallpaperScheme = theme.wallpaperScheme;
     return favorite;
@@ -125,8 +124,6 @@ namespace {
       return theme.builtinPalette;
     case PaletteSource::Wallpaper:
       return theme.wallpaperScheme;
-    case PaletteSource::Community:
-      return theme.communityPalette;
     case PaletteSource::Custom:
       return theme.customPalette;
     }
@@ -1269,9 +1266,6 @@ std::optional<PaletteSource> WallpaperPanel::paletteSourceForSegment(std::size_t
 }
 
 std::size_t WallpaperPanel::segmentForPaletteSource(PaletteSource source) const {
-  if (themes::isPresetSource(source)) {
-    source = PaletteSource::Builtin;
-  }
   for (std::size_t i = 0; i < m_paletteSourceOrder.size(); ++i) {
     if (m_paletteSourceOrder[i] == source) {
       return i;
@@ -1506,21 +1500,16 @@ WallpaperFavorite WallpaperPanel::themeFromControls() const {
   if (m_ui.favoritePaletteDetailSelect != nullptr && !m_favoritePaletteDetailValues.empty()) {
     const std::size_t index = m_ui.favoritePaletteDetailSelect->selectedIndex();
     if (index < m_favoritePaletteDetailValues.size()) {
-      // The chosen palette decides the source: Presets holds builtin and community ones.
-      const themes::PaletteChoice& choice = m_favoritePaletteDetailValues[index];
-      theme.paletteSource = choice.source;
-      switch (choice.source) {
+      const std::string& value = m_favoritePaletteDetailValues[index].value;
+      switch (theme.paletteSource.value_or(PaletteSource::Builtin)) {
       case PaletteSource::Builtin:
-        theme.builtinPalette = choice.value;
+        theme.builtinPalette = value;
         break;
       case PaletteSource::Wallpaper:
-        theme.wallpaperScheme = choice.value;
-        break;
-      case PaletteSource::Community:
-        theme.communityPalette = choice.value;
+        theme.wallpaperScheme = value;
         break;
       case PaletteSource::Custom:
-        theme.customPalette = choice.value;
+        theme.customPalette = value;
         break;
       }
     }

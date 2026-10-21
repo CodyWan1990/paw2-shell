@@ -1313,8 +1313,6 @@
           "follow": "追従"
         },
         "source": {
-          "built-in": "内蔵",
-          "community": "コミュニティ",
           "custom": "独自設定",
           "wallpaper": "壁紙"
         }

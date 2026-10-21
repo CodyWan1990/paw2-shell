@@ -752,6 +752,48 @@ German = "Clock"
     expect(secondPassIssues.empty(), "keyboard layout custom_labels normalization was not idempotent");
   }
 
+  void checkCommunityThemeMigration() {
+    toml::table sidecar = toml::parse(R"(
+config_version = 15
+[theme]
+source = "community"
+builtin = "Nord"
+community_palette = "Tokyo Night Storm"
+[theme.templates]
+enable_community_templates = true
+community_ids = ["discord"]
+)");
+    noctalia::config::schema::Diagnostics diagnostics;
+    const int applied = noctalia::config::applyPendingConfigMigrations(sidecar, 15, diagnostics);
+    expect(applied == noctalia::config::currentConfigVersion(), "community theme migration was not applied");
+    expect(
+        sidecar["theme"]["source"].value<std::string_view>() == std::optional<std::string_view>{"builtin"},
+        "community palette source did not become builtin"
+    );
+    expect(
+        sidecar["theme"]["builtin"].value<std::string_view>() == std::optional<std::string_view>{"Tokyo Night Storm"},
+        "community palette name did not move to theme.builtin"
+    );
+    expect(sidecar["theme"].as_table()->get("community_palette") == nullptr, "community_palette was not removed");
+    const auto* templates = sidecar["theme"]["templates"].as_table();
+    expect(templates != nullptr && templates->empty(), "community template keys were not removed");
+
+    // A builtin source keeps its palette; only the stale community key goes.
+    toml::table legacyConfig = toml::parse(R"(
+[theme]
+source = "builtin"
+builtin = "Nord"
+community_palette = "Oxocarbon"
+)");
+    noctalia::config::LegacyConfigIssues issues;
+    noctalia::config::normalizeLegacyConfig(legacyConfig, issues);
+    expect(
+        legacyConfig["theme"]["builtin"].value<std::string_view>() == std::optional<std::string_view>{"Nord"},
+        "builtin palette changed although the source was not community"
+    );
+    expect(hasIssuePath(issues, "theme.community_palette"), "stale community_palette was not reported");
+  }
+
   void checkCalendarEventFormatsMigration() {
     toml::table sidecar = toml::parse(R"(
 config_version = 13
@@ -1021,6 +1063,7 @@ int main() {
   checkCustomButtonCommandsMigration();
   checkDeadZoneActionsMigration();
   checkCalendarEventFormatsMigration();
+  checkCommunityThemeMigration();
   checkDockMonitorAllowListMigration();
   checkSysmonPresentationMigration();
   checkKeyboardLayoutShowGlyphMigration();

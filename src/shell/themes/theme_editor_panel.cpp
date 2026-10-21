@@ -30,14 +30,8 @@ namespace {
   constexpr float kThumbHeight = 40.0F;
   constexpr float kPreviewHeight = 150.0F;
 
-  // Segment order of the source switch. Builtin stands for every preset,
-  // community ones included; picking a palette sets the exact source.
+  // Segment order of the source switch; matches PaletteSource's values.
   constexpr std::array kSources{PaletteSource::Builtin, PaletteSource::Wallpaper, PaletteSource::Custom};
-
-  std::size_t segmentFor(PaletteSource source) {
-    const auto it = std::ranges::find(kSources, themes::isPresetSource(source) ? PaletteSource::Builtin : source);
-    return it != kSources.end() ? static_cast<std::size_t>(it - kSources.begin()) : 0;
-  }
 
   std::unique_ptr<Label> sectionLabel(std::string_view key, float scale) {
     return ui::label({
@@ -113,7 +107,6 @@ void ThemeEditorPanel::create() {
             if (m_draft.source == PaletteSource::Wallpaper) {
               m_draft.wallpaperScheme = m_choices[index].value;
             } else {
-              m_draft.source = m_choices[index].source;
               m_draft.palette = m_choices[index].value;
             }
             syncButtons();
@@ -221,9 +214,7 @@ void ThemeEditorPanel::onOpen(std::string_view context) {
       // A new theme starts from the look on screen now.
       const auto& theme = m_config->config().theme;
       m_draft.source = theme.source;
-      m_draft.palette = theme.source == PaletteSource::Community ? theme.communityPalette
-                      : theme.source == PaletteSource::Custom    ? theme.customPalette
-                                                                 : theme.builtinPalette;
+      m_draft.palette = theme.source == PaletteSource::Custom ? theme.customPalette : theme.builtinPalette;
       m_draft.wallpaperScheme = theme.wallpaperScheme;
     }
   }
@@ -250,7 +241,7 @@ void ThemeEditorPanel::syncFromDraft() {
     m_ui.titleInput->setValue(m_draft.title);
   }
   if (m_ui.sourceSwitch != nullptr) {
-    m_ui.sourceSwitch->setSelectedIndex(segmentFor(m_draft.source));
+    m_ui.sourceSwitch->setSelectedIndex(static_cast<std::size_t>(m_draft.source));
   }
   syncPaletteSelect();
   rebuildWallpaperList();
@@ -274,8 +265,6 @@ void ThemeEditorPanel::syncPaletteSelect() {
   m_ui.paletteSelect->setColorSwatchPreviews(std::move(previews));
   const auto it = std::ranges::find(m_choices, m_draft.paletteValue(), &themes::PaletteChoice::value);
   if (it != m_choices.end()) {
-    // Switching to Presets keeps the palette, which may be a community one.
-    m_draft.source = it->source;
     m_ui.paletteSelect->setSelectedIndexSilently(static_cast<std::size_t>(it - m_choices.begin()));
   } else if (m_draft.source == PaletteSource::Wallpaper && !m_choices.empty()) {
     // The wallpaper source always has a scheme; start from the first.

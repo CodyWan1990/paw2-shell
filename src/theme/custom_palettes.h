@@ -1,7 +1,5 @@
 #pragma once
 
-#include "theme/community_palettes.h"
-
 #include <filesystem>
 #include <string>
 #include <string_view>
@@ -10,6 +8,28 @@
 namespace noctalia::theme {
 
   struct GeneratedPalette;
+
+  // A palette stored as a JSON file, with the swatches pickers show for it.
+  struct AvailablePalette {
+    struct PreviewMode {
+      std::string surface;
+      std::vector<std::string> accents;
+    };
+
+    struct Preview {
+      PreviewMode dark;
+      PreviewMode light;
+    };
+
+    std::string name;
+    Preview preview = {};
+  };
+
+  // Presets that ship with the shell (assets/palettes), read through the builtin source
+  // alongside the palettes compiled into builtin_palettes.cpp.
+  [[nodiscard]] std::filesystem::path presetPalettePath(std::string_view name);
+  [[nodiscard]] bool presetPaletteExists(std::string_view name);
+  [[nodiscard]] std::vector<AvailablePalette> availablePresetPalettes();
 
   [[nodiscard]] std::filesystem::path customPaletteDir();
   [[nodiscard]] std::filesystem::path customPalettePath(std::string_view name);

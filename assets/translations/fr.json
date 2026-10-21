@@ -1403,8 +1403,6 @@
           "light": "Clair"
         },
         "source": {
-          "built-in": "Intégré",
-          "community": "Communauté",
           "custom": "Personnalisé",
           "wallpaper": "Fond d'écran"
         }

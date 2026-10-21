@@ -17,7 +17,7 @@ namespace noctalia::theme {
   // After a template writes colors.json: ensure the Pywalfox-compatible native-messaging
   // manifest points at this noctalia binary (without clobbering a foreign host), then push
   // theme mode (when dark/light) and a colors update to every running host — same parity as
-  // the old community apply.sh (`pywalfox dark|light` + `pywalfox update`), with multi-profile
+  // the old Pywalfox template's apply.sh (`pywalfox dark|light` + `pywalfox update`), with multi-profile
   // fan-out so all open Firefox profiles refresh.
   [[nodiscard]] FirefoxThemeApplyResult
   applyFirefoxTheme(const std::filesystem::path& colorsJsonPath, std::string_view mode = {});

@@ -567,21 +567,6 @@ void Application::initStyleThemeAndWayland() {
   });
   m_configService.addReloadCallback([this]() { syncClipboardService(); });
   m_configService.addReloadCallback([this]() { syncScreenTimeService(); });
-  m_communityPaletteService.setReadyCallback([this]() {
-    // A refreshed catalog may carry a new md5 for the selected palette; re-resolve
-    // so a stale cached palette gets re-downloaded and faded in.
-    m_themeService.onConfigReload();
-    m_settingsWindow.onExternalOptionsChanged();
-  });
-  m_communityPaletteService.sync();
-  m_configService.addReloadCallback(
-      [this]() {
-        if (m_configService.lastChange().theme) {
-          m_communityPaletteService.sync();
-        }
-      },
-      "community-palette-sync"
-  );
 
   // i18n has no dependencies on other services and must be ready before any
   // UI construction reads a translated string.

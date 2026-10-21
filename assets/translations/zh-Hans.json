@@ -1539,8 +1539,6 @@
           "follow": "跟随"
         },
         "source": {
-          "built-in": "内置",
-          "community": "社区",
           "custom": "自定义",
           "wallpaper": "壁纸"
         }

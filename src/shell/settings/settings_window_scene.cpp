@@ -29,7 +29,6 @@
 #include "system/battery_warning_monitor.h"
 #include "system/dependency_service.h"
 #include "theme/builtin_templates.h"
-#include "theme/community_palettes.h"
 #include "theme/custom_palettes.h"
 #include "ui/builders.h"
 #include "ui/controls/select_dropdown_popup.h"

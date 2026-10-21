@@ -7,12 +7,13 @@
 #include "i18n/i18n.h"
 #include "render/core/renderer.h"
 #include "shell/panel/panel_manager.h"
-#include "theme/builtin_palettes.h"
+#include "shell/themes/theme_palette_choices.h"
 #include "ui/builders.h"
 #include "ui/dialogs/file_dialog.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 
+#include <algorithm>
 #include <cstdlib>
 #include <filesystem>
 #include <iterator>
@@ -32,7 +33,7 @@ namespace {
   };
 
   constexpr SelectOption kSetupPaletteSources[] = {
-      {"settings.options.theme.source.built-in", "builtin"},
+      {"settings.options.theme.source.presets", "builtin"},
       {"settings.options.theme.source.wallpaper", "wallpaper"},
   };
 
@@ -77,24 +78,19 @@ namespace {
     return 0;
   }
 
+  // Every preset, compiled or shipped as JSON, in the order Settings lists them.
   std::vector<std::string> builtinPaletteNames() {
     std::vector<std::string> paletteNames;
-    paletteNames.reserve(noctalia::theme::builtinPalettes().size());
-    for (const auto& entry : noctalia::theme::builtinPalettes()) {
-      paletteNames.emplace_back(entry.name);
+    for (auto& choice : themes::paletteChoices(PaletteSource::Builtin, ThemeMode::Dark)) {
+      paletteNames.push_back(std::move(choice.value));
     }
     return paletteNames;
   }
 
   std::size_t selectedBuiltinPaletteIndex(std::string_view name) {
-    std::size_t index = 0;
-    for (const auto& entry : noctalia::theme::builtinPalettes()) {
-      if (entry.name == name) {
-        return index;
-      }
-      ++index;
-    }
-    return 0;
+    const auto names = builtinPaletteNames();
+    const auto it = std::ranges::find(names, name);
+    return it != names.end() ? static_cast<std::size_t>(it - names.begin()) : 0;
   }
 
   std::unique_ptr<Flex> makeCard(float scale, float fillOpacity) {
@@ -306,8 +302,8 @@ void SetupWizardPanel::create() {
 
       // Respect the user's existing palette: seed controls from current config
       // and write no override until the user actually changes a control. The
-      // wizard only offers builtin/wallpaper, so community/custom sources are
-      // displayed as builtin but left untouched in config unless changed.
+      // wizard only offers presets/wallpaper, so a custom source is displayed
+      // as a preset but left untouched in config unless changed.
       m_paletteSource =
           cfg.theme.source == PaletteSource::Wallpaper ? PaletteSource::Wallpaper : PaletteSource::Builtin;
       m_builtinPalette = cfg.theme.builtinPalette;

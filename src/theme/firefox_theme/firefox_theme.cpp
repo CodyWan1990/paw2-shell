@@ -579,7 +579,7 @@ namespace noctalia::theme {
       result.warning = ensureWarning;
     }
 
-    // Match community apply.sh: pywalfox dark|light (when valid), then pywalfox update.
+    // Match the old Pywalfox template's apply.sh: pywalfox dark|light (when valid), then pywalfox update.
     // publishCommand fans out to every profile host; the Unix socket nudges the primary.
     if (mode == "dark" || mode == "light") {
       firefox_theme::settings::set("theme_mode", mode);

@@ -20,16 +20,7 @@ namespace noctalia::cli {
       Flag{"--render", "-r", "<in:out>", "Render a template file to an output path", {}, {}, true, false},
       Flag{"--config", "-c", "<file>", "Process a TOML template config file", {}, {}, false, false},
       Flag{"--builtin-config", {}, {}, "Process the shipped built-in template catalog", {}, {}, false, false},
-      Flag{
-          "--list-templates",
-          {},
-          {},
-          "List built-in, cached community, and configured user templates",
-          {},
-          {},
-          false,
-          false
-      },
+      Flag{"--list-templates", {}, {}, "List built-in and configured user templates", {}, {}, false, false},
       Flag{"--default-mode", {}, "<mode>", "Template default mode", kThemeModeChoices, "dark", false, false},
   };
   inline constexpr std::array kThemePositionals{

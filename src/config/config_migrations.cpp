@@ -29,6 +29,7 @@ namespace noctalia::config {
     constexpr int kRemovedPluginAutoUpdateMigrationVersion = 13;
     constexpr int kCalendarEventFormatsMigrationVersion = 14;
     constexpr int kDockMonitorOverridesMigrationVersion = 15;
+    constexpr int kCommunityThemeMigrationVersion = 16;
     constexpr std::int64_t kMaxBarRadius = 500;
     constexpr std::array<std::string_view, 5> kBarRadiusKeys = {
         "radius", "radius_top_left", "radius_top_right", "radius_bottom_left", "radius_bottom_right",
@@ -694,6 +695,38 @@ namespace noctalia::config {
       });
     }
 
+    // Community palettes are bundled presets now, read through the builtin source, and the
+    // community template store is gone.
+    template <typename OnChanged> void migrateCommunityTheme(toml::table& root, OnChanged&& onChanged) {
+      auto* theme = root["theme"].as_table();
+      if (theme == nullptr) {
+        return;
+      }
+      if ((*theme)["source"].value<std::string_view>() == std::optional<std::string_view>{"community"}) {
+        theme->insert_or_assign("source", "builtin");
+        if (const auto name = (*theme)["community_palette"].value<std::string>()) {
+          theme->insert_or_assign("builtin", *name);
+        }
+        onChanged("theme.source", "community palettes are presets now; using builtin");
+      }
+      if (theme->erase("community_palette") > 0) {
+        onChanged("theme.community_palette", "community palettes are presets now; use theme.builtin");
+      }
+      if (auto* templates = (*theme)["templates"].as_table()) {
+        for (const std::string_view key : {"enable_community_templates", "community_ids"}) {
+          if (templates->erase(key) > 0) {
+            onChanged("theme.templates." + std::string(key), "community templates were removed");
+          }
+        }
+      }
+    }
+
+    void migrateCommunityThemeSidecar(toml::table& root, schema::Diagnostics& diag) {
+      migrateCommunityTheme(root, [&diag](const std::string& path, std::string_view message) {
+        diag.warn(path, std::string(message));
+      });
+    }
+
     template <typename OnChanged> void migrateDockMonitorAllowList(toml::table& root, OnChanged&& onChanged) {
       auto* dock = root["dock"].as_table();
       if (dock == nullptr) {
@@ -868,6 +901,11 @@ namespace noctalia::config {
             .summary = "dock: migrate monitor allow-list to per-monitor enabled overrides",
             .apply = migrateDockMonitorAllowListSidecar,
         },
+        {
+            .toVersion = kCommunityThemeMigrationVersion,
+            .summary = "theme: community palettes become presets; community templates removed",
+            .apply = migrateCommunityThemeSidecar,
+        },
     };
     return migrations;
   }
@@ -1021,6 +1059,13 @@ namespace noctalia::config {
           .migrationVersion = kDockMonitorOverridesMigrationVersion,
           .path = path,
           .message = "dock monitors is deprecated; use per-monitor enabled overrides",
+      });
+    });
+    migrateCommunityTheme(root, [&issues](const std::string& path, std::string_view message) {
+      issues.push_back({
+          .migrationVersion = kCommunityThemeMigrationVersion,
+          .path = path,
+          .message = std::string(message),
       });
     });
   }

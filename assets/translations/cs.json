@@ -1222,8 +1222,6 @@
           "light": "Světlý"
         },
         "source": {
-          "built-in": "Vestavěná",
-          "community": "Komunitní",
           "custom": "Vlastní",
           "wallpaper": "Tapeta"
         }

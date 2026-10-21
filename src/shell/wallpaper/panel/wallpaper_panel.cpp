@@ -23,6 +23,7 @@
 #include "ui/dialogs/color_picker_dialog.h"
 #include "ui/grid_nav.h"
 #include "ui/palette.h"
+#include "ui/sort_mode_table.h"
 #include "ui/style.h"
 #include "util/file_utils.h"
 #include "util/string_utils.h"
@@ -40,6 +41,15 @@
 #include <utility>
 
 namespace {
+
+  using SortMode = WallpaperPanel::SortMode;
+  constexpr SortModeInfo<SortMode> kSortModes[] = {
+      {SortMode::NameAsc, "name_asc", "sort-a-z", "wallpaper.panel.sort-name-asc"},
+      {SortMode::NameDesc, "name_desc", "sort-z-a", "wallpaper.panel.sort-name-desc"},
+      {SortMode::DateAsc, "date_asc", "sort-ascending-2", "wallpaper.panel.sort-date-asc"},
+      {SortMode::DateDesc, "date_desc", "sort-descending-2", "wallpaper.panel.sort-date-desc"},
+      {SortMode::Random, "random", "arrows-random", "wallpaper.panel.sort-random"},
+  };
 
   constexpr Logger kLog("wp-panel");
   constexpr auto kFilterDebounceInterval = std::chrono::milliseconds(120);
@@ -407,7 +417,7 @@ WallpaperPanel::WallpaperPanel(
     m_flatten = m_config->stateBool("wallpaper_panel", "flatten").value_or(false);
     m_showNames = m_config->config().shell.panel.wallpaperShowNames;
     if (const std::optional<std::string> sort = m_config->stateString("wallpaper_panel", "sort")) {
-      m_sortMode = sortModeFromState(*sort);
+      m_sortMode = sort_modes::fromState(kSortModes, *sort);
     }
   }
   if (m_scanner != nullptr) {
@@ -565,10 +575,10 @@ void WallpaperPanel::create() {
   toolbar->addChild(
       ui::button({
           .out = &m_ui.sortButton,
-          .glyph = std::string(sortModeGlyph(m_sortMode)),
+          .glyph = std::string(sort_modes::info(kSortModes, m_sortMode).glyph),
           .glyphSize = Style::fontSizeBody * scale,
           .variant = ButtonVariant::Default,
-          .tooltip = i18n::tr(sortModeTooltipKey(m_sortMode)),
+          .tooltip = i18n::tr(sort_modes::info(kSortModes, m_sortMode).tooltipKey),
           .minWidth = Style::controlHeightSm * scale,
           .minHeight = Style::controlHeightSm * scale,
           .padding = Style::spaceXs * scale,
@@ -1642,76 +1652,12 @@ void WallpaperPanel::navigateUp() {
   PanelManager::instance().refresh();
 }
 
-WallpaperPanel::SortMode WallpaperPanel::sortModeFromState(std::string_view value) {
-  if (value == "name_desc") {
-    return SortMode::NameDesc;
-  }
-  if (value == "date_asc") {
-    return SortMode::DateAsc;
-  }
-  if (value == "date_desc") {
-    return SortMode::DateDesc;
-  }
-  if (value == "random") {
-    return SortMode::Random;
-  }
-  return SortMode::NameAsc;
-}
-
-std::string_view WallpaperPanel::sortModeStateValue(SortMode mode) {
-  switch (mode) {
-  case SortMode::NameDesc:
-    return "name_desc";
-  case SortMode::DateAsc:
-    return "date_asc";
-  case SortMode::DateDesc:
-    return "date_desc";
-  case SortMode::Random:
-    return "random";
-  case SortMode::NameAsc:
-  default:
-    return "name_asc";
-  }
-}
-
-std::string_view WallpaperPanel::sortModeGlyph(SortMode mode) {
-  switch (mode) {
-  case SortMode::NameDesc:
-    return "sort-z-a";
-  case SortMode::DateAsc:
-    return "sort-ascending-2";
-  case SortMode::DateDesc:
-    return "sort-descending-2";
-  case SortMode::Random:
-    return "arrows-random";
-  case SortMode::NameAsc:
-  default:
-    return "sort-a-z";
-  }
-}
-
-const char* WallpaperPanel::sortModeTooltipKey(SortMode mode) {
-  switch (mode) {
-  case SortMode::NameDesc:
-    return "wallpaper.panel.sort-name-desc";
-  case SortMode::DateAsc:
-    return "wallpaper.panel.sort-date-asc";
-  case SortMode::DateDesc:
-    return "wallpaper.panel.sort-date-desc";
-  case SortMode::Random:
-    return "wallpaper.panel.sort-random";
-  case SortMode::NameAsc:
-  default:
-    return "wallpaper.panel.sort-name-asc";
-  }
-}
-
 void WallpaperPanel::syncSortButtonGlyph() {
   if (m_ui.sortButton == nullptr) {
     return;
   }
-  m_ui.sortButton->setGlyph(sortModeGlyph(m_sortMode));
-  m_ui.sortButton->setTooltip(i18n::tr(sortModeTooltipKey(m_sortMode)));
+  m_ui.sortButton->setGlyph(sort_modes::info(kSortModes, m_sortMode).glyph);
+  m_ui.sortButton->setTooltip(i18n::tr(sort_modes::info(kSortModes, m_sortMode).tooltipKey));
 
   if (!m_ui.sortButton->hovered()) {
     return;
@@ -1727,27 +1673,7 @@ void WallpaperPanel::syncSortButtonGlyph() {
   TooltipManager::instance().onHoverChange(area, parentCtx->layerSurface, parentCtx->output);
 }
 
-void WallpaperPanel::cycleSortMode() {
-  SortMode next = SortMode::NameAsc;
-  switch (m_sortMode) {
-  case SortMode::NameAsc:
-    next = SortMode::NameDesc;
-    break;
-  case SortMode::NameDesc:
-    next = SortMode::DateAsc;
-    break;
-  case SortMode::DateAsc:
-    next = SortMode::DateDesc;
-    break;
-  case SortMode::DateDesc:
-    next = SortMode::Random;
-    break;
-  case SortMode::Random:
-    next = SortMode::NameAsc;
-    break;
-  }
-  setSortMode(next);
-}
+void WallpaperPanel::cycleSortMode() { setSortMode(sort_modes::next(kSortModes, m_sortMode)); }
 
 void WallpaperPanel::setSortMode(SortMode mode) {
   if (m_sortMode == mode) {
@@ -1758,7 +1684,7 @@ void WallpaperPanel::setSortMode(SortMode mode) {
     reseedRandomSort();
   }
   if (m_config != nullptr) {
-    (void)m_config->setStateString("wallpaper_panel", "sort", std::string(sortModeStateValue(mode)));
+    (void)m_config->setStateString("wallpaper_panel", "sort", std::string(sort_modes::info(kSortModes, mode).state));
   }
   syncSortButtonGlyph();
   sortVisibleEntries();

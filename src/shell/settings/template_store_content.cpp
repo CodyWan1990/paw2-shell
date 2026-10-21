@@ -13,6 +13,7 @@
 #include "ui/controls/virtual_grid_view.h"
 #include "ui/grid_nav.h"
 #include "ui/palette.h"
+#include "ui/sort_mode_table.h"
 #include "ui/style.h"
 #include "util/string_utils.h"
 
@@ -23,6 +24,15 @@
 namespace settings {
 
   namespace {
+
+    constexpr SortModeInfo<TemplateSortMode> kSortModes[] = {
+        {TemplateSortMode::NameAsc, "name_asc", "sort-a-z", "settings.templates.store.sort-name-asc"},
+        {TemplateSortMode::NameDesc, "name_desc", "sort-z-a", "settings.templates.store.sort-name-desc"},
+        {TemplateSortMode::CategoryAsc, "category_asc", "sort-ascending-2",
+         "settings.templates.store.sort-category-asc"},
+        {TemplateSortMode::CategoryDesc, "category_desc", "sort-descending-2",
+         "settings.templates.store.sort-category-desc"},
+    };
 
     // Sentinel for the Enabled chip — not a real catalog category value.
     constexpr std::string_view kEnabledFilter = "__enabled__";
@@ -85,7 +95,7 @@ namespace settings {
         m_callbacks(std::move(callbacks)) {
     if (m_config != nullptr) {
       if (const std::optional<std::string> sort = m_config->stateString("template_store", "sort")) {
-        m_sortMode = sortModeFromState(*sort);
+        m_sortMode = sort_modes::fromState(kSortModes, *sort);
       }
     }
     collectCategories();
@@ -126,24 +136,7 @@ namespace settings {
     });
   }
 
-  void TemplateStoreContent::cycleSortMode() {
-    TemplateSortMode next = TemplateSortMode::NameAsc;
-    switch (m_sortMode) {
-    case TemplateSortMode::NameAsc:
-      next = TemplateSortMode::NameDesc;
-      break;
-    case TemplateSortMode::NameDesc:
-      next = TemplateSortMode::CategoryAsc;
-      break;
-    case TemplateSortMode::CategoryAsc:
-      next = TemplateSortMode::CategoryDesc;
-      break;
-    case TemplateSortMode::CategoryDesc:
-      next = TemplateSortMode::NameAsc;
-      break;
-    }
-    setSortMode(next);
-  }
+  void TemplateStoreContent::cycleSortMode() { setSortMode(sort_modes::next(kSortModes, m_sortMode)); }
 
   void TemplateStoreContent::setSortMode(TemplateSortMode mode) {
     if (m_sortMode == mode) {
@@ -151,7 +144,7 @@ namespace settings {
     }
     m_sortMode = mode;
     if (m_config != nullptr) {
-      (void)m_config->setStateString("template_store", "sort", std::string(sortModeStateValue(mode)));
+      (void)m_config->setStateString("template_store", "sort", std::string(sort_modes::info(kSortModes, mode).state));
     }
     syncSortButtonGlyph();
     sortFiltered();
@@ -161,67 +154,12 @@ namespace settings {
     }
   }
 
-  TemplateSortMode TemplateStoreContent::sortModeFromState(std::string_view value) {
-    if (value == "name_desc") {
-      return TemplateSortMode::NameDesc;
-    }
-    if (value == "category_asc") {
-      return TemplateSortMode::CategoryAsc;
-    }
-    if (value == "category_desc") {
-      return TemplateSortMode::CategoryDesc;
-    }
-    return TemplateSortMode::NameAsc;
-  }
-
-  std::string_view TemplateStoreContent::sortModeStateValue(TemplateSortMode mode) {
-    switch (mode) {
-    case TemplateSortMode::NameDesc:
-      return "name_desc";
-    case TemplateSortMode::CategoryAsc:
-      return "category_asc";
-    case TemplateSortMode::CategoryDesc:
-      return "category_desc";
-    case TemplateSortMode::NameAsc:
-    default:
-      return "name_asc";
-    }
-  }
-
-  std::string_view TemplateStoreContent::sortModeGlyph(TemplateSortMode mode) {
-    switch (mode) {
-    case TemplateSortMode::NameDesc:
-      return "sort-z-a";
-    case TemplateSortMode::CategoryAsc:
-      return "sort-ascending-2";
-    case TemplateSortMode::CategoryDesc:
-      return "sort-descending-2";
-    case TemplateSortMode::NameAsc:
-    default:
-      return "sort-a-z";
-    }
-  }
-
-  const char* TemplateStoreContent::sortModeTooltipKey(TemplateSortMode mode) {
-    switch (mode) {
-    case TemplateSortMode::NameDesc:
-      return "settings.templates.store.sort-name-desc";
-    case TemplateSortMode::CategoryAsc:
-      return "settings.templates.store.sort-category-asc";
-    case TemplateSortMode::CategoryDesc:
-      return "settings.templates.store.sort-category-desc";
-    case TemplateSortMode::NameAsc:
-    default:
-      return "settings.templates.store.sort-name-asc";
-    }
-  }
-
   void TemplateStoreContent::syncSortButtonGlyph() {
     if (m_sortButton == nullptr) {
       return;
     }
-    m_sortButton->setGlyph(sortModeGlyph(m_sortMode));
-    m_sortButton->setTooltip(i18n::tr(sortModeTooltipKey(m_sortMode)));
+    m_sortButton->setGlyph(sort_modes::info(kSortModes, m_sortMode).glyph);
+    m_sortButton->setTooltip(i18n::tr(sort_modes::info(kSortModes, m_sortMode).tooltipKey));
   }
 
   void TemplateStoreContent::applyFilter() {
@@ -418,10 +356,10 @@ namespace settings {
     summaryRow.addChild(
         ui::button({
             .out = &m_sortButton,
-            .glyph = std::string(sortModeGlyph(m_sortMode)),
+            .glyph = std::string(sort_modes::info(kSortModes, m_sortMode).glyph),
             .glyphSize = Style::fontSizeTitle * scale,
             .variant = ButtonVariant::Default,
-            .tooltip = i18n::tr(sortModeTooltipKey(m_sortMode)),
+            .tooltip = i18n::tr(sort_modes::info(kSortModes, m_sortMode).tooltipKey),
             .minWidth = Style::controlHeight * scale,
             .minHeight = Style::controlHeight * scale,
             .padding = Style::spaceXs * scale,

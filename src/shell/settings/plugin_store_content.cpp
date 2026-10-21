@@ -22,6 +22,7 @@
 #include "ui/controls/virtual_grid_view.h"
 #include "ui/grid_nav.h"
 #include "ui/palette.h"
+#include "ui/sort_mode_table.h"
 #include "ui/style.h"
 #include "util/string_utils.h"
 
@@ -36,6 +37,19 @@
 namespace settings {
 
   namespace {
+
+    constexpr SortModeInfo<SortMode> kSortModes[] = {
+        {SortMode::NameAsc, "name_asc", "sort-a-z", "settings.plugins.store.sort-name-asc"},
+        {SortMode::NameDesc, "name_desc", "sort-z-a", "settings.plugins.store.sort-name-desc"},
+        {SortMode::UpdatedAtDesc, "updated_at_desc", "sort-descending-2",
+         "settings.plugins.store.sort-updated-at-desc"},
+        {SortMode::UpdatedAtAsc, "updated_at_asc", "sort-ascending-2", "settings.plugins.store.sort-updated-at-asc"},
+        {SortMode::AddedAtDesc, "added_at_desc", "sort-descending-2-filled",
+         "settings.plugins.store.sort-added-at-desc"},
+        {SortMode::AddedAtAsc, "added_at_asc", "sort-ascending-2-filled", "settings.plugins.store.sort-added-at-asc"},
+        {SortMode::MostRecommended, "most_recommended", "thumb-up", "settings.plugins.store.sort-most-recommended"},
+        {SortMode::Trending, "trending", "trending-up", "settings.plugins.store.sort-trending"},
+    };
 
     constexpr float kSourceBadgeMaxWidth = 120.0F;
     constexpr float kTagBadgeMaxWidth = 120.0F;
@@ -129,7 +143,7 @@ namespace settings {
         m_callbacks(std::move(callbacks)), m_fileCache(fileCache), m_scrollState(scrollState) {
     if (m_config != nullptr) {
       if (const std::optional<std::string> sort = m_config->stateString("plugin_store", "sort")) {
-        m_sortMode = sortModeFromState(*sort);
+        m_sortMode = sort_modes::fromState(kSortModes, *sort);
       }
     }
     if (m_config != nullptr && m_recommendations != nullptr) {
@@ -182,36 +196,11 @@ namespace settings {
   bool PluginStoreContent::isDetailView() const noexcept { return m_detailIndex.has_value(); }
 
   void PluginStoreContent::cycleSortMode() {
-    SortMode next = SortMode::NameAsc;
-    switch (m_sortMode) {
-    case SortMode::NameAsc:
-      next = SortMode::NameDesc;
-      break;
-    case SortMode::NameDesc:
-      next = SortMode::UpdatedAtDesc;
-      break;
-    case SortMode::UpdatedAtDesc:
-      next = SortMode::UpdatedAtAsc;
-      break;
-    case SortMode::UpdatedAtAsc:
-      next = SortMode::AddedAtDesc;
-      break;
-    case SortMode::AddedAtDesc:
-      next = SortMode::AddedAtAsc;
-      break;
-    case SortMode::AddedAtAsc:
-      next = m_recommendations != nullptr && m_recommendations->metricsAvailable() ? SortMode::MostRecommended
-                                                                                   : SortMode::NameAsc;
-      break;
-    case SortMode::MostRecommended:
-      next = m_recommendations != nullptr && m_recommendations->metricsAvailable() ? SortMode::Trending
-                                                                                   : SortMode::NameAsc;
-      break;
-    case SortMode::Trending:
-      next = SortMode::NameAsc;
-      break;
-    }
-    setSortMode(next);
+    // The recommendation orders need the store's metrics.
+    const bool metrics = m_recommendations != nullptr && m_recommendations->metricsAvailable();
+    setSortMode(sort_modes::next(kSortModes, m_sortMode, std::function<bool(SortMode)>([metrics](SortMode mode) {
+                                   return metrics || (mode != SortMode::MostRecommended && mode != SortMode::Trending);
+                                 })));
   }
 
   void PluginStoreContent::setSortMode(SortMode mode) {
@@ -220,103 +209,12 @@ namespace settings {
     }
     m_sortMode = mode;
     if (m_config != nullptr) {
-      (void)m_config->setStateString("plugin_store", "sort", std::string(sortModeStateValue(mode)));
+      (void)m_config->setStateString("plugin_store", "sort", std::string(sort_modes::info(kSortModes, mode).state));
     }
 
     syncSortButtonGlyph();
     sortEntries();
     syncGridSelection();
-  }
-
-  SortMode PluginStoreContent::sortModeFromState(std::string_view value) {
-    if (value == "most_recommended") {
-      return SortMode::MostRecommended;
-    }
-    if (value == "trending") {
-      return SortMode::Trending;
-    }
-    if (value == "name_desc") {
-      return SortMode::NameDesc;
-    }
-    if (value == "updated_at_asc") {
-      return SortMode::UpdatedAtAsc;
-    }
-    if (value == "updated_at_desc") {
-      return SortMode::UpdatedAtDesc;
-    }
-    if (value == "added_at_asc") {
-      return SortMode::AddedAtAsc;
-    }
-    if (value == "added_at_desc") {
-      return SortMode::AddedAtDesc;
-    }
-    return SortMode::NameAsc;
-  }
-
-  std::string_view PluginStoreContent::sortModeStateValue(SortMode mode) {
-    switch (mode) {
-    case SortMode::MostRecommended:
-      return "most_recommended";
-    case SortMode::Trending:
-      return "trending";
-    case SortMode::NameDesc:
-      return "name_desc";
-    case SortMode::UpdatedAtAsc:
-      return "updated_at_asc";
-    case SortMode::UpdatedAtDesc:
-      return "updated_at_desc";
-    case SortMode::AddedAtAsc:
-      return "added_at_asc";
-    case SortMode::AddedAtDesc:
-      return "added_at_desc";
-    case SortMode::NameAsc:
-    default:
-      return "name_asc";
-    }
-  }
-
-  std::string_view PluginStoreContent::sortModeGlyph(SortMode mode) {
-    switch (mode) {
-    case SortMode::MostRecommended:
-      return "thumb-up";
-    case SortMode::Trending:
-      return "trending-up";
-    case SortMode::NameDesc:
-      return "sort-z-a";
-    case SortMode::UpdatedAtAsc:
-      return "sort-ascending-2";
-    case SortMode::UpdatedAtDesc:
-      return "sort-descending-2";
-    case SortMode::AddedAtAsc:
-      return "sort-ascending-2-filled";
-    case SortMode::AddedAtDesc:
-      return "sort-descending-2-filled";
-    case SortMode::NameAsc:
-    default:
-      return "sort-a-z";
-    }
-  }
-
-  const char* PluginStoreContent::sortModeTooltipKey(SortMode mode) {
-    switch (mode) {
-    case SortMode::MostRecommended:
-      return "settings.plugins.store.sort-most-recommended";
-    case SortMode::Trending:
-      return "settings.plugins.store.sort-trending";
-    case SortMode::NameDesc:
-      return "settings.plugins.store.sort-name-desc";
-    case SortMode::UpdatedAtAsc:
-      return "settings.plugins.store.sort-updated-at-asc";
-    case SortMode::UpdatedAtDesc:
-      return "settings.plugins.store.sort-updated-at-desc";
-    case SortMode::AddedAtAsc:
-      return "settings.plugins.store.sort-added-at-asc";
-    case SortMode::AddedAtDesc:
-      return "settings.plugins.store.sort-added-at-desc";
-    case SortMode::NameAsc:
-    default:
-      return "settings.plugins.store.sort-name-asc";
-    }
   }
 
   void PluginStoreContent::syncSortButtonGlyph() {
@@ -326,9 +224,9 @@ namespace settings {
     const bool unavailable = (m_sortMode == SortMode::MostRecommended || m_sortMode == SortMode::Trending)
         && (m_recommendations == nullptr || !m_recommendations->metricsAvailable());
     const auto displayedMode = unavailable ? SortMode::NameAsc : m_sortMode;
-    m_sortButton->setGlyph(sortModeGlyph(displayedMode));
+    m_sortButton->setGlyph(sort_modes::info(kSortModes, displayedMode).glyph);
     // Retargets a tooltip already on screen: setTooltip notifies TooltipManager.
-    m_sortButton->setTooltip(i18n::tr(sortModeTooltipKey(displayedMode)));
+    m_sortButton->setTooltip(i18n::tr(sort_modes::info(kSortModes, displayedMode).tooltipKey));
   }
 
   std::optional<std::string> PluginStoreContent::detailPageUrl() const {
@@ -656,10 +554,10 @@ namespace settings {
     summaryRow.addChild(
         ui::button({
             .out = &m_sortButton,
-            .glyph = std::string(sortModeGlyph(m_sortMode)),
+            .glyph = std::string(sort_modes::info(kSortModes, m_sortMode).glyph),
             .glyphSize = Style::fontSizeTitle * scale,
             .variant = ButtonVariant::Default,
-            .tooltip = i18n::tr(sortModeTooltipKey(m_sortMode)),
+            .tooltip = i18n::tr(sort_modes::info(kSortModes, m_sortMode).tooltipKey),
             .minWidth = Style::controlHeight * scale,
             .minHeight = Style::controlHeight * scale,
             .padding = Style::spaceXs * scale,

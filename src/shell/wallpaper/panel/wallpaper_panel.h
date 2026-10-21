@@ -109,10 +109,6 @@ private:
   void syncSortButtonGlyph();
   void cycleSortMode();
   void setSortMode(SortMode mode);
-  [[nodiscard]] static SortMode sortModeFromState(std::string_view value);
-  [[nodiscard]] static std::string_view sortModeStateValue(SortMode mode);
-  [[nodiscard]] static std::string_view sortModeGlyph(SortMode mode);
-  [[nodiscard]] static const char* sortModeTooltipKey(SortMode mode);
   void applyColorWallpaper();
   void rebindGrid(bool resetScroll = false);
   void resetSelection();

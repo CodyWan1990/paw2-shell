@@ -64,10 +64,6 @@ namespace settings {
     void cycleSortMode();
     void setSortMode(TemplateSortMode mode);
     void syncSortButtonGlyph();
-    [[nodiscard]] static TemplateSortMode sortModeFromState(std::string_view value);
-    [[nodiscard]] static std::string_view sortModeStateValue(TemplateSortMode mode);
-    [[nodiscard]] static std::string_view sortModeGlyph(TemplateSortMode mode);
-    [[nodiscard]] static const char* sortModeTooltipKey(TemplateSortMode mode);
     void commitSelection();
     void selectIndex(std::size_t index);
     [[nodiscard]] std::optional<std::size_t> indexOfTemplateId(std::string_view id) const;

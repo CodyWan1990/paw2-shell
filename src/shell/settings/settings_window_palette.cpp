@@ -331,15 +331,8 @@ void SettingsWindow::setResolvedPalette(const noctalia::theme::GeneratedPalette&
 }
 
 void SettingsWindow::openPaletteInspector() {
-  if (m_surface == nullptr || m_templateColorMode.empty()) {
+  if (m_templateColorMode.empty() || !prepareEditorSheet()) {
     return;
-  }
-  if (m_editorSheetModal != nullptr && m_editorSheetModal->isOpen()) {
-    m_editorSheetModal->close();
-  }
-  if (m_editorSheetModal == nullptr) {
-    m_editorSheetModal = std::make_unique<settings::SettingsSheetModal>();
-    m_editorSheetModal->initialize(m_modalHost, [this]() { dismissOpenSelectDropdown(); });
   }
   const float scale = uiScale();
   auto content = std::make_shared<settings::PaletteInspectorContent>(scale, [this](std::string value) {

@@ -186,6 +186,13 @@ private:
   [[nodiscard]] settings::SettingsContentContext makeContentContext(
       const Config& cfg, const BarConfig* selectedBar, const BarMonitorOverride* selectedMonitorOverride
   );
+  // Readies the editor sheet for a new editor: false when the window can't host one. Closes any
+  // open editor and popup first, and creates the sheet on first use.
+  [[nodiscard]] bool prepareEditorSheet();
+  // Stores a list with a row removed by its editor, then closes the editor and rebuilds the page.
+  void commitRowRemoval(std::vector<std::string> path, ConfigOverrideValue rows);
+  // Content context for an editor hosted in the sheet, for the selected bar and override.
+  [[nodiscard]] settings::SettingsContentContext hostedEditorContext(const Config& cfg);
   [[nodiscard]] std::vector<std::vector<std::string>> currentPageResetPaths() const;
   [[nodiscard]] bool
   tryPatchSettingsRegistryValue(const std::vector<std::string>& path, const ConfigOverrideValue& value);

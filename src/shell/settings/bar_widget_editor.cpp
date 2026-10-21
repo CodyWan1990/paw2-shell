@@ -252,43 +252,6 @@ namespace settings {
       return std::string(lane);
     }
 
-    std::vector<std::string> barWidgetItemsForPath(const Config& cfg, const std::vector<std::string>& path) {
-      if (!isBarWidgetListPath(path) || path.size() < 3) {
-        return {};
-      }
-
-      const auto* bar = findBar(cfg, path[1]);
-      if (bar == nullptr) {
-        return {};
-      }
-
-      const auto& lane = path.back();
-      if (path.size() >= 5 && path[2] == "monitor") {
-        const auto* ovr = findMonitorOverride(*bar, path[3]);
-        if (ovr != nullptr) {
-          if (lane == "start") {
-            return ovr->startWidgets.value_or(bar->startWidgets);
-          }
-          if (lane == "center") {
-            return ovr->centerWidgets.value_or(bar->centerWidgets);
-          }
-          if (lane == "end") {
-            return ovr->endWidgets.value_or(bar->endWidgets);
-          }
-        }
-      }
-
-      if (lane == "start") {
-        return bar->startWidgets;
-      }
-      if (lane == "center") {
-        return bar->centerWidgets;
-      }
-      if (lane == "end") {
-        return bar->endWidgets;
-      }
-      return {};
-    }
 
     bool isMonitorWidgetListPath(const std::vector<std::string>& path) {
       return isBarWidgetListPath(path) && path.size() >= 5 && path[2] == "monitor";
@@ -2682,6 +2645,44 @@ namespace settings {
     }
 
   } // namespace
+
+  std::vector<std::string> barWidgetItemsForPath(const Config& cfg, const std::vector<std::string>& path) {
+    if (!isBarWidgetListPath(path) || path.size() < 3) {
+      return {};
+    }
+
+    const auto* bar = findBar(cfg, path[1]);
+    if (bar == nullptr) {
+      return {};
+    }
+
+    const auto& lane = path.back();
+    if (path.size() >= 5 && path[2] == "monitor") {
+      const auto* ovr = findMonitorOverride(*bar, path[3]);
+      if (ovr != nullptr) {
+        if (lane == "start") {
+          return ovr->startWidgets.value_or(bar->startWidgets);
+        }
+        if (lane == "center") {
+          return ovr->centerWidgets.value_or(bar->centerWidgets);
+        }
+        if (lane == "end") {
+          return ovr->endWidgets.value_or(bar->endWidgets);
+        }
+      }
+    }
+
+    if (lane == "start") {
+      return bar->startWidgets;
+    }
+    if (lane == "center") {
+      return bar->centerWidgets;
+    }
+    if (lane == "end") {
+      return bar->endWidgets;
+    }
+    return {};
+  }
 
   bool isBarWidgetListPath(const std::vector<std::string>& path) {
     if (path.size() < 3 || path.front() != "bar") {

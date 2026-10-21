@@ -78,6 +78,9 @@ namespace settings {
 
   [[nodiscard]] bool isBarWidgetListPath(const std::vector<std::string>& path);
   [[nodiscard]] bool isFirstBarWidgetListPath(const std::vector<std::string>& path);
+  // Widgets on the lane at `path` (bar.<name>.<lane> or bar.<name>.monitor.<match>.<lane>), with an
+  // override's unset lane falling back to the bar's.
+  [[nodiscard]] std::vector<std::string> barWidgetItemsForPath(const Config& cfg, const std::vector<std::string>& path);
 
   // Lane selection tokens address a lane position as "<laneKey>#<index>".
   struct LaneSelectionToken {

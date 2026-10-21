@@ -301,12 +301,6 @@ namespace settings {
     bool advanced = false;
     std::string searchText;
     SettingVisibility visibleWhen; // empty = always visible
-
-    // While building a registry: entries.push_back(makeEntry(...).shownWhen(pred)).
-    [[nodiscard]] SettingEntry&& shownWhen(SettingVisibility predicate) && {
-      visibleWhen = std::move(predicate);
-      return std::move(*this);
-    }
   };
 
   // Runtime conditions that gate optional sections (e.g. compositor-specific features).

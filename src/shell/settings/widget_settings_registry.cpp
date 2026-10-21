@@ -17,13 +17,13 @@
 #include "shell/bar/widgets/control_center_widget_definition.h"
 #include "shell/bar/widgets/custom_button_widget_definition.h"
 #include "shell/bar/widgets/keyboard_layout_widget_definition.h"
-#include "shell/bar/widgets/paw2_layout_widget_definition.h"
 #include "shell/bar/widgets/launcher_widget_definition.h"
 #include "shell/bar/widgets/lock_keys_widget_definition.h"
 #include "shell/bar/widgets/media_widget_definition.h"
 #include "shell/bar/widgets/network_widget_definition.h"
 #include "shell/bar/widgets/nightlight_widget_definition.h"
 #include "shell/bar/widgets/notification_widget_definition.h"
+#include "shell/bar/widgets/paw2_layout_widget_definition.h"
 #include "shell/bar/widgets/power_profile_widget_definition.h"
 #include "shell/bar/widgets/privacy_widget_definition.h"
 #include "shell/bar/widgets/screenshot_widget_definition.h"
@@ -35,15 +35,16 @@
 #include "shell/bar/widgets/test_widget_definition.h"
 #include "shell/bar/widgets/text_widget_definition.h"
 #include "shell/bar/widgets/theme_mode_widget_definition.h"
+#include "shell/bar/widgets/themes_widget_definition.h"
 #include "shell/bar/widgets/tray_widget_definition.h"
 #include "shell/bar/widgets/volume_widget_definition.h"
-#include "shell/bar/widgets/themes_widget_definition.h"
 #include "shell/bar/widgets/wallpaper_widget_definition.h"
 #include "shell/bar/widgets/weather_widget_definition.h"
 #include "shell/bar/widgets/workspaces_widget_definition.h"
 #include "shell/settings/font_family_catalog.h"
 #include "shell/settings/font_weight_catalog.h"
 #include "shell/settings/font_weight_i18n.h"
+#include "shell/settings/settings_registry.h"
 #include "ui/style.h"
 
 #include <algorithm>
@@ -1468,6 +1469,75 @@ namespace settings {
       return !widgetSettingValuesEqual(*withValue, *withoutValue);
     }
     return !widgetSettingValuesEqual(withValue.value_or(*defaultValue), withoutValue.value_or(*defaultValue));
+  }
+
+  std::vector<SelectOption> widgetSpecSelectOptions(const WidgetSettingSpec& spec) {
+    std::vector<SelectOption> options;
+    options.reserve(spec.options.size());
+    for (const auto& option : spec.options) {
+      options.push_back(SelectOption{option.value, spec.literalLabels ? option.labelKey : i18n::tr(option.labelKey)});
+    }
+    return options;
+  }
+
+  std::string widgetSettingAsString(const WidgetSettingValue& value) {
+    if (const auto* s = std::get_if<std::string>(&value)) {
+      return *s;
+    }
+    if (const auto* b = std::get_if<bool>(&value)) {
+      return *b ? "true" : "false";
+    }
+    if (const auto* i = std::get_if<std::int64_t>(&value)) {
+      return std::to_string(*i);
+    }
+    if (const auto* d = std::get_if<double>(&value)) {
+      return std::to_string(*d);
+    }
+    return {};
+  }
+
+  std::vector<std::string> widgetSettingAsStringList(const WidgetSettingValue& value) {
+    if (const auto* v = std::get_if<std::vector<std::string>>(&value)) {
+      return *v;
+    }
+    return {};
+  }
+
+  WidgetSettingStringMap widgetSettingAsStringMap(const WidgetSettingValue& value) {
+    if (const auto* map = std::get_if<WidgetSettingStringMap>(&value)) {
+      return *map;
+    }
+    return {};
+  }
+
+  bool widgetSettingAsBool(const WidgetSettingValue& value) {
+    if (const auto* b = std::get_if<bool>(&value)) {
+      return *b;
+    }
+    if (const auto* i = std::get_if<std::int64_t>(&value)) {
+      return *i != 0;
+    }
+    return false;
+  }
+
+  std::int64_t widgetSettingAsInt(const WidgetSettingValue& value) {
+    if (const auto* i = std::get_if<std::int64_t>(&value)) {
+      return *i;
+    }
+    if (const auto* d = std::get_if<double>(&value)) {
+      return static_cast<std::int64_t>(std::llround(*d));
+    }
+    return 0;
+  }
+
+  double widgetSettingAsDouble(const WidgetSettingValue& value) {
+    if (const auto* d = std::get_if<double>(&value)) {
+      return *d;
+    }
+    if (const auto* i = std::get_if<std::int64_t>(&value)) {
+      return static_cast<double>(*i);
+    }
+    return 0.0;
   }
 
 } // namespace settings

@@ -127,6 +127,9 @@ namespace settings {
             -> std::unique_ptr<Node> { return factory.makeStepper(setting, std::move(path)); },
         .makeText = [&factory](const std::string& value, const std::string& placeholder, std::vector<std::string> path)
             -> std::unique_ptr<Node> { return factory.makeText(value, placeholder, std::move(path)); },
+        .makeGlyphText = [&factory](const std::string& value, std::vector<std::string> path) -> std::unique_ptr<Node> {
+          return factory.makeGlyphText(value, std::move(path), {}, 0.0F, true);
+        },
         .makeColorSpecPicker = [&factory](const ColorSpecPickerSetting& setting, std::vector<std::string> path)
             -> std::unique_ptr<Node> { return factory.makeColorSpecPicker(setting, std::move(path)); },
         .makeListBlock = [&factory](
@@ -202,37 +205,6 @@ namespace settings {
 
     SettingsControlFactory factory(ctx);
 
-    const auto makeGlyphText = [&](const TextSetting& setting, std::vector<std::string> path) -> std::unique_ptr<Node> {
-      auto wrap = ui::row({.align = FlexAlign::Center, .gap = Style::spaceSm * scale});
-      wrap->addChild(factory.makeText(setting.value, setting.placeholder, path, setting.width));
-
-      auto pickerButton = ui::button({
-          .glyph = "apps",
-          .glyphSize = Style::fontSizeBody * scale,
-          .variant = ButtonVariant::Default,
-          .minWidth = Style::controlHeight * scale,
-          .minHeight = Style::controlHeight * scale,
-          .paddingV = Style::spaceXs * scale,
-          .paddingH = Style::spaceSm * scale,
-          .radius = Style::scaledRadiusMd(scale),
-          .onClick = [setOverride = ctx.setOverride, path, currentValue = setting.value]() {
-            GlyphPickerDialogOptions options;
-            if (!currentValue.empty()) {
-              options.initialGlyph = currentValue;
-            }
-            (void)GlyphPickerDialog::open(
-                std::move(options), [setOverride, path](std::optional<GlyphPickerResult> result) {
-                  if (!result.has_value()) {
-                    return;
-                  }
-                  setOverride(path, result->name);
-                }
-            );
-          },
-      });
-      wrap->addChild(std::move(pickerButton));
-      return wrap;
-    };
 
     const auto makeMultiSelectBlock = [&](Flex& section, const SettingEntry& entry, const MultiSelectSetting& setting) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));
@@ -947,7 +919,7 @@ namespace settings {
               return factory.makeRangeSlider(control, entry.path);
             } else if constexpr (std::is_same_v<T, TextSetting>) {
               if (isDockLauncherIconPath(entry.path)) {
-                return makeGlyphText(control, entry.path);
+                return factory.makeGlyphText(control.value, entry.path, control.placeholder, control.width);
               }
               if (control.browseMode != TextSettingBrowseMode::None) {
                 return factory.makePathBrowse(control, entry.path);

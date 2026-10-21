@@ -252,7 +252,6 @@ namespace settings {
       return std::string(lane);
     }
 
-
     bool isMonitorWidgetListPath(const std::vector<std::string>& path) {
       return isBarWidgetListPath(path) && path.size() >= 5 && path[2] == "monitor";
     }
@@ -943,33 +942,6 @@ namespace settings {
       return bar->position != "left" && bar->position != "right";
     }
 
-    bool settingValueAsBool(const WidgetSettingValue& value) {
-      if (const auto* v = std::get_if<bool>(&value)) {
-        return *v;
-      }
-      return false;
-    }
-
-    std::int64_t settingValueAsInt(const WidgetSettingValue& value) {
-      if (const auto* v = std::get_if<std::int64_t>(&value)) {
-        return *v;
-      }
-      if (const auto* v = std::get_if<double>(&value)) {
-        return static_cast<std::int64_t>(std::llround(*v));
-      }
-      return std::int64_t{0};
-    }
-
-    double settingValueAsDouble(const WidgetSettingValue& value) {
-      if (const auto* v = std::get_if<double>(&value)) {
-        return *v;
-      }
-      if (const auto* v = std::get_if<std::int64_t>(&value)) {
-        return static_cast<double>(*v);
-      }
-      return 0.0;
-    }
-
     std::optional<double>
     widgetSettingOptionalDouble(const Config& cfg, std::string_view widgetName, const std::string& key) {
       if (const auto it = cfg.widgets.find(std::string(widgetName)); it != cfg.widgets.end()) {
@@ -1090,16 +1062,6 @@ namespace settings {
       });
     }
 
-    std::string settingValueAsString(const WidgetSettingValue& value) {
-      if (const auto* v = std::get_if<std::string>(&value)) {
-        return *v;
-      }
-      if (const auto* v = std::get_if<std::int64_t>(&value)) {
-        return std::to_string(*v);
-      }
-      return {};
-    }
-
     std::string widgetLabelFontWeightSelectedValue(const Config& cfg, std::string_view widgetName) {
       const auto widgetIt = cfg.widgets.find(std::string(widgetName));
       if (widgetIt == cfg.widgets.end()) {
@@ -1109,7 +1071,7 @@ namespace settings {
       if (settingIt == widgetIt->second.settings.end()) {
         return {};
       }
-      return settingValueAsString(settingIt->second);
+      return widgetSettingAsString(settingIt->second);
     }
 
     // Effective typeface for the widget's labels: its own font_family override, else the hosting bar's
@@ -1118,7 +1080,7 @@ namespace settings {
       if (const auto widgetIt = cfg.widgets.find(std::string(widgetName)); widgetIt != cfg.widgets.end()) {
         const auto it = widgetIt->second.settings.find("font_family");
         if (it != widgetIt->second.settings.end()) {
-          const std::string family = settingValueAsString(it->second);
+          const std::string family = widgetSettingAsString(it->second);
           if (!family.empty()) {
             return family;
           }
@@ -1134,13 +1096,6 @@ namespace settings {
         }
       }
       return cfg.shell.fontFamily;
-    }
-
-    std::vector<std::string> settingValueAsStringList(const WidgetSettingValue& value) {
-      if (const auto* v = std::get_if<std::vector<std::string>>(&value)) {
-        return *v;
-      }
-      return {};
     }
 
     std::string settingValueAsDisplayString(const WidgetSettingValue& value) {
@@ -1242,7 +1197,7 @@ namespace settings {
 
       const auto hasEmptyOption = std::ranges::contains(options, std::string_view{}, &SelectOption::value);
       if (selectedValue.empty() && !hasEmptyOption) {
-        selectedValue = settingValueAsString(spec.schema.defaultValue);
+        selectedValue = widgetSettingAsString(spec.schema.defaultValue);
       }
 
       const auto hasSelected = std::ranges::contains(options, selectedValue, &SelectOption::value);
@@ -1448,49 +1403,9 @@ namespace settings {
             .searchText = {},
         };
 
-        const auto makeGlyphTextControl = [&ctx, path](std::string currentValue) -> std::unique_ptr<Node> {
-          auto textNode = ctx.makeText(currentValue, {}, path);
-          return ui::row(
-              {
-                  .align = FlexAlign::Center,
-                  .gap = Style::spaceSm * ctx.scale,
-              },
-              std::move(textNode),
-              ui::button({
-                  .glyph = "apps",
-                  .glyphSize = Style::fontSizeBody * ctx.scale,
-                  .variant = ButtonVariant::Default,
-                  .minWidth = Style::controlHeight * ctx.scale,
-                  .minHeight = Style::controlHeight * ctx.scale,
-                  .paddingV = Style::spaceXs * ctx.scale,
-                  .paddingH = Style::spaceSm * ctx.scale,
-                  .radius = Style::scaledRadiusMd(ctx.scale),
-                  .onClick = [setOverride = ctx.setOverride, requestRebuild = ctx.requestRebuild, path,
-                              currentValue = std::move(currentValue)]() {
-                    GlyphPickerDialogOptions options;
-                    if (!currentValue.empty()) {
-                      options.initialGlyph = currentValue;
-                    }
-                    (void)GlyphPickerDialog::open(
-                        std::move(options),
-                        [setOverride, requestRebuild, path](std::optional<GlyphPickerResult> result) {
-                          if (!result.has_value()) {
-                            return;
-                          }
-                          setOverride(path, result->name);
-                          if (requestRebuild) {
-                            requestRebuild();
-                          }
-                        }
-                    );
-                  },
-              })
-          );
-        };
-
         switch (spec.control) {
         case WidgetControlKind::Bool: {
-          const bool resolved = settingValueAsBool(value);
+          const bool resolved = widgetSettingAsBool(value);
           if (spec.schema.inheritsFromBar) {
             std::optional<bool> explicitValue;
             if (widgetConfig != nullptr && widgetConfig->settings.contains(spec.schema.key)) {
@@ -1498,7 +1413,7 @@ namespace settings {
             }
             ctx.makeRow(
                 *panel, entry,
-                makeInheritedBoolControl(ctx, path, explicitValue, settingValueAsBool(spec.schema.defaultValue))
+                makeInheritedBoolControl(ctx, path, explicitValue, widgetSettingAsBool(spec.schema.defaultValue))
             );
             break;
           }
@@ -1520,7 +1435,7 @@ namespace settings {
             const int minStep = static_cast<int>(std::lround(minValue));
             const int maxStep = static_cast<int>(std::lround(maxValue));
             const int stepValue = static_cast<int>(std::clamp(
-                settingValueAsInt(value), static_cast<std::int64_t>(minStep), static_cast<std::int64_t>(maxStep)
+                widgetSettingAsInt(value), static_cast<std::int64_t>(minStep), static_cast<std::int64_t>(maxStep)
             ));
             ctx.makeRow(
                 *panel, entry,
@@ -1539,7 +1454,7 @@ namespace settings {
             ctx.makeRow(
                 *panel, entry,
                 ctx.makeSlider(
-                    static_cast<double>(settingValueAsInt(value)), minValue, maxValue, spec.schema.step.value_or(1.0),
+                    static_cast<double>(widgetSettingAsInt(value)), minValue, maxValue, spec.schema.step.value_or(1.0),
                     path, true
                 )
             );
@@ -1552,7 +1467,7 @@ namespace settings {
           ctx.makeRow(
               *panel, entry,
               ctx.makeSlider(
-                  settingValueAsDouble(value), minValue, maxValue, spec.schema.step.value_or(1.0), path, false
+                  widgetSettingAsDouble(value), minValue, maxValue, spec.schema.step.value_or(1.0), path, false
               )
           );
           break;
@@ -1586,11 +1501,11 @@ namespace settings {
             ctx.makeRow(
                 *panel, entry,
                 makePathBrowseControl(
-                    ctx, path, settingValueAsString(value), "photo", std::move(options), PathBrowseKind::File
+                    ctx, path, widgetSettingAsString(value), "photo", std::move(options), PathBrowseKind::File
                 )
             );
           } else {
-            ctx.makeRow(*panel, entry, ctx.makeText(settingValueAsString(value), {}, path));
+            ctx.makeRow(*panel, entry, ctx.makeText(widgetSettingAsString(value), {}, path));
           }
           break;
         }
@@ -1603,7 +1518,7 @@ namespace settings {
           ctx.makeRow(
               *panel, entry,
               makePathBrowseControl(
-                  ctx, path, settingValueAsString(value), "file-text", std::move(options), PathBrowseKind::File
+                  ctx, path, widgetSettingAsString(value), "file-text", std::move(options), PathBrowseKind::File
               )
           );
           break;
@@ -1616,16 +1531,16 @@ namespace settings {
           ctx.makeRow(
               *panel, entry,
               makePathBrowseControl(
-                  ctx, path, settingValueAsString(value), "folder", std::move(options), PathBrowseKind::Folder
+                  ctx, path, widgetSettingAsString(value), "folder", std::move(options), PathBrowseKind::Folder
               )
           );
           break;
         }
         case WidgetControlKind::Glyph:
-          ctx.makeRow(*panel, entry, makeGlyphTextControl(settingValueAsString(value)));
+          ctx.makeRow(*panel, entry, ctx.makeGlyphText(widgetSettingAsString(value), path));
           break;
         case WidgetControlKind::StringList:
-          ctx.makeListBlock(*panel, entry, ListSetting{.items = settingValueAsStringList(value)});
+          ctx.makeListBlock(*panel, entry, ListSetting{.items = widgetSettingAsStringList(value)});
           break;
         case WidgetControlKind::StringMap: {
           // Gesture bindings have a closed key set, so they get one fixed row per gesture rather
@@ -1689,18 +1604,11 @@ namespace settings {
         }
         case WidgetControlKind::Select: {
           SelectSetting selectSetting;
-          const std::string selectedValue = settingValueAsString(value);
+          const std::string selectedValue = widgetSettingAsString(value);
           // Font family uses the filterable search picker (catalogs can hold thousands of families).
           if (spec.schema.key == "font_family" && ctx.makeSearchPicker) {
-            std::vector<SelectOption> familyOptions;
-            familyOptions.reserve(spec.options.size());
-            for (const auto& option : spec.options) {
-              familyOptions.push_back(
-                  SelectOption{option.value, spec.literalLabels ? option.labelKey : i18n::tr(option.labelKey)}
-              );
-            }
             SearchPickerSetting picker;
-            picker.options = std::move(familyOptions);
+            picker.options = widgetSpecSelectOptions(spec);
             picker.selectedValue = selectedValue;
             picker.placeholder = ctx.config.shell.fontFamily;
             picker.emptyText = i18n::tr("ui.controls.search-picker.empty");
@@ -1715,14 +1623,7 @@ namespace settings {
                 widgetResolvedFontFamily(ctx.config, widgetName)
             );
           } else {
-            std::vector<SelectOption> options;
-            options.reserve(spec.options.size());
-            for (const auto& option : spec.options) {
-              options.push_back(
-                  SelectOption{option.value, spec.literalLabels ? option.labelKey : i18n::tr(option.labelKey)}
-              );
-            }
-            selectSetting = SelectSetting{std::move(options), selectedValue};
+            selectSetting = SelectSetting{widgetSpecSelectOptions(spec), selectedValue};
           }
           selectSetting.segmented = spec.segmented;
           selectSetting.valueType = spec.integerValue ? SelectValueType::Integer : SelectValueType::String;
@@ -1735,7 +1636,7 @@ namespace settings {
         }
         case WidgetControlKind::ColorSpec: {
           ColorSpecPickerSetting pickerSetting;
-          pickerSetting.selectedValue = settingValueAsString(value);
+          pickerSetting.selectedValue = widgetSettingAsString(value);
           pickerSetting.allowNone = spec.advanced;
           pickerSetting.allowCustomColor = spec.allowCustomColor;
           ctx.makeRow(*panel, entry, ctx.makeColorSpecPicker(pickerSetting, path));

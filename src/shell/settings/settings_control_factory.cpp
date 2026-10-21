@@ -22,6 +22,7 @@
 #include "ui/controls/stepper.h"
 #include "ui/controls/toggle.h"
 #include "ui/dialogs/file_dialog.h"
+#include "ui/dialogs/glyph_picker_dialog.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 #include "util/string_utils.h"
@@ -897,6 +898,45 @@ namespace settings {
       );
     }
     return control;
+  }
+
+  std::unique_ptr<Flex> SettingsControlFactory::makeGlyphText(
+      const std::string& value, std::vector<std::string> path, const std::string& placeholder, float width,
+      bool rebuildAfterPick
+  ) {
+    const float scale = m_scale;
+    return ui::row(
+        {.align = FlexAlign::Center, .gap = Style::spaceSm * scale}, makeText(value, placeholder, path, width),
+        ui::button({
+            .glyph = "apps",
+            .glyphSize = Style::fontSizeBody * scale,
+            .variant = ButtonVariant::Default,
+            .minWidth = Style::controlHeight * scale,
+            .minHeight = Style::controlHeight * scale,
+            .paddingV = Style::spaceXs * scale,
+            .paddingH = Style::spaceSm * scale,
+            .radius = Style::scaledRadiusMd(scale),
+            .onClick = [setOverride = m_ctx.setOverride,
+                        requestRebuild = rebuildAfterPick ? m_ctx.requestRebuild : std::function<void()>{}, path,
+                        value]() {
+              GlyphPickerDialogOptions options;
+              if (!value.empty()) {
+                options.initialGlyph = value;
+              }
+              (void)GlyphPickerDialog::open(
+                  std::move(options), [setOverride, requestRebuild, path](std::optional<GlyphPickerResult> result) {
+                    if (!result.has_value()) {
+                      return;
+                    }
+                    setOverride(path, result->name);
+                    if (requestRebuild) {
+                      requestRebuild();
+                    }
+                  }
+              );
+            },
+        })
+    );
   }
 
   std::unique_ptr<Input> SettingsControlFactory::makeText(

@@ -367,66 +367,6 @@ namespace settings {
 
     // ── Per-plugin settings editor ─────────────────────────────────────────
 
-    std::string valueAsString(const WidgetSettingValue& value) {
-      if (const auto* s = std::get_if<std::string>(&value)) {
-        return *s;
-      }
-      if (const auto* b = std::get_if<bool>(&value)) {
-        return *b ? "true" : "false";
-      }
-      if (const auto* i = std::get_if<std::int64_t>(&value)) {
-        return std::to_string(*i);
-      }
-      if (const auto* d = std::get_if<double>(&value)) {
-        return std::to_string(*d);
-      }
-      return {};
-    }
-
-    std::vector<std::string> valueAsStringList(const WidgetSettingValue& value) {
-      if (const auto* v = std::get_if<std::vector<std::string>>(&value)) {
-        return *v;
-      }
-      return {};
-    }
-
-    WidgetSettingStringMap valueAsStringMap(const WidgetSettingValue& value) {
-      if (const auto* map = std::get_if<WidgetSettingStringMap>(&value)) {
-        return *map;
-      }
-      return {};
-    }
-
-    bool valueAsBool(const WidgetSettingValue& value) {
-      if (const auto* b = std::get_if<bool>(&value)) {
-        return *b;
-      }
-      if (const auto* i = std::get_if<std::int64_t>(&value)) {
-        return *i != 0;
-      }
-      return false;
-    }
-
-    std::int64_t valueAsInt(const WidgetSettingValue& value) {
-      if (const auto* i = std::get_if<std::int64_t>(&value)) {
-        return *i;
-      }
-      if (const auto* d = std::get_if<double>(&value)) {
-        return static_cast<std::int64_t>(std::llround(*d));
-      }
-      return 0;
-    }
-
-    double valueAsDouble(const WidgetSettingValue& value) {
-      if (const auto* d = std::get_if<double>(&value)) {
-        return *d;
-      }
-      if (const auto* i = std::get_if<std::int64_t>(&value)) {
-        return static_cast<double>(*i);
-      }
-      return 0.0;
-    }
-
     // Current value for a plugin setting: the override if present, else the manifest default.
     WidgetSettingValue
     pluginSettingValue(const Config& cfg, const std::string& pluginId, const WidgetSettingSpec& spec) {
@@ -453,7 +393,7 @@ namespace settings {
         if (depIt == allSpecs.end()) {
           return {};
         }
-        return valueAsString(pluginSettingValue(cfg, pluginId, *depIt));
+        return widgetSettingAsString(pluginSettingValue(cfg, pluginId, *depIt));
       };
       const auto matches = [&](const WidgetSettingVisibilityCondition& cond) {
         if (cond.nonEmpty) {
@@ -491,13 +431,13 @@ namespace settings {
         if (const auto* defaultBool = std::get_if<bool>(&spec.schema.defaultValue)) {
           clearWhenValue = *defaultBool;
         }
-        return factory.makeToggle(valueAsBool(value), true, path, clearWhenValue);
+        return factory.makeToggle(widgetSettingAsBool(value), true, path, clearWhenValue);
       }
       case WidgetControlKind::Int: {
         const double minValue = spec.schema.minValue.value_or(0.0);
         const double maxValue = spec.schema.maxValue.value_or(100.0);
         return factory.makeSlider(
-            static_cast<double>(valueAsInt(value)), minValue, maxValue, spec.schema.step.value_or(1.0), path,
+            static_cast<double>(widgetSettingAsInt(value)), minValue, maxValue, spec.schema.step.value_or(1.0), path,
             /*integerValue=*/true
         );
       }
@@ -505,18 +445,11 @@ namespace settings {
         const double minValue = spec.schema.minValue.value_or(0.0);
         const double maxValue = spec.schema.maxValue.value_or(1.0);
         return factory.makeSlider(
-            valueAsDouble(value), minValue, maxValue, spec.schema.step.value_or(1.0), path, false
+            widgetSettingAsDouble(value), minValue, maxValue, spec.schema.step.value_or(1.0), path, false
         );
       }
       case WidgetControlKind::Select: {
-        std::vector<SelectOption> options;
-        options.reserve(spec.options.size());
-        for (const auto& option : spec.options) {
-          options.push_back(
-              SelectOption{option.value, spec.literalLabels ? option.labelKey : i18n::tr(option.labelKey)}
-          );
-        }
-        SelectSetting selectSetting{std::move(options), valueAsString(value)};
+        SelectSetting selectSetting{widgetSpecSelectOptions(spec), widgetSettingAsString(value)};
         selectSetting.segmented = spec.segmented;
         if (spec.schema.type == noctalia::config::schema::WidgetSettingType::Bool) {
           selectSetting.valueType = SelectValueType::Boolean;
@@ -528,7 +461,7 @@ namespace settings {
       }
       case WidgetControlKind::ColorSpec: {
         ColorSpecPickerSetting pickerSetting;
-        pickerSetting.selectedValue = valueAsString(value);
+        pickerSetting.selectedValue = widgetSettingAsString(value);
         pickerSetting.allowNone = spec.advanced;
         pickerSetting.allowCustomColor = spec.allowCustomColor;
         return factory.makeColorSpecPicker(pickerSetting, path);
@@ -540,7 +473,7 @@ namespace settings {
       case WidgetControlKind::Folder:
         return factory.makePathBrowse(
             TextSetting{
-                .value = valueAsString(value),
+                .value = widgetSettingAsString(value),
                 .placeholder = {},
                 .width = 190.0F,
                 .browseMode = spec.control == WidgetControlKind::Folder ? TextSettingBrowseMode::SelectFolder
@@ -550,43 +483,11 @@ namespace settings {
             },
             path
         );
-      case WidgetControlKind::Glyph: {
-        const std::string currentValue = valueAsString(value);
-        auto textNode = factory.makeText(currentValue, {}, path);
-        return ui::row(
-            {
-                .align = FlexAlign::Center,
-                .gap = Style::spaceSm * factory.scale(),
-            },
-            std::move(textNode),
-            ui::button({
-                .glyph = "apps",
-                .glyphSize = Style::fontSizeBody * factory.scale(),
-                .variant = ButtonVariant::Default,
-                .minWidth = Style::controlHeight * factory.scale(),
-                .minHeight = Style::controlHeight * factory.scale(),
-                .paddingV = Style::spaceXs * factory.scale(),
-                .paddingH = Style::spaceSm * factory.scale(),
-                .radius = Style::scaledRadiusMd(factory.scale()),
-                .onClick = [setOverride = factory.context().setOverride, path, currentValue]() {
-                  GlyphPickerDialogOptions options;
-                  if (!currentValue.empty()) {
-                    options.initialGlyph = currentValue;
-                  }
-                  (void)GlyphPickerDialog::open(
-                      std::move(options), [setOverride, path](std::optional<GlyphPickerResult> result) {
-                        if (result.has_value()) {
-                          setOverride(path, result->name);
-                        }
-                      }
-                  );
-                },
-            })
-        );
-      }
+      case WidgetControlKind::Glyph:
+        return factory.makeGlyphText(widgetSettingAsString(value), path);
       case WidgetControlKind::String:
       default:
-        return factory.makeText(valueAsString(value), {}, path);
+        return factory.makeText(widgetSettingAsString(value), {}, path);
       }
     }
 
@@ -655,12 +556,12 @@ namespace settings {
           .searchText = {},
       };
       if (spec.control == WidgetControlKind::StringList) {
-        factory.makeListBlock(body, entry, ListSetting{.items = valueAsStringList(value)});
+        factory.makeListBlock(body, entry, ListSetting{.items = widgetSettingAsStringList(value)});
       } else if (spec.control == WidgetControlKind::StringMap) {
         factory.makeStringMapBlock(
             body, entry,
             StringMapSetting{
-                .entries = valueAsStringMap(value),
+                .entries = widgetSettingAsStringMap(value),
                 .keyPlaceholder = i18n::tr("settings.widgets.map-placeholders.key"),
                 .valuePlaceholder = i18n::tr("settings.widgets.map-placeholders.value"),
             }

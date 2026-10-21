@@ -69,6 +69,12 @@ namespace settings {
 
     [[nodiscard]] std::unique_ptr<Node> makePathBrowse(const TextSetting& setting, std::vector<std::string> path);
 
+    // A glyph-name field with a button that opens the glyph picker; picking one stores its name.
+    [[nodiscard]] std::unique_ptr<Flex> makeGlyphText(
+        const std::string& value, std::vector<std::string> path, const std::string& placeholder = {},
+        float width = 0.0F, bool rebuildAfterPick = false
+    );
+
     [[nodiscard]] std::unique_ptr<Input>
     makeOptionalNumber(const OptionalNumberSetting& setting, std::vector<std::string> path);
 

@@ -152,6 +152,19 @@ namespace settings {
   // `config` resolves a plugin [[widget]] type to its manifest-driven settings, and supplies the
   // discriminator for types whose gesture defaults depend on a setting (a volume widget bound to
   // the microphone). May be null when neither applies.
+  // A setting value read as one type; numbers convert between int and double, and anything else
+  // reads as the type's empty value.
+  [[nodiscard]] std::string widgetSettingAsString(const WidgetSettingValue& value);
+  [[nodiscard]] std::vector<std::string> widgetSettingAsStringList(const WidgetSettingValue& value);
+  [[nodiscard]] WidgetSettingStringMap widgetSettingAsStringMap(const WidgetSettingValue& value);
+  [[nodiscard]] bool widgetSettingAsBool(const WidgetSettingValue& value);
+  [[nodiscard]] std::int64_t widgetSettingAsInt(const WidgetSettingValue& value);
+  [[nodiscard]] double widgetSettingAsDouble(const WidgetSettingValue& value);
+
+  struct SelectOption;
+  // A Select spec's options as select-control options, labels translated unless the spec's are literal.
+  [[nodiscard]] std::vector<SelectOption> widgetSpecSelectOptions(const WidgetSettingSpec& spec);
+
   [[nodiscard]] std::vector<WidgetSettingSpec> widgetSettingSpecs(
       std::string_view type, const WidgetConfig* config, std::string_view shellFontFamily,
       bool populateFontCatalogs = true

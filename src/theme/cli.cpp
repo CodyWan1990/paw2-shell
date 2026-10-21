@@ -416,7 +416,7 @@ namespace paw2shell::theme {
     }
 
     if (!imagePath && !themeJsonPath) {
-      std::println(stderr, "error: theme requires an image path or --theme-json (try: noctalia theme --help)");
+      std::println(stderr, "error: theme requires an image path or --theme-json (try: paw2-shell theme --help)");
       return 1;
     }
 

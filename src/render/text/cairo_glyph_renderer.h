@@ -21,7 +21,7 @@ struct Color;
 struct Mat3;
 
 // Direct FreeType + Cairo renderer for single codepoints in a dedicated font
-// (noctalia-tabler.ttf icon font). No Pango, no shaping, no fallback — the icon font
+// (paw2-tabler.ttf icon font). No Pango, no shaping, no fallback — the icon font
 // MUST be used, never substituted.
 class CairoGlyphRenderer {
 public:

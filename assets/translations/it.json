@@ -885,12 +885,12 @@
       "calendar-reminder-open": "Apri",
       "calendar-reminder-untitled": "Evento senza titolo",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "Aggiorna {path} nel source file. Noctalia applica questa sostituzione solo temporaneamente. Esegui noctalia config validate per elencare tutte le modifiche richieste.",
+      "config-migration-body": "Aggiorna {path} nel source file. paw2-shell applica questa sostituzione solo temporaneamente. Esegui paw2-shell config validate per elencare tutte le modifiche richieste.",
       "config-migration-title": "È necessario l'aggiornamento della configurazione",
       "dbus-disabled": "Notifiche DBus disabilitate",
       "desktop-widgets-editor": "Editor widget",
       "desktop-widgets-editor-enabled": "L'editor dei widget desktop è attivo. Passa a un'area di lavoro vuota in modo che le finestre aperte non coprano l'editor.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Questa scorciatoia accetta un singolo tasto senza modificatori.",
       "keybind-invalid-printable": "I tasti stampabili (lettere, numeri, simboli) richiedono un modificatore come Ctrl o Alt.",
       "keybind-invalid-super": "Il tasto Super/Windows non può essere usato nelle scorciatoie della shell.",
@@ -1675,7 +1675,7 @@
           "label": "Arrotondamento angoli"
         },
         "custom-palette": {
-          "description": "Scegli una palette da ~/.config/noctalia/palettes/",
+          "description": "Scegli una palette da ~/.config/paw2-shell/palettes/",
           "label": "Palette personalizzata",
           "search-placeholder": "Cerca palette personalizzate..."
         },
@@ -1719,7 +1719,7 @@
           "label": "Nero puro"
         },
         "shell-theme-mode": {
-          "description": "Fissa la modalità chiara o scura di Noctalia; Segui la mantiene sincronizzata con la Modalità Tema.",
+          "description": "Fissa la modalità chiara o scura di paw2-shell; Segui la mantiene sincronizzata con la Modalità Tema.",
           "label": "Modalità tema Shell"
         },
         "show-close-buttons": {
@@ -2169,7 +2169,7 @@
             "label": "Allo spegnimento"
           },
           "started": {
-            "description": "Comando da eseguire dopo l'avvio di Noctalia",
+            "description": "Comando da eseguire dopo l'avvio di paw2-shell",
             "label": "All'avvio"
           },
           "theme-mode-changed": {
@@ -2574,7 +2574,7 @@
           "label": "Mostra Pulsante Sessione"
         },
         "launcher-show-settings-button": {
-          "description": "Mostra una scorciatoia per le Impostazioni Noctalia",
+          "description": "Mostra una scorciatoia per le Impostazioni paw2-shell",
           "label": "Mostra Pulsante Impostazioni"
         },
         "launcher-sort-by-usage": {
@@ -2802,7 +2802,7 @@
           "placeholder": "Città, Paese"
         },
         "location-auto-locate": {
-          "description": "Rileva automaticamente la tua posizione in base al tuo indirizzo IP via noctalia.dev",
+          "description": "Rileva automaticamente la tua posizione in base al tuo indirizzo IP via ipapi.co",
           "label": "Localizzazione automatica (IP)"
         },
         "longitude": {
@@ -3046,7 +3046,7 @@
           "label": "Formato data"
         },
         "external-ip": {
-          "description": "Risolvi l'IP WAN pubblico della connessione (tramite api.noctalia.dev) e mostralo nella scheda rete del Control Center",
+          "description": "Risolvi l'IP WAN pubblico della connessione (tramite api.ipify.org) e mostralo nella scheda rete del Control Center",
           "label": "Mostra IP WAN"
         },
         "keyboard-layout-custom-labels": {
@@ -3054,9 +3054,9 @@
           "label": "Etichette del layout della tastiera"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Avvia le applicazioni in servizi systemd separati così non condividono il cgroup di Noctalia",
+          "description": "Avvia le applicazioni in servizi systemd separati così non condividono il cgroup di paw2-shell",
           "label": "Avvia app come servizi systemd",
-          "requires-systemd-session": "Richiede che Noctalia venga eseguito come servizio utente systemd (uwsm o unità utente systemd)"
+          "requires-systemd-session": "Richiede che paw2-shell venga eseguito come servizio utente systemd (uwsm o unità utente systemd)"
         },
         "launch-apps-custom-command": {
           "description": "Comprende le app avviate dal launcher, dal dock e dalla barra delle applicazioni; sostituisce $CMD con il comando originale",
@@ -3634,10 +3634,6 @@
             "description": "Imposta il profilo di output o di input di EasyEffects",
             "label": "Imposta il profilo EasyEffects"
           },
-          "greeter-sync": {
-            "description": "Sincronizza lo sfondo, i colori e il layout del monitor con Noctalia Greeter.",
-            "label": "Sincronizza l'aspetto del greeter"
-          },
           "keyboard-backlight-down": {
             "description": "Riduci di un livello la retroilluminazione della tastiera",
             "label": "Riduci retroilluminazione tastiera"
@@ -3751,7 +3747,7 @@
             "label": "Richiama l'ultima azione di notifica"
           },
           "notification-show": {
-            "description": "Mostra una notifica interna di Noctalia",
+            "description": "Mostra una notifica interna di paw2-shell",
             "label": "Mostra una notifica"
           },
           "osd-disable": {
@@ -4678,8 +4674,8 @@
       "export-config": "Esporta configurazione...",
       "export-config-saved": "Esportazione configurazione salvata.",
       "filter-overridden": "Sovrascritto",
-      "legacy-config-warning": "Impostazione legacy: {issue}. Modifica questa voce; Noctalia applica la sostituzione solo temporaneamente. Esegui noctalia config validate per elencare tutte le modifiche richieste.",
-      "native-title": "Impostazioni Noctalia",
+      "legacy-config-warning": "Impostazione legacy: {issue}. Modifica questa voce; paw2-shell applica la sostituzione solo temporaneamente. Esegui paw2-shell config validate per elencare tutte le modifiche richieste.",
+      "native-title": "Impostazioni paw2-shell",
       "no-results": "Nessuna impostazione trovata",
       "no-results-hint": "Prova un nome impostazione o una chiave configurazione diversa.",
       "offline-mode-notice": {

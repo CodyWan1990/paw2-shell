@@ -48,7 +48,7 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-template-notify-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-template-notify-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
   std::filesystem::create_directories(root / "config");
   std::filesystem::create_directories(root / "state");

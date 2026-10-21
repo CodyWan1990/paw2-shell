@@ -853,12 +853,12 @@
       "calendar-reminder-open": "Відкрити",
       "calendar-reminder-untitled": "Подія без назви",
       "calendar-reminder-with-location": "",
-      "config-migration-body": "Оновіть {path} у вихідному файлі. Noctalia застосовує цю заміну лише тимчасово. Виконайте команду \"noctalia config validate\", щоб переглянути всі необхідні зміни.",
+      "config-migration-body": "Оновіть {path} у вихідному файлі. paw2-shell застосовує цю заміну лише тимчасово. Виконайте команду \"paw2-shell config validate\", щоб переглянути всі необхідні зміни.",
       "config-migration-title": "Потрібно оновити конфігурацію",
       "dbus-disabled": "Сповіщення DBus вимкнено",
       "desktop-widgets-editor": "Редактор віджетів",
       "desktop-widgets-editor-enabled": "Редактор віджетів робочого столу увімкнено. Перейди на порожній робочий простір, щоб побачити оверлей редактора.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Це поєднання клавіш приймає одну клавішу без модифікаторів.",
       "keybind-invalid-printable": "Клавіші з друкованими символами (літери, цифри тощо) працюватимуть лише з модифікатором, як-от Ctrl або Alt.",
       "keybind-invalid-super": "Клавіша Super/Windows не може бути використана у прив'язках клавіш оболонки.",
@@ -1607,7 +1607,7 @@
           "label": "Закруглення кутів"
         },
         "custom-palette": {
-          "description": "Обери палітру з ~/.config/noctalia/palettes/",
+          "description": "Обери палітру з ~/.config/paw2-shell/palettes/",
           "label": "Користувацька палітра",
           "search-placeholder": "Пошук власних палітр..."
         },
@@ -2045,7 +2045,7 @@
             "label": "При вимкненні"
           },
           "started": {
-            "description": "Команда для запуску після старту Noctalia",
+            "description": "Команда для запуску після старту paw2-shell",
             "label": "При запуску"
           },
           "theme-mode-changed": {
@@ -2371,7 +2371,7 @@
           "placeholder": "Місто, Країна"
         },
         "location-auto-locate": {
-          "description": "Визначати ваше місцеперебування автоматично за IP-адресою через сайт noctalia.dev",
+          "description": "Визначати ваше місцеперебування автоматично за IP-адресою через сайт ipapi.co",
           "label": "Автовизначення (IP)"
         },
         "longitude": {
@@ -2571,7 +2571,7 @@
           "label": "Формат дати"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Запускає програми в окремих службах systemd, щоб вони не ділили cgroup Noctalia",
+          "description": "Запускає програми в окремих службах systemd, щоб вони не ділили cgroup paw2-shell",
           "label": "Запускати програми як служби systemd"
         },
         "niri-overview-type-to-launch": {
@@ -3379,7 +3379,7 @@
       "export-config": "Експортувати конфігурацію…",
       "export-config-saved": "Конфігурацію експортовано.",
       "filter-overridden": "Змінені",
-      "native-title": "Параметри Noctalia",
+      "native-title": "Параметри paw2-shell",
       "no-results": "Параметр не знайдено",
       "no-results-hint": "Спробуйте іншу назву налаштування або config key.",
       "offline-mode-notice": {

@@ -208,8 +208,8 @@ namespace paw2shell::config {
 
       const std::filesystem::path configHome = target / "config-home";
       const std::filesystem::path stateHome = target / "state-home";
-      const std::filesystem::path configDir = configHome / "noctalia";
-      const std::filesystem::path stateDir = stateHome / "noctalia";
+      const std::filesystem::path configDir = configHome / "paw2-shell";
+      const std::filesystem::path stateDir = stateHome / "paw2-shell";
 
       if (options.force) {
         std::error_code ec;
@@ -472,7 +472,7 @@ namespace paw2shell::config {
     }
 
     std::println(stderr, "error: unknown command: {}", argv[2]);
-    std::println(stderr, "Run 'noctalia config --help' for usage.");
+    std::println(stderr, "Run 'paw2-shell config --help' for usage.");
     return 1;
   }
 

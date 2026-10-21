@@ -734,12 +734,12 @@
       "battery-low-body": "{device}: {percent}% restant",
       "battery-low-title": "Bateria baixa",
       "calendar": "Calendari",
-      "config-migration-body": "Actualitza {path} al fitxer font. Noctalia només aplica aquest canvi temporalment. Executa noctalia config validate per veure tots els canvis necessaris.",
+      "config-migration-body": "Actualitza {path} al fitxer font. paw2-shell només aplica aquest canvi temporalment. Executa paw2-shell config validate per veure tots els canvis necessaris.",
       "config-migration-title": "Cal actualitzar la configuració",
       "dbus-disabled": "Notificacions DBus desactivades",
       "desktop-widgets-editor": "Editor de widgets",
       "desktop-widgets-editor-enabled": "L'editor de ginys d'escriptori està activat. Canvia a un espai de treball buit perquè les finestres obertes no cobreixin l'editor.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Aquesta drecera accepta una sola tecla sense modificadors.",
       "keybind-invalid-printable": "Les tecles imprimibles (lletres, números, símbols) requereixen un modificador com Ctrl o Alt.",
       "keybind-invalid-super": "La tecla Super/Windows no es pot utilitzar a les dreceres del shell.",
@@ -1460,7 +1460,7 @@
           "label": "Arrodoniment de cantonades"
         },
         "custom-palette": {
-          "description": "Tria una paleta de ~/.config/noctalia/palettes/",
+          "description": "Tria una paleta de ~/.config/paw2-shell/palettes/",
           "label": "Paleta personalitzada",
           "search-placeholder": "Cerca paletes personalitzades…"
         },
@@ -1930,7 +1930,7 @@
             "label": "En apagar"
           },
           "started": {
-            "description": "Ordre a executar després que el Noctalia s'iniciï",
+            "description": "Ordre a executar després que el paw2-shell s'iniciï",
             "label": "En iniciar"
           },
           "theme-mode-changed": {
@@ -2447,7 +2447,7 @@
           "placeholder": "Ciutat, País"
         },
         "location-auto-locate": {
-          "description": "Detecta la teva ubicació automàticament a partir de la teva adreça IP mitjançant noctalia.dev",
+          "description": "Detecta la teva ubicació automàticament a partir de la teva adreça IP mitjançant ipapi.co",
           "label": "Auto-localització (IP)"
         },
         "longitude": {
@@ -2670,7 +2670,7 @@
           "label": "Format de data"
         },
         "external-ip": {
-          "description": "Resol la IP WAN pública de la connexió (mitjançant api.noctalia.dev) i mostra-la a la pestanya de xarxa del Centre de control",
+          "description": "Resol la IP WAN pública de la connexió (mitjançant api.ipify.org) i mostra-la a la pestanya de xarxa del Centre de control",
           "label": "Mostra la IP WAN"
         },
         "keyboard-layout-custom-labels": {
@@ -2678,9 +2678,9 @@
           "label": "Etiquetes de disposició del teclat"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Llança aplicacions en serveis systemd separats perquè no comparteixin el cgroup del Noctalia",
+          "description": "Llança aplicacions en serveis systemd separats perquè no comparteixin el cgroup del paw2-shell",
           "label": "Llança aplicacions com a serveis systemd",
-          "requires-systemd-session": "Requereix que Noctalia s'executi com un servei d'usuari de systemd (uwsm o una unitat d'usuari de systemd)"
+          "requires-systemd-session": "Requereix que paw2-shell s'executi com un servei d'usuari de systemd (uwsm o una unitat d'usuari de systemd)"
         },
         "launch-apps-custom-command": {
           "description": "Envolta les aplicacions iniciades des del llançador, el dock i la barra de tasques; substitueix $CMD per l'ordre original",
@@ -3733,8 +3733,8 @@
       "export-config": "Exporta la configuració…",
       "export-config-saved": "Exportació de la configuració desada.",
       "filter-overridden": "Sobreescrit",
-      "legacy-config-warning": "Configuració obsoleta: {issue}. Edita aquesta entrada font; Noctalia només aplica aquest canvi temporalment. Executa noctalia config validate per veure tots els canvis necessaris.",
-      "native-title": "Configuració del Noctalia",
+      "legacy-config-warning": "Configuració obsoleta: {issue}. Edita aquesta entrada font; paw2-shell només aplica aquest canvi temporalment. Executa paw2-shell config validate per veure tots els canvis necessaris.",
+      "native-title": "Configuració del paw2-shell",
       "no-results": "No s'han trobat paràmetres",
       "no-results-hint": "Prova amb un nom de paràmetre o una clau de configuració diferent.",
       "offline-mode-notice": {

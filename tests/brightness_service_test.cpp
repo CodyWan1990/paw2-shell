@@ -161,7 +161,7 @@ namespace {
   public:
     DdcExecutable(std::string_view mode, int outputCount) {
       std::array<char, 64> directory{};
-      constexpr std::string_view pattern = "/tmp/noctalia-brightness-test.XXXXXX";
+      constexpr std::string_view pattern = "/tmp/paw2-shell-brightness-test.XXXXXX";
       std::ranges::copy(pattern, directory.begin());
       TEST_CHECK(mkdtemp(directory.data()) != nullptr);
       m_directory = directory.data();

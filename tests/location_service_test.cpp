@@ -35,7 +35,7 @@ namespace {
 
 int main() {
   const auto root =
-      std::filesystem::temp_directory_path() / ("noctalia-location-service-test-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-location-service-test-" + std::to_string(::getpid()));
   const auto configHome = root / "config";
   const auto stateHome = root / "state";
   const auto cacheHome = root / "cache";

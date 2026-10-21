@@ -44,7 +44,7 @@ namespace {
   };
 
   void checkGroupHelp() {
-    const std::string expected = "Usage: noctalia tools <command> [options]\n"
+    const std::string expected = "Usage: paw2-shell tools <command> [options]\n"
                                  "\n"
                                  "Manage offline tools.\n"
                                  "\n"
@@ -55,11 +55,11 @@ namespace {
                                  "Options:\n"
                                  "      --verbose  Enable verbose output\n"
                                  "  -h, --help     Show this help message\n";
-    TEST_CHECK(paw2shell::cli::renderHelp(kGroup, "noctalia tools") == expected);
+    TEST_CHECK(paw2shell::cli::renderHelp(kGroup, "paw2-shell tools") == expected);
   }
 
   void checkLeafHelp() {
-    const std::string expected = "Usage: noctalia convert <input> [kind] [options]\n"
+    const std::string expected = "Usage: paw2-shell convert <input> [kind] [options]\n"
                                  "\n"
                                  "Convert a source file.\n"
                                  "\n"
@@ -76,7 +76,7 @@ namespace {
                                  "  -h, --help         Show this help message\n"
                                  "\n"
                                  "See https://example.test for details.\n";
-    TEST_CHECK(paw2shell::cli::renderHelp(kLeaf, "noctalia convert") == expected);
+    TEST_CHECK(paw2shell::cli::renderHelp(kLeaf, "paw2-shell convert") == expected);
     TEST_CHECK(paw2shell::cli::renderArgsSpec(kLeaf) == "<input> [kind] [options]");
     TEST_CHECK(paw2shell::cli::renderArgsSpec(kGroup) == "<{zeta|alpha}> ...");
   }

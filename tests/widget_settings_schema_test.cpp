@@ -41,7 +41,7 @@ int main() {
   }
 
   // paw2-shell's editor order: Look (style, color, underline width) first and basic, then the
-  // widget's own options, then Noctalia's fine-tuning behind Advanced.
+  // widget's own options, then fine-tuning behind Advanced.
   {
     const auto specs = settings::widgetSettingSpecs("volume", nullptr, "sans-serif", false);
     std::vector<const settings::WidgetSettingSpec*> shown;

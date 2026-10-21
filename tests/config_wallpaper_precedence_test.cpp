@@ -26,7 +26,7 @@ namespace {
   // is written for the first time.
   void checkConfigSurvivesFirstSidecarWrite() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-config-file-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("paw2-shell-wallpaper-config-file-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
@@ -62,7 +62,7 @@ namespace {
   // State settings loads last, so it should outranks config.toml
   void checkSidecarPathOutranksConfigFilePath() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-sidecar-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("paw2-shell-wallpaper-sidecar-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
@@ -97,7 +97,7 @@ namespace {
   // pathStringField). Regression guard: wallpaper.directory must expand $VARS.
   void checkDirectoryExpandsEnvVars() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-envvar-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("paw2-shell-wallpaper-envvar-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
@@ -129,7 +129,7 @@ namespace {
   // one with an explicit theme_mode must restore it.
   void checkFavoriteThemeModeOverride() {
     const std::filesystem::path root =
-        std::filesystem::temp_directory_path() / ("noctalia-wallpaper-favorite-" + std::to_string(::getpid()));
+        std::filesystem::temp_directory_path() / ("paw2-shell-wallpaper-favorite-" + std::to_string(::getpid()));
     std::filesystem::remove_all(root);
     std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
     std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);

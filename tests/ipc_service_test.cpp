@@ -17,7 +17,7 @@
 namespace {
 
   std::filesystem::path makeTempDir() {
-    std::string pattern = (std::filesystem::temp_directory_path() / "noctalia-ipc-service-XXXXXX").string();
+    std::string pattern = (std::filesystem::temp_directory_path() / "paw2-shell-ipc-service-XXXXXX").string();
     std::vector<char> buffer(pattern.begin(), pattern.end());
     buffer.push_back('\0');
     char* result = ::mkdtemp(buffer.data());
@@ -71,7 +71,7 @@ namespace {
 int main() {
   const auto runtimeDir = makeTempDir();
   TEST_CHECK(!runtimeDir.empty());
-  constexpr const char* kWaylandDisplay = "noctalia-ipc-service-test";
+  constexpr const char* kWaylandDisplay = "paw2-shell-ipc-service-test";
   TEST_CHECK(::setenv("XDG_RUNTIME_DIR", runtimeDir.c_str(), 1) == 0);
   TEST_CHECK(::setenv("WAYLAND_DISPLAY", kWaylandDisplay, 1) == 0);
 

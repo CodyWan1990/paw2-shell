@@ -672,7 +672,7 @@
       "dbus-disabled": "DBus oznámení jsou vypnuta",
       "desktop-widgets-editor": "Editor widgetů",
       "desktop-widgets-editor-enabled": "Editor desktopových widgetů je zapnutý. Přepněte na prázdnou plochu pro zobrazení překryvu editoru.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Tato zkratka přijímá pouze jednu klávesu bez modifikátorů.",
       "keybind-invalid-printable": "Tisknutelné klávesy (písmena, čísla, symboly) vyžadují modifikátor jako Ctrl nebo Alt.",
       "keybind-invalid-super": "Klávesu Super/Windows nelze použít v klávesových zkratkách shellu.",
@@ -1291,7 +1291,7 @@
           "label": "Zaoblení rohů"
         },
         "custom-palette": {
-          "description": "Vybrat paletu z ~/.config/noctalia/palettes/",
+          "description": "Vybrat paletu z ~/.config/paw2-shell/palettes/",
           "label": "Vlastní paleta",
           "search-placeholder": "Hledat vlastní palety..."
         },
@@ -2060,7 +2060,7 @@
           "placeholder": "Město, Země"
         },
         "location-auto-locate": {
-          "description": "Automaticky zjistit vaši polohu z IP adresy přes noctalia.dev",
+          "description": "Automaticky zjistit vaši polohu z IP adresy přes ipapi.co",
           "label": "Automatická lokalizace (IP)"
         },
         "longitude": {
@@ -3086,7 +3086,7 @@
     "window": {
       "export-config": "Exportovat konfiguraci…",
       "export-config-saved": "Export konfigurace uložen.",
-      "native-title": "Nastavení Noctalia",
+      "native-title": "Nastavení paw2-shell",
       "no-results": "Nebyla nalezena žádná nastavení",
       "no-results-hint": "Zkuste jiný název nastavení nebo klíč konfigurace.",
       "reset-page": "Obnovit stránku",

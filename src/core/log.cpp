@@ -281,7 +281,7 @@ void initLogFile() {
   if (cacheHome != nullptr && cacheHome[0] != '\0') {
     dir = std::string(cacheHome) + "/" + FileUtils::kAppDirName;
   } else if (home != nullptr && home[0] != '\0') {
-    dir = std::string(home) + "/.cache/noctalia";
+    dir = std::string(home) + "/.cache/paw2-shell";
   } else {
     return; // no writable location available
   }

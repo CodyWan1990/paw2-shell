@@ -863,12 +863,12 @@
       "calendar-reminder-open": "Открыть",
       "calendar-reminder-untitled": "Событие без названия",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "Обновите {path} в исходном файле. Noctalia применяет эту замену временно. Выполните «noctalia config validate», чтобы просмотреть список всех необходимых изменений.",
+      "config-migration-body": "Обновите {path} в исходном файле. paw2-shell применяет эту замену временно. Выполните «paw2-shell config validate», чтобы просмотреть список всех необходимых изменений.",
       "config-migration-title": "Требуется обновление конфигурации",
       "dbus-disabled": "DBus-уведомления отключены",
       "desktop-widgets-editor": "Редактор виджетов",
       "desktop-widgets-editor-enabled": "Редактор виджетов рабочего стола включён. Переключитесь на пустое рабочее пространство, чтобы открытые окна не перекрывали редактор.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Это сочетание клавиш принимает одну клавишу без модификаторов.",
       "keybind-invalid-printable": "Печатные клавиши (буквы, цифры, символы) требуют модификатор, например Ctrl или Alt.",
       "keybind-invalid-super": "Клавишу Super/Windows нельзя использовать в сочетаниях клавиш командной строки.",
@@ -1625,7 +1625,7 @@
           "label": "Скругление углов"
         },
         "custom-palette": {
-          "description": "Выберите палитру из ~/.config/noctalia/palettes/",
+          "description": "Выберите палитру из ~/.config/paw2-shell/palettes/",
           "label": "Пользовательская палитра",
           "search-placeholder": "Поиск пользовательских палитр…"
         },
@@ -1669,8 +1669,8 @@
           "label": "Чистый черный цвет"
         },
         "shell-theme-mode": {
-          "description": "Закрепить светлый или тёмный режим Noctalia. Вариант \"Следовать\" синхронизирует его с общим режимом темы",
-          "label": "Режим темы Noctalia"
+          "description": "Закрепить светлый или тёмный режим paw2-shell. Вариант \"Следовать\" синхронизирует его с общим режимом темы",
+          "label": "Режим темы paw2-shell"
         },
         "theme-mode": {
           "description": "Выберите тёмный, светлый или автоматический режим в зависимости от времени суток; также распространяется на приложения из шаблонов",
@@ -2111,7 +2111,7 @@
             "label": "При выключении"
           },
           "started": {
-            "description": "Команда для запуска после запуска Noctalia",
+            "description": "Команда для запуска после запуска paw2-shell",
             "label": "При запуске"
           },
           "theme-mode-changed": {
@@ -2697,7 +2697,7 @@
           "placeholder": "Город, страна"
         },
         "location-auto-locate": {
-          "description": "Автоматически определять местоположение по IP-адресу через noctalia.dev",
+          "description": "Автоматически определять местоположение по IP-адресу через ipapi.co",
           "label": "Автоматическое определение местоположения (IP)"
         },
         "longitude": {
@@ -2925,7 +2925,7 @@
           "label": "Формат даты"
         },
         "external-ip": {
-          "description": "Определять публичный WAN-адрес подключения (через api.noctalia.dev) и показывать его в Центре управления во вкладке \"Сеть\"",
+          "description": "Определять публичный WAN-адрес подключения (через api.ipify.org) и показывать его в Центре управления во вкладке \"Сеть\"",
           "label": "Показывать WAN IP"
         },
         "keyboard-layout-custom-labels": {
@@ -2933,9 +2933,9 @@
           "label": "Метки раскладки"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Запускать приложения в отдельных службах systemd, чтобы они не использовали cgroup Noctalia",
+          "description": "Запускать приложения в отдельных службах systemd, чтобы они не использовали cgroup paw2-shell",
           "label": "Запускать приложения как службы systemd",
-          "requires-systemd-session": "Требует, чтобы Noctalia работала как пользовательская служба systemd (uwsm или пользовательский юнит systemd)"
+          "requires-systemd-session": "Требует, чтобы paw2-shell работала как пользовательская служба systemd (uwsm или пользовательский юнит systemd)"
         },
         "launch-apps-custom-command": {
           "description": "Оборачивает приложения, запускаемые из лаунчера, дока и панели задач; вместо $CMD подставляется исходная команда",
@@ -3509,10 +3509,6 @@
             "description": "Установить профиль вывода или ввода EasyEffects",
             "label": "Установить профиль EasyEffects"
           },
-          "greeter-sync": {
-            "description": "Синхронизировать обои, цвета и расположение мониторов с Noctalia Greeter",
-            "label": "Синхронизировать внешний вид Greeter"
-          },
           "keyboard-backlight-down": {
             "description": "Уменьшить подсветку всех клавиатур на один уровень",
             "label": "Уменьшить подсветку клавиатуры"
@@ -3626,7 +3622,7 @@
             "label": "Выполнить действие последнего уведомления"
           },
           "notification-show": {
-            "description": "Показать внутреннее уведомление Noctalia",
+            "description": "Показать внутреннее уведомление paw2-shell",
             "label": "Показать уведомление"
           },
           "osd-disable": {
@@ -4545,8 +4541,8 @@
       "export-config": "Экспортировать конфигурацию…",
       "export-config-saved": "Экспорт конфигурации сохранён.",
       "filter-overridden": "Измененные",
-      "legacy-config-warning": "Устаревшая настройка: {issue}. Отредактируйте эту запись в исходном файле; Noctalia применяет замену только временно. Выполните «noctalia config validate», чтобы просмотреть список всех необходимых изменений.",
-      "native-title": "Настройки Noctalia",
+      "legacy-config-warning": "Устаревшая настройка: {issue}. Отредактируйте эту запись в исходном файле; paw2-shell применяет замену только временно. Выполните «paw2-shell config validate», чтобы просмотреть список всех необходимых изменений.",
+      "native-title": "Настройки paw2-shell",
       "no-results": "Настройки не найдены",
       "no-results-hint": "Попробуйте другое имя параметра или ключ конфигурации.",
       "offline-mode-notice": {

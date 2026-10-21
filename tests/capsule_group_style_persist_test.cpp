@@ -36,7 +36,7 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-group-style-persist-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-group-style-persist-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
   writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", R"(
 [bar.default]

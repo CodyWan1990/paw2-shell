@@ -22,8 +22,8 @@ namespace {
 
   std::string_view powerProfileOriginName(PowerProfilesChangeOrigin origin) {
     switch (origin) {
-    case PowerProfilesChangeOrigin::Noctalia:
-      return "noctalia";
+    case PowerProfilesChangeOrigin::Shell:
+      return "paw2-shell";
     case PowerProfilesChangeOrigin::External:
       return "external";
     }
@@ -142,7 +142,7 @@ void Application::onNetworkStateChangedForEvents(const NetworkState& state, Netw
   }
   const bool prev = *m_prevWirelessEnabledForEvents;
   if (prev != state.wirelessEnabled) {
-    if (origin != NetworkChangeOrigin::Noctalia) {
+    if (origin != NetworkChangeOrigin::Shell) {
       m_osdOverlay.show(wifiOsdContent(state.wirelessEnabled));
     }
     if (state.wirelessEnabled) {
@@ -161,7 +161,7 @@ void Application::onBluetoothStateChangedForEvents(const BluetoothState& state, 
   }
   const bool prev = *m_prevBluetoothPoweredForEvents;
   if (prev != state.powered) {
-    if (origin != BluetoothStateChangeOrigin::Noctalia) {
+    if (origin != BluetoothStateChangeOrigin::Shell) {
       m_osdOverlay.show(bluetoothOsdContent(state.powered));
     }
     if (state.powered) {
@@ -183,7 +183,7 @@ void Application::onPowerProfileChangedForEvents(const PowerProfilesState& state
   }
   const std::string prev = *m_prevPowerProfileActiveForEvents;
   if (prev != state.activeProfile) {
-    if (origin != PowerProfilesChangeOrigin::Noctalia) {
+    if (origin != PowerProfilesChangeOrigin::Shell) {
       m_osdOverlay.show(powerProfileOsdContent(state.activeProfile));
     }
     m_hookManager.fire(

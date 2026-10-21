@@ -885,12 +885,12 @@
       "calendar-reminder-open": "Abrir",
       "calendar-reminder-untitled": "Evento sem título",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "Atualize {path} no arquivo fonte. Noctalia está aplicando está substituição só temporariamente. Execute nocatlia config validade para listar cada mudança necessária.",
+      "config-migration-body": "Atualize {path} no arquivo fonte. paw2-shell está aplicando está substituição só temporariamente. Execute nocatlia config validade para listar cada mudança necessária.",
       "config-migration-title": "Atualiação de configuração necessária",
       "dbus-disabled": "Notificações DBus desabilitadas",
       "desktop-widgets-editor": "Editor de Widget",
       "desktop-widgets-editor-enabled": "O editor de widgets da área de trabalho está ligado. Mude para um espaço de trabalho vazio para que as janelas abertas não cubram o editor.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Este atalho aceita uma única tecla sem modificadores.",
       "keybind-invalid-printable": "Teclas imprimíveis (letras, números, símbolos) requerem uma tecla modificadora como Ctrl ou Alt.",
       "keybind-invalid-super": "A tecla Super/Windows não pode ser usada em atalhos de teclado do shell.",
@@ -1675,7 +1675,7 @@
           "label": "Arredondamento dos Cantos"
         },
         "custom-palette": {
-          "description": "Escolha uma paleta em ~/.config/noctalia/palettes/",
+          "description": "Escolha uma paleta em ~/.config/paw2-shell/palettes/",
           "label": "Paleta Personalizada",
           "search-placeholder": "Busque paletas personalizadas..."
         },
@@ -1719,7 +1719,7 @@
           "label": "Preto Puro"
         },
         "shell-theme-mode": {
-          "description": "Fixar modo Claro ou Escuro do Noctalia; Seguir mantém em sincronia com o Modo do Tema",
+          "description": "Fixar modo Claro ou Escuro do paw2-shell; Seguir mantém em sincronia com o Modo do Tema",
           "label": "Modo do Tema do Shell"
         },
         "show-close-buttons": {
@@ -2169,7 +2169,7 @@
             "label": "Ao Desligar"
           },
           "started": {
-            "description": "Comando para executar após o Noctalia iniciar",
+            "description": "Comando para executar após o paw2-shell iniciar",
             "label": "Ao Iniciar"
           },
           "theme-mode-changed": {
@@ -2574,7 +2574,7 @@
           "label": "Mostrar Botão de Sessão"
         },
         "launcher-show-settings-button": {
-          "description": "Mostrar um atalho nas Configurações Noctalia",
+          "description": "Mostrar um atalho nas Configurações paw2-shell",
           "label": "Mostrar Botão Configurações"
         },
         "launcher-sort-by-usage": {
@@ -3046,7 +3046,7 @@
           "label": "Formato da Data"
         },
         "external-ip": {
-          "description": "Determinar o IP público da WAN da conexão (por meio de api.noctalia.dev) e exibi-lo na guia “Rede” da Central de Controle",
+          "description": "Determinar o IP público da WAN da conexão (por meio de api.ipify.org) e exibi-lo na guia “Rede” da Central de Controle",
           "label": "Mostrar IP da WAN"
         },
         "keyboard-layout-custom-labels": {
@@ -3054,9 +3054,9 @@
           "label": "Rótulos de Layouts de Teclado"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Executa aplicativos em serviços systemd separados para que não compartilhem o cgroup do Noctalia",
+          "description": "Executa aplicativos em serviços systemd separados para que não compartilhem o cgroup do paw2-shell",
           "label": "Iniciar Apps como Serviços do Systemd",
-          "requires-systemd-session": "Requer que o Noctalia seja executado como um serviço de usuário do systemd (uwsm ou uma unidade de usuário do systemd)"
+          "requires-systemd-session": "Requer que o paw2-shell seja executado como um serviço de usuário do systemd (uwsm ou uma unidade de usuário do systemd)"
         },
         "launch-apps-custom-command": {
           "description": "Envolve apps iniciados pelo launcher, dock e taskbar; substitui $CMD pelo comando original",
@@ -3634,10 +3634,6 @@
             "description": "Definir perfil do EasyEffects de entrada ou saída",
             "label": "Definir perfil do EasyEffects"
           },
-          "greeter-sync": {
-            "description": "Sincronizar papel de parede, cores e layout de monitor como Noctalia Greeter",
-            "label": "Sincronizar aparência do greeter"
-          },
           "keyboard-backlight-down": {
             "description": "Diminuir retroiluminação de todos teclados em um nível",
             "label": "Diminuir retroiluminação de teclado"
@@ -3751,7 +3747,7 @@
             "label": "Invocar a ação mais recente de notificação"
           },
           "notification-show": {
-            "description": "Mostrar uma notificação interna de Noctalia",
+            "description": "Mostrar uma notificação interna de paw2-shell",
             "label": "Mostrar uma notificação"
           },
           "osd-disable": {
@@ -4678,8 +4674,8 @@
       "export-config": "Exportar Config...",
       "export-config-saved": "Exportação de configuração salva.",
       "filter-overridden": "Sobrescrito",
-      "legacy-config-warning": "Configurações Legadas: {issue}. Edite esta entrada na fonte; Noctalia está aplicando está substituição só temporariamente. Execute nocatlia config validade para listar cada mudança necessária.",
-      "native-title": "Configurações do Noctalia",
+      "legacy-config-warning": "Configurações Legadas: {issue}. Edite esta entrada na fonte; paw2-shell está aplicando está substituição só temporariamente. Execute nocatlia config validade para listar cada mudança necessária.",
+      "native-title": "Configurações do paw2-shell",
       "no-results": "Nenhuma configuração encontrada",
       "no-results-hint": "Tente um nome diferente de configuração ou uma tecla de config.",
       "offline-mode-notice": {

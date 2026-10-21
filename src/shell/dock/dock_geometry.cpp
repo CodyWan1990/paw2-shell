@@ -271,7 +271,7 @@ namespace shell::dock {
     const auto geometry =
         computeSurfaceGeometry(cfg, shadow, itemCount, fractionalScale, outputLogicalWidth, outputLogicalHeight);
     return LayerSurfaceConfig{
-        .nameSpace = "noctalia-dock",
+        .nameSpace = "paw2-shell-dock",
         .layer = layerShellLayerFromConfig(cfg.layer),
         .anchor = positionToAnchor(cfg.position),
         .width = geometry.surfaceW,

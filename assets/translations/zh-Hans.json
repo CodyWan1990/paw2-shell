@@ -855,12 +855,12 @@
       "calendar-reminder-open": "打开",
       "calendar-reminder-untitled": "无标题日程",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "请在源配置文件中更新 {path}。Noctalia 仅在内存中临时兼容。执行 noctalia config validate 命令查看所有必需的更改。",
+      "config-migration-body": "请在源配置文件中更新 {path}。paw2-shell 仅在内存中临时兼容。执行 paw2-shell config validate 命令查看所有必需的更改。",
       "config-migration-title": "需要更新配置",
       "dbus-disabled": "DBus 通知已禁用",
       "desktop-widgets-editor": "桌面小组件编辑器",
       "desktop-widgets-editor-enabled": "桌面小组件编辑器已开启。请切换至空工作区，避免打开的窗口遮挡编辑器。",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "该快捷键仅接受不带修饰键的单键。",
       "keybind-invalid-printable": "字母、数字和符号键需要配合 Ctrl 或 Alt 等修饰键使用。",
       "keybind-invalid-super": "Super/Windows 键无法用于 Shell 快捷键。",
@@ -1622,7 +1622,7 @@
           "label": "圆角缩放"
         },
         "custom-palette": {
-          "description": "从 ~/.config/noctalia/palettes/ 中选择配色方案",
+          "description": "从 ~/.config/paw2-shell/palettes/ 中选择配色方案",
           "label": "自定义配色方案",
           "search-placeholder": "搜索自定义配色方案…"
         },
@@ -1666,7 +1666,7 @@
           "label": "纯黑"
         },
         "shell-theme-mode": {
-          "description": "固定 Noctalia 的浅色或深色模式；选择“跟随”则与主题模式保持同步",
+          "description": "固定 paw2-shell 的浅色或深色模式；选择“跟随”则与主题模式保持同步",
           "label": "Shell 主题模式"
         },
         "theme-mode": {
@@ -2112,7 +2112,7 @@
             "label": "关机时"
           },
           "started": {
-            "description": "Noctalia 启动后执行的命令",
+            "description": "paw2-shell 启动后执行的命令",
             "label": "启动时"
           },
           "theme-mode-changed": {
@@ -2713,7 +2713,7 @@
           "placeholder": "城市, 国家"
         },
         "location-auto-locate": {
-          "description": "通过 noctalia.dev 根据 IP 地址自动定位",
+          "description": "通过 ipapi.co 根据 IP 地址自动定位",
           "label": "自动定位（IP）"
         },
         "longitude": {
@@ -2957,7 +2957,7 @@
           "label": "日期格式"
         },
         "external-ip": {
-          "description": "通过 api.noctalia.dev 解析当前连接的公网 WAN IP，并显示在控制中心的网络选项卡中",
+          "description": "通过 api.ipify.org 解析当前连接的公网 WAN IP，并显示在控制中心的网络选项卡中",
           "label": "显示 WAN IP"
         },
         "keyboard-layout-custom-labels": {
@@ -2965,9 +2965,9 @@
           "label": "键盘布局标签"
         },
         "launch-apps-as-systemd-services": {
-          "description": "将应用作为独立的 systemd 服务启动，避免与 Noctalia 共用 cgroup",
+          "description": "将应用作为独立的 systemd 服务启动，避免与 paw2-shell 共用 cgroup",
           "label": "作为 systemd 服务启动应用",
-          "requires-systemd-session": "需要将 Noctalia 作为 systemd 用户服务运行（使用 uwsm 或 systemd 用户单元）"
+          "requires-systemd-session": "需要将 paw2-shell 作为 systemd 用户服务运行（使用 uwsm 或 systemd 用户单元）"
         },
         "launch-apps-custom-command": {
           "description": "包装从启动器、Dock 和任务栏启动的应用；$CMD 会替换为原命令",
@@ -3541,10 +3541,6 @@
             "description": "设置 EasyEffects 的输出或输入预设",
             "label": "设置 EasyEffects 预设"
           },
-          "greeter-sync": {
-            "description": "将壁纸、配色和屏幕布局同步到 Noctalia Greeter",
-            "label": "同步 Greeter 外观"
-          },
           "keyboard-backlight-down": {
             "description": "将所有键盘背光降低一级",
             "label": "降低键盘背光"
@@ -3658,7 +3654,7 @@
             "label": "执行最新活动通知的操作"
           },
           "notification-show": {
-            "description": "显示 Noctalia 内部通知",
+            "description": "显示 paw2-shell 内部通知",
             "label": "显示通知"
           },
           "osd-disable": {
@@ -4585,8 +4581,8 @@
       "export-config": "导出配置…",
       "export-config-saved": "配置导出已保存。",
       "filter-overridden": "已覆盖",
-      "legacy-config-warning": "旧版配置：{issue}。请修改源配置项。Noctalia 仅在内存中临时兼容。执行 noctalia config validate 命令查看所有必需的更改。",
-      "native-title": "Noctalia 设置",
+      "legacy-config-warning": "旧版配置：{issue}。请修改源配置项。paw2-shell 仅在内存中临时兼容。执行 paw2-shell config validate 命令查看所有必需的更改。",
+      "native-title": "paw2-shell 设置",
       "no-results": "未找到相关设置",
       "no-results-hint": "请尝试使用其他设置名称或配置键。",
       "offline-mode-notice": {

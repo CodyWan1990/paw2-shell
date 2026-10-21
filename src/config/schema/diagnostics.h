@@ -63,7 +63,7 @@ namespace paw2shell::config::schema {
   };
 
   // Accumulates issues found while reading or validating a config table. The
-  // same sink feeds the reload pipeline (warnings) and `noctalia config validate`
+  // same sink feeds the reload pipeline (warnings) and `paw2-shell config validate`
   // (errors). `path` is the dotted key path, e.g. "shell.animation.style".
   // `origin` is filled in afterwards by ConfigOriginIndex::annotate, except for
   // syntax errors that carry it from the start.

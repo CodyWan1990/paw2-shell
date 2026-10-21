@@ -355,7 +355,7 @@ namespace settings {
       return colorSpecPicker(std::optional<ColorSpec>{selected}, allowNone, std::move(noneLabel));
     }
 
-    // The bar settings paw2-shell's own Bar tab had; every other bar setting is Noctalia's
+    // The bar settings the old QML shell's Bar tab had; every other bar setting is
     // fine-tuning and shows only with Advanced on. Keys are the last element of a bar entry's
     // path (`bar.<name>.<key>`, or `bar.<name>.monitor.<match>.<key>` for an override).
     void moveBarFineTuningToAdvanced(std::vector<SettingEntry>& entries) {

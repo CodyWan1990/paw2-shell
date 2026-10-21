@@ -847,7 +847,7 @@ void PanelManager::openPanel(const std::string& panelId, PanelOpenRequest reques
   }
 
   auto surfaceConfig = LayerSurfaceConfig{
-      .nameSpace = "noctalia-panel",
+      .nameSpace = "paw2-shell-panel",
       .layer = floatingPanelLayer,
       .anchor = standaloneAnchor,
       .width = requestedSurfaceWidth,
@@ -1090,7 +1090,7 @@ void PanelManager::openPanel(const std::string& panelId, PanelOpenRequest reques
     }
 
     auto attachedConfig = LayerSurfaceConfig{
-        .nameSpace = "noctalia-attached-panel",
+        .nameSpace = "paw2-shell-attached-panel",
         .layer = panelLayer,
         .anchor = attachedAnchor,
         .width = surfaceWidth,

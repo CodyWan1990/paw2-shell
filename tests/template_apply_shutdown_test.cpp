@@ -174,7 +174,7 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-template-shutdown-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-template-shutdown-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
   std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
@@ -188,7 +188,7 @@ int main() {
   std::filesystem::create_directories(root / "assets" / "templates");
   std::filesystem::create_directories(root / "assets" / "translations");
   writeFile(root / "assets" / "emoji.json", "[]\n");
-  writeFile(root / "assets" / "fonts" / "noctalia-tabler.ttf", "");
+  writeFile(root / "assets" / "fonts" / "paw2-tabler.ttf", "");
   writeFile(root / "assets" / "templates" / "builtin.toml", "");
   writeFile(root / "assets" / "translations" / "en.json", "{}\n");
   ::setenv("PAW2_SHELL_ASSETS_DIR", (root / "assets").c_str(), 1);

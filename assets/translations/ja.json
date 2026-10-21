@@ -851,12 +851,12 @@
       "calendar-reminder-open": "開く",
       "calendar-reminder-untitled": "無題の予定",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "ソースファイル内の{path}を更新してください。Noctaliaはこの置換を一時的にのみ適用しています。必要な変更をすべて確認するには、noctalia config validateを実行してください。",
+      "config-migration-body": "ソースファイル内の{path}を更新してください。paw2-shellはこの置換を一時的にのみ適用しています。必要な変更をすべて確認するには、paw2-shell config validateを実行してください。",
       "config-migration-title": "設定の更新が必要です",
       "dbus-disabled": "DBus通知は無効です",
       "desktop-widgets-editor": "ウィジェット編集",
       "desktop-widgets-editor-enabled": "デスクトップウィジェットの編集が有効です。開いているウィンドウで編集画面が隠れないよう、空のワークスペースに切り替えてください。",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "このショートカットには、修飾キーを使わない単一のキーを指定できます。",
       "keybind-invalid-printable": "文字入力キー（英字、数字、記号）を使用するには、CtrlやAltなどの修飾キーが必要です。",
       "keybind-invalid-super": "シェルのキーバインドではSuper/Windowsキーを使用できません。",
@@ -1386,7 +1386,7 @@
           "label": "角の丸み"
         },
         "custom-palette": {
-          "description": "~/.config/noctalia/palettes/から配色を選択"
+          "description": "~/.config/paw2-shell/palettes/から配色を選択"
         },
         "export-wallpaper-palette": {
           "button": "独自の配色として保存",
@@ -1415,7 +1415,7 @@
           "description": "暗いサーフェスを完全な黒に固定し、OLEDパネルでのバンディングを防止（ダークモードのみ）"
         },
         "shell-theme-mode": {
-          "description": "Noctalia独自のライトまたはダークモードに固定します。「追従」ではテーマモードと同期します",
+          "description": "paw2-shell独自のライトまたはダークモードに固定します。「追従」ではテーマモードと同期します",
           "label": "シェルのテーマモード"
         },
         "theme-mode": {
@@ -1829,7 +1829,7 @@
             "label": "シャットダウン時"
           },
           "started": {
-            "description": "Noctalia起動後に実行するコマンド"
+            "description": "paw2-shell起動後に実行するコマンド"
           },
           "theme-mode-changed": {
             "description": "確定したテーマモードがライトとダークの間で切り替わったときに実行するコマンドです",
@@ -2348,7 +2348,7 @@
           "placeholder": "都市名、国名"
         },
         "location-auto-locate": {
-          "description": "noctalia.devを利用してIPアドレスから現在地を自動検出",
+          "description": "ipapi.coを利用してIPアドレスから現在地を自動検出",
           "label": "現在地を自動検出（IP）"
         },
         "longitude": {
@@ -2524,13 +2524,13 @@
           "description": "個別設定のないシェルUIで使用する既定の日付形式"
         },
         "external-ip": {
-          "description": "接続のパブリックWAN IPアドレスを（api.noctalia.dev経由で）取得し、コントロールセンターのネットワークタブに表示します",
+          "description": "接続のパブリックWAN IPアドレスを（api.ipify.org経由で）取得し、コントロールセンターのネットワークタブに表示します",
           "label": "WAN IPを表示"
         },
         "launch-apps-as-systemd-services": {
-          "description": "アプリを個別のsystemdサービスとして起動し、Noctaliaのcgroupを共有しないようにします。",
+          "description": "アプリを個別のsystemdサービスとして起動し、paw2-shellのcgroupを共有しないようにします。",
           "label": "アプリをsystemdサービスとして起動",
-          "requires-systemd-session": "Noctaliaをsystemdユーザーサービスとして実行する必要があります（uwsmまたはsystemdユーザーユニット）"
+          "requires-systemd-session": "paw2-shellをsystemdユーザーサービスとして実行する必要があります（uwsmまたはsystemdユーザーユニット）"
         },
         "launch-apps-custom-command": {
           "description": "ランチャー、ドック、タスクバーから起動するアプリをこのコマンド経由で起動し、$CMDを元のコマンドに置き換えます",
@@ -3009,9 +3009,6 @@
           "dpms-on": {
             "description": "画面の電源を入れる",
             "label": "画面の電源を入れる"
-          },
-          "greeter-sync": {
-            "description": "壁紙、配色、画面配置をNoctalia Greeterに同期"
           },
           "keyboard-backlight-down": {
             "description": "すべてのキーボードバックライトを1段階暗くする",

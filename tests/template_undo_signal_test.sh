@@ -65,10 +65,10 @@ run_undo() {
 
 # script:theme file relative to XDG_CONFIG_HOME
 cases="
-ghostty/undo.sh:ghostty/themes/noctalia
-kitty/undo.sh:kitty/themes/noctalia.conf
-btop/undo.sh:btop/themes/noctalia.theme
-cava/undo.sh:cava/themes/noctalia
+ghostty/undo.sh:ghostty/themes/paw2-shell
+kitty/undo.sh:kitty/themes/paw2-shell.conf
+btop/undo.sh:btop/themes/paw2-shell.theme
+cava/undo.sh:cava/themes/paw2-shell
 "
 
 for entry in $cases; do
@@ -84,7 +84,7 @@ for entry in $cases; do
 
   config_home="$work_dir/$(dirname "$script")-themed"
   mkdir -p "$config_home/$(dirname "$theme_file")"
-  printf 'noctalia\n' >"$config_home/$theme_file"
+  printf 'paw2-shell\n' >"$config_home/$theme_file"
   run_undo "$script" "$config_home"
   if [ ! -s "$calls_file" ]; then
     fail "$script removed its theme without reloading its client"
@@ -111,12 +111,12 @@ fi
 config_home="$work_dir/wezterm-themed"
 mkdir -p "$config_home/wezterm/colors"
 config_file="$config_home/wezterm/wezterm.lua"
-printf 'local config = {}\nconfig.color_scheme = "Noctalia"\nreturn config\n' >"$config_file"
-printf 'colors\n' >"$config_home/wezterm/colors/Noctalia.toml"
+printf 'local config = {}\nconfig.color_scheme = "paw2-shell"\nreturn config\n' >"$config_file"
+printf 'colors\n' >"$config_home/wezterm/colors/paw2-shell.toml"
 touch -t 202001010000 "$config_file"
 run_undo "wezterm/undo.sh" "$config_home"
-if grep -q 'Noctalia' "$config_file"; then
-  fail "wezterm/undo.sh left the Noctalia color scheme in wezterm.lua"
+if grep -q 'paw2-shell' "$config_file"; then
+  fail "wezterm/undo.sh left the paw2-shell color scheme in wezterm.lua"
 fi
 if [ "$(stat -c '%Y' "$config_file")" = "$(date -d '2020-01-01 00:00' +%s)" ]; then
   fail "wezterm/undo.sh did not bump wezterm.lua after removing the color scheme"

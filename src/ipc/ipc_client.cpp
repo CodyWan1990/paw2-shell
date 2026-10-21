@@ -56,7 +56,7 @@ int IpcClient::send(const std::string& command) {
   std::memcpy(addr.sun_path, path.c_str(), path.size() + 1);
 
   if (::connect(fd, reinterpret_cast<const sockaddr*>(&addr), sizeof(addr)) < 0) {
-    std::println(stderr, "error: noctalia is not running");
+    std::println(stderr, "error: paw2-shell is not running");
     ::close(fd);
     return 1;
   }

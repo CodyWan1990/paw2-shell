@@ -37,7 +37,7 @@ namespace {
 } // namespace
 
 int main() {
-  char dirTemplate[] = "/tmp/noctalia_cpu_freq_test_XXXXXX";
+  char dirTemplate[] = "/tmp/paw2_shell_cpu_freq_test_XXXXXX";
   char* dir = mkdtemp(dirTemplate);
   if (dir == nullptr)
     return EXIT_FAILURE;

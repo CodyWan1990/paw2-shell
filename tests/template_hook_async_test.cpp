@@ -18,7 +18,7 @@ namespace {
   using paw2shell::theme::HookRunner;
   using paw2shell::theme::TemplateEngine;
 
-  const std::filesystem::path kRoot = std::filesystem::temp_directory_path() / "noctalia_hook_async_test";
+  const std::filesystem::path kRoot = std::filesystem::temp_directory_path() / "paw2_shell_hook_async_test";
 
   void writeFile(const std::filesystem::path& path, const std::string& text) {
     std::ofstream out(path);

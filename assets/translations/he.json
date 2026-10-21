@@ -751,12 +751,12 @@
       "battery-low-body": "{device}: נותרו {percent}%",
       "battery-low-title": "סוללה נמוכה",
       "calendar": "לוח שנה",
-      "config-migration-body": "יש לעדכן את {path} בקובץ המקור. Noctalia מיישמת החלפה זו באופן זמני בלבד. יש להריץ את noctalia config validate כדי להציג רשימה של כל השינויים הנדרשים.",
+      "config-migration-body": "יש לעדכן את {path} בקובץ המקור. paw2-shell מיישמת החלפה זו באופן זמני בלבד. יש להריץ את paw2-shell config validate כדי להציג רשימה של כל השינויים הנדרשים.",
       "config-migration-title": "נדרש עדכון תצורה",
       "dbus-disabled": "התראות DBus מושבתות",
       "desktop-widgets-editor": "עורך וידג'טים",
       "desktop-widgets-editor-enabled": "עורך הווידג'טים של שולחן העבודה מופעל. מומלץ לעבור לסביבת עבודה ריקה כדי שחלונות פתוחים לא יסתירו את העורך.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "קיצור דרך זה מקבל מקש בודד ללא מקשי צירוף.",
       "keybind-invalid-printable": "מקשים הניתנים להדפסה (אותיות, מספרים, סמלים) דורשים מקש שינוי כגון Ctrl או Alt.",
       "keybind-invalid-super": "לא ניתן להשתמש במקש Super/Windows בקיצורי המקשים של המעטפת.",
@@ -1477,7 +1477,7 @@
           "label": "עיגול פינות"
         },
         "custom-palette": {
-          "description": "בחר פלטה מ-~/.config/noctalia/palettes/",
+          "description": "בחר פלטה מ-~/.config/paw2-shell/palettes/",
           "label": "פלטת צבעים מותאמת אישית",
           "search-placeholder": "חיפוש פלטות מותאמות אישית…"
         },
@@ -1951,7 +1951,7 @@
             "label": "בכיבוי"
           },
           "started": {
-            "description": "פקודה להרצה לאחר ש-Noctalia מתחיל",
+            "description": "פקודה להרצה לאחר ש-paw2-shell מתחיל",
             "label": "בהפעלה"
           },
           "theme-mode-changed": {
@@ -2468,7 +2468,7 @@
           "placeholder": "עיר, מדינה"
         },
         "location-auto-locate": {
-          "description": "זיהוי המיקום שלך באופן אוטומטי מכתובת ה-IP שלך דרך noctalia.dev",
+          "description": "זיהוי המיקום שלך באופן אוטומטי מכתובת ה-IP שלך דרך ipapi.co",
           "label": "איתור אוטומטי (IP)"
         },
         "longitude": {
@@ -2691,7 +2691,7 @@
           "label": "פורמט תאריך"
         },
         "external-ip": {
-          "description": "בצע רזולוציה לכתובת ה-WAN הציבורית של החיבור (דרך api.noctalia.dev) והצג אותה בלשונית הרשת של ה-Control Center",
+          "description": "בצע רזולוציה לכתובת ה-WAN הציבורית של החיבור (דרך api.ipify.org) והצג אותה בלשונית הרשת של ה-Control Center",
           "label": "הצג כתובת WAN IP"
         },
         "keyboard-layout-custom-labels": {
@@ -2699,9 +2699,9 @@
           "label": "תוויות פריסת מקלדת"
         },
         "launch-apps-as-systemd-services": {
-          "description": "מפעיל יישומים בשירותי systemd נפרדים כדי שלא ישתפו את ה-cgroup של Noctalia",
+          "description": "מפעיל יישומים בשירותי systemd נפרדים כדי שלא ישתפו את ה-cgroup של paw2-shell",
           "label": "הפעל אפליקציות כשירותי systemd",
-          "requires-systemd-session": "דורש מ-Noctalia לרוץ כשירות משתמש של systemd (uwsm או יחידת משתמש של systemd)"
+          "requires-systemd-session": "דורש מ-paw2-shell לרוץ כשירות משתמש של systemd (uwsm או יחידת משתמש של systemd)"
         },
         "launch-apps-custom-command": {
           "description": "עוטף אפליקציות שהופעלו מה-Launcher, מה-Dock ומה-Taskbar; מחליף את $CMD בפקודה המקורית",
@@ -3762,8 +3762,8 @@
       "export-config": "ייצוא הגדרה…",
       "export-config-saved": "ייצוא ה-Config נשמר.",
       "filter-overridden": "עוקף",
-      "legacy-config-warning": "הגדרה מיושנת: {issue}. ערוך את רשומת המקור הזו; Noctalia מחילה את ההחלפה באופן זמני בלבד. הרץ noctalia config validate כדי להציג את כל השינויים הנדרשים.",
-      "native-title": "הגדרות Noctalia",
+      "legacy-config-warning": "הגדרה מיושנת: {issue}. ערוך את רשומת המקור הזו; paw2-shell מחילה את ההחלפה באופן זמני בלבד. הרץ paw2-shell config validate כדי להציג את כל השינויים הנדרשים.",
+      "native-title": "הגדרות paw2-shell",
       "no-results": "לא נמצאו הגדרות",
       "no-results-hint": "נסה שם הגדרה או מפתח תצורה אחר.",
       "offline-mode-notice": {

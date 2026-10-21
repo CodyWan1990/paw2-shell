@@ -753,12 +753,12 @@
       "battery-low-body": "{device}: {percent}% kaldı",
       "battery-low-title": "Düşük Pil",
       "calendar": "Takvim",
-      "config-migration-body": "Kaynak dosyadaki {path} konumunu güncelleyin. Noctalia bu değişimi sadece geçici olarak uyguluyor. Gerekli tüm değişiklikleri listelemek için noctalia config validate komutunu çalıştırın.",
+      "config-migration-body": "Kaynak dosyadaki {path} konumunu güncelleyin. paw2-shell bu değişimi sadece geçici olarak uyguluyor. Gerekli tüm değişiklikleri listelemek için paw2-shell config validate komutunu çalıştırın.",
       "config-migration-title": "Yapılandırma güncellemesi gerekiyor",
       "dbus-disabled": "DBus bildirimleri devre dışı",
       "desktop-widgets-editor": "Bileşen düzenleyici",
       "desktop-widgets-editor-enabled": "Masaüstü bileşen düzenleyicisi açık. Açık pencerelerin düzenleyiciyi kapatmaması için boş bir çalışma alanına geçin.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Bu kısayol, değiştirici olmadan yalnızca tek bir tuş kabul eder.",
       "keybind-invalid-printable": "Yazdırılabilir tuşlar (harfler, sayılar, semboller) Ctrl veya Alt gibi bir değiştirici tuş gerektirir.",
       "keybind-invalid-super": "Super/Windows tuşu sistem tuş atamalarında kullanılamaz.",
@@ -1480,7 +1480,7 @@
           "label": "Köşe Yuvarlaklığı"
         },
         "custom-palette": {
-          "description": "~/.config/noctalia/palettes/ klasöründen özel bir palet seç",
+          "description": "~/.config/paw2-shell/palettes/ klasöründen özel bir palet seç",
           "label": "Özel Palet",
           "search-placeholder": "Özel paletlerde ara..."
         },
@@ -1950,7 +1950,7 @@
             "label": "Sistem Kapanırken"
           },
           "started": {
-            "description": "Noctalia başladıktan sonra çalıştırılacak komut",
+            "description": "paw2-shell başladıktan sonra çalıştırılacak komut",
             "label": "Başlangıçta"
           },
           "theme-mode-changed": {
@@ -2463,7 +2463,7 @@
           "placeholder": "Şehir, Ülke"
         },
         "location-auto-locate": {
-          "description": "noctalia.dev aracılığıyla konumu IP üzerinden otomatik olarak tespit et",
+          "description": "ipapi.co aracılığıyla konumu IP üzerinden otomatik olarak tespit et",
           "label": "Otomatik-Konumlandır (IP)"
         },
         "longitude": {
@@ -2686,7 +2686,7 @@
           "label": "Tarih Biçimi"
         },
         "external-ip": {
-          "description": "Bağlantının genel WAN IP adresini çözümle (api.noctalia.dev üzerinden) ve Kontrol Merkezi ağ sekmesinde göster",
+          "description": "Bağlantının genel WAN IP adresini çözümle (api.ipify.org üzerinden) ve Kontrol Merkezi ağ sekmesinde göster",
           "label": "WAN IP'yi Göster"
         },
         "keyboard-layout-custom-labels": {
@@ -2694,9 +2694,9 @@
           "label": "Klavye Düzeni Etiketleri"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Uygulamaları Noctalia'nın cgroup'unu paylaşmamaları için ayrı systemd servisleri olarak başlatır",
+          "description": "Uygulamaları paw2-shell'nın cgroup'unu paylaşmamaları için ayrı systemd servisleri olarak başlatır",
           "label": "Uygulamaları systemd Servisi Olarak Başlat",
-          "requires-systemd-session": "Noctalia'nın bir systemd kullanıcı servisi olarak çalışmasını gerektirir (uwsm veya systemd kullanıcı birimi)"
+          "requires-systemd-session": "paw2-shell'nın bir systemd kullanıcı servisi olarak çalışmasını gerektirir (uwsm veya systemd kullanıcı birimi)"
         },
         "launch-apps-custom-command": {
           "description": "Başlatıcıdan, rıhtımdan ve görev çubuğundan başlatılan uygulamaları sarar; $CMD'yi orijinal komutla değiştirir.",
@@ -3754,8 +3754,8 @@
       "export-config": "Yapılandırmayı Dışa Aktar...",
       "export-config-saved": "Yapılandırma dışa aktarımı kaydedildi.",
       "filter-overridden": "Üzerine yazıldı",
-      "legacy-config-warning": "Eski ayar: {issue}. Bu kaynak girişini düzenleyin; Noctalia değişimi sadece geçici olarak uyguluyor. Gerekli tüm değişiklikleri listelemek için noctalia config validate komutunu çalıştırın.",
-      "native-title": "Noctalia Ayarları",
+      "legacy-config-warning": "Eski ayar: {issue}. Bu kaynak girişini düzenleyin; paw2-shell değişimi sadece geçici olarak uyguluyor. Gerekli tüm değişiklikleri listelemek için paw2-shell config validate komutunu çalıştırın.",
+      "native-title": "paw2-shell Ayarları",
       "no-results": "Ayar bulunamadı",
       "no-results-hint": "Farklı bir ayar veya yapılandırma adı girin.",
       "offline-mode-notice": {

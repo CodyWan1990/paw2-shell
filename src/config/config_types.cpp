@@ -289,7 +289,7 @@ WidgetStylePreset parseWidgetStylePreset(std::string_view value) noexcept {
   if (value == "none") {
     return WidgetStylePreset::None;
   }
-  // "pill" was paw2-shell's QML name for the same idea; Noctalia's capsule replaced it.
+  // "pill" was the old QML shell's name for the same idea; capsule replaced it.
   if (value == "capsule" || value == "pill") {
     return WidgetStylePreset::Capsule;
   }

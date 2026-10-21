@@ -34,7 +34,7 @@ namespace {
   }
 
   TempDir makeTempDir() {
-    std::string pattern = (std::filesystem::temp_directory_path() / "noctalia-kde-colors-XXXXXX").string();
+    std::string pattern = (std::filesystem::temp_directory_path() / "paw2-shell-kde-colors-XXXXXX").string();
     std::vector<char> writable(pattern.begin(), pattern.end());
     writable.push_back('\0');
     char* result = ::mkdtemp(writable.data());
@@ -75,7 +75,7 @@ namespace {
       return false;
     }
 
-    const auto scheme = root.path / "noctalia.colors";
+    const auto scheme = root.path / "paw2-shell.colors";
     const auto globals = root.path / "kdeglobals";
     bool ok = expect(
         writeFile(
@@ -97,8 +97,8 @@ namespace {
              writeFile(
                  scheme,
                  "[General]\n"
-                 "ColorScheme=Noctalia\n"
-                 "Name=noctalia\n"
+                 "ColorScheme=paw2-shell\n"
+                 "Name=paw2-shell\n"
                  "\n"
                  "[Colors:Button]\n"
                  "ForegroundNormal=9,8,7\n"
@@ -122,7 +122,7 @@ namespace {
     const bool merged = paw2shell::theme::mergeKdeColorScheme(scheme, globals, &error);
     ok = expect(merged, error) && ok;
     ok = expect(keyValue(globals, "General", "ExistingKey") == "keep", "preserves an unrelated key") && ok;
-    ok = expect(keyValue(globals, "General", "ColorScheme") == "Noctalia", "replaces the active scheme") && ok;
+    ok = expect(keyValue(globals, "General", "ColorScheme") == "paw2-shell", "replaces the active scheme") && ok;
     ok = expect(keyValue(globals, "Colors:Button", "ForegroundNormal") == "9,8,7", "replaces scheme values") && ok;
     ok = expect(keyValue(globals, "Colors:Button", "BackgroundNormal") == "4,5,6", "adds scheme values") && ok;
     ok =

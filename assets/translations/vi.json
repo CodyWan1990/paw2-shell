@@ -749,12 +749,12 @@
       "battery-low-body": "{device}: còn {percent}%",
       "battery-low-title": "Pin yếu",
       "calendar": "Lịch",
-      "config-migration-body": "Cấu hình cũ, bao gồm {path}, đang được chuyển đổi tạm thời trong bộ nhớ. Hãy cập nhật cấu hình gốc; Cài đặt và noctalia config validate sẽ hiển thị cấu hình thay thế cần dùng.",
+      "config-migration-body": "Cấu hình cũ, bao gồm {path}, đang được chuyển đổi tạm thời trong bộ nhớ. Hãy cập nhật cấu hình gốc; Cài đặt và paw2-shell config validate sẽ hiển thị cấu hình thay thế cần dùng.",
       "config-migration-title": "Cần cập nhật cấu hình",
       "dbus-disabled": "Thông báo DBus đã tắt",
       "desktop-widgets-editor": "Trình chỉnh sửa tiện ích",
       "desktop-widgets-editor-enabled": "Trình chỉnh sửa tiện ích màn hình nền đang bật. Chuyển sang một không gian làm việc trống để xem Overlay trình chỉnh sửa.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Phím tắt này nhận một phím không kèm phím bổ trợ.",
       "keybind-invalid-printable": "Các phím ký tự (chữ cái, số, ký hiệu) cần một phím bổ trợ như Ctrl hoặc Alt.",
       "keybind-invalid-super": "Không thể dùng phím Super/Windows trong các phím tắt của shell.",
@@ -1445,7 +1445,7 @@
           "label": "Màu biểu tượng ứng dụng"
         },
         "app-icon-colorize": {
-          "description": "Đổi màu biểu tượng ứng dụng trên toàn bộ Noctalia để phù hợp với bảng màu đang hoạt động",
+          "description": "Đổi màu biểu tượng ứng dụng trên toàn bộ paw2-shell để phù hợp với bảng màu đang hoạt động",
           "label": "Tô màu biểu tượng ứng dụng"
         },
         "builtin-palette": {
@@ -1469,7 +1469,7 @@
           "label": "Độ bo góc"
         },
         "custom-palette": {
-          "description": "Chọn bảng màu từ ~/.config/noctalia/palettes/",
+          "description": "Chọn bảng màu từ ~/.config/paw2-shell/palettes/",
           "label": "Bảng màu tùy chỉnh",
           "search-placeholder": "Tìm kiếm bảng màu tùy chỉnh..."
         },
@@ -1936,7 +1936,7 @@
             "label": "Khi tắt máy"
           },
           "started": {
-            "description": "Lệnh để chạy sau khi Noctalia khởi động",
+            "description": "Lệnh để chạy sau khi paw2-shell khởi động",
             "label": "Khi khởi động"
           },
           "theme-mode-changed": {
@@ -2108,7 +2108,7 @@
           "label": "Vị trí màn hình"
         },
         "scale": {
-          "description": "Điều chỉnh kích thước các Toast thông báo theo tỷ lệ giao diện người dùng của Noctalia",
+          "description": "Điều chỉnh kích thước các Toast thông báo theo tỷ lệ giao diện người dùng của paw2-shell",
           "label": "Kích thước"
         },
         "show-actions": {
@@ -2521,7 +2521,7 @@
           "label": "Định dạng ngày"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Khởi chạy ứng dụng trong các dịch vụ systemd riêng biệt để chúng không chia sẻ cgroup của Noctalia",
+          "description": "Khởi chạy ứng dụng trong các dịch vụ systemd riêng biệt để chúng không chia sẻ cgroup của paw2-shell",
           "label": "Khởi chạy ứng dụng dưới dạng dịch vụ systemd"
         },
         "launch-apps-custom-command": {
@@ -2618,7 +2618,7 @@
           "label": "Vị trí dọc"
         },
         "osd-scale": {
-          "description": "Điều chỉnh tỷ lệ các OSD pop-up theo tỷ lệ giao diện người dùng của Noctalia (1.0 sẽ giữ kích thước mặc định)",
+          "description": "Điều chỉnh tỷ lệ các OSD pop-up theo tỷ lệ giao diện người dùng của paw2-shell (1.0 sẽ giữ kích thước mặc định)",
           "label": "Tỷ lệ"
         },
         "password-style": {
@@ -2689,7 +2689,7 @@
           "label": "Ping khởi động ẩn danh"
         },
         "time-format": {
-          "description": "Định dạng thời gian mặc định cho giao diện Noctalia khi không có cài đặt riêng",
+          "description": "Định dạng thời gian mặc định cho giao diện paw2-shell khi không có cài đặt riêng",
           "label": "Định dạng thời gian"
         }
       },
@@ -2699,7 +2699,7 @@
           "label": "{device} Ngưỡng cảnh báo"
         },
         "battery-warning-threshold": {
-          "description": "Mức phần trăm pin hệ thống mà khi đạt đến hoặc thấp hơn, Noctalia sẽ gửi thông báo pin yếu và các Widget pin sẽ hiển thị màu cảnh báo; đặt 0 để tắt.",
+          "description": "Mức phần trăm pin hệ thống mà khi đạt đến hoặc thấp hơn, paw2-shell sẽ gửi thông báo pin yếu và các Widget pin sẽ hiển thị màu cảnh báo; đặt 0 để tắt.",
           "label": "Ngưỡng cảnh báo pin"
         }
       },
@@ -3363,7 +3363,7 @@
     "window": {
       "export-config": "Xuất cấu hình…",
       "export-config-saved": "Xuất cấu hình đã lưu.",
-      "native-title": "Cài đặt Noctalia",
+      "native-title": "Cài đặt paw2-shell",
       "no-results": "Không tìm thấy cài đặt nào",
       "no-results-hint": "Thử một tên cài đặt hoặc khóa cấu hình khác.",
       "reset-page": "Đặt lại trang",

@@ -5,7 +5,7 @@
 #include <source_location>
 
 #ifdef NDEBUG
-#error "Noctalia test targets must be compiled without NDEBUG"
+#error "paw2-shell test targets must be compiled without NDEBUG"
 #endif
 
 namespace paw2shell::test {

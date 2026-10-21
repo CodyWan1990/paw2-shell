@@ -48,7 +48,7 @@ namespace paw2shell::theme {
     std::filesystem::path userTemplateConfigPath() {
       const std::string configDir = FileUtils::configDir();
       if (configDir.empty()) {
-        return "noctalia.toml";
+        return "paw2-shell.toml";
       }
       return std::filesystem::path(configDir) / "config.toml";
     }
@@ -151,7 +151,7 @@ namespace paw2shell::theme {
       return root;
     }
 
-    // state.toml owner/key holding the built-in template ids Noctalia has applied.
+    // state.toml owner/key holding the built-in template ids paw2-shell has applied.
     constexpr std::string_view kStateOwner = "theme_templates";
     constexpr std::string_view kAppliedBuiltinIdsKey = "applied_builtin_ids";
 

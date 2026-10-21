@@ -718,7 +718,7 @@
       "dbus-disabled": "DBus 通知已停用",
       "desktop-widgets-editor": "桌面小工具編輯器",
       "desktop-widgets-editor-enabled": "桌面小工具編輯器已開啟。請切換至空閒桌面，避免開啟的視窗遮擋編輯器。",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "此快捷鍵僅接受單一按鍵，不可與修飾鍵(Ctrl, Alt或Super等)並用。",
       "keybind-invalid-printable": "字母、數字及符號健需要配合修飾鍵 ( Ctrl 或是 Alt ) 使用。",
       "keybind-invalid-super": "Super/Windows 鍵無法用於 Shell 快捷鍵。",

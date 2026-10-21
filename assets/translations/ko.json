@@ -791,12 +791,12 @@
       "calendar-reminder-open": "열기",
       "calendar-reminder-untitled": "제목 없는 이벤트",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "소스 파일에서 {path}를 업데이트하세요.  Noctalia는 변경 사항을 일시적으로 적용하고 있습니다. noctalia config validate를 실행하여 필요한 변경 사항을 확인하세요",
+      "config-migration-body": "소스 파일에서 {path}를 업데이트하세요.  paw2-shell는 변경 사항을 일시적으로 적용하고 있습니다. paw2-shell config validate를 실행하여 필요한 변경 사항을 확인하세요",
       "config-migration-title": "설정 업데이트 필요",
       "dbus-disabled": "DBus 알림 비활성화됨",
       "desktop-widgets-editor": "위젯 편집기",
       "desktop-widgets-editor-enabled": "데스크톱 위젯 편집기가 켜져 있습니다. 빈 작업 공간으로 전환하여 편집기 오버레이를 확인하세요.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "이 단축키는 수정자 키 없이 단일 키만 허용합니다.",
       "keybind-invalid-printable": "인쇄 가능한 키(문자, 숫자, 기호)는 Ctrl 또는 Alt와 같은 수정자 키가 필요합니다.",
       "keybind-invalid-super": "Super/Windows 키는 쉘 단축키에 사용할 수 없습니다.",
@@ -1523,7 +1523,7 @@
           "label": "모서리 둥글기"
         },
         "custom-palette": {
-          "description": "~/.config/noctalia/palettes/에서 팔레트 선택",
+          "description": "~/.config/paw2-shell/palettes/에서 팔레트 선택",
           "label": "사용자 팔레트",
           "search-placeholder": "사용자 팔레트 검색…"
         },
@@ -1999,7 +1999,7 @@
             "label": "종료 시"
           },
           "started": {
-            "description": "Noctalia 시작 후 실행할 명령어",
+            "description": "paw2-shell 시작 후 실행할 명령어",
             "label": "시작 시"
           },
           "theme-mode-changed": {
@@ -2511,7 +2511,7 @@
           "placeholder": "도시, 국가"
         },
         "location-auto-locate": {
-          "description": "noctalia.dev를 통해 IP 주소에서 자동으로 위치 감지",
+          "description": "ipapi.co를 통해 IP 주소에서 자동으로 위치 감지",
           "label": "자동 위치 감지 (IP)"
         },
         "longitude": {
@@ -2739,16 +2739,16 @@
           "label": "날짜 형식"
         },
         "external-ip": {
-          "description": "연결의 공개 WAN IP를 확인하고 (api.noctalia.dev를 통해) 제어 센터 네트워크 탭에 표시",
+          "description": "연결의 공개 WAN IP를 확인하고 (api.ipify.org를 통해) 제어 센터 네트워크 탭에 표시",
           "label": "WAN IP 표시"
         },
         "keyboard-layout-custom-labels": {
           "label": "키보드 레이아웃 라벨"
         },
         "launch-apps-as-systemd-services": {
-          "description": "앱을 별도의 systemd 서비스에서 실행하여 Noctalia의 cgroup을 공유하지 않도록 합니다",
+          "description": "앱을 별도의 systemd 서비스에서 실행하여 paw2-shell의 cgroup을 공유하지 않도록 합니다",
           "label": "앱을 systemd 서비스로 실행",
-          "requires-systemd-session": "Noctalia가 systemd 사용자 서비스 (uwsm 또는 systemd 사용자 유닛)로 실행되어야 합니다"
+          "requires-systemd-session": "paw2-shell가 systemd 사용자 서비스 (uwsm 또는 systemd 사용자 유닛)로 실행되어야 합니다"
         },
         "launch-apps-custom-command": {
           "description": "런처, 독 및 태스크바에서 실행되는 앱을 감쌉니다. $CMD를 원래 명령어로 대체합니다",
@@ -3857,8 +3857,8 @@
       "export-config": "설정 내보내기…",
       "export-config-saved": "설정 내보내기가 저장되었습니다.",
       "filter-overridden": "재정의됨",
-      "legacy-config-warning": "레거시 설정: {issue}. 소스 항목을 수정하세요. Noctalia는 변경 사항을 일시적으로 적용하고 있습니다. noctalia config validate를 실행하여 필요한 변경 사항을 확인하세요.",
-      "native-title": "Noctalia 설정",
+      "legacy-config-warning": "레거시 설정: {issue}. 소스 항목을 수정하세요. paw2-shell는 변경 사항을 일시적으로 적용하고 있습니다. paw2-shell config validate를 실행하여 필요한 변경 사항을 확인하세요.",
+      "native-title": "paw2-shell 설정",
       "no-results": "설정을 찾을 수 없음",
       "no-results-hint": "다른 설정 이름이나 설정 키를 시도해 보세요.",
       "offline-mode-notice": {

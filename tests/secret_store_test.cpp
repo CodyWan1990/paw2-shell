@@ -262,14 +262,14 @@ namespace {
     bool ok = true;
 
     std::optional<SecretStoreStatus> status;
-    store.store(id, security::SecureBuffer(first), "Noctalia clipboard key", [&status](SecretStoreStatus value) {
+    store.store(id, security::SecureBuffer(first), "paw2-shell clipboard key", [&status](SecretStoreStatus value) {
       status = value;
     });
     ok = dispatchCompletion(store) && ok;
     ok = expect(status == SecretStoreStatus::Success, "binary store failed") && ok;
 
     status.reset();
-    store.store(id, security::SecureBuffer(replacement), "Noctalia clipboard key", [&status](SecretStoreStatus value) {
+    store.store(id, security::SecureBuffer(replacement), "paw2-shell clipboard key", [&status](SecretStoreStatus value) {
       status = value;
     });
     ok = dispatchCompletion(store) && ok;

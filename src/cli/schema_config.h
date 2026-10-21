@@ -71,8 +71,8 @@ namespace paw2shell::cli {
   inline constexpr Command kConfigReplayReportCmd{
       "replay-report",
       "Reconstruct config and state from a support report",
-      "Reconstruct config-home/noctalia and state-home/noctalia from a support report.\n\n"
-      "With --flattened, reconstruct a single config-home/noctalia/config.toml from the report's merged config.",
+      "Reconstruct config-home/paw2-shell and state-home/paw2-shell from a support report.\n\n"
+      "With --flattened, reconstruct a single config-home/paw2-shell/config.toml from the report's merged config.",
       {},
       kConfigReplayFlags,
       kConfigReplayPositionals,

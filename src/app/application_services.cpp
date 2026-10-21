@@ -196,7 +196,7 @@ void Application::syncNotificationDaemon() {
     m_notificationPollSource.setDbusService(nullptr);
     m_notificationDaemonInitFailed = true;
     m_notificationManager.addInternal(
-        "Noctalia", i18n::tr("notifications.internal.dbus-disabled"), ownerError.what(), Urgency::Low
+        "paw2-shell", i18n::tr("notifications.internal.dbus-disabled"), ownerError.what(), Urgency::Low
     );
   }
 }
@@ -394,7 +394,7 @@ void Application::syncPolkitAgent() {
       DeferredCall::callLater([this, error]() {
         if (polkit_session::isNoSessionForPidError(error)) {
           notify::error(
-              "Noctalia", i18n::tr("notifications.internal.polkit-agent"),
+              "paw2-shell", i18n::tr("notifications.internal.polkit-agent"),
               i18n::tr("notifications.internal.polkit-no-session")
           );
         }
@@ -506,7 +506,7 @@ void Application::initServices() {
   // can now be reported with a translated message.
   if (m_earlySessionBusError.has_value()) {
     m_notificationManager.addInternal(
-        "Noctalia", i18n::tr("notifications.internal.session-bus-unavailable"), *m_earlySessionBusError, Urgency::Low
+        "paw2-shell", i18n::tr("notifications.internal.session-bus-unavailable"), *m_earlySessionBusError, Urgency::Low
     );
     m_earlySessionBusError.reset();
   }
@@ -945,7 +945,7 @@ void Application::initSystemBusServices() {
             m_screenTimeService.setSuspendPaused(true);
             // The readiness hook releases the delay inhibit after the revealed lock frames are acknowledged.
             if (m_skipLockOnNextSleep) {
-              // Noctalia-initiated suspend: skip lock-before-sleep (plain Suspend or already locked).
+              // paw2-shell-initiated suspend: skip lock-before-sleep (plain Suspend or already locked).
               m_skipLockOnNextSleep = false;
               m_releaseSleepDelayWhenLocked = false;
               if (m_logindService != nullptr) {
@@ -1372,7 +1372,7 @@ void Application::initSessionBusServices() {
   if (m_bus != nullptr) {
     try {
       m_debugService = std::make_unique<DebugService>(*m_bus, m_notificationManager);
-      kLog.info("debug service active on dev.noctalia.Debug");
+      kLog.info("debug service active on dev.paw2.Shell.Debug");
     } catch (const std::exception& e) {
       kLog.warn("debug service disabled: {}", e.what());
       m_debugService.reset();
@@ -1406,7 +1406,7 @@ void Application::initSessionBusServices() {
       m_mprisService.reset();
       m_lockScreen.setLoginBoxServices(&m_sessionActionRunner, nullptr, &m_weatherService, &m_httpClient);
       m_notificationManager.addInternal(
-          "Noctalia", i18n::tr("notifications.internal.mpris-disabled"), e.what(), Urgency::Low
+          "paw2-shell", i18n::tr("notifications.internal.mpris-disabled"), e.what(), Urgency::Low
       );
     }
 

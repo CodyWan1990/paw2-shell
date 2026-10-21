@@ -757,12 +757,12 @@
       "battery-low-body": "{device}: {percent} % att",
       "battery-low-title": "Lågt batteri",
       "calendar": "Kalender",
-      "config-migration-body": "Oppdater {path} i brunnfila. Noctalia legg til dette utbytet berre mellombels. Køyr noctalia config validate for å sjå alle dei naudsynlege brigda.",
+      "config-migration-body": "Oppdater {path} i brunnfila. paw2-shell legg til dette utbytet berre mellombels. Køyr paw2-shell config validate for å sjå alle dei naudsynlege brigda.",
       "config-migration-title": "Tilmåtinga krev oppdatering",
       "dbus-disabled": "DBus-varsel avslegne",
       "desktop-widgets-editor": "Nøytelbrigdar",
       "desktop-widgets-editor-enabled": "Skrivebordsnøytelbrigdaren er på. Gå til eit tomt arbeidsrom slik at opne ruter ikkje ligg over brigdaren.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Snarvegen godtek éin knapp utan hjelpeknappar.",
       "keybind-invalid-printable": "Skrivande knappar (bokstavar, tal, teikn) krev ein hjelpeknapp som Ctrl eller Alt.",
       "keybind-invalid-super": "Du kan ikkje bruka Superknappen/Windowsknappen i skalsnarvegar.",
@@ -908,7 +908,7 @@
       "provider-label": "Leverandør",
       "save": "Lagra",
       "save-error": "Kunne ikkje lagra kalenderkonto.",
-      "secret-cleanup-error": "Noctalia kunne ikkje lagra kontoen, og kunne ikkje skipa innskrivingsdata på lykelringen opp att eller retta opp i han. Prøv atter når du har låst opp Løyndomstenesta.",
+      "secret-cleanup-error": "paw2-shell kunne ikkje lagra kontoen, og kunne ikkje skipa innskrivingsdata på lykelringen opp att eller retta opp i han. Prøv atter når du har låst opp Løyndomstenesta.",
       "secret-service-cancelled": "Leieteksten for Løyndomstenesta vart avbroten. Prøv att når du er klar til å låsa henne opp.",
       "secret-service-error": "Fekk ikkje tilgang til kalenderinnskrivingsdata i Løyndomstenesta. Prøv att.",
       "secret-service-locked": "Kalenderinnskrivingsdata er låste eller tilgang vart neitta. Lås opp Løyndomstenesta og prøv att.",
@@ -1481,7 +1481,7 @@
           "label": "Rundingsgrad på hyrno"
         },
         "custom-palette": {
-          "description": "Vel ein palett frå ~/.config/noctalia/palettes/",
+          "description": "Vel ein palett frå ~/.config/paw2-shell/palettes/",
           "label": "Sjølvvald palett",
           "search-placeholder": "Leita i sjølvvalde palettar ..."
         },
@@ -1509,7 +1509,7 @@
           "label": "Mål"
         },
         "palette-source": {
-          "description": "Kvar Noctalia tek letpaletten frå",
+          "description": "Kvar paw2-shell tek letpaletten frå",
           "label": "Palettbrunn"
         },
         "popup-borders": {
@@ -1951,7 +1951,7 @@
             "label": "Ved avslåing"
           },
           "started": {
-            "description": "Kommandoen som køyrer etter Noctalia byrjar",
+            "description": "Kommandoen som køyrer etter paw2-shell byrjar",
             "label": "Ved byrjing"
           },
           "theme-mode-changed": {
@@ -2394,7 +2394,7 @@
         "calendar-credentials": {
           "button": "Prøv att",
           "description-cancelled": "Leietekst til løyndomstenesta vart avbroten; prøv att når du er klar",
-          "description-error": "Noctalia kunne ikkje finna innskrivingsdata til kalenderen gjennom Løyndomstenesta",
+          "description-error": "paw2-shell kunne ikkje finna innskrivingsdata til kalenderen gjennom Løyndomstenesta",
           "description-locked": "Innskrivingsdata til kalenderen er låste eller tilgang var neitta; lås opp Løyndomstenesta og prøv att",
           "description-migration": "Innskrivingsdata til kalenderen i berr tekst ventar på å flytta inn til Løyndomstenesta; dei vert ikkje bruka til kalendersynkronisering",
           "description-opening": "Innskrivingsdata til kalenderen vert opna gjennom Løyndomstenesta",
@@ -2420,12 +2420,12 @@
         "calendar-storage": {
           "button": "Prøv att",
           "description-cancelled": "Leieteksten for kryptert lagring vart avbroten; kalenderarrangement er tilgjengelege berre for denne øykta",
-          "description-error": "Noctalia kunne ikkje opna eller lagra det krypterte mellomlageret for kalenderarrangement",
+          "description-error": "paw2-shell kunne ikkje opna eller lagra det krypterte mellomlageret for kalenderarrangement",
           "description-locked": "Kryptert lagring er låst eller tilgang neitta; ordna tilgang og prøv att",
           "description-migration": "Mellomlageret for kalenderarrangement i berr tekst ventar på kryptering; det held seg fram til flyttinga har vellukka",
           "description-missing-key": "Lykelen for mellomlagring av kalenderarrangement vantar; innskrivingsdata brukar anna lagring (filer i mellomlageret er berga)",
           "description-opening": "Det krypterte mellomlageret for kalenderarrangement opnar",
-          "description-recovery": "Noctalia kunne ikkje sanna mellomlageret for kalenderarrangement eller det er skadt, prøv att med attoppskipa og rett lykel eller nullstill privat lagring",
+          "description-recovery": "paw2-shell kunne ikkje sanna mellomlageret for kalenderarrangement eller det er skadt, prøv att med attoppskipa og rett lykel eller nullstill privat lagring",
           "description-unavailable": "Ingen tilgjengelege Løyndomstenestegjevarar; kalenderarrangement held seg tilgjengelege berre for denne øykta",
           "label": "Lager for kalenderarrangement"
         },
@@ -2460,7 +2460,7 @@
           "placeholder": "By, Land"
         },
         "location-auto-locate": {
-          "description": "Finn staden din automatisk ut frå IP-adressa di med noctalia.dev",
+          "description": "Finn staden din automatisk ut frå IP-adressa di med ipapi.co",
           "label": "Finn-stad (IP)"
         },
         "longitude": {
@@ -2669,12 +2669,12 @@
         "clipboard-storage": {
           "button": "Prøv att",
           "description-cancelled": "Leieteksten for Løyndomstenesta vart avbroten; tavlehistorikken er tilgjengeleg berre for denne øykta",
-          "description-error": "Noctalia kunne ikkje opna eller lagra kryptert tavlehistorikk ",
+          "description-error": "paw2-shell kunne ikkje opna eller lagra kryptert tavlehistorikk ",
           "description-locked": "Lykellagring for tavla er låst eller tilgang neitta; ordna tilgang og prøv att",
           "description-migration": "Tavlehistorikk i berr tekst ventar på kryptering; filer no er berga fram til flytting er vellukka",
           "description-missing-key": "Den tilmåta kryptolagringslykelen vantar; tavlehistorikken no er berga",
           "description-opening": "Kryptert tavlehistorikk opnar",
-          "description-recovery": "Noctalia kunne ikkje sanna tavlehistorikk eller han er skadd; prøv att med attoppskipa og rett lykel, eller nullstill privat lagring",
+          "description-recovery": "paw2-shell kunne ikkje sanna tavlehistorikk eller han er skadd; prøv att med attoppskipa og rett lykel, eller nullstill privat lagring",
           "description-unavailable": "Ingen Løyndomstenestegjevar er tilgjengeleg; tavlehistorikk er tilgjengeleg berre for denne øykta",
           "label": "Tavlehistorikklagring"
         },
@@ -2683,7 +2683,7 @@
           "label": "Datoformattering"
         },
         "external-ip": {
-          "description": "Finn den offentlege WAN IP-adressa til oppkoplinga (med api.noctalia.dev) og vis henne i nettverksfana i Styreromet",
+          "description": "Finn den offentlege WAN IP-adressa til oppkoplinga (med api.ipify.org) og vis henne i nettverksfana i Styreromet",
           "label": "Vis WAN IP"
         },
         "keyboard-layout-custom-labels": {
@@ -2691,9 +2691,9 @@
           "label": "Knappefjøloppsettsnamn"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Køyrer applikasjonar i serskilde systemd-tenester slik at dei ikkje dela cgroup med Noctalia",
+          "description": "Køyrer applikasjonar i serskilde systemd-tenester slik at dei ikkje dela cgroup med paw2-shell",
           "label": "Køyr appar som systemd-tenester",
-          "requires-systemd-session": "Krev at Noctalia køyrer som systemd-brukartenesta (uwsm eller systemd brukareining)"
+          "requires-systemd-session": "Krev at paw2-shell køyrer som systemd-brukartenesta (uwsm eller systemd brukareining)"
         },
         "launch-apps-custom-command": {
           "description": "Ballar inn appar som køyrer frå veljaren, festepunktet og oppgåvelina; byter ut $CMD med den opphavlege kommandoen.",
@@ -3027,7 +3027,7 @@
       "button-confirm": "Stadfest nullstilling",
       "description": "Sletta lagra tavlehistorikk og kalenderarrangement i all æve, og opna privat lagring å nyo (ei tilmåta lykelfil vert aldri brigda)",
       "error-delete": "Nokre filer i privat lagring kunne ikkje slettast. Lagringslykene var berga.",
-      "error-key": "Filer i privat lagring var sletta, men Noctalia kunne ikkje opna trygg lagring å nyo. Ordna tilgang og prøv att.",
+      "error-key": "Filer i privat lagring var sletta, men paw2-shell kunne ikkje opna trygg lagring å nyo. Ordna tilgang og prøv att.",
       "label": "Berga privat lagring",
       "success": "Privat lagring vellukka med nullstilling"
     },
@@ -3315,7 +3315,7 @@
           "label": "Del etter arbeidsrom"
         },
         "group-single-icon-per-app": {
-          "description": "Når Noctalia delar etter arbeidsrom med merke, slå saman mange ruter frå same appen til eitt merke og eit tal.",
+          "description": "Når paw2-shell delar etter arbeidsrom med merke, slå saman mange ruter frå same appen til eitt merke og eit tal.",
           "label": "Eit merke for kvar app"
         },
         "height": {
@@ -3335,7 +3335,7 @@
           "label": "Gøym artist"
         },
         "hide-empty-workspaces": {
-          "description": "Når Noctalia delar etter arbeidsrom, ikkje tak med piller utan køyrande ruter i lista på oppgåvelina.",
+          "description": "Når paw2-shell delar etter arbeidsrom, ikkje tak med piller utan køyrande ruter i lista på oppgåvelina.",
           "label": "Gøym tome arbeidsrom"
         },
         "hide-inactive": {
@@ -3729,15 +3729,15 @@
       "export-config": "Før ut tilmåting ...",
       "export-config-saved": "Tilmåtingsutførsle lagra.",
       "filter-overridden": "Overstyrt",
-      "legacy-config-warning": "Utdatert innstilling: {issue}. Brigda på dette brunnoppslag; Noctalia legg til dette utbytet berre mellombels. Køyr nocatlia config validate for å sjå alle dei naudsynlege brigda.",
-      "native-title": "Noctalia-innstillingar",
+      "legacy-config-warning": "Utdatert innstilling: {issue}. Brigda på dette brunnoppslag; paw2-shell legg til dette utbytet berre mellombels. Køyr nocatlia config validate for å sjå alle dei naudsynlege brigda.",
+      "native-title": "paw2-shell-innstillingar",
       "no-results": "Ingen innstillingar funne",
       "no-results-hint": "Prøv med eit anna innstillingsnamn eller config-lykel.",
       "offline-mode-notice": {
         "appearance": "Nedlasta palettar frå samfunnet kjem ikkje til å verka.",
         "calendar-account": "Kalenderfinning og synkronisering kjem ikkje til å verka.",
         "disable-hint": "Slå av avnetes-modus i Tryggleik.",
-        "launcher": "Noctalia kjem ikkje til å kunna henta valutakurs.",
+        "launcher": "paw2-shell kjem ikkje til å kunna henta valutakurs.",
         "location": "Vêr og stadfinning kjem ikkje til å verka.",
         "security": "Ekstern IP-finning og telemetri kjem ikkje til å verka.",
         "templates": "Nedlasting og oppdatering av malar frå samfunnet kjem ikkje til å verka.",

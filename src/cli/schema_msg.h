@@ -524,7 +524,7 @@ namespace paw2shell::cli {
         false
     };
     inline constexpr Command notificationShow{"notification-show",
-                                              "Show an internal Noctalia notification",
+                                              "Show an internal paw2-shell notification",
                                               {},
                                               {},
                                               {},

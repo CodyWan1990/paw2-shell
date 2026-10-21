@@ -106,9 +106,9 @@ namespace calendar {
   std::string CalendarCredentialStore::label(CredentialKind kind) {
     switch (kind) {
     case CredentialKind::Password:
-      return "Noctalia calendar password";
+      return "paw2-shell calendar password";
     }
-    return "Noctalia calendar credential";
+    return "paw2-shell calendar credential";
   }
 
   CredentialState CalendarCredentialStore::stateForStatus(security::SecretStoreStatus status) {

@@ -398,18 +398,18 @@ namespace FileUtils {
   }
 
   [[nodiscard]] inline std::string configDir() {
-    const char* noctalia = std::getenv("PAW2_SHELL_CONFIG_HOME");
-    if (noctalia != nullptr && noctalia[0] != '\0') {
-      return std::string(noctalia) + "/" + kAppDirName;
+    const char* override = std::getenv("PAW2_SHELL_CONFIG_HOME");
+    if (override != nullptr && override[0] != '\0') {
+      return std::string(override) + "/" + kAppDirName;
     }
     const std::string base = xdgConfigHome();
     return base.empty() ? std::string{} : base + "/" + kAppDirName;
   }
 
   [[nodiscard]] inline std::string stateDir() {
-    const char* noctalia = std::getenv("PAW2_SHELL_STATE_HOME");
-    if (noctalia != nullptr && noctalia[0] != '\0') {
-      return std::string(noctalia) + "/" + kAppDirName;
+    const char* override = std::getenv("PAW2_SHELL_STATE_HOME");
+    if (override != nullptr && override[0] != '\0') {
+      return std::string(override) + "/" + kAppDirName;
     }
     const char* xdg = std::getenv("XDG_STATE_HOME");
     if (xdg != nullptr && xdg[0] != '\0') {
@@ -423,9 +423,9 @@ namespace FileUtils {
   }
 
   [[nodiscard]] inline std::string dataDir() {
-    const char* noctalia = std::getenv("PAW2_SHELL_DATA_HOME");
-    if (noctalia != nullptr && noctalia[0] != '\0') {
-      return std::string(noctalia) + "/" + kAppDirName;
+    const char* override = std::getenv("PAW2_SHELL_DATA_HOME");
+    if (override != nullptr && override[0] != '\0') {
+      return std::string(override) + "/" + kAppDirName;
     }
     const char* xdg = std::getenv("XDG_DATA_HOME");
     if (xdg != nullptr && xdg[0] != '\0') {

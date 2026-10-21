@@ -673,7 +673,7 @@
       "dbus-disabled": "Powiadomienia DBus wyłączone",
       "desktop-widgets-editor": "Edytor widżetów",
       "desktop-widgets-editor-enabled": "Edytor widżetów pulpitu jest włączony. Przejdź na pusty obszar roboczy, aby otwarte okna nie zasłaniały edytora.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Ten skrót przyjmuje jeden klawisz bez modyfikatorów.",
       "keybind-invalid-printable": "Klawishe drukowalne (litery, cyfry, symbole) wymagają modyfikatora, takiego jak Ctrl lub Alt.",
       "keybind-invalid-super": "Klawisz Super/Windows nie może być używany w skrótach shella.",
@@ -1223,7 +1223,7 @@
           "label": "Zaokrąglenie narożników"
         },
         "custom-palette": {
-          "description": "Wybierz paletę z ~/.config/noctalia/palettes/",
+          "description": "Wybierz paletę z ~/.config/paw2-shell/palettes/",
           "label": "Niestandardowa paleta",
           "search-placeholder": "Szukaj niestandardowych palet…"
         },
@@ -1582,7 +1582,7 @@
             "label": "Przy wyłączaniu"
           },
           "started": {
-            "description": "Polecenie do uruchomienia po uruchomieniu Noctalia",
+            "description": "Polecenie do uruchomienia po uruchomieniu paw2-shell",
             "label": "Przy starcie"
           },
           "theme-mode-changed": {
@@ -1856,7 +1856,7 @@
           "placeholder": "Miasto, Kraj"
         },
         "location-auto-locate": {
-          "description": "Wykryj swoją lokalizację automatycznie na podstawie twojego adresu IP za pomocą serwisu noctalia.dev",
+          "description": "Wykryj swoją lokalizację automatycznie na podstawie twojego adresu IP za pomocą serwisu ipapi.co",
           "label": "Auto-lokalizacja (IP)"
         },
         "longitude": {
@@ -2047,7 +2047,7 @@
           "label": "Format daty"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Uruchamia aplikacje w oddzielnych usługach systemd, aby nie udostępniały cgroup Noctalia",
+          "description": "Uruchamia aplikacje w oddzielnych usługach systemd, aby nie udostępniały cgroup paw2-shell",
           "label": "Uruchamiaj aplikacje jako usługi systemd"
         },
         "niri-overview-type-to-launch": {
@@ -2733,7 +2733,7 @@
     "window": {
       "export-config": "Eksportuj konfigurację…",
       "export-config-saved": "Konfiguracja wyeksportowana.",
-      "native-title": "Ustawienia Noctalia",
+      "native-title": "Ustawienia paw2-shell",
       "no-results": "Nie znaleziono ustawień",
       "no-results-hint": "Spróbuj innej nazwy ustawienia lub klucza konfiguracji.",
       "reset-page": "Resetuj stronę",

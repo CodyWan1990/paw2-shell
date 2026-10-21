@@ -14,7 +14,7 @@ namespace {
   class TempDir {
   public:
     TempDir() {
-      std::string pattern = (std::filesystem::temp_directory_path() / "noctalia-firefox-manifest-XXXXXX").string();
+      std::string pattern = (std::filesystem::temp_directory_path() / "paw2-shell-firefox-manifest-XXXXXX").string();
       std::array<char, 4096> buffer{};
       TEST_CHECK(pattern.size() < buffer.size());
       std::ranges::copy(pattern, buffer.begin());
@@ -61,13 +61,13 @@ int main() {
   const auto manifestPath = temp.path() / "pywalfox.json";
   TEST_CHECK(manifest::inspect(manifestPath).ownership == manifest::Ownership::Missing);
 
-  const std::filesystem::path staleNixHost = "/nix/store/old-noctalia-5.1.0/bin/.noctalia-wrapped";
+  const std::filesystem::path staleNixHost = "/nix/store/old-paw2-shell-5.1.0/bin/.paw2-shell-wrapped";
   writeManifest(manifestPath, manifest::kDescription, staleNixHost);
   auto inspection = manifest::inspect(manifestPath);
-  TEST_CHECK(inspection.ownership == manifest::Ownership::Noctalia);
+  TEST_CHECK(inspection.ownership == manifest::Ownership::Shell);
   TEST_CHECK(inspection.hostPath == staleNixHost);
 
-  const auto currentNixHost = temp.path() / ".noctalia-wrapped";
+  const auto currentNixHost = temp.path() / ".paw2-shell-wrapped";
   {
     std::ofstream out(currentNixHost);
     TEST_CHECK(out.good());
@@ -75,11 +75,11 @@ int main() {
   std::string error;
   TEST_CHECK(manifest::install(manifestPath, currentNixHost, &error));
   inspection = manifest::inspect(manifestPath);
-  TEST_CHECK(inspection.ownership == manifest::Ownership::Noctalia);
+  TEST_CHECK(inspection.ownership == manifest::Ownership::Shell);
   TEST_CHECK(inspection.hostPath == std::filesystem::weakly_canonical(currentNixHost));
 
-  writeManifest(manifestPath, "Noctalia Pywalfox native messaging host", "/usr/bin/noctalia-pywalfox");
-  TEST_CHECK(manifest::inspect(manifestPath).ownership == manifest::Ownership::Noctalia);
+  writeManifest(manifestPath, "paw2-shell Pywalfox native messaging host", "/usr/bin/paw2-shell-pywalfox");
+  TEST_CHECK(manifest::inspect(manifestPath).ownership == manifest::Ownership::Shell);
 
   writeManifest(manifestPath, "Automatically theme Firefox with Pywal", "/usr/bin/pywalfox");
   inspection = manifest::inspect(manifestPath);

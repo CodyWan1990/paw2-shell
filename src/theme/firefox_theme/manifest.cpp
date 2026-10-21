@@ -6,9 +6,9 @@
 namespace paw2shell::theme::firefox_theme::manifest {
   namespace {
 
-    constexpr std::string_view kLegacyDescription = "Noctalia Pywalfox native messaging host";
+    constexpr std::string_view kLegacyDescription = "paw2-shell Pywalfox native messaging host";
 
-    [[nodiscard]] bool isNoctaliaDescription(std::string_view description) {
+    [[nodiscard]] bool isShellDescription(std::string_view description) {
       return description == kDescription || description == kLegacyDescription;
     }
 
@@ -35,8 +35,8 @@ namespace paw2shell::theme::firefox_theme::manifest {
       }
       if (const auto description = root.find("description"); description != root.end()
           && description->is_string()
-          && isNoctaliaDescription(description->get_ref<const std::string&>())) {
-        result.ownership = Ownership::Noctalia;
+          && isShellDescription(description->get_ref<const std::string&>())) {
+        result.ownership = Ownership::Shell;
       }
       return result;
     } catch (...) {

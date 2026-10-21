@@ -40,9 +40,9 @@ namespace paw2shell::cli {
 
   inline constexpr Command kRootCmd{
       "paw2-shell",
-      "Desktop shell for the paw2 Wayland compositor, built on Noctalia",
+      "Desktop shell for the paw2 Wayland compositor",
       {},
-      "Noctalia documentation (most of it applies):\n  https://noctalia.dev",
+      "Source and issues:\n  https://github.com/CodyWan1990/paw2-shell",
       kRootFlags,
       {},
       kRootSubcommands,

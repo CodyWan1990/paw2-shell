@@ -1262,7 +1262,7 @@ void SettingsWindow::openCalendarAccountEditor(std::optional<std::string> accoun
             ui::input({
                 .out = &passwordFileInput,
                 .value = draft->passwordFile,
-                .placeholder = "/run/agenix/noctalia-caldav",
+                .placeholder = "/run/agenix/paw2-shell-caldav",
                 .invalid = draft->passwordFileInvalid,
                 .enabled = draft->creating,
                 .onChange = [draft](const std::string& value) {
@@ -1738,7 +1738,7 @@ void SettingsWindow::saveSupportReport() {
 
   FileDialogOptions options;
   options.mode = FileDialogMode::Save;
-  options.defaultFilename = "noctalia-support-report.toml";
+  options.defaultFilename = "paw2-shell-support-report.toml";
   options.title = i18n::tr("settings.window.support-report-title");
   options.extensions = {".toml"};
 
@@ -1781,7 +1781,7 @@ void SettingsWindow::saveConfigExport(settings::ConfigExportMode mode) {
 
   FileDialogOptions options;
   options.mode = FileDialogMode::Save;
-  options.defaultFilename = fullEffective ? "noctalia-full-config.toml" : "noctalia-config.toml";
+  options.defaultFilename = fullEffective ? "paw2-shell-full-config.toml" : "paw2-shell-config.toml";
   options.title = fullEffective ? i18n::tr("settings.export-config.full-effective-save-title")
                                 : i18n::tr("settings.export-config.merged-user-save-title");
   options.extensions = {".toml"};

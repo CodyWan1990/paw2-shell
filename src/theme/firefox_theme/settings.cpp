@@ -18,7 +18,7 @@ namespace paw2shell::theme::firefox_theme::settings {
       if (configHome.empty()) {
         return {};
       }
-      // Extension wire path — keep stable even though noctalia naming avoids "pywalfox".
+      // Extension wire path — keep stable even though paw2-shell naming avoids "pywalfox".
       return configHome / "pywalfox" / "config.json";
     }
 

@@ -722,9 +722,9 @@ std::string ConfigService::buildSupportReport() const {
 
   toml::table report;
   report.insert_or_assign("format_version", std::int64_t{1});
-  report.insert_or_assign("generated_by", "noctalia");
+  report.insert_or_assign("generated_by", "paw2-shell");
   report.insert_or_assign("generated_at_utc", utcTimestamp());
-  report.insert_or_assign("noctalia_version", std::string(paw2shell::build_info::version()));
+  report.insert_or_assign("paw2_shell_version", std::string(paw2shell::build_info::version()));
   report.insert_or_assign("git_revision", std::string(paw2shell::build_info::revision()));
   root.insert_or_assign("report", std::move(report));
 
@@ -1289,7 +1289,7 @@ void ConfigService::setConfigParseError(ConfigProblem problem) {
   std::string title = located ? problem.origin.shortFormat(m_configDir) : std::string("Config error");
   std::string body = located ? "Error: " + problem.message : std::move(problem.message);
   m_configErrorNotificationId =
-      m_notificationManager->addInternal("Noctalia", std::move(title), std::move(body), Urgency::Critical, 0);
+      m_notificationManager->addInternal("paw2-shell", std::move(title), std::move(body), Urgency::Critical, 0);
 }
 
 void ConfigService::updateLegacyConfigIssues(paw2shell::config::LegacyConfigIssues issues) {
@@ -1355,7 +1355,7 @@ void ConfigService::notifyLegacyConfigIssues() {
   std::string title = issue.origin.valid() ? issue.origin.shortFormat(m_configDir)
                                            : i18n::tr("notifications.internal.config-migration-title");
   (void)m_notificationManager->addInternal(
-      "Noctalia", std::move(title),
+      "paw2-shell", std::move(title),
       i18n::tr("notifications.internal.config-migration-body", "path", issue.path + ": " + issue.message),
       Urgency::Normal
   );

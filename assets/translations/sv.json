@@ -695,7 +695,7 @@
       "battery-low-body": "{device}: {percent}% kvar",
       "battery-low-title": "Batterinivå låg",
       "calendar": "Kalender",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "launcher-usage-reset": "Launcher",
       "screen-time-reset": "Skärmtid",
       "wallpaper-palette-export": "Anpassad färgskala"

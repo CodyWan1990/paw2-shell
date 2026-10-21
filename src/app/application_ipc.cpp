@@ -256,7 +256,7 @@ void Application::initIpc() {
       return "error: notification-show requires <summary> or <json-payload>\n";
     }
 
-    std::string appName = "Noctalia";
+    std::string appName = "paw2-shell";
     std::string summary;
     std::string body;
     Urgency urgency = Urgency::Normal;
@@ -367,12 +367,12 @@ void Application::initIpc() {
 
     if (icon.has_value()) {
       const std::string& iconValue = *icon;
-      const bool hasExplicitPrefix = iconValue.starts_with("noctalia-glyph:");
+      const bool hasExplicitPrefix = iconValue.starts_with("paw2-glyph:");
       const bool looksLikePath = iconValue.starts_with('/') || iconValue.starts_with("~/") || iconValue.contains('/');
       const bool looksLikeFileUri = iconValue.starts_with("file:");
       const bool looksLikeRemoteUrl = iconValue.starts_with("http://") || iconValue.starts_with("https://");
       if (!hasExplicitPrefix && !looksLikePath && !looksLikeFileUri && !looksLikeRemoteUrl) {
-        icon = "noctalia-glyph:" + iconValue;
+        icon = "paw2-glyph:" + iconValue;
       }
     }
 

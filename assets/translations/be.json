@@ -794,12 +794,12 @@
       "battery-low-body": "{device}: засталося {percent}%",
       "battery-low-title": "Нізкі зарад батарэі",
       "calendar": "Каляндар",
-      "config-migration-body": "Абнавіце {path} у зыходным файле. Noctalia толькі тэрмінова прымяняе гэтую замену. Выканайце noctalia config validate, каб убачыць усе патрэбныя змены.",
+      "config-migration-body": "Абнавіце {path} у зыходным файле. paw2-shell толькі тэрмінова прымяняе гэтую замену. Выканайце paw2-shell config validate, каб убачыць усе патрэбныя змены.",
       "config-migration-title": "Патрабуецца абнаўленне канфігурацыі",
       "dbus-disabled": "Апавяшчэнні DBus выключаныя",
       "desktop-widgets-editor": "Рэдактар віджэтаў",
       "desktop-widgets-editor-enabled": "Рэдактар віджэтаў працоўнага стала ўключаны. Пераключыцеся на пустую прастору, каб вокны не перакрывалі рэдактар.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Гэта спалучэнне можа быць адной клавішай без мадыфікатараў.",
       "keybind-invalid-printable": "Клавішам-сімвалам (літарам, лічбам, пунктуацыі і інш.) патрабуюцца мадыфікатары, такія як Ctrl або Alt.",
       "keybind-invalid-super": "Клавіша Super/Windows не можа быць выкарыстана ў спалучэннях клавішаў абалонкі.",
@@ -1521,7 +1521,7 @@
           "label": "Скругленасць кутоў"
         },
         "custom-palette": {
-          "description": "Выберыце палітру з ~/.config/noctalia/palettes/",
+          "description": "Выберыце палітру з ~/.config/paw2-shell/palettes/",
           "label": "Уласная палітра",
           "search-placeholder": "Шукаць карыстальніцкія палітры…"
         },

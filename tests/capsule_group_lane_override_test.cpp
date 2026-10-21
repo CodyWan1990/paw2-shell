@@ -37,7 +37,7 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-lane-override-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-lane-override-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
   writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", R"(
 [bar.default]

@@ -63,7 +63,7 @@ namespace {
   }
 
   bool writesCappedLogLines() {
-    const auto cacheRoot = makeTempRoot("noctalia-log-cap");
+    const auto cacheRoot = makeTempRoot("paw2-shell-log-cap");
     if (!expect(useCacheHome(cacheRoot), "failed to set XDG_CACHE_HOME")) {
       return false;
     }
@@ -85,7 +85,7 @@ namespace {
   }
 
   bool rotatesWhileRunning() {
-    const auto cacheRoot = makeTempRoot("noctalia-log-rotate");
+    const auto cacheRoot = makeTempRoot("paw2-shell-log-rotate");
     if (!expect(useCacheHome(cacheRoot), "failed to set XDG_CACHE_HOME")) {
       return false;
     }

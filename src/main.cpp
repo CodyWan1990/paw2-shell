@@ -224,7 +224,7 @@ namespace {
     // is settled before bars or surfaces are created. Held for the process lifetime.
     SingleInstanceLock instanceLock;
     if (!instanceLock.tryAcquire()) {
-      std::println(stderr, "error: noctalia is already running");
+      std::println(stderr, "error: paw2-shell is already running");
       completeDaemonStartup(1);
       _exit(1);
     }
@@ -306,7 +306,7 @@ int main(int argc, char* argv[]) {
 
   if (argc >= 2) {
     std::println(stderr, "error: unknown command: {}", argv[1]);
-    std::println(stderr, "Run 'noctalia --help' for usage.");
+    std::println(stderr, "Run 'paw2-shell --help' for usage.");
     return 1;
   }
 

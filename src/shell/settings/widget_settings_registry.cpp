@@ -650,7 +650,7 @@ namespace settings {
 
     widgetColor = withGroup(std::move(widgetColor), "look");
 
-    // The Look group is what shows by default; everything else is Noctalia's fine-tuning and waits
+    // The Look group is what shows by default; everything else is fine-tuning and waits
     // for the Settings window's Advanced toggle.
     std::vector<WidgetSettingSpec> look{std::move(style), std::move(widgetColor), std::move(underlineWidth)};
     for (auto& spec : look) {

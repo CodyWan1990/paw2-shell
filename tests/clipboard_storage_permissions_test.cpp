@@ -561,7 +561,7 @@ int main() {
   }
 
   const auto serial = std::chrono::steady_clock::now().time_since_epoch().count();
-  const fs::path root = fs::temp_directory_path() / ("noctalia-clipboard-storage-test-" + std::to_string(serial));
+  const fs::path root = fs::temp_directory_path() / ("paw2-shell-clipboard-storage-test-" + std::to_string(serial));
   fs::remove_all(root);
   fs::create_directories(root);
 

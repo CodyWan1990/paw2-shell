@@ -846,7 +846,7 @@ namespace settings {
                     state->push_back(
                         SessionPanelActionConfig{
                             .action = "command",
-                            .command = "notify-send 'Noctalia' 'Custom session entry'",
+                            .command = "notify-send 'paw2-shell' 'Custom session entry'",
                         }
                     );
                     commit();

@@ -48,7 +48,7 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-override-mutation-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-override-mutation-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
   writeFile(root / "config" / FileUtils::kAppDirName / "config.toml", "[dock]\nenabled = true\nmonitors = [\"legacy\"]\n");
 
@@ -83,7 +83,7 @@ int main() {
     // `path` is required, so both edits belong to the same commit.
     std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>> switchToVdir;
     switchToVdir.emplace_back(typePath, std::string("vdir"));
-    switchToVdir.emplace_back(vdirPath, std::string("/tmp/noctalia-vdir-mutation-test"));
+    switchToVdir.emplace_back(vdirPath, std::string("/tmp/paw2-shell-vdir-mutation-test"));
     expect(config.mutateOverrides(switchToVdir, {serverUrlPath}, nullptr), "provider switch writes");
 
     expect(reloads == 1, "provider switch reaches the config exactly once");
@@ -95,7 +95,7 @@ int main() {
     expect(account != nullptr, "account survives the switch");
     if (account != nullptr) {
       expect(account->type == "vdir", "account type is vdir");
-      expect(account->path == "/tmp/noctalia-vdir-mutation-test", "account path is set");
+      expect(account->path == "/tmp/paw2-shell-vdir-mutation-test", "account path is set");
       expect(account->serverUrl.empty(), "account server_url is cleared");
     }
 

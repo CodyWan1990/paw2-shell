@@ -115,7 +115,7 @@ namespace {
 
   std::string userHostLine() { return std::format("{}@{}", sessionUserName(), hostName()); }
 
-  std::string noctaliaVersionLine() { return std::format("Noctalia {}", paw2shell::build_info::displayVersion()); }
+  std::string shellVersionLine() { return std::format("paw2-shell {}", paw2shell::build_info::displayVersion()); }
 
   void applyShortcutButtonStyle(Button& button, bool enabled, bool active, float fillOpacity) {
     const bool on = enabled && active;
@@ -258,7 +258,7 @@ std::unique_ptr<Flex> HomeTab::create() {
         return;
       }
       notify::error(
-          "Noctalia", i18n::tr("control-center.home.avatar-error-title"),
+          "paw2-shell", i18n::tr("control-center.home.avatar-error-title"),
           i18n::tr(shell::avatarApplyErrorTranslationKey(applyResult.error))
       );
     });
@@ -340,7 +340,7 @@ std::unique_ptr<Flex> HomeTab::create() {
           }),
           ui::label({
               .out = &m_ui.userVersion,
-              .text = noctaliaVersionLine(),
+              .text = shellVersionLine(),
               .fontSize = Style::fontSizeCaption * scale,
               .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
               .configure = configureUserDetailLabel,
@@ -1383,7 +1383,7 @@ void HomeTab::sync(Renderer& renderer) {
     m_ui.userUptime->setText(i18n::tr("control-center.home.uptime", "uptime", uptimeText));
   }
   if (m_ui.userVersion != nullptr) {
-    m_ui.userVersion->setText(noctaliaVersionLine());
+    m_ui.userVersion->setText(shellVersionLine());
   }
 
   const bool weatherEnabled = m_weather != nullptr && m_weather->enabled();

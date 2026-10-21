@@ -790,7 +790,7 @@
       "dbus-disabled": "Notifications DBus désactivées",
       "desktop-widgets-editor": "Éditeur de widgets",
       "desktop-widgets-editor-enabled": "L’éditeur de widgets de bureau est activé. Basculez sur un espace de travail vide pour ne pas superposer des fenêtres sur l'éditeur.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Ce raccourci accepte une seule touche sans modificateur.",
       "keybind-invalid-printable": "Les touches imprimables (lettres, chiffres, symboles) nécessitent un modificateur tel que Ctrl ou Alt.",
       "keybind-invalid-super": "La touche Super/Windows ne peut pas être utilisée dans les raccourcis du shell.",
@@ -1482,7 +1482,7 @@
           "label": "Arrondi des coins"
         },
         "custom-palette": {
-          "description": "Choisir une palette depuis ~/.config/noctalia/palettes/",
+          "description": "Choisir une palette depuis ~/.config/paw2-shell/palettes/",
           "label": "Palette personnalisée",
           "search-placeholder": "Chercher des palettes personnalisées..."
         },
@@ -1914,7 +1914,7 @@
             "label": "Lors de l’arrêt du système"
           },
           "started": {
-            "description": "Commande à exécuter après le démarrage de Noctalia",
+            "description": "Commande à exécuter après le démarrage de paw2-shell",
             "label": "Après le démarrage"
           },
           "theme-mode-changed": {
@@ -2330,7 +2330,7 @@
           "placeholder": "Ville, Pays"
         },
         "location-auto-locate": {
-          "description": "Détecte vote position automatiquement à partir de votre adresse IP via noctalia.dev",
+          "description": "Détecte vote position automatiquement à partir de votre adresse IP via ipapi.co",
           "label": "Localisation automatique (IP)"
         },
         "longitude": {
@@ -2537,7 +2537,7 @@
           "label": "Format de date"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Lance les applications dans des services systemd distincts afin qu’elles ne partagent pas le même cgroup que Noctalia",
+          "description": "Lance les applications dans des services systemd distincts afin qu’elles ne partagent pas le même cgroup que paw2-shell",
           "label": "Lancer les applications comme services systemd"
         },
         "launch-apps-custom-command": {
@@ -3165,7 +3165,7 @@
     },
     "window": {
       "export-config": "Exporter la configuration...",
-      "native-title": "Paramètres Noctalia",
+      "native-title": "Paramètres paw2-shell",
       "no-results": "Pas de paramètre trouvé",
       "offline-mode-notice": {
         "templates": "Les téléchargements des modèles de la communauté et des mises à jour ne vont pas fonctionner. ",

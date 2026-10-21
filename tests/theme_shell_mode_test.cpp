@@ -51,7 +51,7 @@ namespace {
 
 int main() {
   const std::filesystem::path root =
-      std::filesystem::temp_directory_path() / ("noctalia-theme-shell-mode-" + std::to_string(::getpid()));
+      std::filesystem::temp_directory_path() / ("paw2-shell-theme-shell-mode-" + std::to_string(::getpid()));
   std::filesystem::remove_all(root);
   std::filesystem::create_directories(root / "config" / FileUtils::kAppDirName);
   std::filesystem::create_directories(root / "state" / FileUtils::kAppDirName);
@@ -79,7 +79,7 @@ int main() {
     TEST_CHECK(r.appliedMode == "dark");
   }
 
-  // A shell_mode left over from Noctalia no longer pins the shell apart from apps.
+  // A shell_mode left over from older configs no longer pins the shell apart from apps.
   {
     const Resolution r = resolve(overrides, "[theme]\nmode = \"light\"\nshell_mode = \"dark\"\n");
     TEST_CHECK(r.mode == "light");

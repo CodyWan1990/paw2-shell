@@ -37,7 +37,7 @@ namespace paw2shell::theme {
     namespace settings = firefox_theme::settings;
 
     // Wire names required by the Pywalfox Firefox/Thunderbird extension.
-    constexpr std::string_view kHostVersion = "noctalia-2.9.0-compat";
+    constexpr std::string_view kHostVersion = "paw2-shell-2.9.0-compat";
 
     constexpr std::string_view kActionVersion = "debug:version";
     constexpr std::string_view kActionColors = "action:colors";
@@ -107,9 +107,9 @@ namespace paw2shell::theme {
     // reach all Firefox profiles, not only the process that owns the Unix socket.
     [[nodiscard]] std::filesystem::path commandNotifyDir() {
       if (const char* runtime = std::getenv("XDG_RUNTIME_DIR"); runtime != nullptr && runtime[0] != '\0') {
-        return std::filesystem::path(runtime) / "noctalia" / "firefox-theme";
+        return std::filesystem::path(runtime) / "paw2-shell" / "firefox-theme";
       }
-      return std::filesystem::temp_directory_path() / ("noctalia-firefox-theme-" + std::to_string(::getuid()));
+      return std::filesystem::temp_directory_path() / ("paw2-shell-firefox-theme-" + std::to_string(::getuid()));
     }
 
     [[nodiscard]] std::filesystem::path commandNotifyPath() { return commandNotifyDir() / "command"; }
@@ -190,7 +190,7 @@ namespace paw2shell::theme {
       return home / ".mozilla" / "native-messaging-hosts" / "pywalfox.json";
     }
 
-    [[nodiscard]] std::filesystem::path resolveNoctaliaExecutable() {
+    [[nodiscard]] std::filesystem::path resolveShellExecutable() {
       const std::string self = selfExePath();
       if (!self.empty()) {
         return self;
@@ -237,9 +237,9 @@ namespace paw2shell::theme {
       return true;
     }
 
-    // Install only when absent or already owned by noctalia — never clobber a foreign host.
-    bool ensureManifestOwnedByNoctalia(std::string* error, std::string* warning) {
-      const auto host = resolveNoctaliaExecutable();
+    // Install only when absent or already owned by paw2-shell — never clobber a foreign host.
+    bool ensureManifestOwnedByShell(std::string* error, std::string* warning) {
+      const auto host = resolveShellExecutable();
       if (host.empty()) {
         if (error != nullptr) {
           *error = "paw2-shell executable not found";
@@ -571,7 +571,7 @@ namespace paw2shell::theme {
 
     std::string ensureError;
     std::string ensureWarning;
-    if (!ensureManifestOwnedByNoctalia(&ensureError, &ensureWarning)) {
+    if (!ensureManifestOwnedByShell(&ensureError, &ensureWarning)) {
       result.error = ensureError;
       return result;
     }
@@ -721,7 +721,7 @@ namespace paw2shell::theme {
       return runFirefoxNativeMessagingHost();
     }
     if (action == "install") {
-      const auto host = resolveNoctaliaExecutable();
+      const auto host = resolveShellExecutable();
       std::string err;
       if (!installManifest(host, &err)) {
         std::println(stderr, "install failed: {}", err);

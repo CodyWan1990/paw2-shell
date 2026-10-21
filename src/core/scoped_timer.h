@@ -9,7 +9,7 @@
 
 // Lightweight, opt-in wall-clock profiling. Output is gated behind the
 // PAW2_SHELL_PROFILE env var so normal runs stay silent; set it to any non-empty
-// value to surface timing lines (e.g. `PAW2_SHELL_PROFILE=1 noctalia`).
+// value to surface timing lines (e.g. `PAW2_SHELL_PROFILE=1 paw2-shell`).
 namespace paw2shell::profiling {
 
   // Evaluated once on first use.

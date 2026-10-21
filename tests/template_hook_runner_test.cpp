@@ -15,7 +15,7 @@
 namespace {
 
   std::filesystem::path sentinelPath(const char* name) {
-    return std::filesystem::temp_directory_path() / (std::string("noctalia_hook_runner_") + name);
+    return std::filesystem::temp_directory_path() / (std::string("paw2_shell_hook_runner_") + name);
   }
 
   std::string readSentinel(const std::filesystem::path& path) {

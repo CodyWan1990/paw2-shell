@@ -146,7 +146,7 @@ namespace paw2shell::cli {
 
     void appendBashWords(std::string& output, std::string_view words, unsigned indent) {
       output.append(indent, ' ');
-      output.append("_noctalia_complete_words ");
+      output.append("_paw2_shell_complete_words ");
       output.append(bashAnsiQuote(words));
       output.push_back('\n');
     }
@@ -205,15 +205,15 @@ namespace paw2shell::cli {
   std::string generateBash(const Command& root) {
     const auto states = collectStates(root);
     std::string output =
-        "# bash completion for noctalia; generated from the live CLI schema\n"
-        "_noctalia_complete_words() {\n"
+        "# bash completion for paw2-shell; generated from the live CLI schema\n"
+        "_paw2_shell_complete_words() {\n"
         "  local words=\"$1\"\n"
         "  local IFS=$'\\n'\n"
         "  COMPREPLY=( $(compgen -W \"$words\" -- \"$cur\") )\n"
         "}\n\n"
-        "_noctalia_completions() {\n"
+        "_paw2_shell_completions() {\n"
         "  local cur=\"${COMP_WORDS[COMP_CWORD]}\"\n"
-        "  local path=noctalia\n"
+        "  local path=paw2-shell\n"
         "  local depth=1\n"
         "  local i token\n"
         "  for ((i=1; i<COMP_CWORD; ++i)); do\n"
@@ -313,7 +313,7 @@ namespace paw2shell::cli {
         output.append(")\n");
         if (!positional.runtimeProvider.empty()) {
           output.append(10, ' ');
-          output.append("_noctalia_");
+          output.append("_paw2_shell_");
           output.append(positional.runtimeProvider);
           output.append("\n");
         } else if (positional.choices.empty()) {
@@ -330,7 +330,7 @@ namespace paw2shell::cli {
         const Positional& positional = command.positionals.back();
         if (!positional.runtimeProvider.empty()) {
           output.append(10, ' ');
-          output.append("_noctalia_");
+          output.append("_paw2_shell_");
           output.append(positional.runtimeProvider);
           output.append("\n");
         } else if (positional.choices.empty()) {
@@ -341,17 +341,17 @@ namespace paw2shell::cli {
       }
       output.append("          ;;\n      esac\n      ;;\n");
     }
-    output.append("  esac\n}\n\ncomplete -F _noctalia_completions noctalia\n");
+    output.append("  esac\n}\n\ncomplete -F _paw2_shell_completions paw2-shell\n");
     return output;
   }
 
   std::string generateZsh(const Command& root) {
     const auto states = collectStates(root);
-    std::string output = "#compdef noctalia\n# generated from the live CLI schema\n\n";
+    std::string output = "#compdef paw2-shell\n# generated from the live CLI schema\n\n";
 
     for (const CommandState& state : states) {
       const Command& command = *state.command;
-      output.append("_noctalia_");
+      output.append("_paw2_shell_");
       output.append(stateId(state.path));
       output.append("() {\n  local context state state_descr line\n  typeset -A opt_args\n");
 
@@ -380,7 +380,7 @@ namespace paw2shell::cli {
           childPath.push_back(child.name);
           output.append("        ");
           output.append(child.name);
-          output.append(") _noctalia_");
+          output.append(") _paw2_shell_");
           output.append(stateId(childPath));
           output.append(" ;;\n");
         }
@@ -398,7 +398,7 @@ namespace paw2shell::cli {
           spec.push_back(':');
 
           if (!positional.runtimeProvider.empty())
-            spec.append("_noctalia_").append(positional.runtimeProvider);
+            spec.append("_paw2_shell_").append(positional.runtimeProvider);
           else if (positional.choices.empty())
             spec.append("_files");
           else
@@ -414,16 +414,16 @@ namespace paw2shell::cli {
       output.append("}\n\n");
     }
 
-    output.append("_noctalia() { _noctalia_");
+    output.append("_paw2_shell() { _paw2_shell_");
     output.append(stateId(states.front().path));
-    output.append(" }\n\n_noctalia \"$@\"\n");
+    output.append(" }\n\n_paw2-shell \"$@\"\n");
     return output;
   }
 
   std::string generateFish(const Command& root) {
     const auto states = collectStates(root);
-    std::string output = "# fish completion for noctalia; generated from the live CLI schema\n"
-                         "function __noctalia_path_prefix\n"
+    std::string output = "# fish completion for paw2-shell; generated from the live CLI schema\n"
+                         "function __paw2_shell_path_prefix\n"
                          "    set -l tokens (commandline -opc)\n"
                          "    if test (count $tokens) -gt 0\n"
                          "        set -e tokens[1]\n"
@@ -436,7 +436,7 @@ namespace paw2shell::cli {
                          "    end\n"
                          "    return 0\n"
                          "end\n\n"
-                         "function __noctalia_exact_path\n"
+                         "function __paw2_shell_exact_path\n"
                          "    set -l tokens (commandline -opc)\n"
                          "    if test (count $tokens) -gt 0\n"
                          "        set -e tokens[1]\n"
@@ -452,7 +452,7 @@ namespace paw2shell::cli {
                          "    end\n"
                          "    return 0\n"
                          "end\n\n"
-                         "function __noctalia_at_pos\n"
+                         "function __paw2_shell_at_pos\n"
                          "    set -l wanted $argv[1]\n"
                          "    set -e argv[1]\n"
                          "    set -l tokens (commandline -opc)\n"
@@ -477,13 +477,13 @@ namespace paw2shell::cli {
     for (const CommandState& state : states) {
       const Command& command = *state.command;
       const std::string path = pathArgs(state.path);
-      const std::string exactCondition = path.empty() ? "__noctalia_exact_path" : "__noctalia_exact_path " + path;
-      const std::string prefixCondition = path.empty() ? "__noctalia_path_prefix" : "__noctalia_path_prefix " + path;
+      const std::string exactCondition = path.empty() ? "__paw2_shell_exact_path" : "__paw2_shell_exact_path " + path;
+      const std::string prefixCondition = path.empty() ? "__paw2_shell_path_prefix" : "__paw2_shell_path_prefix " + path;
 
       for (const Command& child : command.subcommands) {
         if (child.hidden)
           continue;
-        output.append("complete -c noctalia -n ");
+        output.append("complete -c paw2-shell -n ");
         output.append(shellSingleQuote(exactCondition));
         output.append(" -f -a ");
         output.append(shellSingleQuote(child.name));
@@ -495,7 +495,7 @@ namespace paw2shell::cli {
       }
 
       for (const Flag& flag : command.flags) {
-        output.append("complete -c noctalia -n ");
+        output.append("complete -c paw2-shell -n ");
         output.append(shellSingleQuote(prefixCondition));
         if (!flag.shortName.empty()) {
           output.append(" -s ");
@@ -520,7 +520,7 @@ namespace paw2shell::cli {
         }
         output.push_back('\n');
       }
-      output.append("complete -c noctalia -n ");
+      output.append("complete -c paw2-shell -n ");
       output.append(shellSingleQuote(prefixCondition));
       output.append(" -s h -l help -d 'Show this help message'\n");
 
@@ -529,17 +529,17 @@ namespace paw2shell::cli {
         if (positional.choices.empty() && positional.runtimeProvider.empty())
           continue;
 
-        std::string condition = "__noctalia_at_pos " + std::to_string(i);
+        std::string condition = "__paw2_shell_at_pos " + std::to_string(i);
         if (!path.empty()) {
           condition.push_back(' ');
           condition.append(path);
         }
-        output.append("complete -c noctalia -n ");
+        output.append("complete -c paw2-shell -n ");
         output.append(shellSingleQuote(condition));
         output.append(" -f -a ");
 
         if (!positional.runtimeProvider.empty()) {
-          std::string call = "(__noctalia_" + std::string(positional.runtimeProvider) + ")";
+          std::string call = "(__paw2_shell_" + std::string(positional.runtimeProvider) + ")";
           output.append(shellSingleQuote(call));
         } else {
           output.append(shellSingleQuote(fishChoiceList(positional.choices)));

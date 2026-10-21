@@ -1,7 +1,7 @@
 [Desktop Entry]
 Type=Application
 Name=paw2-shell
-Comment=Desktop shell for the paw2 Wayland compositor, built on Noctalia.
+Comment=Desktop shell for the paw2 Wayland compositor.
 Exec=paw2-shell --daemon
 Icon=paw2-shell
 Terminal=false

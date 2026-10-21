@@ -188,14 +188,14 @@ private:
   void startTrayService();
   void syncNotificationDaemon();
   void installNotificationBusNameWatch();
-  // gnome-keyring / kwalletd usually claim org.freedesktop.secrets a moment after Noctalia starts,
+  // gnome-keyring / kwalletd usually claim org.freedesktop.secrets a moment after paw2-shell starts,
   // so the first credential lookups report "no provider". Watch the bus name and re-drive the
   // consumers that gave up once an owner appears.
   void installSecretServiceNameWatch();
   // The provider may be present but its collection still locked at startup (PAM holds the password
   // but only opens the store on first request; or a fingerprint/autologin session unlocks it a few
   // seconds later). Watch the collection set and re-drive consumers once the default collection is
-  // actually unlocked, so a lookup that lost the startup race recovers without restarting Noctalia.
+  // actually unlocked, so a lookup that lost the startup race recovers without restarting paw2-shell.
   void installSecretServiceCollectionWatch();
   void onSecretServiceCollectionChanged();
   void retrySecretServiceConsumers(bool defaultCollectionUnlocked = false);
@@ -257,7 +257,7 @@ private:
   std::unique_ptr<LogindService> m_logindService;
   // Set on PrepareForSleep(true); cleared when the session lock engages (or the lock aborts).
   bool m_releaseSleepDelayWhenLocked = false;
-  // Set before Noctalia-initiated suspend so PrepareForSleep skips lock-before-sleep.
+  // Set before paw2-shell-initiated suspend so PrepareForSleep skips lock-before-sleep.
   bool m_skipLockOnNextSleep = false;
   std::uint64_t m_outputPowerRequestGeneration = 0;
   std::unique_ptr<AccountsService> m_accountsService;

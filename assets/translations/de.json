@@ -751,12 +751,12 @@
       "battery-low-body": "{device}: {percent}% verbleibend",
       "battery-low-title": "Akkustand niedrig",
       "calendar": "Kalender",
-      "config-migration-body": "Aktualisiere {path} in der Quelldatei. Noctalia wendet diesen Ersatz nur vorübergehend an. Führe noctalia config validate aus, um alle erforderlichen Änderungen aufzulisten.",
+      "config-migration-body": "Aktualisiere {path} in der Quelldatei. paw2-shell wendet diesen Ersatz nur vorübergehend an. Führe paw2-shell config validate aus, um alle erforderlichen Änderungen aufzulisten.",
       "config-migration-title": "Konfigurationsupdate erforderlich",
       "dbus-disabled": "DBus-Benachrichtigungen deaktiviert",
       "desktop-widgets-editor": "Widget-Editor",
       "desktop-widgets-editor-enabled": "Der Desktop-Widget-Editor ist aktiv. Wechsle zu einem leeren Arbeitsbereich, damit offene Fenster den Editor nicht verdecken.",
-      "keybind-app": "Noctalia",
+      "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "Dieses Tastenkürzel akzeptiert eine einzelne Taste ohne Zusatztasten.",
       "keybind-invalid-printable": "Druckbare Tasten (Buchstaben, Zahlen, Symbole) benötigen einen Modifikator wie Ctrl oder Alt.",
       "keybind-invalid-super": "Die Super-/Windows-Taste kann nicht für Shell-Tastenkombinationen verwendet werden.",
@@ -1477,7 +1477,7 @@
           "label": "Eckenrundung"
         },
         "custom-palette": {
-          "description": "Wähle eine Palette aus ~/.config/noctalia/palettes/",
+          "description": "Wähle eine Palette aus ~/.config/paw2-shell/palettes/",
           "label": "Benutzerdefinierte Palette",
           "search-placeholder": "Benutzerdefinierte Paletten suchen…"
         },
@@ -1951,7 +1951,7 @@
             "label": "Beim Herunterfahren"
           },
           "started": {
-            "description": "Befehl, der nach dem Start von Noctalia ausgeführt wird",
+            "description": "Befehl, der nach dem Start von paw2-shell ausgeführt wird",
             "label": "Nach dem Start"
           },
           "theme-mode-changed": {
@@ -2468,7 +2468,7 @@
           "placeholder": "Stadt, Land"
         },
         "location-auto-locate": {
-          "description": "Erkenne deinen Standort automatisch anhand deiner IP-Adresse via noctalia.dev",
+          "description": "Erkenne deinen Standort automatisch anhand deiner IP-Adresse via ipapi.co",
           "label": "Auto-Lokalisierung (IP)"
         },
         "longitude": {
@@ -2691,7 +2691,7 @@
           "label": "Datumsformat"
         },
         "external-ip": {
-          "description": "Löse die öffentliche WAN-IP der Verbindung auf (über api.noctalia.dev) und zeige sie im Netzwerk-Tab des Kontrollzentrums an",
+          "description": "Löse die öffentliche WAN-IP der Verbindung auf (über api.ipify.org) und zeige sie im Netzwerk-Tab des Kontrollzentrums an",
           "label": "WAN-IP anzeigen"
         },
         "keyboard-layout-custom-labels": {
@@ -2699,9 +2699,9 @@
           "label": "Tastaturlayout-Beschriftungen"
         },
         "launch-apps-as-systemd-services": {
-          "description": "Startet Anwendungen in separaten systemd-Diensten, damit sie sich keine cgroup mit Noctalia teilen",
+          "description": "Startet Anwendungen in separaten systemd-Diensten, damit sie sich keine cgroup mit paw2-shell teilen",
           "label": "Apps als systemd-Dienste starten",
-          "requires-systemd-session": "Erfordert, dass Noctalia als systemd-Benutzerdienst ausgeführt wird (uwsm oder eine systemd-Benutzereinheit)"
+          "requires-systemd-session": "Erfordert, dass paw2-shell als systemd-Benutzerdienst ausgeführt wird (uwsm oder eine systemd-Benutzereinheit)"
         },
         "launch-apps-custom-command": {
           "description": "Wird für Apps verwendet, die vom Launcher, Dock und der Taskleiste gestartet werden; ersetzt $CMD durch den ursprünglichen Befehl",
@@ -3762,8 +3762,8 @@
       "export-config": "Konfiguration exportieren…",
       "export-config-saved": "Konfigurationsexport gespeichert.",
       "filter-overridden": "Überschreiben",
-      "legacy-config-warning": "Veraltete Einstellung: {issue}. Bearbeite diesen Quelleintrag; Noctalia wendet den Ersatz nur vorübergehend an. Führe noctalia config validate aus, um alle erforderlichen Änderungen aufzulisten.",
-      "native-title": "Noctalia-Einstellungen",
+      "legacy-config-warning": "Veraltete Einstellung: {issue}. Bearbeite diesen Quelleintrag; paw2-shell wendet den Ersatz nur vorübergehend an. Führe paw2-shell config validate aus, um alle erforderlichen Änderungen aufzulisten.",
+      "native-title": "paw2-shell-Einstellungen",
       "no-results": "Keine Einstellungen gefunden",
       "no-results-hint": "Versuche einen anderen Einstellungsnamen oder Konfigurationsschlüssel.",
       "offline-mode-notice": {

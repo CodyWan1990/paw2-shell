@@ -15,7 +15,7 @@ namespace paw2shell::launcher {
       return {.path = {}, .error = "WAYLAND_DISPLAY is not set"};
     }
 
-    return {.path = std::string(runtime) + "/noctalia-dmenu-" + display + ".sock", .error = {}};
+    return {.path = std::string(runtime) + "/paw2-shell-dmenu-" + display + ".sock", .error = {}};
   }
 
 } // namespace paw2shell::launcher

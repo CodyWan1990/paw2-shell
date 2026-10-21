@@ -23,7 +23,7 @@ namespace {
 } // namespace
 
 int main() {
-  char tempDir[] = "/tmp/noctalia-icon-resolver-test-XXXXXX";
+  char tempDir[] = "/tmp/paw2-shell-icon-resolver-test-XXXXXX";
   if (mkdtemp(tempDir) == nullptr) {
     std::perror("mkdtemp");
     return 1;
@@ -54,7 +54,7 @@ int main() {
   const std::string indexContents = "[Icon Theme]\n"
                                     "Directories = 48x48/apps, scalable/apps, 16x16/apps, 16x16/status, 24x24/status, "
                                     "16x16/panel, 24x24/panel, scalable/status, default/status\n"
-                                    "Inherits = noctalia-status-test, noctalia-bare-test\n"
+                                    "Inherits = paw2-shell-status-test, paw2-shell-bare-test\n"
                                     "[48x48/apps]\n"
                                     "Size = 48\n"
                                     "Type = Fixed\n"
@@ -115,7 +115,7 @@ int main() {
 
   // An inherited theme with no index.theme exercises the fallback search paths
   // (theme root and 512x512/apps) that only apply to index-less themes.
-  const fs::path bareThemeRoot = root / "icons/noctalia-bare-test";
+  const fs::path bareThemeRoot = root / "icons/paw2-shell-bare-test";
   const fs::path bareBitmapDir = bareThemeRoot / "512x512/apps";
   fs::create_directories(bareBitmapDir);
   const fs::path bareSizedIcon = bareBitmapDir / "bare-sized-icon.png";
@@ -136,7 +136,7 @@ int main() {
   const fs::path extraStatusDir = extraThemeRoot / "16x16/status";
   fs::create_directories(extraStatusDir);
   std::ofstream(extraStatusDir / "split-root.svg") << "<svg/>";
-  const fs::path statusThemeRoot = root / "icons/noctalia-status-test";
+  const fs::path statusThemeRoot = root / "icons/paw2-shell-status-test";
   const fs::path inheritedStatusDir = statusThemeRoot / "16x16/status";
   fs::create_directories(inheritedStatusDir);
   std::ofstream(statusThemeRoot / "index.theme") << "[Icon Theme]\nDirectories = 16x16/status\n"

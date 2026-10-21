@@ -2312,18 +2312,6 @@ namespace settings {
         TextSetting{.value = cfg.shell.privacy.screenFilterRegex, .placeholder = "", .browseFileExtensions = {}},
         "privacy screen share screenshare app process regex filter ignore"
     ));
-    if (env.greeterSyncAvailable) {
-      entries.push_back(keyedEntry(
-          SettingsSection::Security, "greeter", "shell.greeter-sync-privilege-command",
-          {"shell", "greeter_sync", "privilege_command"},
-          TextSetting{
-              .value = cfg.shell.greeterSync.privilegeCommand,
-              .placeholder = "pkexec",
-              .browseFileExtensions = {},
-          },
-          "greeter sync pkexec run0 ghostty terminal sudo polkit wrapper"
-      ));
-    }
     entries.push_back(keyedEntry(
         SettingsSection::Screenshot, "screenshot-capture", "shell.screenshot-freeze-screen",
         {"shell", "screenshot", "freeze_screen"}, ToggleSetting{cfg.shell.screenshot.freezeScreen},

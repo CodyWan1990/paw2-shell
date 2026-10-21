@@ -695,7 +695,6 @@
       "battery-low-body": "{device}: {percent}% kvar",
       "battery-low-title": "Batterinivå låg",
       "calendar": "Kalender",
-      "greeter-sync": "Noctalia Greeter",
       "keybind-app": "Noctalia",
       "launcher-usage-reset": "Launcher",
       "screen-time-reset": "Skärmtid",

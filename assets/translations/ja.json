@@ -856,16 +856,6 @@
       "dbus-disabled": "DBus通知は無効です",
       "desktop-widgets-editor": "ウィジェット編集",
       "desktop-widgets-editor-enabled": "デスクトップウィジェットの編集が有効です。開いているウィンドウで編集画面が隠れないよう、空のワークスペースに切り替えてください。",
-      "greeter-sync": "Noctalia Greeter",
-      "greeter-sync-pending": "外観設定をグリーターに同期しています。管理者の認証画面が表示された場合は承認してください。パスワード不要の認証はシステムポリシーに従います。",
-      "greeter-sync-pending-console": "外観設定をグリーターに同期しています。認証が必要な場合は、Noctalia、TTY、またはコンソールに表示されるpolkitの認証要求を承認してください。",
-      "greeter-sync-pending-legacy": "認証済みの従来方式ヘルパーを使用して同期しています。管理者の承認が必要です。",
-      "greeter-sync-pending-manual": "認証済みの従来方式の同期用ファイルを準備しました。ターミナルで位置引数形式の適用ヘルパーを実行してください。独自の保存先を使用している場合はNOCTALIA_GREETER_STATE_DIRを引き継ぐか、shell.greeter_sync.privilege_commandを設定してから、もう一度同期してください。",
-      "greeter-sync-pending-manual-pkexec": "外観設定をグリーターに同期しています。管理者の認証が必要なのに認証要求が表示されない場合は、ターミナルで次のコマンドを実行してください：pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
-      "greeter-sync-success": "外観設定を同期しました。変更は次回のログイン画面から反映されます。",
-      "greeter-sync-timeout": "グリーターの同期は、まだ認証待ちです。TTYまたはコンソールでpolkitの認証要求を確認するか、セキュリティ設定でpolkitエージェントを有効にするか、pkexecを手動で実行してください。",
-      "greeter-sync-timeout-manual": "認証済みの従来方式の同期には、引き続き管理者の承認が必要です。ターミナルで位置引数形式の適用ヘルパーを実行し、独自の保存先を使用している場合はNOCTALIA_GREETER_STATE_DIRを引き継いでください",
-      "greeter-sync-timeout-manual-pkexec": "グリーターの同期には、まだ認証が必要です。ターミナルで次のコマンドを実行してください：pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
       "keybind-app": "Noctalia",
       "keybind-invalid-modifier": "このショートカットには、修飾キーを使わない単一のキーを指定できます。",
       "keybind-invalid-printable": "文字入力キー（英字、数字、記号）を使用するには、CtrlやAltなどの修飾キーが必要です。",
@@ -1121,10 +1111,6 @@
       },
       "reset-page": "一部の設定をリセットできませんでした。",
       "support-report": "サポートレポートを保存できませんでした。",
-      "sync-greeter": "外観設定をNoctalia Greeterに同期できませんでした。",
-      "sync-greeter-timeout": "グリーターの同期は、まだ認証待ちです。TTYまたはコンソールでpolkitの認証要求を確認するか、セキュリティ設定でpolkitエージェントを有効にするか、pkexecを手動で実行してください。",
-      "sync-greeter-timeout-manual": "認証済みの従来方式の同期には、引き続き管理者の承認が必要です。ターミナルで位置引数形式の適用ヘルパーを実行し、独自の保存先を使用している場合はNOCTALIA_GREETER_STATE_DIRを引き継いでください",
-      "sync-greeter-timeout-manual-pkexec": "グリーターの同期には、まだ認証が必要です。ターミナルで次のコマンドを実行してください：pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
       "widget": {
         "rename": "名前付きウィジェットの名前を変更できませんでした。"
       },
@@ -2544,12 +2530,6 @@
           "description": "接続のパブリックWAN IPアドレスを（api.noctalia.dev経由で）取得し、コントロールセンターのネットワークタブに表示します",
           "label": "WAN IPを表示"
         },
-        "greeter-sync-auto": {
-          "description": "壁紙、配色、テーマモード、またはシェルフォントの変更時に、グリーターを自動同期します。認証は引き続きシステムの方針に従います。この設定でパスワードなしの同期が有効になることはありません。"
-        },
-        "greeter-sync-privilege-command": {
-          "description": "グリーターの「今すぐ同期」で使用する権限昇格コマンドを上書きします。レガシーモード（旧ヘルパーまたはカスタムのグリーター状態ディレクトリ）では、別の管理者権限昇格ツールも使用できます。制限付き同期では--syncが追加され、指定したプレフィックスが最終的にpkexecを起動する必要があります（例：ghostty -e pkexec）"
-        },
         "launch-apps-as-systemd-services": {
           "description": "アプリを個別のsystemdサービスとして起動し、Noctaliaのcgroupを共有しないようにします。",
           "label": "アプリをsystemdサービスとして起動",
@@ -2736,9 +2716,6 @@
         "show-location": {
           "description": "天気予報に地名を表示する",
           "label": "位置情報を表示"
-        },
-        "sync-greeter": {
-          "description": "現在の外観設定と画面配置をNoctalia Greeterにコピーします。システムポリシーでユーザーのパスワードなし同期が許可されていない場合は、管理者の承認を求めます。"
         },
         "telemetry": {
           "description": "バージョン、OS、コンポジター、画面解像度、RAM、UI倍率を含む匿名の起動時通信を送信します。"

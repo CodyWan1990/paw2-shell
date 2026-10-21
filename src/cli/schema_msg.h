@@ -406,9 +406,6 @@ namespace noctalia::cli {
         {},
         false
     };
-    inline constexpr Command greeterSync{
-        "greeter-sync", "Sync wallpaper, colors, and monitor layout to Noctalia Greeter", {}, {}, {}, {}, {}, false
-    };
     inline constexpr Command keyboardBacklightDown{
         "keyboard-backlight-down", "Decrease all keyboard backlights by one level", {}, {}, {}, {}, {}, false
     };
@@ -842,7 +839,6 @@ namespace noctalia::cli {
       msg::dpmsOff,
       msg::dpmsOn,
       msg::effectsProfileSet,
-      msg::greeterSync,
       msg::keyboardBacklightDown,
       msg::keyboardBacklightOsd,
       msg::keyboardBacklightSet,

@@ -860,16 +860,6 @@
       "dbus-disabled": "Notificaciones DBus deshabilitada",
       "desktop-widgets-editor": "Editor de Widget",
       "desktop-widgets-editor-enabled": "El editor de widgets de escritorio está activado. Cambie a un espacio de trabajo vacío para que las ventanas abiertas no tapen el editor.",
-      "greeter-sync": "Noctalia Greeter",
-      "greeter-sync-pending": "Sincronizando la apariencia con el greeter. Si aparece una solicitud del administrador, acéptala; la autorización sin contraseña sigue la política del sistema.",
-      "greeter-sync-pending-console": "Sincronizando la apariencia con el greeter. Si se requiere autorización, aprueba la solicitud de polkit en Noctalia, en una TTY o en una consola.",
-      "greeter-sync-pending-legacy": "Sincronizando a través del asistente autenticado auxiliar antiguo. Se requiere la aprobación del administrador.",
-      "greeter-sync-pending-manual": "Los archivos están preparados para la sincronización heredada autenticada. Ejecuta el asistente de aplicación posicional en una terminal, conservando NOCTALIA_GREETER_STATE_DIR si usas una ruta personalizada, o configura shell.greeter_sync.privilege_command y sincroniza de nuevo.",
-      "greeter-sync-pending-manual-pkexec": "Sincronizando la apariencia con el greeter. Si se requiere autorización de administrador y no aparece ninguna solicitud, ejecute lo siguiente en una terminal: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\".",
-      "greeter-sync-success": "Apariencia sincronizada. Los cambios se aplicarán en la siguiente pantalla de inicio de sesión.",
-      "greeter-sync-timeout": "La sincronización con el greeter sigue a la espera de autorización. Busca una solicitud de polkit en una TTY o consola, activa el agente de polkit en los ajustes de Seguridad, o ejecuta pkexec manualmente.",
-      "greeter-sync-timeout-manual": "La sincronización heredada autenticada todavía necesita la aprobación del administrador. Ejecuta el asistente de aplicación posicional en una terminal y conserva NOCTALIA_GREETER_STATE_DIR si usas una ruta personalizada.",
-      "greeter-sync-timeout-manual-pkexec": "La sincronización del greeter aún requiere autorización. Ejecute lo siguiente en una terminal: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
       "keybind-app": "Noctalia",
       "keybind-invalid-modifier": "Este atajo acepta una sola tecla sin modificadores.",
       "keybind-invalid-printable": "Las teclas imprimibles (letras, números, símbolos) requieren un modificador como Ctrl o Alt.",
@@ -1221,10 +1211,6 @@
       },
       "reset-page": "No se pudieron restablecer algunas configuraciones.",
       "support-report": "No se pudo guardar el informe de soporte.",
-      "sync-greeter": "No se pudo sincronizar la apariencia con Noctalia Greeter.",
-      "sync-greeter-timeout": "La sincronización con el greeter sigue a la espera de autorización. Busca una solicitud de polkit en una TTY o consola, activa el agente de polkit en los ajustes de Seguridad, o ejecuta pkexec manualmente.",
-      "sync-greeter-timeout-manual": "La sincronización heredada autenticada todavía necesita la aprobación del administrador. Ejecuta el asistente de aplicación posicional en una terminal y conserva NOCTALIA_GREETER_STATE_DIR si usas una ruta personalizada.",
-      "sync-greeter-timeout-manual-pkexec": "La sincronización del greeter aún requiere autorización. Ejecuta lo siguiente en una terminal: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
       "widget": {
         "rename": "No se pudo renombrar el widget con nombre."
       },
@@ -1296,7 +1282,6 @@
         "focus-styling": "Estilo de enfoque",
         "formats": "Formatos",
         "general": "General",
-        "greeter": "Greeter",
         "grouping": "Agrupación",
         "history": "Historial",
         "home": "Inicio",
@@ -2957,14 +2942,6 @@
           "description": "Resuelve IP publica WAN (via api.noctalia.dev) y se muestra en el panel de Red del Panel de Control",
           "label": "Mostrar IP WAN"
         },
-        "greeter-sync-auto": {
-          "description": "Sincroniza automáticamente el greeter siempre que cambien el fondo de pantalla, los colores, el modo de tema o la fuente del shell. La autorización sigue la política del sistema; este ajuste no activa la sincronización sin contraseña.",
-          "label": "Sincronizar pantalla de inicio automáticamente"
-        },
-        "greeter-sync-privilege-command": {
-          "description": "Anular el lanzamiento con privilegios para Sync Now del greeter. El modo heredado (un asistente antiguo o un directorio de estado del greeter personalizado) acepta otro escalador de privilegios. La sincronización restringida añade --sync y requiere que el prefijo lance pkexec en última instancia (ejemplo: ghostty -e pkexec).",
-          "label": "Comando de privilegios para sincronizar pantalla de inicio"
-        },
         "keyboard-layout-custom-labels": {
           "description": "Asociar nombres de distribuciones de teclado con etiquetas utilizadas en todo el shell",
           "label": "Etiquetas de distribución del teclado"
@@ -3208,11 +3185,6 @@
         "show-location": {
           "description": "Mostrar el nombre de la ubicación en el widget del pronóstico",
           "label": "Mostrar ubicación"
-        },
-        "sync-greeter": {
-          "button": "Sincronizar ahora",
-          "description": "Copiar la apariencia actual y la disposición de monitores al Greeter de Noctalia. Se solicita la aprobación del administrador a menos que la política del sistema autorice la sincronización sin contraseña para tu usuario.",
-          "label": "Noctalia Greeter"
         },
         "telemetry": {
           "description": "Envía un pequeño ping anónimo de inicio con la versión, el SO, el compositor, las resoluciones de monitor, la RAM y la escala de la interfaz",

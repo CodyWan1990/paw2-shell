@@ -899,16 +899,6 @@
       "dbus-disabled": "DBus notifications disabled",
       "desktop-widgets-editor": "Widget editor",
       "desktop-widgets-editor-enabled": "Desktop widget editor is on. Switch to an empty workspace so open windows do not cover the editor.",
-      "greeter-sync": "Noctalia Greeter",
-      "greeter-sync-pending": "Syncing appearance to the greeter. If an administrator prompt appears, approve it; passwordless authorization follows system policy.",
-      "greeter-sync-pending-console": "Syncing appearance to the greeter. If authorization is required, approve the polkit prompt in Noctalia, on a TTY, or on a console.",
-      "greeter-sync-pending-legacy": "Syncing through the authenticated legacy helper. Administrator approval is required.",
-      "greeter-sync-pending-manual": "Files are staged for authenticated legacy sync. Run the positional apply helper in a terminal, preserving NOCTALIA_GREETER_STATE_DIR if you use a custom path, or configure shell.greeter_sync.privilege_command and sync again.",
-      "greeter-sync-pending-manual-pkexec": "Syncing appearance to the greeter. If administrator authorization is required and no prompt appears, run in a terminal: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\".",
-      "greeter-sync-success": "Appearance synced. Changes apply on the next login screen.",
-      "greeter-sync-timeout": "Greeter sync is still waiting for authorization. Check a TTY or console for a polkit prompt, enable the polkit agent in Security settings, or run pkexec manually.",
-      "greeter-sync-timeout-manual": "Authenticated legacy sync still needs administrator approval. Run the positional apply helper in a terminal and preserve NOCTALIA_GREETER_STATE_DIR if you use a custom path.",
-      "greeter-sync-timeout-manual-pkexec": "Greeter sync still needs authorization. Run in a terminal: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
       "keybind-app": "Noctalia",
       "keybind-invalid-modifier": "This shortcut accepts a single key without modifiers.",
       "keybind-invalid-printable": "Printable keys (letters, numbers, symbols) require a modifier such as Ctrl or Alt.",
@@ -930,7 +920,7 @@
       "network-connect-failed-timeout": "The network did not respond in time.",
       "network-connect-failed-title": "Could not connect to {ssid}",
       "polkit-agent": "Polkit Agent",
-      "polkit-no-session": "Polkit agent needs logind, elogind, or XDG_SESSION_ID. On seatd-only setups it cannot register for graphical prompts. Use terminal pkexec for greeter sync, or install elogind for in-session authentication.",
+      "polkit-no-session": "Polkit agent needs logind, elogind, or XDG_SESSION_ID. On seatd-only setups it cannot register for graphical prompts. Install elogind for in-session authentication.",
       "screen-time-reset": "Screen Time",
       "screen-time-reset-success": "Usage history cleared.",
       "session-bus-unavailable": "Session bus unavailable",
@@ -1270,10 +1260,6 @@
       },
       "reset-page": "Failed to reset some settings.",
       "support-report": "Failed to save support report.",
-      "sync-greeter": "Could not sync appearance to Noctalia Greeter.",
-      "sync-greeter-timeout": "Greeter sync is still waiting for authorization. Check a TTY or console for a polkit prompt, enable the polkit agent in Security settings, or run pkexec manually.",
-      "sync-greeter-timeout-manual": "Authenticated legacy sync still needs administrator approval. Run the positional apply helper in a terminal and preserve NOCTALIA_GREETER_STATE_DIR if you use a custom path.",
-      "sync-greeter-timeout-manual-pkexec": "Greeter sync still needs authorization. Run in a terminal: pkexec noctalia-greeter-apply-appearance --sync \"/run/user/$(id -u)/noctalia-greeter-sync\"",
       "widget": {
         "rename": "Could not rename named widget."
       },
@@ -1363,7 +1349,6 @@
         "focus-styling": "Focus Styling",
         "formats": "Formats",
         "general": "General",
-        "greeter": "Greeter",
         "grouping": "Grouping",
         "history": "History",
         "home": "Home",
@@ -3430,14 +3415,6 @@
           "description": "Resolve the connection's public WAN IP (via api.noctalia.dev) and show it in the Control Center network tab",
           "label": "Show WAN IP"
         },
-        "greeter-sync-auto": {
-          "description": "Automatically sync the greeter whenever wallpaper, colors, theme mode, or shell font change. Authorization still follows system policy; this setting does not enable passwordless sync.",
-          "label": "Auto-Sync Greeter"
-        },
-        "greeter-sync-privilege-command": {
-          "description": "Override privilege launch for greeter Sync Now. Legacy mode (an older helper or a custom greeter state directory) accepts another administrator escalator. Constrained sync appends --sync and requires the prefix to ultimately launch pkexec (example: ghostty -e pkexec)",
-          "label": "Greeter Sync Privilege Command"
-        },
         "keyboard-layout-custom-labels": {
           "description": "Map keyboard layout names to labels used throughout the shell",
           "label": "Keyboard Layout Labels"
@@ -3689,11 +3666,6 @@
         "show-location": {
           "description": "Show location name in weather widgets",
           "label": "Show Location"
-        },
-        "sync-greeter": {
-          "button": "Sync Now",
-          "description": "Copy the current appearance and monitor arrangement to Noctalia Greeter. Administrator approval is requested unless system policy authorizes passwordless sync for your user.",
-          "label": "Noctalia Greeter"
         },
         "telemetry": {
           "description": "Sends a small anonymous startup ping with version, OS, compositor, monitor resolutions, RAM, and UI scale",

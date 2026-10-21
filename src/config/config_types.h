@@ -263,17 +263,6 @@ struct ShellSessionConfig {
   bool operator==(const ShellSessionConfig&) const = default;
 };
 
-struct ShellGreeterSyncConfig {
-  // Optional shell prefix before the apply helper and staging directory. Legacy
-  // sync accepts the configured escalator directly. Secure sync also appends
-  // --sync, so that prefix must ultimately invoke pkexec to provide PKEXEC_UID.
-  // Empty selects the protocol's default escalator.
-  std::string privilegeCommand;
-  bool autoSync = false;
-
-  bool operator==(const ShellGreeterSyncConfig&) const = default;
-};
-
 struct IdleBehaviorConfig {
   std::string name;
   bool enabled = true;
@@ -1338,7 +1327,6 @@ struct ShellConfig {
   ScreenshotConfig screenshot;
   PrivacyConfig privacy;
   ShellSessionConfig session;
-  ShellGreeterSyncConfig greeterSync;
 
   bool operator==(const ShellConfig&) const = default;
 };

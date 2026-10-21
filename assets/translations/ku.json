@@ -530,7 +530,6 @@
       "battery-device": "Amûrê betariyê",
       "battery-low-title": "Betarî kêm e",
       "calendar": "Salname",
-      "greeter-sync": "Silavkarê Noctalia",
       "keybind-app": "Noctalia"
     }
   },
@@ -746,7 +745,6 @@
         "dead-zone": "Herêma mirî",
         "effects": "Bandor",
         "general": "Giştî",
-        "greeter": "Silavkar",
         "home": "Rûpela sereke",
         "interface": "Navrû",
         "location": "Cih",

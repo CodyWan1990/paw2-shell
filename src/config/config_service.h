@@ -95,8 +95,6 @@ public:
   [[nodiscard]] std::string getDefaultWallpaperPath() const;
   // Last applied wallpaper, else default. Drives palette generation and template previews.
   [[nodiscard]] std::string getPaletteWallpaperPath() const;
-  // Greeter sync fallback when no monitor-specific path is chosen.
-  [[nodiscard]] std::string getGreeterSyncWallpaperPath() const;
   void setWallpaperPath(const std::optional<std::string>& connectorName, const std::string& path);
   void setWallpaperChangeCallback(ChangeCallback callback);
 

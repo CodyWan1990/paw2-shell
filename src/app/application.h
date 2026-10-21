@@ -207,8 +207,6 @@ private:
   void syncClipboardService();
   void syncStorageKeyProvider();
   void syncScreenTimeService();
-  void performGreeterSync(bool quiet = false);
-  void scheduleGreeterAutoSync();
   bool runShellCommandBlocking(const std::string& command);
   bool runIdleAction(const IdleActionRequest& action);
   bool setOutputPower(bool on);
@@ -393,12 +391,9 @@ private:
   CalendarReminderPollSource m_calendarReminderPollSource{m_calendarReminderMonitor};
   Timer m_polkitInitTimer;
   Timer m_polkitIdleCloseTimer;
-  Timer m_greeterSyncTimeoutTimer;
-  Timer m_greeterAutoSyncTimer;
   Timer m_clipboardAutoPasteTimer;
   Timer m_launcherAutoPasteTimer;
   Timer m_graphicsRecoveryTimer;
-  std::uint64_t m_greeterSyncGeneration = 0;
   int m_graphicsRecoveryAttempts = 0;
   bool m_graphicsRecoveryScheduled = false;
 

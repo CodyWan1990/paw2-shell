@@ -18,7 +18,6 @@
 #include "render/scene/input_area.h"
 #include "render/scene/node.h"
 #include "shell/bar/widget_action.h"
-#include "shell/greeter/greeter_appearance_sync.h"
 #include "shell/profile/avatar_path.h"
 #include "shell/settings/font_family_catalog.h"
 #include "shell/settings/settings_bar_management.h"
@@ -153,9 +152,6 @@ namespace {
       return true;
     }
     if (path.size() >= 2 && path[0] == "calendar" && path[1] == "account") {
-      return true;
-    }
-    if (path.size() >= 2 && path[0] == "shell" && path[1] == "greeter_sync") {
       return true;
     }
     return false;
@@ -787,8 +783,6 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
   env.ddcutilAvailable = (m_dependencies != nullptr && m_dependencies->hasDdcutil());
   env.systemdUserManaged = process::runningUnderSystemdUserManager();
   env.gammaControlAvailable = (m_wayland != nullptr && m_wayland->hasGammaControl());
-  env.greeterSyncAvailable =
-      m_config != nullptr && greeter::appearanceSyncAvailable(m_config->config().shell.greeterSync);
   const ThemeMode previewMode = m_config != nullptr ? m_config->config().theme.mode : ThemeMode::Dark;
   for (const auto& p : noctalia::theme::availableCustomPalettes()) {
     env.customPalettes.push_back(
@@ -1706,28 +1700,6 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
   }
   if (clipboardStorageRecovery && m_resetEncryptedStorage) {
     insertStorageRecovery(settings::SettingsSection::Panels, "clipboard");
-  }
-
-  if (m_syncGreeterAppearance && env.greeterSyncAvailable) {
-    constexpr auto section = settings::SettingsSection::Security;
-    const auto next = insertEntry(
-        atPath({"shell", "greeter_sync", "privilege_command"}),
-        settings::makeEntry(
-            section, "greeter", i18n::tr("settings.schema.shell.sync-greeter.label"),
-            i18n::tr("settings.schema.shell.sync-greeter.description"), {},
-            button(i18n::tr("settings.schema.shell.sync-greeter.button"), m_syncGreeterAppearance),
-            "greeter login sync appearance wallpaper colors security"
-        ),
-        true
-    );
-    m_settingsRegistry.insert(
-        next,
-        settings::makeEntry(
-            section, "greeter", i18n::tr("settings.schema.shell.greeter-sync-auto.label"),
-            i18n::tr("settings.schema.shell.greeter-sync-auto.description"), {"shell", "greeter_sync", "auto_sync"},
-            settings::ToggleSetting{cfg.shell.greeterSync.autoSync}, "greeter sync auto automatic"
-        )
-    );
   }
 
   if (m_resetLauncherUsage) {

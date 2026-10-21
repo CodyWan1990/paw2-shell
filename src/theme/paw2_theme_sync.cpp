@@ -44,7 +44,10 @@ namespace noctalia::theme {
       return;
     }
     writer.set("appearance.focus_ring_color", formatRgbHex(*m_focusRing));
-    writer.set("appearance.shadow_color", formatRgbHex(*m_shadow));
+    // Some palettes' shadow role is their surface colour, which is also the wallpaper-less background, so a
+    // shadow in it vanishes. Pull it most of the way to black: it keeps a hint of the palette and always
+    // reads darker than what it falls on.
+    writer.set("appearance.shadow_color", formatRgbHex(lerpColor(*m_shadow, rgba(0.0F, 0.0F, 0.0F), 0.75F)));
     writer.set("appearance.titlebar_color", formatRgbHex(*m_titlebar));
     writer.set("overview.backdrop_color", formatRgbHex(*m_backdrop));
   }

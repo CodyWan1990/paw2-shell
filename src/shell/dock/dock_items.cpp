@@ -9,6 +9,7 @@
 #include "shell/dock/dock_geometry.h"
 #include "shell/dock/dock_instance.h"
 #include "shell/dock/dock_model.h"
+#include "shell/surface/shadow.h"
 #include "shell/tooltip/tooltip_manager.h"
 #include "system/icon_resolver.h"
 #include "system/internal_app_metadata.h"
@@ -765,7 +766,10 @@ namespace shell::dock {
       );
     }
 
-    shell::dock::resizeSurface(instance, cfg, deps.model.config.config().shell.shadow);
+    shell::dock::resizeSurface(
+        instance, cfg,
+        shell::surface_shadow::withOverrides(deps.model.config.config().shell.shadow, cfg.shadowSize, cfg.shadowOpacity)
+    );
 
     if (cfg.magnification && instance.surface != nullptr) {
       instance.surface->requestFrameTick();

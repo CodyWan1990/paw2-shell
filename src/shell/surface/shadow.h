@@ -4,10 +4,9 @@
 #include "render/core/render_styles.h"
 
 #include <cstdint>
+#include <optional>
 
 namespace shell::surface_shadow {
-
-  constexpr std::int32_t kBlurRadius = 12;
 
   struct Bleed {
     std::int32_t left = 0;
@@ -26,6 +25,10 @@ namespace shell::surface_shadow {
   [[nodiscard]] Bleed bleed(bool componentShadow, const ShellConfig::ShadowConfig& shadow) noexcept;
   [[nodiscard]] RoundedRectStyle
   style(const ShellConfig::ShadowConfig& shadow, float backgroundOpacity, const Shape& shape) noexcept;
+  // The shell shadow with a surface's own size and opacity, where it sets them, on top.
+  [[nodiscard]] ShellConfig::ShadowConfig withOverrides(
+      ShellConfig::ShadowConfig shadow, std::optional<std::int32_t> size, std::optional<float> alpha
+  ) noexcept;
   [[nodiscard]] bool
   sameSurfaceMetrics(const ShellConfig::ShadowConfig& previous, const ShellConfig::ShadowConfig& next) noexcept;
 

@@ -1318,6 +1318,7 @@ namespace noctalia::config::schema {
       static const Schema<ShellConfig::ShadowConfig> s = {
           enumField(&ShellConfig::ShadowConfig::direction, "direction", kShadowDirections),
           field(&ShellConfig::ShadowConfig::alpha, "alpha", kUnitRange),
+          field(&ShellConfig::ShadowConfig::size, "size", kShadowSizeRange),
       };
       return s;
     }
@@ -2219,6 +2220,8 @@ namespace noctalia::config::schema {
           optionalIntField(&DockMonitorOverride::marginEnds, "margin_ends", kDockMarginEndsRange),
           optionalIntField(&DockMonitorOverride::marginEdge, "margin_edge", kDockMarginEdgeRange),
           optionalBoolField(&DockMonitorOverride::shadow, "shadow"),
+          optionalIntField(&DockMonitorOverride::shadowSize, "shadow_size", kShadowSizeRange),
+          optionalFloatField(&DockMonitorOverride::shadowOpacity, "shadow_opacity", kUnitRange),
           optionalBoolField(&DockMonitorOverride::showRunning, "show_running"),
           optionalBoolField(&DockMonitorOverride::autoHide, "auto_hide"),
           optionalBoolField(&DockMonitorOverride::smartAutoHide, "smart_auto_hide"),
@@ -2296,6 +2299,8 @@ namespace noctalia::config::schema {
         field(&DockConfig::marginEnds, "margin_ends", kDockMarginEndsRange),
         field(&DockConfig::marginEdge, "margin_edge", kDockMarginEdgeRange),
         field(&DockConfig::shadow, "shadow"),
+        optionalIntField(&DockConfig::shadowSize, "shadow_size", kShadowSizeRange),
+        optionalFloatField(&DockConfig::shadowOpacity, "shadow_opacity", kUnitRange),
         field(&DockConfig::showRunning, "show_running"),
         field(&DockConfig::autoHide, "auto_hide"),
         field(&DockConfig::smartAutoHide, "smart_auto_hide"),

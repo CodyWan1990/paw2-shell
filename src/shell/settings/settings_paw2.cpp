@@ -427,6 +427,14 @@ namespace settings {
         edits.emplace_back("appearance.shadow_offset_x", has("left") ? -kOffset : has("right") ? kOffset : 0);
         edits.emplace_back("appearance.shadow_offset_y", has("up") ? -kOffset : has("down") ? kOffset : 0);
       }
+    } else if (path == std::vector<std::string>{"shell", "shadow", "size"}) {
+      // The shell's shadow size is paw2's window shadow size too.
+      if (value == nullptr) {
+        return reset({"appearance.shadow_radius"});
+      }
+      if (const auto size = number()) {
+        edits.emplace_back("appearance.shadow_radius", std::clamp(static_cast<int>(std::lround(*size)), 0, 64));
+      }
     } else if (path == std::vector<std::string>{"shell", "corner_radius_scale"}) {
       if (value == nullptr) {
         return reset({"appearance.corner_radius"});

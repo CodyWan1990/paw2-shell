@@ -680,6 +680,8 @@ struct DockMonitorOverride {
   std::optional<std::int32_t> marginEnds;
   std::optional<std::int32_t> marginEdge;
   std::optional<bool> shadow;
+  std::optional<std::int32_t> shadowSize;
+  std::optional<float> shadowOpacity;
   std::optional<bool> showRunning;
   std::optional<bool> autoHide;
   std::optional<bool> smartAutoHide;
@@ -723,6 +725,8 @@ struct DockConfig {
   std::int32_t marginEnds = 0;         // inset from each end of the dock along its main axis
   std::int32_t marginEdge = 15;        // distance from the nearest screen edge (floats the dock when > 0)
   bool shadow = true;                  // use the global shell shadow
+  std::optional<std::int32_t> shadowSize; // own shadow size; unset follows [shell.shadow] size
+  std::optional<float> shadowOpacity;     // own shadow opacity; unset follows [shell.shadow] alpha
   bool showRunning = true;             // also show running apps not in pinned list
   bool autoHide = false;               // slide out when not hovered (overlay mode)
   bool smartAutoHide = false;          // hide while the active workspace has windows; show when it is empty
@@ -1085,6 +1089,7 @@ struct ShellConfig {
   struct ShadowConfig {
     ShadowDirection direction = ShadowDirection::DownRight;
     float alpha = 1.0F;
+    std::int32_t size = 12; // blur reach in logical px; 0 turns shell shadows off
 
     bool operator==(const ShadowConfig&) const = default;
   };

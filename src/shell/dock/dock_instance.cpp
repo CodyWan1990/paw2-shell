@@ -222,7 +222,8 @@ namespace shell::dock {
     const auto w = static_cast<float>(instance.surface->width());
     const auto h = static_cast<float>(instance.surface->height());
 
-    const auto& shadowConfig = deps.config.config().shell.shadow;
+    const auto shadowConfig =
+        shell::surface_shadow::withOverrides(deps.config.config().shell.shadow, cfg.shadowSize, cfg.shadowOpacity);
     const auto panelGeometry = shell::dock::computePanelGeometry(cfg, shadowConfig, w, h);
     const auto concave = shell::dock::dockConcaveShape(cfg);
 

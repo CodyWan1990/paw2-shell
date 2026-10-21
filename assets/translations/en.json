@@ -2192,6 +2192,10 @@
         "global-shadow-alpha": {
           "description": "Shadow opacity for surfaces and windows"
         },
+        "global-shadow-size": {
+          "description": "How far shadows reach past bars, panels, the dock and popups, and past windows while paw2 shares its settings. Zero turns them off.",
+          "label": "Shadow Size"
+        },
         "global-shadow-direction": {
           "description": "Direction shadows are cast from surfaces and windows"
         },
@@ -2618,6 +2622,14 @@
         },
         "shadow": {
           "description": "Cast the global surface shadow from the dock"
+        },
+        "shadow-opacity": {
+          "description": "The dock's own shadow opacity. Leave empty to use the shared shadow opacity.",
+          "label": "Shadow Opacity"
+        },
+        "shadow-size": {
+          "description": "The dock's own shadow size, or Inherit for the shared shadow size.",
+          "label": "Shadow Size"
         },
         "show-dots": {
           "description": "Show running window dots below dock icons",

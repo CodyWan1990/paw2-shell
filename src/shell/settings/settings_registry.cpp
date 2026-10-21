@@ -748,11 +748,6 @@ namespace settings {
       rows.slider("appearance.titlebar_height", 24, 16, 48, 1, "titlebar height size", true, titlebarsOn);
     }
 
-    void appendPaw2ShadowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
-      Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "shadows");
-      rows.slider("appearance.shadow_radius", 0, 0, 64, 1, "window shadow drop size");
-    }
-
     void appendPaw2TransparencyEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
       Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "transparency");
       const bool transparencyOn = rows.toggle("appearance.transparency", false, "transparency translucent");
@@ -1118,12 +1113,17 @@ namespace settings {
         tr("settings.schema.appearance.global-shadow-alpha.description"), {"shell", "shadow", "alpha"},
         sliderFor(cfg.shell.shadow.alpha, noctalia::config::schema::kUnitRange, false), "shadow opacity", true
     ));
+    // One size for every shadow: the shell's surfaces and, while paw2 shares its config, its windows.
+    entries.push_back(keyedEntry(
+        SettingsSection::Appearance, "shadows", "appearance.global-shadow-size", {"shell", "shadow", "size"},
+        sliderFor(cfg.shell.shadow.size, noctalia::config::schema::kShadowSizeRange, true),
+        "shadow size blur reach drop window dock bar panel"
+    ));
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "shadows", "appearance.popup-shadows", {"shell", "popup_shadows"},
         ToggleSetting{cfg.shell.popupShadows}, "popup menu dropdown drop shadow depth"
     ));
     if (paw2) {
-      appendPaw2ShadowEntries(entries, *paw2);
       appendPaw2TransparencyEntries(entries, *paw2);
     }
     entries.push_back(keyedEntry(
@@ -1565,6 +1565,31 @@ namespace settings {
       entries.push_back(makeEntry(
           SettingsSection::Dock, "effects", tr("settings.schema.shared.shadow.label"),
           tr("settings.schema.dock.shadow.description"), path("shadow"), ToggleSetting{dock.shadow}, "shadow"
+      ));
+      // Unset follows the shared shadow settings on the Appearance page.
+      const SettingVisibility dockShadowOn = [currentDock](const Config& c) { return currentDock(c).shadow; };
+      entries.push_back(keyedEntry(
+          SettingsSection::Dock, "effects", "dock.shadow-size", path("shadow_size"),
+          OptionalStepperSetting{
+              .value = dock.shadowSize,
+              .minValue = 0,
+              .maxValue = static_cast<int>(noctalia::config::schema::kShadowSizeRange.max.value()),
+              .step = 1,
+              .fallbackValue = cfg.shell.shadow.size,
+              .unsetLabel = tr("common.states.inherit"),
+              .customLabel = tr("common.states.custom"),
+          },
+          "shadow size blur reach", false, dockShadowOn
+      ));
+      entries.push_back(keyedEntry(
+          SettingsSection::Dock, "effects", "dock.shadow-opacity", path("shadow_opacity"),
+          OptionalNumberSetting{
+              .value = dock.shadowOpacity.has_value() ? std::optional<double>(*dock.shadowOpacity) : std::nullopt,
+              .minValue = 0.0,
+              .maxValue = 1.0,
+              .placeholder = std::format("{:.2f}", cfg.shell.shadow.alpha),
+          },
+          "shadow opacity alpha", false, dockShadowOn
       ));
       entries.push_back(keyedEntry(
           SettingsSection::Dock, "focus-styling", "dock.magnification", path("magnification"),

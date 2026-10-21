@@ -14,6 +14,7 @@
 #include "shell/dock/dock_model.h"
 #include "shell/dock/pinned_apps.h"
 #include "shell/panel/panel_manager.h"
+#include "shell/surface/shadow.h"
 #include "system/desktop_entry.h"
 #include "system/desktop_entry_launch.h"
 #include "ui/app_icon_colorization.h"
@@ -806,7 +807,8 @@ void Dock::createInstance(const WaylandOutput& output) {
     instance->monitorOverrideTable = override->tableName;
   }
 
-  const auto& shadowConfig = m_config->config().shell.shadow;
+  const auto shadowConfig =
+      shell::surface_shadow::withOverrides(m_config->config().shell.shadow, cfg.shadowSize, cfg.shadowOpacity);
   LayerSurfaceConfig lsCfg = shell::dock::makeLayerSurfaceConfig(
       cfg, shadowConfig, cfg.pinned.size() + shell::dock::dockLauncherButtonCount(cfg), instance->fractionalScale,
       instance->outputLogicalWidth, instance->outputLogicalHeight

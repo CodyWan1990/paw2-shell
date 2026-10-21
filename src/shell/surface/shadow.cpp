@@ -6,7 +6,9 @@
 
 namespace shell::surface_shadow {
 
-  bool enabled(bool componentShadow, const ShellConfig::ShadowConfig& /*shadow*/) noexcept { return componentShadow; }
+  bool enabled(bool componentShadow, const ShellConfig::ShadowConfig& shadow) noexcept {
+    return componentShadow && shadow.size > 0;
+  }
 
   Bleed bleed(bool componentShadow, const ShellConfig::ShadowConfig& shadow) noexcept {
     if (!enabled(componentShadow, shadow)) {
@@ -14,10 +16,10 @@ namespace shell::surface_shadow {
     }
     const auto offset = shadowDirectionOffset(shadow.direction);
     return {
-        .left = kBlurRadius + std::max(0, -offset.x),
-        .right = kBlurRadius + std::max(0, offset.x),
-        .up = kBlurRadius + std::max(0, -offset.y),
-        .down = kBlurRadius + std::max(0, offset.y),
+        .left = shadow.size + std::max(0, -offset.x),
+        .right = shadow.size + std::max(0, offset.x),
+        .up = shadow.size + std::max(0, -offset.y),
+        .down = shadow.size + std::max(0, offset.y),
     };
   }
 
@@ -32,7 +34,7 @@ namespace shell::surface_shadow {
         .corners = shape.corners,
         .logicalInset = shape.logicalInset,
         .radius = shape.radius,
-        .softness = static_cast<float>(kBlurRadius),
+        .softness = static_cast<float>(shadow.size),
         .borderWidth = 0.0F,
         .outerShadow = true,
         .shadowCutoutOffsetX = static_cast<float>(offset.x),
@@ -41,7 +43,19 @@ namespace shell::surface_shadow {
   }
 
   bool sameSurfaceMetrics(const ShellConfig::ShadowConfig& previous, const ShellConfig::ShadowConfig& next) noexcept {
-    return previous.direction == next.direction;
+    return previous.direction == next.direction && previous.size == next.size;
+  }
+
+  ShellConfig::ShadowConfig withOverrides(
+      ShellConfig::ShadowConfig shadow, std::optional<std::int32_t> size, std::optional<float> alpha
+  ) noexcept {
+    if (size.has_value()) {
+      shadow.size = *size;
+    }
+    if (alpha.has_value()) {
+      shadow.alpha = *alpha;
+    }
+    return shadow;
   }
 
 } // namespace shell::surface_shadow

@@ -794,16 +794,6 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
   env.greeterSyncAvailable =
       m_config != nullptr && greeter::appearanceSyncAvailable(m_config->config().shell.greeterSync);
   const ThemeMode previewMode = m_config != nullptr ? m_config->config().theme.mode : ThemeMode::Dark;
-  for (const auto& paletteInfo : noctalia::theme::availableCommunityPalettes()) {
-    env.communityPalettes.push_back(
-        settings::SelectOption{
-            .value = paletteInfo.name,
-            .label = paletteInfo.name,
-            .description = {},
-            .preview = availablePalettePreview(paletteInfo, previewMode),
-        }
-    );
-  }
   for (const auto& p : noctalia::theme::availableCustomPalettes()) {
     env.customPalettes.push_back(
         settings::SelectOption{

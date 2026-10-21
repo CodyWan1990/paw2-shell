@@ -1677,6 +1677,7 @@
           "built-in": "Built-In",
           "community": "Community",
           "custom": "Custom",
+          "presets": "Presets",
           "wallpaper": "Wallpaper"
         }
       },
@@ -2154,10 +2155,6 @@
           "description": "Recolor application icons across the shell to match the active palette",
           "label": "Colorize App Icons"
         },
-        "builtin-palette": {
-          "description": "Choose a palette from the bundled catalog",
-          "label": "Built-In Palette"
-        },
         "button-borders": {
           "description": "Draw outlines around buttons throughout the shell",
           "label": "Button Borders"
@@ -2165,11 +2162,6 @@
         "card-borders": {
           "description": "Draw outlines around section cards inside panels and the settings window",
           "label": "Card Borders"
-        },
-        "community-palette": {
-          "description": "Choose a palette from the community catalog",
-          "label": "Community Palette",
-          "search-placeholder": "Search palettes…"
         },
         "corner-roundness": {
           "description": "Scale corner radius across the shell, and set window corners to match",
@@ -2228,6 +2220,11 @@
         "popup-shadows": {
           "description": "Draw drop shadows behind popups and dropdowns",
           "label": "Popup Shadows"
+        },
+        "preset-palette": {
+          "description": "Choose a built-in or community palette",
+          "label": "Preset",
+          "search-placeholder": "Search presets…"
         },
         "pure-black-dark": {
           "description": "Anchor dark surfaces to true black, preventing banding on OLED panels (dark mode only)",

@@ -15,8 +15,6 @@
 #include "shell/tooltip/tooltip_manager.h"
 #include "shell/wallpaper/panel/wallpaper_tile.h"
 #include "shell/wallpaper/wallpaper_paths.h"
-#include "theme/builtin_palettes.h"
-#include "theme/community_palettes.h"
 #include "theme/custom_palettes.h"
 #include "theme/theme_service.h"
 #include "ui/builders.h"
@@ -80,23 +78,6 @@ namespace {
     default:
       return ThemeMode::Auto;
     }
-  }
-
-  [[nodiscard]] std::vector<std::string> wallpaperSchemeOptions() {
-    return {
-        i18n::tr("theme.scheme.m3-content"),     i18n::tr("theme.scheme.m3-tonal-spot"),
-        i18n::tr("theme.scheme.m3-fruit-salad"), i18n::tr("theme.scheme.m3-rainbow"),
-        i18n::tr("theme.scheme.m3-monochrome"),  i18n::tr("theme.scheme.vibrant"),
-        i18n::tr("theme.scheme.faithful"),       i18n::tr("theme.scheme.soft"),
-        i18n::tr("theme.scheme.dysfunctional"),  i18n::tr("theme.scheme.muted"),
-    };
-  }
-
-  [[nodiscard]] std::vector<std::string> wallpaperSchemeValues() {
-    return {
-        "m3-content", "m3-tonal-spot", "m3-fruit-salad", "m3-rainbow",    "m3-monochrome",
-        "vibrant",    "faithful",      "soft",           "dysfunctional", "muted",
-    };
   }
 
   [[nodiscard]] std::optional<ThemeMode> favoriteThemeBadge(const WallpaperFavorite* favorite) {
@@ -637,19 +618,16 @@ void WallpaperPanel::create() {
       .fillWidth = true,
   });
 
-  // Only offer palette sources that actually have palettes; Community/Custom are empty
-  // when nothing is fetched/installed, and selecting them would do nothing.
+  // Only offer palette sources that actually have palettes; Custom is empty when nothing
+  // is installed, and selecting it would do nothing. Presets always has the builtins.
   m_paletteSourceOrder.clear();
   std::vector<ui::SegmentedOption> paletteSourceOptions;
   const auto addPaletteSource = [&](PaletteSource source, const char* labelKey) {
     m_paletteSourceOrder.push_back(source);
     paletteSourceOptions.push_back({.label = i18n::tr(labelKey)});
   };
-  addPaletteSource(PaletteSource::Builtin, "settings.options.theme.source.built-in");
+  addPaletteSource(PaletteSource::Builtin, "settings.options.theme.source.presets");
   addPaletteSource(PaletteSource::Wallpaper, "settings.options.theme.source.wallpaper");
-  if (!noctalia::theme::availableCommunityPalettes().empty()) {
-    addPaletteSource(PaletteSource::Community, "settings.options.theme.source.community");
-  }
   if (!noctalia::theme::availableCustomPalettes().empty()) {
     addPaletteSource(PaletteSource::Custom, "settings.options.theme.source.custom");
   }
@@ -1254,35 +1232,13 @@ void WallpaperPanel::rebuildFavoritePaletteDetailSelect(const WallpaperFavorite*
   std::string selectedValue;
 
   if (favorite != nullptr) {
-    const PaletteSource source = favorite->paletteSource.value_or(PaletteSource::Builtin);
-    switch (source) {
-    case PaletteSource::Builtin:
-      for (const auto& builtin : noctalia::theme::builtinPalettes()) {
-        m_favoritePaletteDetailValues.emplace_back(builtin.name);
-        labels.emplace_back(builtin.name);
-      }
-      selectedValue = favorite->builtinPalette;
-      break;
-    case PaletteSource::Wallpaper:
-      m_favoritePaletteDetailValues = wallpaperSchemeValues();
-      labels = wallpaperSchemeOptions();
-      selectedValue = favorite->wallpaperScheme;
-      break;
-    case PaletteSource::Community:
-      for (const auto& community : noctalia::theme::availableCommunityPalettes()) {
-        m_favoritePaletteDetailValues.push_back(community.name);
-        labels.push_back(community.name);
-      }
-      selectedValue = favorite->communityPalette;
-      break;
-    case PaletteSource::Custom:
-      for (const auto& custom : noctalia::theme::availableCustomPalettes()) {
-        m_favoritePaletteDetailValues.push_back(custom.name);
-        labels.push_back(custom.name);
-      }
-      selectedValue = favorite->customPalette;
-      break;
+    m_favoritePaletteDetailValues = themes::paletteChoices(
+        favorite->paletteSource.value_or(PaletteSource::Builtin), favorite->themeMode.value_or(ThemeMode::Dark)
+    );
+    for (const auto& choice : m_favoritePaletteDetailValues) {
+      labels.push_back(choice.label);
     }
+    selectedValue = paletteSelectionValue(*favorite);
   }
 
   const bool visible = !labels.empty();
@@ -1296,7 +1252,7 @@ void WallpaperPanel::rebuildFavoritePaletteDetailSelect(const WallpaperFavorite*
   m_ui.favoritePaletteDetailSelect->setOptions(std::move(labels));
   if (!selectedValue.empty()) {
     for (std::size_t i = 0; i < m_favoritePaletteDetailValues.size(); ++i) {
-      if (m_favoritePaletteDetailValues[i] == selectedValue) {
+      if (m_favoritePaletteDetailValues[i].value == selectedValue) {
         selectedIndex = i;
         break;
       }
@@ -1313,6 +1269,9 @@ std::optional<PaletteSource> WallpaperPanel::paletteSourceForSegment(std::size_t
 }
 
 std::size_t WallpaperPanel::segmentForPaletteSource(PaletteSource source) const {
+  if (themes::isPresetSource(source)) {
+    source = PaletteSource::Builtin;
+  }
   for (std::size_t i = 0; i < m_paletteSourceOrder.size(); ++i) {
     if (m_paletteSourceOrder[i] == source) {
       return i;
@@ -1547,19 +1506,21 @@ WallpaperFavorite WallpaperPanel::themeFromControls() const {
   if (m_ui.favoritePaletteDetailSelect != nullptr && !m_favoritePaletteDetailValues.empty()) {
     const std::size_t index = m_ui.favoritePaletteDetailSelect->selectedIndex();
     if (index < m_favoritePaletteDetailValues.size()) {
-      const std::string& value = m_favoritePaletteDetailValues[index];
-      switch (theme.paletteSource.value_or(PaletteSource::Builtin)) {
+      // The chosen palette decides the source: Presets holds builtin and community ones.
+      const themes::PaletteChoice& choice = m_favoritePaletteDetailValues[index];
+      theme.paletteSource = choice.source;
+      switch (choice.source) {
       case PaletteSource::Builtin:
-        theme.builtinPalette = value;
+        theme.builtinPalette = choice.value;
         break;
       case PaletteSource::Wallpaper:
-        theme.wallpaperScheme = value;
+        theme.wallpaperScheme = choice.value;
         break;
       case PaletteSource::Community:
-        theme.communityPalette = value;
+        theme.communityPalette = choice.value;
         break;
       case PaletteSource::Custom:
-        theme.customPalette = value;
+        theme.customPalette = choice.value;
         break;
       }
     }

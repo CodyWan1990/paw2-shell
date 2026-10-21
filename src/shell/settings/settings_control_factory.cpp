@@ -479,6 +479,11 @@ namespace settings {
   ) {
     auto& ctx = m_ctx;
     const float scale = m_scale;
+    auto onSelect = setting.onSelect;
+    if (!onSelect && setting.groupedCommit) {
+      onSelect = [setOverrides = ctx.setOverrides, groupedCommit = setting.groupedCommit,
+                  path](const std::string& value) { setOverrides(groupedCommit(value, path)); };
+    }
     return ui::button({
         .text = optionLabel(setting.options, setting.selectedValue),
         .fontSize = Style::fontSizeBody * scale,
@@ -491,7 +496,7 @@ namespace settings {
         .radius = Style::scaledRadiusMd(scale),
         .onClick = [openPopup = ctx.openSearchPickerPopup, title = std::move(title), options = setting.options,
                     selectedValue = setting.selectedValue, placeholder = setting.placeholder,
-                    emptyText = setting.emptyText, path = std::move(path), onSelect = setting.onSelect]() {
+                    emptyText = setting.emptyText, path = std::move(path), onSelect = std::move(onSelect)]() {
           if (openPopup) {
             openPopup(
                 SearchPickerOpenRequest{

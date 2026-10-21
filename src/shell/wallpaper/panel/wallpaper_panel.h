@@ -4,6 +4,7 @@
 #include "render/core/color.h"
 #include "render/core/thumbnail_service.h"
 #include "shell/panel/panel.h"
+#include "shell/themes/theme_palette_choices.h"
 #include "shell/wallpaper/panel/wallpaper_scanner.h"
 
 #include <cstddef>
@@ -185,7 +186,7 @@ private:
   bool m_syncingFavoriteControls = false;
   bool m_syncingGridSelectionVisual = false;
   bool m_gridKeyboardActive = false;
-  std::vector<std::string> m_favoritePaletteDetailValues;
+  std::vector<themes::PaletteChoice> m_favoritePaletteDetailValues;
   std::vector<PaletteSource> m_paletteSourceOrder;
   static constexpr std::size_t kNoVisibleSelection = std::numeric_limits<std::size_t>::max();
   std::size_t m_selectedVisibleIndex = kNoVisibleSelection;

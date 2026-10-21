@@ -110,6 +110,12 @@ namespace settings {
     float preferredHeight = 240.0F;
     // When set, replaces the default commit for the setting path.
     std::function<void(const std::string&)> onSelect;
+    // Like SelectSetting's: the overrides to write for a pick, in place of the
+    // setting path alone. Ignored when onSelect is set.
+    std::function<std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>>(
+        std::string_view selectedValue, const std::vector<std::string>& primaryPath
+    )>
+        groupedCommit;
   };
 
   struct SliderSetting {
@@ -316,7 +322,6 @@ namespace settings {
     bool systemBatteryAvailable = false;
     std::vector<SelectOption> batteryDeviceOptions;
     std::unordered_map<std::string, int> batteryWarningThresholds;
-    std::vector<SelectOption> communityPalettes;
     std::vector<SelectOption> customPalettes;
     std::vector<SelectOption> communityTemplates;
     std::vector<SelectOption> fontFamilies;

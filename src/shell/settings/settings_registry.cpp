@@ -19,9 +19,9 @@
 #include "shell/settings/color_spec_picker.h"
 #include "shell/settings/font_weight_catalog.h"
 #include "shell/settings/settings_paw2.h"
+#include "shell/themes/theme_palette_choices.h"
 #include "shell/wallpaper/wallpaper_paths.h"
 #include "system/sysmon_threshold_profile.h"
-#include "theme/builtin_palettes.h"
 #include "theme/builtin_templates.h"
 #include "ui/app_icon_colorization.h"
 #include "util/file_utils.h"
@@ -280,38 +280,48 @@ namespace settings {
       return select;
     }
 
-    ColorSwatchPreview palettePreviewFromPalette(const ::Palette& palette) {
-      return ColorSwatchPreview{
-          .surface = fixedColorSpec(palette.surface),
-          .swatches = {
-              fixedColorSpec(palette.primary),
-              fixedColorSpec(palette.secondary),
-              fixedColorSpec(palette.tertiary),
-              fixedColorSpec(palette.error),
-          },
+    // Builtin and community palettes share one "Presets" segment; the preset
+    // picker records which of the two the chosen palette is.
+    SelectSetting paletteSourceSelect(PaletteSource source) {
+      return asSegmented(plainSelect(
+          {{"builtin", "settings.options.theme.source.presets"},
+           {"wallpaper", "settings.options.theme.source.wallpaper"},
+           {"custom", "settings.options.theme.source.custom"}},
+          themes::isPresetSource(source) ? "builtin" : enumToKey(kPaletteSources, source)
+      ));
+    }
+
+    // Every builtin and community palette in one searchable list. Picking one
+    // stores its name under the field its source reads, and switches to that
+    // source.
+    SearchPickerSetting presetPalettePicker(const ThemeConfig& theme) {
+      SearchPickerSetting picker{
+          .selectedValue = theme.source == PaletteSource::Community ? theme.communityPalette : theme.builtinPalette,
+          .placeholder = i18n::tr("settings.schema.appearance.preset-palette.search-placeholder"),
+          .emptyText = i18n::tr("ui.controls.search-picker.empty"),
       };
-    }
-
-    ColorSwatchPreview builtinPalettePreview(const noctalia::theme::BuiltinPalette& palette, ThemeMode mode) {
-      return palettePreviewFromPalette(mode == ThemeMode::Light ? palette.light.palette : palette.dark.palette);
-    }
-
-    SelectSetting builtinPaletteSelect(std::string_view selected, ThemeMode mode) {
-      std::vector<SelectOption> opts;
-      opts.reserve(noctalia::theme::builtinPalettes().size());
-      for (const auto& palette : noctalia::theme::builtinPalettes()) {
-        opts.push_back(
-            SelectOption{
-                .value = std::string(palette.name),
-                .label = std::string(palette.name),
-                .description = {},
-                .preview = builtinPalettePreview(palette, mode),
-            }
-        );
+      std::unordered_map<std::string, PaletteSource> sources;
+      for (auto& choice : themes::paletteChoices(PaletteSource::Builtin, theme.mode)) {
+        sources.emplace(choice.value, choice.source);
+        picker.options.push_back(SelectOption{
+            .value = choice.value,
+            .label = std::move(choice.label),
+            .description = i18n::tr(
+                choice.source == PaletteSource::Community ? "settings.options.theme.source.community"
+                                                          : "settings.options.theme.source.built-in"
+            ),
+            .preview = std::move(choice.preview),
+        });
       }
-      return SelectSetting{
-          .options = std::move(opts), .selectedValue = std::string(selected), .preferredWidth = 240.0F
+      picker.groupedCommit = [sources = std::move(sources)](std::string_view value, const std::vector<std::string>&) {
+        const auto it = sources.find(std::string(value));
+        const PaletteSource source = it != sources.end() ? it->second : PaletteSource::Builtin;
+        return std::vector<std::pair<std::vector<std::string>, ConfigOverrideValue>>{
+            {{"theme", "source"}, std::string(enumToKey(kPaletteSources, source))},
+            {{"theme", source == PaletteSource::Community ? "community_palette" : "builtin"}, std::string(value)},
+        };
       };
+      return picker;
     }
 
     SelectSetting wallpaperSchemeSelect(std::string_view selected) {
@@ -985,26 +995,18 @@ namespace settings {
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Appearance, "theme", "appearance.palette-source", {"theme", "source"},
-        asSegmented(enumSelect(kPaletteSources, cfg.theme.source)), "palette colors"
+        paletteSourceSelect(cfg.theme.source), "palette colors presets"
     ));
-    if (cfg.theme.source == PaletteSource::Builtin) {
+    if (themes::isPresetSource(cfg.theme.source)) {
       entries.push_back(keyedEntry(
-          SettingsSection::Appearance, "theme", "appearance.builtin-palette", {"theme", "builtin"},
-          builtinPaletteSelect(cfg.theme.builtinPalette, cfg.theme.mode), "builtin palette colors"
+          SettingsSection::Appearance, "theme", "appearance.preset-palette",
+          {"theme", cfg.theme.source == PaletteSource::Community ? "community_palette" : "builtin"},
+          presetPalettePicker(cfg.theme), "preset builtin community palette colors"
       ));
     } else if (cfg.theme.source == PaletteSource::Wallpaper) {
       entries.push_back(keyedEntry(
           SettingsSection::Appearance, "theme", "appearance.wallpaper-generation-scheme", {"theme", "wallpaper_scheme"},
           wallpaperSchemeSelect(cfg.theme.wallpaperScheme), "wallpaper palette generator scheme material you m3 colors"
-      ));
-    } else if (cfg.theme.source == PaletteSource::Community) {
-      SettingControl communityPaletteControl = searchPickerOrText(
-          env.communityPalettes, cfg.theme.communityPalette, "Oxocarbon",
-          tr("settings.schema.appearance.community-palette.search-placeholder"), 240.0F
-      );
-      entries.push_back(keyedEntry(
-          SettingsSection::Appearance, "theme", "appearance.community-palette", {"theme", "community_palette"},
-          std::move(communityPaletteControl), "community palette colors"
       ));
     } else if (cfg.theme.source == PaletteSource::Custom) {
       SettingControl customPaletteControl = searchPickerOrText(

@@ -4,6 +4,7 @@
 #include "core/deferred_call.h"
 #include "core/log.h"
 #include "dbus/mpris/mpris_art.h"
+#include "dbus/mpris/mpris_position.h"
 #include "dbus/mpris/mpris_service.h"
 #include "i18n/i18n.h"
 #include "net/http_client.h"
@@ -45,10 +46,6 @@ namespace {
   constexpr float kMediaPlayPauseHeight = kMediaUnit + Style::spaceSm;
   constexpr float kMediaArtworkMinHeight = kMediaUnit * 4;
   constexpr auto kNoActivePlayerGrace = std::chrono::milliseconds(2000);
-  constexpr auto kTransientPositionRegressionWindow = std::chrono::milliseconds(1500);
-  constexpr std::int64_t kTransientPositionRegressionFloorUs = 5'000'000;
-  constexpr std::int64_t kTransientPositionRegressionCeilingUs = 1'500'000;
-  constexpr std::int64_t kTransientPositionRegressionDeltaUs = 5'000'000;
   constexpr std::int64_t kSeekArrivedToleranceUs = 1'500'000;
   constexpr std::int64_t kSeekNearZeroUs = 2'000'000;
   constexpr auto kProgressSettleHold = std::chrono::milliseconds(2500);
@@ -824,16 +821,11 @@ void MediaTab::refresh(Renderer& renderer) {
     const bool withinProgressSettle =
         m_progressSettleUntil != std::chrono::steady_clock::time_point{} && now < m_progressSettleUntil;
     const bool sameDisplayedTrack = m_positionBusName == player.busName && m_positionTrackSignature == trackSignature;
-    const bool withinTransientRegressionWindow = m_positionSampleAt != std::chrono::steady_clock::time_point{}
-        && now - m_positionSampleAt <= kTransientPositionRegressionWindow;
     const bool preserveDisplayedPosition = !seekPending
         && sameDisplayedTrack
         && m_lastPlaybackStatus == "Playing"
         && player.playbackStatus == "Playing"
-        && m_positionUs >= kTransientPositionRegressionFloorUs
-        && livePositionUs <= kTransientPositionRegressionCeilingUs
-        && livePositionUs + kTransientPositionRegressionDeltaUs < m_positionUs
-        && withinTransientRegressionWindow;
+        && mpris::isTransientPositionRegression(m_positionUs, livePositionUs, m_positionSampleAt, now);
     if (preserveDisplayedPosition) {
       livePositionUs = m_positionUs;
     }
@@ -841,7 +833,7 @@ void MediaTab::refresh(Renderer& renderer) {
     std::int64_t displayPositionUs = livePositionUs;
     if (seekPending) {
       displayPositionUs = m_pendingSeekUs;
-    } else if (withinProgressSettle && livePositionUs + kTransientPositionRegressionDeltaUs < m_positionUs) {
+    } else if (withinProgressSettle && livePositionUs + mpris::kPositionRegressionDeltaUs < m_positionUs) {
       displayPositionUs = m_positionUs;
     } else if (preserveDisplayedPosition) {
       displayPositionUs = m_positionUs;

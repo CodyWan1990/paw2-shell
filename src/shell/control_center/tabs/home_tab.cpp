@@ -9,6 +9,7 @@
 #include "cursor-shape-v1-client-protocol.h"
 #include "dbus/accounts/accounts_service.h"
 #include "dbus/mpris/mpris_art.h"
+#include "dbus/mpris/mpris_position.h"
 #include "dbus/mpris/mpris_service.h"
 #include "i18n/i18n.h"
 #include "notification/notifications.h"
@@ -60,10 +61,6 @@ namespace {
   constexpr std::size_t kHomeStackedShortcutMax = 2;
   // Square tiles are trimmed slightly (height = width * trim) so the grid stays compact.
   constexpr float kHomeShortcutSquareTrim = 0.82F;
-  constexpr auto kHomeTransientPositionRegressionWindow = std::chrono::milliseconds(1500);
-  constexpr std::int64_t kHomeTransientPositionRegressionFloorUs = 5'000'000;
-  constexpr std::int64_t kHomeTransientPositionRegressionCeilingUs = 1'500'000;
-  constexpr std::int64_t kHomeTransientPositionRegressionDeltaUs = 5'000'000;
   constexpr int kHomeMediaArtLayoutPassLimit = 8;
 
   float homeAvatarSize(float scale) { return Style::controlHeightLg * kHomeAvatarScale * scale; }
@@ -1497,16 +1494,10 @@ void HomeTab::sync(Renderer& renderer) {
           livePositionUs = std::clamp<std::int64_t>(livePositionUs, 0, active->lengthUs);
           const bool sameDisplayedTrack =
               m_mediaPositionBusName == active->busName && m_mediaPositionTrackSignature == trackSignature;
-          const bool withinTransientRegressionWindow =
-              m_mediaPositionSampleAt != std::chrono::steady_clock::time_point{}
-              && now - m_mediaPositionSampleAt <= kHomeTransientPositionRegressionWindow;
           const bool preserveDisplayedPosition = sameDisplayedTrack
               && m_mediaLastPlaybackStatus == "Playing"
               && active->playbackStatus == "Playing"
-              && m_mediaPositionUs >= kHomeTransientPositionRegressionFloorUs
-              && livePositionUs <= kHomeTransientPositionRegressionCeilingUs
-              && livePositionUs + kHomeTransientPositionRegressionDeltaUs < m_mediaPositionUs
-              && withinTransientRegressionWindow;
+              && mpris::isTransientPositionRegression(m_mediaPositionUs, livePositionUs, m_mediaPositionSampleAt, now);
           if (preserveDisplayedPosition) {
             livePositionUs = m_mediaPositionUs;
           }

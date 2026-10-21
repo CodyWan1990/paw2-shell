@@ -22,17 +22,16 @@ something breaks, an issue is very welcome.
 
 ## What it is
 
-paw2-shell is a fork of [Noctalia](https://noctalia.dev) v5.3.0, a native Wayland shell written in C++ with no Qt or
-GTK. It keeps everything that makes Noctalia great: the bars and widgets, dock, launcher, control center,
-notifications, wallpapers, lock screen, OSDs, desktop widgets and Luau plugins.
+paw2-shell is a native Wayland shell written in C++ with no Qt or GTK: bars and widgets, dock, launcher, control
+center, notifications, wallpapers, lock screen, OSDs and desktop widgets.
 
-The fork drops support for every other compositor and is built to work hand in hand with paw2. The shell and the
-compositor share one look, and you can set up most of paw2 from the shell's settings instead of editing files by hand.
+It runs only on paw2 and is built to work hand in hand with it. The shell and the compositor share one look, and you
+can set up most of paw2 from the shell's settings instead of editing files by hand.
 
-It installs as `paw2-shell` with its own `~/.config/paw2-shell`, so it can sit beside a regular Noctalia install
-without the two fighting over config.
+It installs as `paw2-shell` with its own `~/.config/paw2-shell`, so it can sit beside other shells without the two
+fighting over config. The projects it is built on are credited in [CREDITS.md](CREDITS.md).
 
-## What's different from Noctalia
+## Highlights
 
 **Talks to paw2 directly**
 - Workspaces, the focused window and monitor, and the exact window identity behind the dock, taskbar and window
@@ -50,10 +49,11 @@ without the two fighting over config.
   font
 
 **Themes, built in**
+- Palette presets that ship with the shell, plus palettes generated from your wallpaper or your own files
 - Save named themes: a palette and one or more wallpapers, with a preview picture
 - Switch between them from a carousel, the bar widget, `paw2-shell msg theme-next`, or a paw2 keybind
 - Scroll on the themes widget to flip through the current theme's wallpapers
-- A native take on theblackdon's Theme Switcher plugin
+- Inspired by theblackdon's Theme Switcher
 
 **Small comforts**
 - Per-widget styles: `[widget.<name>] style = none | capsule | box | pill | underline`, with an optional accent
@@ -62,8 +62,7 @@ without the two fighting over config.
 - A screenshot tool with a preview, a file name field, and Copy / Save / Both
 - The paw2 look out of the box, with the paw2 wallpaper as the fallback whenever none is set
 
-For everything else, Noctalia's [documentation](https://docs.noctalia.dev) still applies. Just read `noctalia ...`
-commands as `paw2-shell ...`.
+Everything else is documented in [docs/user](docs/user/index.md).
 
 ## Install
 
@@ -106,17 +105,6 @@ and how the pieces fit together is described in [ARCHITECTURE.md](ARCHITECTURE.m
 The old QML/Quickshell version of paw2-shell is kept on the
 [`legacy-qml`](https://github.com/CodyWan1990/paw2-shell/tree/legacy-qml) branch.
 
-## Support Noctalia
-
-paw2-shell wouldn't exist without Noctalia. The bars, panels, renderer and plugin system are all their work. If you
-enjoy this shell, please consider supporting the people who built its foundation:
-
-- Star [noctalia-dev/noctalia](https://github.com/noctalia-dev/noctalia) on GitHub
-- Donate through [Buy Me a Coffee](https://www.buymeacoffee.com/noctalia) or [Ko-fi](https://ko-fi.com/noctaliadev)
-- Join their community on [Discord](https://discord.noctalia.dev)
-
-Please report paw2-shell bugs here, not to Noctalia. They don't maintain this fork.
-
 ## License
 
-MIT, like Noctalia. See [LICENSE](LICENSE) and [CREDITS.md](CREDITS.md).
+MIT. See [LICENSE](LICENSE) and [CREDITS.md](CREDITS.md).

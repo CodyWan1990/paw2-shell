@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Static i18n checks for noctalia.
+Static i18n checks for paw2-shell.
 
   1) Missing keys (always on): every i18n::tr / i18n::trp string literal key must exist
      in assets/translations/en.json. Exit 1 when any are missing.
@@ -160,14 +160,14 @@ def _ascii_letter_count(s: str) -> int:
 
 
 def is_placeholder_or_internal_literal(s: str) -> bool:
-    """Non–user-copy literals (empty, gauges, paths, noctalia: commands, etc.)."""
+    """Non–user-copy literals (empty, gauges, paths, paw2-shell: commands, etc.)."""
     t = s.strip()
     if not t:
         return True
     low = t.lower()
     if low in _IGNORE_LITERAL_LOWER:
         return True
-    if low.startswith("noctalia:"):
+    if low.startswith("paw2-shell:"):
         return True
     # digits / percent / separators only (e.g. "660", "0%", "100%")
     if re.fullmatch(r"[\d.\s%+-]+", t):

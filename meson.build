@@ -1285,6 +1285,9 @@ if build_tests
     env: config_validate_env,
   )
 
+  # Mentions of the upstream project stay in the licence, credits and migration code.
+  test('upstream_names', find_program('bash'), args: [files('tools/check-upstream-names.sh')])
+
   bash_program = find_program('bash')
   test('template_undo_signal',
     bash_program,

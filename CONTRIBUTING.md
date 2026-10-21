@@ -1,15 +1,12 @@
 Contributing
 ===
 
-This file collects contributor-facing details for Noctalia: design goals, stack notes, code style, contribution rules,
+This file collects contributor-facing details for paw2-shell: design goals, stack notes, code style, contribution rules,
 testing, commit conventions, source layout, and debugging helpers.
 
 For dependencies and normal build commands, start with [BUILDING.md](BUILDING.md). For the architecture and the
-invariants reviewers enforce (UI phases, layer boundaries, rendering, surfaces, config, plugins), read
+invariants reviewers enforce (UI phases, layer boundaries, rendering, surfaces, config), read
 [ARCHITECTURE.md](ARCHITECTURE.md).
-
-Before contributing, read our [ethos](https://noctalia.dev/ethos) to understand the values and philosophy guiding the
-project.
 
 ## Design Principles
 
@@ -50,7 +47,6 @@ Direct project dependencies are listed below; transitive dependencies are owned 
 | Markdown | `md4c` |
 | Fuzzy matching | `fzy` (vendored) |
 | Math expressions | `libqalculate` |
-| Scripting | `Luau` (vendored) |
 | Theme generation | Material Color Utilities (vendored) |
 | Memory allocation | `jemalloc` (optional) |
 
@@ -142,8 +138,8 @@ overwrites them.
 
 ### Vendored code
 
-Do not patch vendored code under `third_party/` for Noctalia behavior; local edits are lost when the dependency is
-refreshed. Put compatibility code in Noctalia-owned sources under `src/`, or fix the issue upstream and update the
+Do not patch vendored code under `third_party/` for paw2-shell behavior; local edits are lost when the dependency is
+refreshed. Put compatibility code in paw2-shell-owned sources under `src/`, or fix the issue upstream and update the
 vendored snapshot from upstream.
 
 ## Testing
@@ -201,14 +197,12 @@ again. The check never closes a pull request.
 
 ## Translations
 
-Noctalia translations are managed through [Noctalia Translate](https://i18n.noctalia.dev/projects/noctalia). The JSON
-files in `assets/translations/` are exported from that workflow, with `assets/translations/en.json` acting as the
-source catalog for new strings.
+`assets/translations/en.json` is the source catalog for every string. The other languages were translated for
+the original project and no longer receive updates from a translation service, so missing strings fall back to English.
 
 When a code, UI, settings, or documentation change needs a new user-facing string, add or update the English string in
 `assets/translations/en.json` only. Do not machine translate strings, copy English into other locales, or include broad
-updates to non-English translation files in a normal feature or bug-fix PR. The translation team handles those locale
-updates through the translation app.
+updates to non-English translation files in a normal feature or bug-fix PR. Send translation updates as their own PR.
 
 Only edit non-English translation files when the PR is explicitly about translation tooling, an import/export sync, or a
 maintainer has asked for that specific locale change.
@@ -229,7 +223,7 @@ src/
   main.cpp          Entry point
   app/              Application bootstrap, main loop, poll sources
   auth/             PAM and fingerprint authentication
-  calendar/         CalDAV, Google Calendar, iCalendar parsing, polling
+  calendar/         CalDAV, iCalendar parsing, polling
   capture/          Screenshots, screencopy capture, region overlay
   compositors/      Compositor detection, runtime adapters, workspace/output/keyboard backends
   config/           Configuration schema, validation, hot reload, state store, overrides
@@ -253,7 +247,7 @@ src/
   i18n/             Translation catalog and language tag handling
   idle/             Idle manager, inhibitor, grace overlay
   ipc/              IPC client/service and CLI command parsing
-  launcher/         Launcher providers (apps, emoji, calculator, sessions, windows, plugins)
+  launcher/         Launcher providers (apps, emoji, calculator, sessions, windows)
   net/              HTTP client, URI parsing, URL opening
   notification/     Notification model, manager, filtering, history
   pipewire/         PipeWire audio service, sound playback, spectrum analyzer
@@ -264,7 +258,6 @@ src/
     programs/       GLES shader programs
     scene/          Scene graph nodes and pointer input dispatch
     text/           Cairo/Pango text and glyph rendering
-  scripting/        Luau plugin runtime, manifests, registry, source management, bindings
   shell/
     backdrop/       Backdrop layer surfaces
     bar/            Bar surface, instance, widget base/factory
@@ -274,7 +267,6 @@ src/
     desktop/        Desktop widget host, factory, layout, editor support
       widgets/      Desktop widget implementations
     dock/           Dock surface, model, pinned apps, context menu
-    greeter/        Greeter appearance sync
     launcher/       Launcher panel
     lockscreen/     Session lock surfaces and lockscreen widgets
     notification/   Notification toasts
@@ -301,9 +293,8 @@ src/
     visuals/        Shared visualizer controls
   util/             Generic helpers
   wayland/          Wayland connection, seats, surfaces, clipboard, toplevels, text input
-    hyprland/       Hyprland-specific Wayland protocol helpers
 assets/
-  fonts/            Bundled Noctalia Tabler and UI fonts
+  fonts/            Bundled paw2-shell Tabler and UI fonts
   sounds/           Notification and UI sounds
   templates/        Built-in theme templates
   translations/     Exported translation catalogs
@@ -314,27 +305,26 @@ nix/                Nix package, module, and dev shell definitions
 third_party/
   wuffs/          Raster image decoding (vendored)
   fzy/            Fuzzy matching (vendored)
-  luau/           Plugin scripting runtime (vendored)
   material_color_utilities/ Material Design color generation (vendored)
 ```
 
 
 ## Debugging
 
-All debug commands use the `dev.noctalia.Debug` D-Bus service, available at runtime.
+All debug commands use the `dev.paw2.Shell.Debug` D-Bus service, available at runtime.
 
 ```sh
 # Enable verbose debug logs
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.SetVerboseLogs true
+gdbus call --session --dest dev.paw2.Shell.Debug --object-path /dev/paw2/Shell/Debug --method dev.paw2.Shell.Debug.SetVerboseLogs true
 
 # Disable verbose debug logs
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.SetVerboseLogs false
+gdbus call --session --dest dev.paw2.Shell.Debug --object-path /dev/paw2/Shell/Debug --method dev.paw2.Shell.Debug.SetVerboseLogs false
 
 # Check current verbose log state
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.GetVerboseLogs
+gdbus call --session --dest dev.paw2.Shell.Debug --object-path /dev/paw2/Shell/Debug --method dev.paw2.Shell.Debug.GetVerboseLogs
 
 # Emit an internal notification (app_name, summary, body, timeout_ms, urgency 0-2)
-gdbus call --session --dest dev.noctalia.Debug --object-path /dev/noctalia/Debug --method dev.noctalia.Debug.EmitInternalNotification "Noctalia" "Test" "Hello from debug" 5000 1
+gdbus call --session --dest dev.paw2.Shell.Debug --object-path /dev/paw2/Shell/Debug --method dev.paw2.Shell.Debug.EmitInternalNotification "paw2-shell" "Test" "Hello from debug" 5000 1
 ```
 
 ### Crash output
@@ -345,17 +335,17 @@ When reporting a crash, include the complete terminal output from the process if
 ### ASan crash reports
 
 AddressSanitizer (ASan) can find memory errors that a normal build reports only as a crash. It requires a temporary
-source build; it does not replace the Noctalia package you already use.
+source build; it does not replace the paw2-shell package you already use.
 
 Install the source-build dependencies for your distribution using the commands in
 [BUILDING.md](BUILDING.md#dependencies), then clone the repository:
 
 ```sh
-git clone https://github.com/noctalia-dev/noctalia.git
-cd noctalia
+git clone https://github.com/CodyWan1990/paw2-shell.git
+cd paw2-shell
 ```
 
-Stop the Noctalia instance started by your compositor, then configure and build ASan:
+Stop the paw2-shell instance started by paw2, then configure and build ASan:
 
 ```sh
 just configure asan && just build asan
@@ -364,9 +354,9 @@ just configure asan && just build asan
 Start the ASan binary in the foreground and save its output:
 
 ```sh
-ASAN_OPTIONS=log_path=/tmp/noctalia-asan ./build-asan/noctalia 2>&1 | tee noctalia-asan-terminal.log
+ASAN_OPTIONS=log_path=/tmp/paw2-shell-asan ./build-asan/paw2-shell 2>&1 | tee paw2-shell-asan-terminal.log
 ```
 
-Reproduce the crash once. If Noctalia does not exit, press `Ctrl+C`. Attach both `noctalia-asan-terminal.log` and every
-`/tmp/noctalia-asan.*` file to the GitHub issue. The files in `/tmp` preserve the ASan report if the crash takes down
+Reproduce the crash once. If paw2-shell does not exit, press `Ctrl+C`. Attach both `paw2-shell-asan-terminal.log` and every
+`/tmp/paw2-shell-asan.*` file to the GitHub issue. The files in `/tmp` preserve the ASan report if the crash takes down
 the terminal. If the build or startup fails, attach that complete output instead.

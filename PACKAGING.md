@@ -1,48 +1,31 @@
-# Packaging Noctalia
+# Packaging paw2-shell
 
 Notes for distribution packagers. End-user install docs live in the
-[README](README.md) and at [docs.noctalia.dev](https://docs.noctalia.dev/noctalia/getting-started/installation/).
+[README](README.md) and [docs/user/getting-started/installation.md](docs/user/getting-started/installation.md).
 
 ## Package description
 
 Use this exact short description for package metadata (`pkgdesc`, `Summary`,
 AppStream, etc.):
 
-> A sleek, customizable desktop shell crafted for Wayland.
+> Desktop shell for the paw2 Wayland compositor.
 
 Do not substitute shorter or alternate blurbs (“lightweight Wayland bar”,
-“status bar”, ...). Noctalia is a full desktop shell (bars, dock, launcher,
+“status bar”, ...). paw2-shell is a full desktop shell (bars, dock, launcher,
 notifications, lock screen, wallpaper, settings, ...), not a bar-only tool.
-
-## Packaged distributions
-
-v5 is already packaged for:
-
-- Arch Linux
-- NixOS
-- Fedora
-- openSUSE
-- KaOS
-- Gentoo
-- GNU Guix
-- Debian (including Ubuntu)
-
-[Repology](https://repology.org/project/noctalia/versions) is a useful at-a-glance
-check, but it only covers repositories it indexes (and may still list v4 as
-`noctalia-shell`). It is not a complete inventory of community packaging.
 
 ## Identity
 
 | | |
 |---|---|
-| Name | `noctalia` |
-| Homepage | https://github.com/noctalia-dev/noctalia |
-| Docs | https://docs.noctalia.dev |
+| Name | `paw2-shell` |
+| Homepage | https://github.com/CodyWan1990/paw2-shell |
+| Docs | [`docs/user`](docs/user/index.md) |
 | License | MIT ([LICENSE](LICENSE)); also see vendored licenses under `third_party/` for SPDX completeness |
 | Version | [`VERSION`](VERSION), read by Meson `project(... version: files('VERSION'))` |
-| Binary | `noctalia` |
-| Desktop entry | `dev.noctalia.Noctalia.desktop` |
-| Icon | `noctalia` (`share/icons/hicolor/scalable/apps/noctalia.svg`) |
+| Binary | `paw2-shell` |
+| Desktop entry | `paw2-shell.desktop` |
+| Icon | `paw2-shell` (`share/icons/hicolor/scalable/apps/paw2-shell.svg`) |
 
 ## Maintenance Policy
 
@@ -102,10 +85,10 @@ Prefix/datadir are baked into the binary via `PAW2_SHELL_INSTALL_PREFIX` /
 ### Installed layout
 
 ```text
-<prefix>/bin/noctalia
-<prefix>/share/noctalia/assets/...
-<prefix>/share/applications/dev.noctalia.Noctalia.desktop
-<prefix>/share/icons/hicolor/scalable/apps/noctalia.svg
+<prefix>/bin/paw2-shell
+<prefix>/share/paw2-shell/assets/...
+<prefix>/share/applications/paw2-shell.desktop
+<prefix>/share/icons/hicolor/scalable/apps/paw2-shell.svg
 ```
 
 The shipped `assets/` tree is **required at runtime**. Shipping only the binary
@@ -117,30 +100,30 @@ Besides the prefix layout above, portable bundle layouts are supported:
 
 ```text
 bundle/
-  noctalia
+  paw2-shell
   assets/
 ```
 
 ```text
 bundle/
-  bin/noctalia
-  share/noctalia/assets/
+  bin/paw2-shell
+  share/paw2-shell/assets/
 ```
 
-Noctalia resolves the asset root in this order:
+paw2-shell resolves the asset root in this order:
 
 1. `PAW2_SHELL_ASSETS_DIR` (a warning is logged if it is set but invalid)
 2. `assets/` next to the executable
 3. `assets/` one level above the executable (this is how a `build-debug/`
    binary finds the source tree's `assets/`)
-4. `../<datadir>/noctalia/assets` relative to the executable, when the
+4. `../<datadir>/paw2-shell/assets` relative to the executable, when the
    configured Meson `datadir` is relative
-5. `../share/noctalia/assets` relative to the executable
-6. the compiled install path from Meson (`<prefix>/<datadir>/noctalia/assets`)
+5. `../share/paw2-shell/assets` relative to the executable
+6. the compiled install path from Meson (`<prefix>/<datadir>/paw2-shell/assets`)
 
 A candidate is only accepted if it contains `emoji.json`,
-`fonts/noctalia-tabler.ttf`, `templates/builtin.toml`, and
-`translations/en.json`. If none qualifies, Noctalia logs a warning and uses the
+`fonts/paw2-tabler.ttf`, `templates/builtin.toml`, and
+`translations/en.json`. If none qualifies, paw2-shell logs a warning and uses the
 compiled install path.
 
 Not shipped (don’t look for them in the install): AppStream / metainfo XML, man
@@ -152,9 +135,9 @@ Static completion files are not shipped. Generate them from the freshly built
 binary and install them in the distribution's completion directories:
 
 ```text
-./build-<mode>/noctalia completions bash  → share/bash-completion/completions/noctalia
-./build-<mode>/noctalia completions zsh   → share/zsh/site-functions/_noctalia
-./build-<mode>/noctalia completions fish  → share/fish/vendor_completions.d/noctalia.fish
+./build-<mode>/paw2-shell completions bash  → share/bash-completion/completions/paw2-shell
+./build-<mode>/paw2-shell completions zsh   → share/zsh/site-functions/_paw2_shell
+./build-<mode>/paw2-shell completions fish  → share/fish/vendor_completions.d/paw2-shell.fish
 ```
 
 This is intentionally a packaging step rather than a Meson install rule:
@@ -181,7 +164,7 @@ Notes packagers hit often:
 
 ### Vendored (no system package)
 
-Shipped under `third_party/`: Wuffs, Luau, fzy, Material Color Utilities.
+Shipped under `third_party/`: Wuffs, fzy, Material Color Utilities.
 Each carries its own license file beside the code.
 
 ### Runtime
@@ -191,7 +174,6 @@ Each carries its own license file beside the code.
 | PipeWire **daemon** (+ WirePlumber 0.5) | Audio, volume OSD, privacy indicators, spectrum. Libraries alone are not enough; without a running daemon those features stay off. |
 | PAM (`login` service by default) | Lock screen authentication |
 | Fontconfig / fonts | Text rendering (users still need usable fonts installed) |
-| `git` | Plugin git sources / auto-update invoke `git` on `PATH` |
 | `upower` | Optional: battery / power devices |
 | `ddcutil` | Optional: external monitor brightness |
 | Secret Service provider | Optional but recommended for credential / encrypted-state persistence (GNOME Keyring, KWallet, KeePassXC, ...). `libsecret` is only the client library; without a session provider those features cannot persist secrets. |
@@ -199,9 +181,9 @@ Each carries its own license file beside the code.
 
 ## Startup and IPC
 
-No systemd user unit is shipped. Typical startup is compositor autostart or the
-desktop entry (`noctalia --daemon`). Control a running instance with
-`noctalia msg ...` (Unix socket under `XDG_RUNTIME_DIR`).
+No systemd user unit is shipped. Typical startup is paw2's `[autostart]` or the
+desktop entry (`paw2-shell --daemon`). Control a running instance with
+`paw2-shell msg ...` (Unix socket under `XDG_RUNTIME_DIR`).
 
 Keep the `.desktop` daemon Exec unless you intentionally package a different
 session integration. Prefer the canonical description above for `Comment=` /
@@ -209,40 +191,31 @@ AppStream summary as well.
 
 ## Session conflicts
 
-On non-Plasma sessions Noctalia provides and registers:
+paw2-shell provides and registers:
 
 - `org.freedesktop.Notifications`
 - `org.kde.StatusNotifierWatcher` (system tray host)
 
 Do not run it alongside another notification daemon or StatusNotifier host
-(mako, dunst, swaync, waybar-as-host, ...) unless those are disabled. On Plasma,
-Noctalia integrates with Plasma's notification / tray paths instead of claiming
-the freedesktop Notifications name.
+(mako, dunst, swaync, waybar-as-host, ...) unless those are disabled.
 
 ## User data paths
 
 | Kind | Default |
 |---|---|
-| Config | `$XDG_CONFIG_HOME/noctalia` (`~/.config/noctalia`), e.g. `config.toml` |
-| State | `$XDG_STATE_HOME/noctalia` (`~/.local/state/noctalia`), e.g. `settings.toml`, caches |
-| Data | `$XDG_DATA_HOME/noctalia` (`~/.local/share/noctalia`) |
-| Logs | `$XDG_CACHE_HOME/noctalia` (`~/.cache/noctalia`) |
+| Config | `$XDG_CONFIG_HOME/paw2-shell` (`~/.config/paw2-shell`), e.g. `config.toml` |
+| State | `$XDG_STATE_HOME/paw2-shell` (`~/.local/state/paw2-shell`), e.g. `settings.toml`, caches |
+| Data | `$XDG_DATA_HOME/paw2-shell` (`~/.local/share/paw2-shell`) |
+| Logs | `$XDG_CACHE_HOME/paw2-shell` (`~/.cache/paw2-shell`) |
 
 Override bases with `PAW2_SHELL_CONFIG_HOME`, `PAW2_SHELL_STATE_HOME`,
-`PAW2_SHELL_DATA_HOME` (each still appends `/noctalia`).
+`PAW2_SHELL_DATA_HOME` (each still appends `/paw2-shell`).
 
-## What Noctalia is not
+## What paw2-shell is not
 
-- Not a compositor, display manager, or greeter. Greeter support is
-  [noctalia-greeter](https://github.com/noctalia-dev/noctalia-greeter).
+- Not a compositor, display manager, or greeter. It runs only on
+  [paw2](https://github.com/CodyWan1990/paw2).
 - Not a replacement for file managers, screen casting, or drive mounting.
-- Compositor support varies (protocols / IPC). See the compositor docs for
-  [Niri](https://docs.noctalia.dev/noctalia/compositor-settings/niri/),
-  [Hyprland](https://docs.noctalia.dev/noctalia/compositor-settings/hyprland/),
-  [Sway / Scroll](https://docs.noctalia.dev/noctalia/compositor-settings/sway-scroll/),
-  [Mango](https://docs.noctalia.dev/noctalia/compositor-settings/mango/),
-  [Labwc](https://docs.noctalia.dev/noctalia/compositor-settings/labwc/), and
-  [KDE Plasma](https://docs.noctalia.dev/noctalia/compositor-settings/kde/).
 
 ## Versioning
 
@@ -251,5 +224,4 @@ you maintain a `-git` / nightly package on purpose.
 
 ## Contact
 
-- Issues: https://github.com/noctalia-dev/noctalia/issues
-- Discord: https://discord.noctalia.dev
+- Issues: https://github.com/CodyWan1990/paw2-shell/issues

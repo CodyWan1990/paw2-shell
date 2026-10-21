@@ -1,7 +1,7 @@
 Architecture
 ===
 
-This file describes how Noctalia is put together and the invariants reviewers enforce. For code style, testing, commit
+This file describes how paw2-shell is put together and the invariants reviewers enforce. For code style, testing, commit
 conventions, and the project layout, see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Event Loop
@@ -116,7 +116,7 @@ Vertical text centering lives in the `Label` engine, never in widgets. Widgets b
 
 ### Panels
 
-- Every panel (attached, detached, floating, centered) owns its own `noctalia-panel` layer surface and draws its own
+- Every panel (attached, detached, floating, centered) owns its own `paw2-shell-panel` layer surface and draws its own
   background, shadow, blur, and reveal animation.
 - "Attached" is a placement mode only: the panel's own surface is anchored to the bar's edge at the bar's layer, with a
   clipped reveal. It is not hosted in the bar surface.
@@ -153,9 +153,10 @@ use `needsFrameTick()` and `onFrameTick()` only for continuous animation.
 - `WaylandConnection` is protocol transport only, with no compositor-specific branches. Compositor behavior goes through
   `CompositorPlatform`.
 - Prefer passing `CompositorPlatform&` over passing both `WaylandConnection&` and `CompositorPlatform&`.
-- Detect compositors with `compositors::detect()`, `isHyprland()`, `isNiri()`, `isSway()`, and `isMango()` from
-  `compositor_detect.h`; do not sniff environment variables again.
-- Session actions use compositor-native logout commands. Niri goes through `NiriRuntime` IPC, not the CLI.
+- paw2 is the only compositor. `compositors::isPaw2()` (`compositor_detect.h`) checks for it; do not sniff
+  environment variables again.
+- paw2 state (workspaces, focused window and output, config) and actions such as logout go through `Paw2Runtime` over
+  `$PAW2_SOCKET`. paw2 has no wlr-foreign-toplevel-management.
 
 ## Configuration and State
 
@@ -170,7 +171,7 @@ use `needsFrameTick()` and `onFrameTick()` only for continuous animation.
 
 ## IPC and D-Bus
 
-- Register IPC handlers in the module that owns the behavior. Scripted-widget IPC is bar owned and target explicit.
+- Register IPC handlers in the module that owns the behavior. 
 - D-Bus services release their well-known names on disable or destroy.
 - Daemon mode forks before IPC, GLib, D-Bus, or render initialization, then execs.
 - The first completed async D-Bus state snapshot is a baseline, not a user-visible transition.
@@ -180,7 +181,7 @@ use `needsFrameTick()` and `onFrameTick()` only for continuous animation.
 ## Services
 
 - **Idle**: `IdleManager` runs `ext_idle_notifier_v1` behaviors. Each `[idle.behavior.*]` has a `command` and an optional
-  `resume_command`. `noctalia:dpms-off` gets an automatic `noctalia:dpms-on` on resume. `pre_action_fade_seconds` drives
+  `resume_command`. `screen_off` turns screens back on at resume. `pre_action_fade_seconds` drives
   `IdleGraceOverlay` on overlay layer surfaces.
 - **PipeWire**: access SPA pod arrays with the stable `SPA_POD_ARRAY_*` macros from `spa/pod/pod.h`, not
   `spa_pod_get_array_full()` (added in PipeWire 1.6, absent in 1.4). Cast macro results from `size_t` to `uint32_t`
@@ -191,27 +192,6 @@ use `needsFrameTick()` and `onFrameTick()` only for continuous animation.
 - **Brightness**: keep the service instance stable across reloads and hotplug, since consumers hold raw pointers. Check
   `BrightnessDisplay::controllable` before exposing writes. Read the `brightness` sysfs file, not `actual_brightness`.
 
-## Plugins
-
-- Plugins are trusted Luau code: installing one is equivalent to running a user-owned script. There is no permission
-  broker, capability sandbox, consent prompt, or path sandbox. Luau sandboxing exists only for VM and global-state
-  isolation.
-- A distributable plugin is a directory with one static `plugin.toml`. There are no single-file `define{}` plugins and no
-  manifest defaults in script code.
-- Canonical ids are `author/plugin` and `author/plugin:entry`. Entry types are `[[widget]]`, `[[shortcut]]`,
-  `[[service]]`, `[[desktop_widget]]`, `[[launcher_provider]]`, and `[[panel]]`.
-- Defaults live once in `plugin.toml`. Plugin code reads them with `noctalia.getConfig(key)` or
-  `barWidget.getConfig(key)`; undeclared keys are loud misses. Plugin-level overrides live under
-  `[plugin_settings."author/plugin"]`.
-- Plugin bar widgets use the normal named `[widget.<name>]` settings, so separate widget names can reuse one plugin entry
-  with different settings. Entry-specific settings belong to the owning surface's config model.
-- Git and path source lifecycle belongs to `PluginManager` and `plugin_git.*`. Source names and plugin ids are validated
-  flat identifiers before they touch paths. Git sources use an app-managed repo cache and exported runtime files (no
-  sparse checkout); `path` sources are for local development.
-- Changes to the plugin-facing API (bindings in `src/scripting/luau_host.cpp` and `src/scripting/plugin_bindings.cpp`,
-  the `ui.*` prelude in `src/scripting/ui_prelude.h`, or the entry callbacks the host calls) require a matching update to
-  `noctalia.d.luau` in the official-plugins repository.
-
 ## Theming and Style
 
 - Style constants live in `src/ui/style.h`, colors in `src/ui/palette.h`. Controls aim for a rounded, comfortably spaced
@@ -220,9 +200,10 @@ use `needsFrameTick()` and `onFrameTick()` only for continuous animation.
   strings say "color role"; "theme" refers to the `[theme]` palette subsystem.
 - `FixedPaletteMode` carries `dark` and `light`, each with a UI `palette` and a nested `terminal` palette. Terminal JSON
   keys use `selectionFg` and `selectionBg`.
-- Built-in template hooks live beside their template (for example `assets/templates/fuzzel/apply.sh`). Community
-  templates are fetched from `https://api.noctalia.dev/templates` and cached under
-  `$XDG_STATE_HOME/noctalia/community-templates`. Template application runs on a background worker.
+- Built-in template hooks live beside their template (for example `assets/templates/kitty/apply.sh`). Template
+  application runs on a background worker.
+- Palette presets are compiled into `src/theme/builtin_palettes.cpp` or shipped as JSON in `assets/palettes/`; both are
+  read through the `builtin` source. Every shipped preset must keep text on its accents at 3:1 or better.
 - Glyph names resolve through `src/render/text/glyph_registry.cpp`: curated aliases, then `U+`/`0x` codepoints, then
   Tabler names from `tabler.json`. C++ glyph literals belong in the curated registry.
 

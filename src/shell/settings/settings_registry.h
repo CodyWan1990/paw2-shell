@@ -336,10 +336,14 @@ namespace settings {
   [[nodiscard]] const BarMonitorOverride* findMonitorOverride(const BarConfig& bar, std::string_view match);
   [[nodiscard]] const DockMonitorOverride* findDockMonitorOverride(const DockConfig& dock, std::string_view tableName);
   [[nodiscard]] std::vector<std::string> barNames(const Config& cfg);
-  [[nodiscard]] std::vector<SettingEntry> buildSettingsRegistry(
-      const Config& cfg, const BarConfig* selectedBar, const BarMonitorOverride* selectedMonitorOverride = nullptr,
-      const RegistryEnvironment& env = {}
+  // One registry row; its search text covers the section, group, title, subtitle, path and tags.
+  [[nodiscard]] SettingEntry makeEntry(
+      SettingsSection section, std::string group, std::string title, std::string subtitle,
+      std::vector<std::string> path, SettingControl control, std::string tags = {}, bool advanced = false,
+      SettingVisibility visibleWhen = {}
   );
+
+  [[nodiscard]] std::vector<SettingEntry> buildSettingsRegistry(const Config& cfg, const RegistryEnvironment& env = {});
   [[nodiscard]] std::string normalizedSettingQuery(std::string_view query);
   [[nodiscard]] bool matchesNormalizedSettingQuery(const SettingEntry& entry, std::string_view normalizedQuery);
   [[nodiscard]] bool isBarMonitorOverrideSettingPath(const std::vector<std::string>& path);

@@ -88,7 +88,7 @@ namespace noctalia::config {
       ConfigService configService;
       const Config& cfg = configService.config();
       settings::RegistryEnvironment env;
-      std::vector<settings::SettingEntry> registry = settings::buildSettingsRegistry(cfg, nullptr, nullptr, env);
+      std::vector<settings::SettingEntry> registry = settings::buildSettingsRegistry(cfg, env);
       const SettingsCountSet registryCounts = countSettingsEntries(registry, cfg);
 
       std::println("Settings controls");

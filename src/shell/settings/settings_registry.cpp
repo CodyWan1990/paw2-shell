@@ -392,37 +392,6 @@ namespace settings {
       }
     }
 
-    SettingEntry makeEntry(
-        SettingsSection section, std::string group, std::string title, std::string subtitle,
-        std::vector<std::string> path, SettingControl control, std::string tags = {}, bool advanced = false,
-        SettingVisibility visibleWhen = {}
-    ) {
-      std::string searchText = std::string(settingsSectionId(section))
-          + " "
-          + group
-          + " "
-          + title
-          + " "
-          + subtitle
-          + " "
-          + StringUtils::join(path, ".")
-          + " "
-          + tags;
-      if (advanced) {
-        searchText += " advanced";
-      }
-      return SettingEntry{
-          .section = section,
-          .group = std::move(group),
-          .title = std::move(title),
-          .subtitle = std::move(subtitle),
-          .path = std::move(path),
-          .control = std::move(control),
-          .advanced = advanced,
-          .searchText = StringUtils::toLower(searchText),
-          .visibleWhen = std::move(visibleWhen),
-      };
-    }
 
     // paw2's settings as its pages show them. paw2's config message carries only what its config
     // files set, so anything missing reads as the default paw2 compiles in (its src/config.rs).
@@ -846,6 +815,38 @@ namespace settings {
 
   } // namespace
 
+  SettingEntry makeEntry(
+      SettingsSection section, std::string group, std::string title, std::string subtitle,
+      std::vector<std::string> path, SettingControl control, std::string tags, bool advanced,
+      SettingVisibility visibleWhen
+  ) {
+    std::string searchText = std::string(settingsSectionId(section))
+        + " "
+        + group
+        + " "
+        + title
+        + " "
+        + subtitle
+        + " "
+        + StringUtils::join(path, ".")
+        + " "
+        + tags;
+    if (advanced) {
+      searchText += " advanced";
+    }
+    return SettingEntry{
+        .section = section,
+        .group = std::move(group),
+        .title = std::move(title),
+        .subtitle = std::move(subtitle),
+        .path = std::move(path),
+        .control = std::move(control),
+        .advanced = advanced,
+        .searchText = StringUtils::toLower(searchText),
+        .visibleWhen = std::move(visibleWhen),
+    };
+  }
+
   const BarConfig* findBar(const Config& cfg, std::string_view name) {
     for (const auto& bar : cfg.bars) {
       if (bar.name == name) {
@@ -959,12 +960,7 @@ namespace settings {
     return it->section;
   }
 
-  std::vector<SettingEntry> buildSettingsRegistry(
-      const Config& cfg, const BarConfig* selectedBar, const BarMonitorOverride* selectedMonitorOverride,
-      const RegistryEnvironment& env
-  ) {
-    (void)selectedBar;
-    (void)selectedMonitorOverride;
+  std::vector<SettingEntry> buildSettingsRegistry(const Config& cfg, const RegistryEnvironment& env) {
     using i18n::tr;
     const auto positionSelect = [](std::string_view selected) {
       return asSegmented(plainSelect(

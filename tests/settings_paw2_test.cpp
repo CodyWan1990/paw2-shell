@@ -73,7 +73,7 @@ int main() {
   };
   env.paw2Outputs = {display};
 
-  const auto entries = settings::buildSettingsRegistry(cfg, nullptr, nullptr, env);
+  const auto entries = settings::buildSettingsRegistry(cfg, env);
   std::size_t paw2Rows = 0;
   for (const auto& entry : entries) {
     if (!isPaw2Section(entry.section)) {
@@ -203,7 +203,7 @@ int main() {
 
   // Without paw2's config every paw2 page shows why, instead of paw2's controls. Rows for the
   // shell's own config on those pages (window switcher, panel keys, night light) stay.
-  const auto offline = settings::buildSettingsRegistry(cfg, nullptr, nullptr, {});
+  const auto offline = settings::buildSettingsRegistry(cfg, {});
   std::size_t statusRows = 0;
   for (const auto& entry : offline) {
     const bool shellRow = !entry.path.empty() && entry.path.front() != "paw2";

@@ -1583,7 +1583,7 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
   const auto env = buildRegistryEnvironment();
   logSettingsProfile("refreshRegistry registryEnvironment", phaseProfileWatch);
   phaseProfileWatch.reset();
-  m_settingsRegistry = settings::buildSettingsRegistry(cfg, nullptr, nullptr, env);
+  m_settingsRegistry = settings::buildSettingsRegistry(cfg, env);
   logSettingsProfile("refreshRegistry registry", phaseProfileWatch);
   phaseProfileWatch.reset();
 
@@ -1600,6 +1600,35 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
       button->action = [this]() { openCommunityTemplateStore(); };
     }
   }
+
+  // Rows that need the window (its services or callbacks) go in after the registry is built,
+  // next to the row they belong with: after the first row `anchor` accepts, or before it when
+  // `before` is set; at the end when there is none. Returns the position after the inserted row.
+  using RegistryIt = std::vector<settings::SettingEntry>::iterator;
+  const auto insertEntry = [this](
+                               const std::function<bool(const settings::SettingEntry&)>& anchor,
+                               settings::SettingEntry entry, bool before = false
+                           ) -> RegistryIt {
+    auto it = std::ranges::find_if(m_settingsRegistry, anchor);
+    if (it != m_settingsRegistry.end() && !before) {
+      ++it;
+    }
+    return std::next(m_settingsRegistry.insert(it, std::move(entry)));
+  };
+  const auto inGroup = [](settings::SettingsSection section, std::string group) {
+    return [section, group = std::move(group)](const settings::SettingEntry& e) {
+      return e.section == section && e.group == group;
+    };
+  };
+  const auto atPath = [](std::vector<std::string> path) {
+    return [path = std::move(path)](const settings::SettingEntry& e) { return e.path == path; };
+  };
+  const auto button = [](std::string label, std::function<void()> action, std::string glyph = {},
+                         ButtonVariant variant = ButtonVariant::Default) {
+    return settings::ButtonSetting{
+        .label = std::move(label), .action = std::move(action), .glyph = std::move(glyph), .variant = variant
+    };
+  };
 
   if (m_calendarService != nullptr
       && (m_calendarService->credentialMigrationPending()
@@ -1628,28 +1657,18 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
       descriptionKey = "settings.schema.services.calendar-credentials.description-migration";
     }
 
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& entry) {
-      return entry.section == settings::SettingsSection::Calendar && entry.group == "general";
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry retry{
-        .section = settings::SettingsSection::Calendar,
-        .group = "general",
-        .title = i18n::tr("settings.schema.services.calendar-credentials.label"),
-        .subtitle = i18n::tr(descriptionKey),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.services.calendar-credentials.button"),
-                .action = [this]() { m_calendarService->retryCredentialMigration(); },
-                .glyph = "refresh",
-                .variant = ButtonVariant::Secondary,
-            },
-        .searchText = "calendar credentials keyring secret service retry migration unlock",
-    };
-    m_settingsRegistry.insert(it, std::move(retry));
+    insertEntry(
+        inGroup(settings::SettingsSection::Calendar, "general"),
+        settings::makeEntry(
+            settings::SettingsSection::Calendar, "general",
+            i18n::tr("settings.schema.services.calendar-credentials.label"), i18n::tr(descriptionKey), {},
+            button(
+                i18n::tr("settings.schema.services.calendar-credentials.button"),
+                [this]() { m_calendarService->retryCredentialMigration(); }, "refresh", ButtonVariant::Secondary
+            ),
+            "calendar credentials keyring secret service retry migration unlock"
+        )
+    );
   }
 
   if (m_calendarService != nullptr
@@ -1685,29 +1704,19 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
       descriptionKey = "settings.schema.services.calendar-storage.description-migration";
     }
 
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& entry) {
-      return entry.section == settings::SettingsSection::Calendar && entry.group == "general";
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry retry{
-        .section = settings::SettingsSection::Calendar,
-        .group = "general",
-        .title = i18n::tr("settings.schema.services.calendar-storage.label"),
-        .subtitle = i18n::tr(descriptionKey),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.services.calendar-storage.button"),
-                .action = [this]() { m_calendarService->retryCachePersistence(); },
-                .glyph = "refresh",
-                .variant = ButtonVariant::Secondary,
-            },
-        .searchText = "calendar events cache encryption storage keyring retry migration unlock",
-        .visibleWhen = [](const Config& config) { return config.calendar.enabled; },
-    };
-    m_settingsRegistry.insert(it, std::move(retry));
+    insertEntry(
+        inGroup(settings::SettingsSection::Calendar, "general"),
+        settings::makeEntry(
+            settings::SettingsSection::Calendar, "general", i18n::tr("settings.schema.services.calendar-storage.label"),
+            i18n::tr(descriptionKey), {},
+            button(
+                i18n::tr("settings.schema.services.calendar-storage.button"),
+                [this]() { m_calendarService->retryCachePersistence(); }, "refresh", ButtonVariant::Secondary
+            ),
+            "calendar events cache encryption storage keyring retry migration unlock", false,
+            [](const Config& config) { return config.calendar.enabled; }
+        )
+    );
   }
 
   if (m_clipboardService != nullptr
@@ -1743,28 +1752,19 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
       descriptionKey = "settings.schema.shell.clipboard-storage.description-migration";
     }
 
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& entry) {
-      return entry.section == settings::SettingsSection::Panels && entry.group == "clipboard";
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry retry{
-        .section = settings::SettingsSection::Panels,
-        .group = "clipboard",
-        .title = i18n::tr("settings.schema.shell.clipboard-storage.label"),
-        .subtitle = i18n::tr(descriptionKey),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.shell.clipboard-storage.button"),
-                .action = [this]() { m_clipboardService->retryPersistence(); },
-                .glyph = "refresh",
-            },
-        .searchText = "clipboard history encryption keyring secret service retry migration unlock",
-        .visibleWhen = [](const Config& config) { return config.shell.clipboardEnabled; },
-    };
-    m_settingsRegistry.insert(it, std::move(retry));
+    insertEntry(
+        inGroup(settings::SettingsSection::Panels, "clipboard"),
+        settings::makeEntry(
+            settings::SettingsSection::Panels, "clipboard", i18n::tr("settings.schema.shell.clipboard-storage.label"),
+            i18n::tr(descriptionKey), {},
+            button(
+                i18n::tr("settings.schema.shell.clipboard-storage.button"),
+                [this]() { m_clipboardService->retryPersistence(); }, "refresh"
+            ),
+            "clipboard history encryption keyring secret service retry migration unlock", false,
+            [](const Config& config) { return config.shell.clipboardEnabled; }
+        )
+    );
   }
 
   const bool calendarStorageRecovery = m_calendarService != nullptr
@@ -1777,44 +1777,35 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
     m_pendingEncryptedStorageReset = false;
   }
 
-  const auto insertStorageRecovery = [this](settings::SettingsSection section, std::string group) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [section, &group](const settings::SettingEntry& entry) {
-      return entry.section == section && entry.group == group;
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
+  const auto insertStorageRecovery = [&](settings::SettingsSection section, std::string group) {
     const bool pendingConfirmation = m_pendingEncryptedStorageReset;
-    settings::SettingEntry recovery{
-        .section = section,
-        .group = std::move(group),
-        .title = i18n::tr("settings.storage-recovery.label"),
-        .subtitle = i18n::tr("settings.storage-recovery.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr(
+    insertEntry(
+        inGroup(section, group),
+        settings::makeEntry(
+            section, group, i18n::tr("settings.storage-recovery.label"),
+            i18n::tr("settings.storage-recovery.description"), {},
+            button(
+                i18n::tr(
                     pendingConfirmation ? "settings.storage-recovery.button-confirm"
                                         : "settings.storage-recovery.button"
                 ),
-                .action =
-                    [this, pendingConfirmation]() {
-                      if (!pendingConfirmation) {
-                        m_pendingEncryptedStorageReset = true;
-                        onExternalOptionsChanged();
-                        return;
-                      }
-                      m_pendingEncryptedStorageReset = false;
-                      if (m_resetEncryptedStorage) {
-                        m_resetEncryptedStorage();
-                      }
-                    },
-                .glyph = pendingConfirmation ? "warning" : "trash",
-                .variant = pendingConfirmation ? ButtonVariant::Destructive : ButtonVariant::Default,
-            },
-        .searchText = "reset recover encrypted private storage clipboard calendar key",
-    };
-    m_settingsRegistry.insert(it, std::move(recovery));
+                [this, pendingConfirmation]() {
+                  if (!pendingConfirmation) {
+                    m_pendingEncryptedStorageReset = true;
+                    onExternalOptionsChanged();
+                    return;
+                  }
+                  m_pendingEncryptedStorageReset = false;
+                  if (m_resetEncryptedStorage) {
+                    m_resetEncryptedStorage();
+                  }
+                },
+                pendingConfirmation ? "warning" : "trash",
+                pendingConfirmation ? ButtonVariant::Destructive : ButtonVariant::Default
+            ),
+            "reset recover encrypted private storage clipboard calendar key"
+        )
+    );
   };
 
   if (calendarStorageRecovery && m_resetEncryptedStorage) {
@@ -1825,218 +1816,122 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
   }
 
   if (m_syncGreeterAppearance && env.greeterSyncAvailable) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Security
-          && e.group == "greeter"
-          && e.path == std::vector<std::string>{"shell", "greeter_sync", "privilege_command"};
-    });
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::Security,
-        .group = "greeter",
-        .title = i18n::tr("settings.schema.shell.sync-greeter.label"),
-        .subtitle = i18n::tr("settings.schema.shell.sync-greeter.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.shell.sync-greeter.button"),
-                .action = m_syncGreeterAppearance,
-                .glyph = {},
-            },
-        .searchText = "greeter login sync appearance wallpaper colors security",
-    };
-    auto insertedIt = m_settingsRegistry.insert(it, std::move(btn));
-    ++insertedIt;
-    settings::SettingEntry toggle{
-        .section = settings::SettingsSection::Security,
-        .group = "greeter",
-        .title = i18n::tr("settings.schema.shell.greeter-sync-auto.label"),
-        .subtitle = i18n::tr("settings.schema.shell.greeter-sync-auto.description"),
-        .path = {"shell", "greeter_sync", "auto_sync"},
-        .control = settings::ToggleSetting{cfg.shell.greeterSync.autoSync},
-        .searchText = "greeter sync auto automatic",
-    };
-    m_settingsRegistry.insert(insertedIt, std::move(toggle));
+    constexpr auto section = settings::SettingsSection::Security;
+    const auto next = insertEntry(
+        atPath({"shell", "greeter_sync", "privilege_command"}),
+        settings::makeEntry(
+            section, "greeter", i18n::tr("settings.schema.shell.sync-greeter.label"),
+            i18n::tr("settings.schema.shell.sync-greeter.description"), {},
+            button(i18n::tr("settings.schema.shell.sync-greeter.button"), m_syncGreeterAppearance),
+            "greeter login sync appearance wallpaper colors security"
+        ),
+        true
+    );
+    m_settingsRegistry.insert(
+        next,
+        settings::makeEntry(
+            section, "greeter", i18n::tr("settings.schema.shell.greeter-sync-auto.label"),
+            i18n::tr("settings.schema.shell.greeter-sync-auto.description"), {"shell", "greeter_sync", "auto_sync"},
+            settings::ToggleSetting{cfg.shell.greeterSync.autoSync}, "greeter sync auto automatic"
+        )
+    );
   }
 
   if (m_resetLauncherUsage) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Launcher
-          && e.group == "history"
-          && e.path == std::vector<std::string>{"shell", "launcher", "sort_by_usage"};
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::Launcher,
-        .group = "history",
-        .title = i18n::tr("settings.schema.panels.launcher-reset-usage.label"),
-        .subtitle = i18n::tr("settings.schema.panels.launcher-reset-usage.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.panels.launcher-reset-usage.button"),
-                .action = m_resetLauncherUsage,
-                .glyph = "refresh",
-            },
-        .searchText = "launcher reset usage recently used launch count history clear",
-    };
-    m_settingsRegistry.insert(it, std::move(btn));
+    insertEntry(
+        atPath({"shell", "launcher", "sort_by_usage"}),
+        settings::makeEntry(
+            settings::SettingsSection::Launcher, "history",
+            i18n::tr("settings.schema.panels.launcher-reset-usage.label"),
+            i18n::tr("settings.schema.panels.launcher-reset-usage.description"), {},
+            button(i18n::tr("settings.schema.panels.launcher-reset-usage.button"), m_resetLauncherUsage, "refresh"),
+            "launcher reset usage recently used launch count history clear"
+        )
+    );
   }
 
   if (m_resetScreenTime) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::System
-          && e.group == "screen-time"
-          && e.path == std::vector<std::string>{"shell", "screen_time_enabled"};
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::System,
-        .group = "screen-time",
-        .title = i18n::tr("settings.schema.shell.screen-time-reset.label"),
-        .subtitle = i18n::tr("settings.schema.shell.screen-time-reset.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.shell.screen-time-reset.button"),
-                .action = m_resetScreenTime,
-                .glyph = "refresh",
-            },
-        .searchText = "screen time reset usage history clear tracking",
-        .visibleWhen = [](const Config& c) { return c.shell.screenTimeEnabled; },
-    };
-    m_settingsRegistry.insert(it, std::move(btn));
+    insertEntry(
+        atPath({"shell", "screen_time_enabled"}),
+        settings::makeEntry(
+            settings::SettingsSection::System, "screen-time", i18n::tr("settings.schema.shell.screen-time-reset.label"),
+            i18n::tr("settings.schema.shell.screen-time-reset.description"), {},
+            button(i18n::tr("settings.schema.shell.screen-time-reset.button"), m_resetScreenTime, "refresh"),
+            "screen time reset usage history clear tracking", false,
+            [](const Config& c) { return c.shell.screenTimeEnabled; }
+        )
+    );
   }
 
   if (m_saveWallpaperPaletteAsCustom && cfg.theme.source == PaletteSource::Wallpaper) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Appearance
-          && e.group == "theme"
-          && e.path == std::vector<std::string>{"theme", "wallpaper_scheme"};
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::Appearance,
-        .group = "theme",
-        .title = i18n::tr("settings.schema.appearance.export-wallpaper-palette.label"),
-        .subtitle = i18n::tr("settings.schema.appearance.export-wallpaper-palette.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.appearance.export-wallpaper-palette.button"),
-                .action = m_saveWallpaperPaletteAsCustom,
-                .glyph = {},
-            },
-        .searchText = "wallpaper palette export custom save colors theme",
-    };
-    m_settingsRegistry.insert(it, std::move(btn));
+    insertEntry(
+        atPath({"theme", "wallpaper_scheme"}),
+        settings::makeEntry(
+            settings::SettingsSection::Appearance, "theme",
+            i18n::tr("settings.schema.appearance.export-wallpaper-palette.label"),
+            i18n::tr("settings.schema.appearance.export-wallpaper-palette.description"), {},
+            button(
+                i18n::tr("settings.schema.appearance.export-wallpaper-palette.button"), m_saveWallpaperPaletteAsCustom
+            ),
+            "wallpaper palette export custom save colors theme"
+        )
+    );
   }
 
   if (m_openWallpaperPanel) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Wallpaper
-          && e.group == "general"
-          && e.path == std::vector<std::string>{"wallpaper", "fill_mode"};
-    });
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::Wallpaper,
-        .group = "general",
-        .title = i18n::tr("settings.schema.wallpaper.panel.label"),
-        .subtitle = i18n::tr("settings.schema.wallpaper.panel.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.wallpaper.panel.button"),
-                .action = m_openWallpaperPanel,
-                .glyph = "wallpaper-selector"
-            },
-        .searchText = "wallpaper panel open selector browse",
-    };
-    m_settingsRegistry.insert(it, std::move(btn));
+    insertEntry(
+        atPath({"wallpaper", "fill_mode"}),
+        settings::makeEntry(
+            settings::SettingsSection::Wallpaper, "general", i18n::tr("settings.schema.wallpaper.panel.label"),
+            i18n::tr("settings.schema.wallpaper.panel.description"), {},
+            button(i18n::tr("settings.schema.wallpaper.panel.button"), m_openWallpaperPanel, "wallpaper-selector"),
+            "wallpaper panel open selector browse"
+        ),
+        true
+    );
   }
 
   if (m_openDesktopWidgetEditor) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Desktop && e.group == "widgets";
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::Desktop,
-        .group = "widgets",
-        .title = i18n::tr("settings.schema.desktop.widgets-editor.label"),
-        .subtitle = i18n::tr("settings.schema.desktop.widgets-editor.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.desktop.widgets-editor.button"),
-                .action = m_openDesktopWidgetEditor,
-                .glyph = {}
-            },
-        .searchText = "desktop widgets editor edit",
-    };
-    m_settingsRegistry.insert(it, std::move(btn));
+    insertEntry(
+        inGroup(settings::SettingsSection::Desktop, "widgets"),
+        settings::makeEntry(
+            settings::SettingsSection::Desktop, "widgets", i18n::tr("settings.schema.desktop.widgets-editor.label"),
+            i18n::tr("settings.schema.desktop.widgets-editor.description"), {},
+            button(i18n::tr("settings.schema.desktop.widgets-editor.button"), m_openDesktopWidgetEditor),
+            "desktop widgets editor edit"
+        )
+    );
   }
 
   if (m_openLockscreenWidgetEditor) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Security
-          && e.group == "lock-screen"
-          && e.path == std::vector<std::string>{"lockscreen_widgets", "enabled"};
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
-    settings::SettingEntry btn{
-        .section = settings::SettingsSection::Security,
-        .group = "lock-screen",
-        .title = i18n::tr("settings.schema.lockscreen.widgets-editor.label"),
-        .subtitle = i18n::tr("settings.schema.lockscreen.widgets-editor.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.lockscreen.widgets-editor.button"),
-                .action = m_openLockscreenWidgetEditor,
-                .glyph = {}
-            },
-        .searchText = "lockscreen widgets editor edit layout",
-        .visibleWhen = [](const Config& c) { return c.lockscreen.enabled && c.lockscreenWidgets.enabled; },
-    };
-    m_settingsRegistry.insert(it, std::move(btn));
+    insertEntry(
+        atPath({"lockscreen_widgets", "enabled"}),
+        settings::makeEntry(
+            settings::SettingsSection::Security, "lock-screen",
+            i18n::tr("settings.schema.lockscreen.widgets-editor.label"),
+            i18n::tr("settings.schema.lockscreen.widgets-editor.description"), {},
+            button(i18n::tr("settings.schema.lockscreen.widgets-editor.button"), m_openLockscreenWidgetEditor),
+            "lockscreen widgets editor edit layout", false,
+            [](const Config& c) { return c.lockscreen.enabled && c.lockscreenWidgets.enabled; }
+        )
+    );
   }
 
   if (m_config != nullptr) {
-    auto it = std::ranges::find_if(m_settingsRegistry, [](const settings::SettingEntry& e) {
-      return e.section == settings::SettingsSection::Calendar
-          && e.group == "calendar-accounts"
-          && e.path == std::vector<std::string>{"calendar", "refresh_minutes"};
-    });
-    if (it != m_settingsRegistry.end()) {
-      ++it;
-    }
     const settings::SettingVisibility calendarOn = [](const Config& c) { return c.calendar.enabled; };
-    settings::SettingEntry addBtn{
-        .section = settings::SettingsSection::Calendar,
-        .group = "calendar-accounts",
-        .title = i18n::tr("settings.schema.services.calendar-add.label"),
-        .subtitle = i18n::tr("settings.schema.services.calendar-add.description"),
-        .path = {},
-        .control =
-            settings::ButtonSetting{
-                .label = i18n::tr("settings.schema.services.calendar-add.button"),
-                .action = [this]() { openCalendarAccountEditor(std::nullopt); },
-                .glyph = "plus",
-            },
-        .searchText = "calendar add account icloud caldav google ics ical subscription vdir vdirsyncer local",
-    };
-    it = m_settingsRegistry.insert(it, std::move(addBtn));
-    ++it;
+    auto it = insertEntry(
+        atPath({"calendar", "refresh_minutes"}),
+        settings::makeEntry(
+            settings::SettingsSection::Calendar, "calendar-accounts",
+            i18n::tr("settings.schema.services.calendar-add.label"),
+            i18n::tr("settings.schema.services.calendar-add.description"), {},
+            button(
+                i18n::tr("settings.schema.services.calendar-add.button"),
+                [this]() { openCalendarAccountEditor(std::nullopt); }, "plus"
+            ),
+            "calendar add account icloud caldav google ics ical subscription vdir vdirsyncer local"
+        )
+    );
 
     for (const CalendarConfig::Account& account : cfg.calendar.accounts) {
       if (account.type != "google" && account.type != "caldav" && account.type != "ics" && account.type != "vdir") {
@@ -2055,35 +1950,30 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
       const std::string_view buttonKey = credentialLocked ? "settings.schema.services.calendar-edit.button-retry"
           : reconnectRequired                             ? "settings.schema.services.calendar-edit.button-reconnect"
                                                           : "settings.schema.services.calendar-edit.button";
-      settings::SettingEntry btn{
-          .section = settings::SettingsSection::Calendar,
-          .group = "calendar-accounts",
-          .title = account.displayName.empty() ? account.id : account.displayName,
-          .subtitle = i18n::tr(descriptionKey),
-          .path = {},
-          .control =
-              settings::ButtonSetting{
-                  .label = i18n::tr(buttonKey),
-                  .action =
-                      [this, id = account.id, credentialLocked]() {
-                        if (credentialLocked) {
-                          m_calendarService->requestRefresh();
-                          return;
-                        }
-                        openCalendarAccountEditor(id);
-                      },
-                  .glyph = credentialLocked ? "key"
-                      : reconnectRequired   ? "brand-google"
-                                            : "edit",
-                  .variant = credentialLocked ? ButtonVariant::Secondary : ButtonVariant::Default,
-              },
-          .searchText =
+      it = std::next(m_settingsRegistry.insert(
+          it,
+          settings::makeEntry(
+              settings::SettingsSection::Calendar, "calendar-accounts",
+              account.displayName.empty() ? account.id : account.displayName, i18n::tr(descriptionKey), {},
+              button(
+                  i18n::tr(buttonKey),
+                  [this, id = account.id, credentialLocked]() {
+                    if (credentialLocked) {
+                      m_calendarService->requestRefresh();
+                      return;
+                    }
+                    openCalendarAccountEditor(id);
+                  },
+                  credentialLocked        ? "key"
+                      : reconnectRequired ? "brand-google"
+                                          : "edit",
+                  credentialLocked ? ButtonVariant::Secondary : ButtonVariant::Default
+              ),
               "calendar account edit connect authorize caldav icloud google password ics ical subscription vdir local "
-              + account.id,
-          .visibleWhen = calendarOn,
-      };
-      it = m_settingsRegistry.insert(it, std::move(btn));
-      ++it;
+                  + account.id,
+              false, calendarOn
+          )
+      ));
     }
   }
   logSettingsProfile("refreshRegistry injectedEntries", phaseProfileWatch);

@@ -1,10 +1,12 @@
 #include "shell/screenshot/screenshot_action_panel.h"
 
-#include "core/input/keybind_matcher.h"
 #include "core/input/key_modifiers.h"
+#include "core/input/keybind_matcher.h"
+#include "i18n/i18n.h"
 #include "render/core/renderer.h"
 #include "render/core/texture_manager.h"
 #include "shell/panel/panel_manager.h"
+#include "shell/panel/panel_scaffold.h"
 #include "ui/builders.h"
 #include "ui/controls/image.h"
 #include "ui/palette.h"
@@ -20,14 +22,14 @@ namespace {
 
   struct ActionButton {
     ScreenshotService::PromptAction action;
-    const char* label;
+    const char* labelKey;
     const char* glyph;
   };
 
   constexpr std::array<ActionButton, 3> kActions{{
-      {ScreenshotService::PromptAction::Copy, "Copy", "copy"},
-      {ScreenshotService::PromptAction::Save, "Save", "device-floppy"},
-      {ScreenshotService::PromptAction::Both, "Both", "files"},
+      {ScreenshotService::PromptAction::Copy, "bar.screenshot.action-copy", "copy"},
+      {ScreenshotService::PromptAction::Save, "bar.screenshot.action-save", "device-floppy"},
+      {ScreenshotService::PromptAction::Both, "bar.screenshot.action-both", "files"},
   }};
 
 } // namespace
@@ -49,27 +51,8 @@ float ScreenshotActionPanel::preferredHeight() const {
 
 void ScreenshotActionPanel::create() {
   const float scale = contentScale();
-  auto root = ui::column({
-      .out = &m_rootLayout,
-      .align = FlexAlign::Stretch,
-      .gap = Style::spaceMd * scale,
-      .padding = Style::spaceLg * scale,
-  });
-
-  root->addChild(ui::row(
-      {.align = FlexAlign::Center, .justify = FlexJustify::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
-      ui::glyph({
-          .glyph = "camera",
-          .glyphSize = Style::fontSizeTitle * scale,
-          .color = colorSpecFromRole(ColorRole::Primary),
-      }),
-      ui::label({
-          .text = "Screenshot",
-          .fontSize = Style::fontSizeTitle * scale,
-          .fontWeight = FontWeight::Bold,
-          .color = colorSpecFromRole(ColorRole::OnSurface),
-      })
-  ));
+  auto root = panel_scaffold::rootColumn(&m_rootLayout, scale);
+  root->addChild(panel_scaffold::header("camera", i18n::tr("bar.screenshot.prompt-title"), scale));
 
   root->addChild(ui::image({
       .out = &m_preview,
@@ -92,22 +75,19 @@ void ScreenshotActionPanel::create() {
       .fillWidth = true,
   });
   for (std::size_t i = 0; i < kActions.size(); ++i) {
-    buttons->addChild(ui::button({
-        .out = &m_buttons[i],
-        .text = kActions[i].label,
-        .glyph = kActions[i].glyph,
-        .variant = i == m_selected ? ButtonVariant::Primary : ButtonVariant::Outline,
-        .onClick = [this, i]() { run(kActions[i].action); },
-    }));
+    buttons->addChild(
+        ui::button({
+            .out = &m_buttons[i],
+            .text = i18n::tr(kActions[i].labelKey),
+            .glyph = kActions[i].glyph,
+            .variant = i == m_selected ? ButtonVariant::Primary : ButtonVariant::Outline,
+            .onClick = [this, i]() { run(kActions[i].action); },
+        })
+    );
   }
   root->addChild(std::move(buttons));
 
-  root->addChild(ui::label({
-      .text = "Esc: discard   Tab: cycle buttons   Enter: confirm",
-      .fontSize = Style::fontSizeCaption * scale,
-      .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
-      .textAlign = TextAlign::Center,
-  }));
+  root->addChild(panel_scaffold::hint(i18n::tr("bar.screenshot.prompt-hint"), scale));
 
   setRoot(std::move(root));
 }

@@ -275,32 +275,37 @@ namespace {
     return attached_panel::revealDirection(barPosition);
   }
 
+  // Config fields behind each built-in panel that has its own placement settings.
+  struct BuiltinPanelFields {
+    std::string_view id;
+    PanelPlacement ShellConfig::PanelConfig::* placement;
+    std::string ShellConfig::PanelConfig::* position;
+    bool ShellConfig::PanelConfig::* openNearClick; // nullptr: never opens near the click
+  };
+
+  using PC = ShellConfig::PanelConfig;
+  constexpr BuiltinPanelFields kBuiltinPanelFields[] = {
+      {"control-center", &PC::controlCenterPlacement, &PC::controlCenterPosition, &PC::openNearClickControlCenter},
+      {"launcher", &PC::launcherPlacement, &PC::launcherPosition, &PC::openNearClickLauncher},
+      {"clipboard", &PC::clipboardPlacement, &PC::clipboardPosition, &PC::openNearClickClipboard},
+      {"wallpaper", &PC::wallpaperPlacement, &PC::wallpaperPosition, &PC::openNearClickWallpaper},
+      {"session", &PC::sessionPlacement, &PC::sessionPosition, &PC::openNearClickSession},
+      {"polkit", &PC::polkitPlacement, &PC::polkitPosition, nullptr},
+  };
+
+  [[nodiscard]] const BuiltinPanelFields* builtinPanelFields(std::string_view panelId) {
+    const auto* it = std::ranges::find(kBuiltinPanelFields, panelId, &BuiltinPanelFields::id);
+    return it != std::end(kBuiltinPanelFields) ? it : nullptr;
+  }
+
   // Floating screen position for a built-in panel (one of kPanelPositions).
   // "auto" = bar-relative (and the default for any non-built-in panel).
   [[nodiscard]] std::string resolvePanelPosition(const ConfigService* configService, std::string_view panelId) {
-    if (configService == nullptr) {
+    const auto* fields = builtinPanelFields(panelId);
+    if (configService == nullptr || fields == nullptr) {
       return "auto";
     }
-    const auto& pc = configService->config().shell.panel;
-    if (panelId == "control-center") {
-      return pc.controlCenterPosition;
-    }
-    if (panelId == "launcher") {
-      return pc.launcherPosition;
-    }
-    if (panelId == "clipboard") {
-      return pc.clipboardPosition;
-    }
-    if (panelId == "wallpaper") {
-      return pc.wallpaperPosition;
-    }
-    if (panelId == "session") {
-      return pc.sessionPosition;
-    }
-    if (panelId == "polkit") {
-      return pc.polkitPosition;
-    }
-    return "auto";
+    return configService->config().shell.panel.*fields->position;
   }
 
   [[nodiscard]] bool usesConfiguredFloatingLayer(std::string_view panelId) {
@@ -324,30 +329,14 @@ namespace {
     if (panelId == "tray-drawer") {
       return true;
     }
-    if (configService == nullptr) {
+    const auto* fields = builtinPanelFields(panelId);
+    if (configService == nullptr || fields == nullptr || fields->openNearClick == nullptr) {
       return false;
     }
     const auto& pc = configService->config().shell.panel;
     // A floating panel pinned to a fixed screen position ignores open-near-click.
-    const auto pinned = [](PanelPlacement placement, const std::string& position) {
-      return placement == PanelPlacement::Floating && position != "auto";
-    };
-    if (panelId == "control-center") {
-      return !pinned(pc.controlCenterPlacement, pc.controlCenterPosition) && pc.openNearClickControlCenter;
-    }
-    if (panelId == "launcher") {
-      return !pinned(pc.launcherPlacement, pc.launcherPosition) && pc.openNearClickLauncher;
-    }
-    if (panelId == "clipboard") {
-      return !pinned(pc.clipboardPlacement, pc.clipboardPosition) && pc.openNearClickClipboard;
-    }
-    if (panelId == "wallpaper") {
-      return !pinned(pc.wallpaperPlacement, pc.wallpaperPosition) && pc.openNearClickWallpaper;
-    }
-    if (panelId == "session") {
-      return !pinned(pc.sessionPlacement, pc.sessionPosition) && pc.openNearClickSession;
-    }
-    return false;
+    const bool pinned = pc.*fields->placement == PanelPlacement::Floating && pc.*fields->position != "auto";
+    return !pinned && pc.*fields->openNearClick;
   }
 
   [[nodiscard]] bool
@@ -1040,9 +1029,7 @@ void PanelManager::openPanel(const std::string& panelId, PanelOpenRequest reques
     m_panelInsetY = visualY - surfaceY;
     m_panelVisualWidth = panelWidth;
     m_panelVisualHeight = panelHeight;
-    m_attachedBackgroundOpacity = m_activePanel->inheritsBarBackgroundOpacity()
-        ? barConfig.backgroundOpacity
-        : m_activePanel->attachedBackgroundOpacityOverride();
+    m_attachedBackgroundOpacity = barConfig.backgroundOpacity;
     m_attachedContactShadow = barConfig.contactShadow;
     m_attachedRevealProgress = 0.0F;
     m_attachedRevealDirection = attached_panel::revealDirection(barPosition);
@@ -1301,7 +1288,7 @@ void PanelManager::closePanel(bool animateClose) {
   m_closing = true;
   m_attachedOpenAnimationPending = false;
 
-  if (animateClose && m_sceneRoot != nullptr && m_activePanel != nullptr && m_activePanel->wantsCloseAnimation()) {
+  if (animateClose && m_sceneRoot != nullptr && m_activePanel != nullptr) {
     const std::uint64_t gen = ++m_destroyGeneration;
     if (m_attachedToBar && m_attachedRevealClipNode != nullptr) {
       m_animations.cancelForOwner(m_attachedRevealClipNode);
@@ -2423,13 +2410,11 @@ void PanelManager::onConfigReloaded() {
   }
   const auto& barConfig = *barConfigOpt;
   bool changed = false;
-  if (m_activePanel->inheritsBarBackgroundOpacity()) {
-    const float newOpacity = barConfig.backgroundOpacity;
-    if (std::abs(newOpacity - m_attachedBackgroundOpacity) >= 0.001F) {
-      m_attachedBackgroundOpacity = newOpacity;
-      m_activePanel->setPanelCardOpacity(shell::panel_surface::cardOpacity(m_config, m_attachedBackgroundOpacity));
-      changed = true;
-    }
+  const float newOpacity = barConfig.backgroundOpacity;
+  if (std::abs(newOpacity - m_attachedBackgroundOpacity) >= 0.001F) {
+    m_attachedBackgroundOpacity = newOpacity;
+    m_activePanel->setPanelCardOpacity(shell::panel_surface::cardOpacity(m_config, m_attachedBackgroundOpacity));
+    changed = true;
   }
   if (!changed) {
     return;

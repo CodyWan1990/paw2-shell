@@ -8,6 +8,7 @@
 #include "render/core/async_texture_cache.h"
 #include "render/core/renderer.h"
 #include "shell/panel/panel_manager.h"
+#include "shell/panel/panel_scaffold.h"
 #include "shell/wallpaper/panel/wallpaper_panel.h"
 #include "ui/builders.h"
 #include "ui/palette.h"
@@ -62,21 +63,8 @@ ThemeEditorPanel::ThemeEditorPanel(
 
 void ThemeEditorPanel::create() {
   const float scale = contentScale();
-  auto root = ui::column({
-      .out = &m_ui.rootLayout,
-      .align = FlexAlign::Stretch,
-      .gap = Style::spaceMd * scale,
-      .padding = Style::spaceLg * scale,
-  });
-
-  root->addChild(
-      ui::label({
-          .out = &m_ui.heading,
-          .fontSize = Style::fontSizeTitle * scale,
-          .fontWeight = FontWeight::Bold,
-          .color = colorSpecFromRole(ColorRole::OnSurface),
-      })
-  );
+  auto root = panel_scaffold::rootColumn(&m_ui.rootLayout, scale);
+  root->addChild(panel_scaffold::title({}, scale, &m_ui.heading));
 
   root->addChild(sectionLabel("themes.editor.name", scale));
   root->addChild(
@@ -460,6 +448,15 @@ bool ThemeEditorPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifier
     return true;
   }
   return false;
+}
+
+void ThemeEditorPanel::onPanelCardOpacityChanged(float opacity) {
+  if (m_ui.titleInput != nullptr) {
+    m_ui.titleInput->setSurfaceOpacity(opacity);
+  }
+  if (m_ui.paletteSelect != nullptr) {
+    m_ui.paletteSelect->setSurfaceOpacity(opacity);
+  }
 }
 
 void ThemeEditorPanel::doUpdate(Renderer& renderer) {

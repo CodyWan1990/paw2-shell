@@ -11,13 +11,13 @@
 #include <vector>
 
 class AsyncTextureCache;
+class Button;
 class ConfigService;
 class Flex;
 class Image;
 class Renderer;
 class ScrollView;
 class Segmented;
-class Button;
 
 namespace noctalia::theme {
   class ThemePresetService;
@@ -52,6 +52,7 @@ private:
 
   void doLayout(Renderer& renderer, float width, float height) override;
   void doUpdate(Renderer& renderer) override;
+  void onPanelCardOpacityChanged(float opacity) override;
   void rebuildCards();
   void addThemeCards();
   void addWallpaperCards();
@@ -72,7 +73,7 @@ private:
   ScrollView* m_scroll = nullptr;
   Segmented* m_viewSwitch = nullptr;
   Button* m_randomButton = nullptr;
-  std::vector<Node*> m_cards;
+  std::vector<Button*> m_cards;
   std::vector<CardImage> m_images;
   View m_view = View::Themes;
   std::size_t m_selected = 0;

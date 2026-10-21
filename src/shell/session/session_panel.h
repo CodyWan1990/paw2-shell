@@ -32,7 +32,6 @@ public:
 
   [[nodiscard]] float preferredWidth() const override;
   [[nodiscard]] float preferredHeight() const override;
-  [[nodiscard]] bool hasDecoration() const override { return true; }
   [[nodiscard]] LayerShellKeyboard keyboardMode() const override { return LayerShellKeyboard::Exclusive; }
   [[nodiscard]] PanelPlacement panelPlacement() const noexcept override;
 

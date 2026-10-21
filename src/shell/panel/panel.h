@@ -78,16 +78,6 @@ public:
   // panels resolve through shell.panel.*_position in PanelManager.
   [[nodiscard]] virtual std::string panelScreenPosition() const { return "auto"; }
   [[nodiscard]] virtual bool panelOpenNearClick() const { return false; }
-  // For attached panels: which bar edge to attach to when more than one bar exists on
-  // the target output. Returned value must outlive the call (use a string literal).
-  [[nodiscard]] virtual std::string_view preferredAttachedBarPosition() const noexcept { return "top"; }
-  // For attached panels: when true (default), the panel's background opacity tracks the
-  // host bar's `backgroundOpacity` config and updates live. When false, the panel uses
-  // attachedBackgroundOpacityOverride() instead — useful for panels whose contents need
-  // a fixed alpha for legibility (e.g. wallpaper thumbnails).
-  [[nodiscard]] virtual bool inheritsBarBackgroundOpacity() const noexcept { return true; }
-  [[nodiscard]] virtual float attachedBackgroundOpacityOverride() const noexcept { return 1.0F; }
-  [[nodiscard]] virtual bool wantsCloseAnimation() const noexcept { return true; }
   [[nodiscard]] virtual bool dismissOnOutsideClick() const { return true; }
   // True to live in PersistentPanelHost instead of PanelManager's single active
   // slot: opening another panel leaves it on screen, and only an explicit toggle

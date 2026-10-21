@@ -6,6 +6,7 @@
 #include "render/core/async_texture_cache.h"
 #include "render/core/renderer.h"
 #include "shell/panel/panel_manager.h"
+#include "shell/panel/panel_scaffold.h"
 #include "shell/themes/theme_palette_choices.h"
 #include "theme/theme_presets.h"
 #include "ui/builders.h"
@@ -41,51 +42,36 @@ ThemesPanel::ThemesPanel(noctalia::theme::ThemePresetService* presets, ConfigSer
 
 void ThemesPanel::create() {
   const float scale = contentScale();
-  auto root = ui::column({
-      .out = &m_rootLayout,
-      .align = FlexAlign::Stretch,
-      .gap = Style::spaceMd * scale,
-      .padding = Style::spaceLg * scale,
-  });
+  auto root = panel_scaffold::rootColumn(&m_rootLayout, scale);
 
-  root->addChild(ui::row(
-      {.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
-      ui::glyph({
-          .glyph = "palette",
-          .glyphSize = Style::fontSizeTitle * scale,
-          .color = colorSpecFromRole(ColorRole::Primary),
-      }),
-      ui::label({
-          .text = i18n::tr("themes.panel.title"),
-          .fontSize = Style::fontSizeTitle * scale,
-          .fontWeight = FontWeight::Bold,
-          .color = colorSpecFromRole(ColorRole::OnSurface),
-          .flexGrow = 1.0F,
-      }),
-      ui::button({
-          .out = &m_randomButton,
-          .text = i18n::tr("themes.panel.random"),
-          .glyph = "arrows-shuffle",
-          .variant = ButtonVariant::Outline,
-          .visible = false,
-          .onClick =
-              [this]() {
-                if (m_presets != nullptr) {
-                  (void)m_presets->randomWallpaper();
-                }
-              },
-      }),
-      ui::segmented({
-          .out = &m_viewSwitch,
-          .options =
-              std::vector<ui::SegmentedOption>{
-                  {.label = i18n::tr("themes.panel.view.themes"), .glyph = "palette", .tooltip = {}},
-                  {.label = i18n::tr("themes.panel.view.wallpapers"), .glyph = "photo", .tooltip = {}},
-              },
-          .selectedIndex = static_cast<std::size_t>(m_view),
-          .onChange = [this](std::size_t index) { setView(index == 0 ? View::Themes : View::Wallpapers); },
-      })
-  ));
+  root->addChild(
+      panel_scaffold::header(
+          "palette", i18n::tr("themes.panel.title"), scale,
+          ui::button({
+              .out = &m_randomButton,
+              .text = i18n::tr("themes.panel.random"),
+              .glyph = "arrows-shuffle",
+              .variant = ButtonVariant::Outline,
+              .visible = false,
+              .onClick =
+                  [this]() {
+                    if (m_presets != nullptr) {
+                      (void)m_presets->randomWallpaper();
+                    }
+                  },
+          }),
+          ui::segmented({
+              .out = &m_viewSwitch,
+              .options =
+                  std::vector<ui::SegmentedOption>{
+                      {.label = i18n::tr("themes.panel.view.themes"), .glyph = "palette", .tooltip = {}},
+                      {.label = i18n::tr("themes.panel.view.wallpapers"), .glyph = "photo", .tooltip = {}},
+                  },
+              .selectedIndex = static_cast<std::size_t>(m_view),
+              .onChange = [this](std::size_t index) { setView(index == 0 ? View::Themes : View::Wallpapers); },
+          })
+      )
+  );
 
   root->addChild(ui::scrollView({
       .out = &m_scroll,
@@ -95,12 +81,7 @@ void ThemesPanel::create() {
       .flexGrow = 1.0F,
   }));
 
-  root->addChild(ui::label({
-      .text = i18n::tr("themes.panel.hint"),
-      .fontSize = Style::fontSizeCaption * scale,
-      .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
-      .textAlign = TextAlign::Center,
-  }));
+  root->addChild(panel_scaffold::hint(i18n::tr("themes.panel.hint"), scale));
 
   setRoot(std::move(root));
 }
@@ -311,7 +292,7 @@ void ThemesPanel::select(std::size_t index) {
   }
   m_selected = std::min(index, m_cards.size() - 1);
   for (std::size_t i = 0; i < m_cards.size(); ++i) {
-    static_cast<Button*>(m_cards[i])->setHoveredVisual(i == m_selected);
+    m_cards[i]->setHoveredVisual(i == m_selected);
   }
   if (m_scroll != nullptr) {
     m_scroll->requestScrollIntoView(m_cards[m_selected]);
@@ -345,6 +326,12 @@ bool ThemesPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, bo
   return false;
 }
 
+void ThemesPanel::onPanelCardOpacityChanged(float opacity) {
+  for (Button* card : m_cards) {
+    card->setSurfaceOpacity(opacity);
+  }
+}
+
 void ThemesPanel::doUpdate(Renderer& renderer) {
   if (m_dirty) {
     rebuildCards();
@@ -365,7 +352,7 @@ void ThemesPanel::doLayout(Renderer& renderer, float width, float height) {
   doUpdate(renderer);
   m_rootLayout->setSize(width, height);
   m_rootLayout->layout(renderer);
-  for (Node* card : m_cards) {
-    static_cast<Button*>(card)->updateInputArea();
+  for (Button* card : m_cards) {
+    card->updateInputArea();
   }
 }

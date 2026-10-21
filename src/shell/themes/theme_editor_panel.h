@@ -50,6 +50,7 @@ public:
 private:
   void doLayout(Renderer& renderer, float width, float height) override;
   void doUpdate(Renderer& renderer) override;
+  void onPanelCardOpacityChanged(float opacity) override;
   void syncFromDraft();
   void syncPaletteSelect();
   void rebuildWallpaperList();

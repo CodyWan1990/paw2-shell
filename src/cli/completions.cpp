@@ -347,8 +347,7 @@ namespace noctalia::cli {
 
   std::string generateZsh(const Command& root) {
     const auto states = collectStates(root);
-    std::string output =
-        "#compdef noctalia\n# generated from the live CLI schema\n\n";
+    std::string output = "#compdef noctalia\n# generated from the live CLI schema\n\n";
 
     for (const CommandState& state : states) {
       const Command& command = *state.command;

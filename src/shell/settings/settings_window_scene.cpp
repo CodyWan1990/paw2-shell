@@ -1794,9 +1794,8 @@ void SettingsWindow::refreshSettingsRegistry(const Config& cfg) {
                   i18n::tr("settings.schema.services.calendar-edit.button"),
                   [this, id = account.id]() { openCalendarAccountEditor(id); }, "edit", ButtonVariant::Default
               ),
-              "calendar account edit caldav icloud password ics ical subscription vdir local "
-                  + account.id,
-              false, calendarOn
+              "calendar account edit caldav icloud password ics ical subscription vdir local " + account.id, false,
+              calendarOn
           )
       ));
     }

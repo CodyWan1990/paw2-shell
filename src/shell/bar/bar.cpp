@@ -1489,9 +1489,7 @@ bool Bar::initialize(const BarServices& services) {
   m_config->addReloadCallback(
       [this]() {
         const auto& cfg = m_config->config();
-        if (cfg.bars == m_lastBars
-            && cfg.widgets == m_lastWidgets
-            && cfg.shell.shadow == m_lastShadow) {
+        if (cfg.bars == m_lastBars && cfg.widgets == m_lastWidgets && cfg.shell.shadow == m_lastShadow) {
           return;
         }
         reload();

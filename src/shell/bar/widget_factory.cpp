@@ -104,7 +104,8 @@ WidgetFactory::WidgetFactory(const BarServices& services)
       m_audioSpectrum(services.audioSpectrum), m_httpClient(services.httpClient), m_weather(services.weather),
       m_nightLight(services.nightLight), m_themeService(services.theme), m_bluetooth(services.bluetooth),
       m_brightness(services.brightness), m_lockKeys(services.lockKeys), m_clipboard(services.clipboard),
-      m_fileWatcher(services.fileWatcher), m_screenshots(services.screenshots), m_renderContext(services.renderContext) {}
+      m_fileWatcher(services.fileWatcher), m_screenshots(services.screenshots),
+      m_renderContext(services.renderContext) {}
 
 WidgetFactory::~WidgetFactory() = default;
 

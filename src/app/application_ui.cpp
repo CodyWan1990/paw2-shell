@@ -909,7 +909,7 @@ void Application::initWidgetControllersAndCallbacks() {
         m_colorPickerDialogPopup.requestLayout();
         m_glyphPickerDialogPopup.requestLayout();
         m_fileDialogPopup.requestLayout();
-          },
+      },
       "shell-font-family"
   );
 
@@ -937,7 +937,7 @@ void Application::initWidgetControllersAndCallbacks() {
         m_colorPickerDialogPopup.requestLayout();
         m_glyphPickerDialogPopup.requestLayout();
         m_fileDialogPopup.requestLayout();
-          },
+      },
       "shell-language-direction"
   );
 

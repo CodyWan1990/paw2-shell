@@ -445,7 +445,6 @@ namespace settings {
     return {};
   }
 
-
   WidgetReferenceInfo widgetReferenceInfo(const Config& cfg, std::string_view name) {
     if (const auto* spec = findWidgetTypeSpec(name)) {
       if (const auto it = cfg.widgets.find(std::string(name));

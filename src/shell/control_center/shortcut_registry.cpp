@@ -566,8 +566,8 @@ namespace {
 std::vector<ShortcutRegistry::CatalogEntry> ShortcutRegistry::catalog() {
   return kBuiltinShortcuts
       | std::views::transform([](const BuiltinShortcutDescriptor& shortcut) {
-                  return CatalogEntry{.type = std::string(shortcut.type), .labelKey = std::string(shortcut.labelKey)};
-                })
+           return CatalogEntry{.type = std::string(shortcut.type), .labelKey = std::string(shortcut.labelKey)};
+         })
       | std::ranges::to<std::vector>();
 }
 

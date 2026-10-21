@@ -70,7 +70,7 @@ namespace settings {
   private:
     std::vector<SearchPickerOption> m_normalOptions;
     std::vector<SearchPickerOption> m_instanceOptions;
-      float m_scale = 1.0F;
+    float m_scale = 1.0F;
     const Config* m_config = nullptr;
     std::vector<std::string> m_lanePath;
     Flex* m_root = nullptr;

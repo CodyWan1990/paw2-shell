@@ -438,9 +438,7 @@ namespace noctalia::config {
       }
     }
 
-    void validateDesktopWidgets(
-        const toml::table& root, schema::Diagnostics& diag
-    ) {
+    void validateDesktopWidgets(const toml::table& root, schema::Diagnostics& diag) {
       const auto* dw = root["desktop_widgets"].as_table();
       if (dw == nullptr) {
         return;
@@ -518,9 +516,7 @@ namespace noctalia::config {
       }
     }
 
-    void validateLockscreenWidgets(
-        const toml::table& root, schema::Diagnostics& diag
-    ) {
+    void validateLockscreenWidgets(const toml::table& root, schema::Diagnostics& diag) {
       const auto* section = root["lockscreen_widgets"].as_table();
       if (section == nullptr) {
         return;

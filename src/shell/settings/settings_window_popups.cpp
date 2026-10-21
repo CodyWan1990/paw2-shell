@@ -1016,8 +1016,7 @@ void SettingsWindow::openCalendarAccountEditor(std::optional<std::string> accoun
   auto draft = std::make_shared<CalendarAccountDraft>();
   if (accountId.has_value()) {
     const CalendarConfig::Account* account = findCalendarAccount(cfg, *accountId);
-    if (account == nullptr
-        || (account->type != "caldav" && account->type != "ics" && account->type != "vdir")) {
+    if (account == nullptr || (account->type != "caldav" && account->type != "ics" && account->type != "vdir")) {
       return;
     }
     draft->creating = false;

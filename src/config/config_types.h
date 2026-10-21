@@ -1353,7 +1353,8 @@ enum class CalendarCredentialSource : std::uint8_t {
 };
 
 struct CalendarConfig {
-  // A single connected account. Secret Service-backed CalDAV passwords are not stored here. id must be [a-z0-9_] because it identifies durable credential records.
+  // A single connected account. Secret Service-backed CalDAV passwords are not stored here. id must be [a-z0-9_]
+  // because it identifies durable credential records.
   struct Account {
     std::string id;
     std::string type; // "caldav" | "ics" | "vdir"

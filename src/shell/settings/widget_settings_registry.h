@@ -136,8 +136,7 @@ namespace settings {
   [[nodiscard]] bool isBuiltInWidgetType(std::string_view type);
   [[nodiscard]] bool widgetTypeRequiresNamedConfig(std::string_view type);
   [[nodiscard]] std::string widgetTypeForReference(const Config& cfg, std::string_view name);
-  [[nodiscard]] WidgetReferenceInfo
-  widgetReferenceInfo(const Config& cfg, std::string_view name);
+  [[nodiscard]] WidgetReferenceInfo widgetReferenceInfo(const Config& cfg, std::string_view name);
   [[nodiscard]] std::vector<WidgetPickerEntry> widgetPickerEntries(const Config& cfg);
   [[nodiscard]] std::vector<WidgetSettingSpec>
   commonWidgetSettingSpecs(std::string_view shellFontFamily, bool populateFontCatalogs = true);

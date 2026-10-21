@@ -155,9 +155,7 @@ CompositorPlatform::CompositorPlatform(WaylandConnection& wayland)
 
 CompositorPlatform::~CompositorPlatform() {
   cleanup();
-  if (m_paw2ListenerToken != 0) {
-    m_runtimeRegistry->paw2().removeListener(m_paw2ListenerToken);
-  }
+  m_paw2ListenerToken.disconnect();
   m_wayland.setOutputLifecycleCallbacks({}, {});
   m_wayland.setWorkspaceManagerCallback({});
   m_wayland.setToplevelChangeCallback({});

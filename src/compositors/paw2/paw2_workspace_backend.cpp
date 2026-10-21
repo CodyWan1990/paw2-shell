@@ -25,7 +25,7 @@ Paw2WorkspaceBackend::Paw2WorkspaceBackend(Paw2Runtime& runtime) : m_runtime(run
   });
 }
 
-Paw2WorkspaceBackend::~Paw2WorkspaceBackend() { m_runtime.removeListener(m_listenerToken); }
+Paw2WorkspaceBackend::~Paw2WorkspaceBackend() = default;
 
 void Paw2WorkspaceBackend::setChangeCallback(ChangeCallback callback) { m_changeCallback = std::move(callback); }
 

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "compositors/workspace_backend.h"
+#include "ui/signal.h"
 
 #include <cstddef>
 #include <optional>
@@ -45,6 +46,6 @@ public:
 
 private:
   compositors::paw2::Paw2Runtime& m_runtime;
-  std::size_t m_listenerToken = 0;
+  Signal<>::ScopedConnection m_listenerToken;
   ChangeCallback m_changeCallback;
 };

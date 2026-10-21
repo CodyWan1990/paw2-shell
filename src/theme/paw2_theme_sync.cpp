@@ -18,7 +18,7 @@ namespace noctalia::theme {
     });
   }
 
-  Paw2ThemeSync::~Paw2ThemeSync() { m_platform.paw2Runtime().removeListener(m_runtimeListener); }
+  Paw2ThemeSync::~Paw2ThemeSync() = default;
 
   void
   Paw2ThemeSync::setColors(const Color& focusRing, const Color& titlebar, const Color& shadow, const Color& backdrop) {

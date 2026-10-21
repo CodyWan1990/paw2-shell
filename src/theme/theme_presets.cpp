@@ -1,6 +1,7 @@
 #include "theme/theme_presets.h"
 
 #include "cli/schema_msg.h"
+#include "config/atomic_file.h"
 #include "core/log.h"
 #include "ipc/ipc_service.h"
 #include "util/string_utils.h"
@@ -298,15 +299,7 @@ namespace noctalia::theme {
     return showWallpaper(candidates[pick(generator)]);
   }
 
-  void ThemePresetService::addChangeCallback(std::function<void()> callback) {
-    m_changeCallbacks.push_back(std::move(callback));
-  }
-
-  void ThemePresetService::notify() const {
-    for (const auto& callback : m_changeCallbacks) {
-      callback();
-    }
-  }
+  void ThemePresetService::notify() const { m_changed.emit(); }
 
   void ThemePresetService::persist() const {
     if (m_storePath.empty()) {
@@ -318,21 +311,8 @@ namespace noctalia::theme {
     }
     const nlohmann::json document{{"version", 1}, {"themes", themes}, {"lastAppliedId", m_lastAppliedId}};
 
-    std::error_code error;
-    std::filesystem::create_directories(m_storePath.parent_path(), error);
-    // Written aside and renamed over, so a crash mid-write never leaves half a file.
-    const auto staging = m_storePath.string() + ".tmp";
-    {
-      std::ofstream file(staging, std::ios::trunc);
-      file << document.dump(2) << '\n';
-      if (!file) {
-        kLog.warn("could not write theme store {}", staging);
-        return;
-      }
-    }
-    std::filesystem::rename(staging, m_storePath, error);
-    if (error) {
-      kLog.warn("could not replace theme store {}: {}", m_storePath.string(), error.message());
+    if (!writeTextFileAtomic(m_storePath, document.dump(2) + "\n")) {
+      kLog.warn("could not write theme store {}", m_storePath.string());
     }
   }
 

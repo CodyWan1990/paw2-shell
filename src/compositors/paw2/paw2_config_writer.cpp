@@ -164,7 +164,7 @@ namespace compositors::paw2 {
     m_runtimeListener = m_runtime.addListener([this]() { onRuntimeChanged(); });
   }
 
-  Paw2ConfigWriter::~Paw2ConfigWriter() { m_runtime.removeListener(m_runtimeListener); }
+  Paw2ConfigWriter::~Paw2ConfigWriter() = default;
 
   void Paw2ConfigWriter::load() {
     const auto text = FileUtils::readTextFile(shellDropIn());
@@ -238,9 +238,7 @@ namespace compositors::paw2 {
     }
     std::erase(m_unsetPending, path);
     m_pending.insert_or_assign(std::move(path), std::move(value));
-    m_shellDirty = true;
-    scheduleSave();
-    notify();
+    markDirty(m_shellDirty);
   }
 
   void Paw2ConfigWriter::unset(std::string_view path) {
@@ -252,9 +250,7 @@ namespace compositors::paw2 {
     if (!std::ranges::contains(m_unsetPending, key)) {
       m_unsetPending.push_back(key);
     }
-    m_shellDirty = true;
-    scheduleSave();
-    notify();
+    markDirty(m_shellDirty);
   }
 
   void Paw2ConfigWriter::setMonitor(std::string_view connector, std::string key, nlohmann::json value) {
@@ -272,9 +268,7 @@ namespace compositors::paw2 {
       }
     }
     m_pendingMonitors[std::string(connector)].insert_or_assign(std::move(key), std::move(value));
-    m_shellDirty = true;
-    scheduleSave();
-    notify();
+    markDirty(m_shellDirty);
   }
 
   void Paw2ConfigWriter::setBinding(std::string path, nlohmann::json value) {
@@ -286,7 +280,11 @@ namespace compositors::paw2 {
       return;
     }
     m_pendingBindings.insert_or_assign(std::move(path), std::move(value));
-    m_keybindsDirty = true;
+    markDirty(m_keybindsDirty);
+  }
+
+  void Paw2ConfigWriter::markDirty(bool& dropInDirty) {
+    dropInDirty = true;
     scheduleSave();
     notify();
   }
@@ -384,8 +382,6 @@ namespace compositors::paw2 {
   }
 
   bool Paw2ConfigWriter::writeFile(const std::filesystem::path& path, const nlohmann::json& document) const {
-    std::error_code ec;
-    std::filesystem::create_directories(path.parent_path(), ec);
     if (!writeTextFileAtomic(path, renderTomlDocument(document))) {
       kLog.warn("could not write {}", path.string());
       return false;
@@ -498,23 +494,6 @@ namespace compositors::paw2 {
     notify();
   }
 
-  std::size_t Paw2ConfigWriter::addListener(Listener listener) {
-    const std::size_t token = m_nextListenerToken++;
-    m_listeners.emplace_back(token, std::move(listener));
-    return token;
-  }
-
-  void Paw2ConfigWriter::removeListener(std::size_t token) {
-    std::erase_if(m_listeners, [token](const auto& entry) { return entry.first == token; });
-  }
-
-  void Paw2ConfigWriter::notify() const {
-    for (const auto& [token, listener] : std::vector(m_listeners)) {
-      (void)token;
-      if (listener) {
-        listener();
-      }
-    }
-  }
+  void Paw2ConfigWriter::notify() const { m_changed.emit(); }
 
 } // namespace compositors::paw2

@@ -37,7 +37,7 @@ Paw2LayoutWidget::Paw2LayoutWidget(CompositorPlatform& platform, wl_output* outp
   m_listenerToken = m_platform.paw2Runtime().addListener([this]() { requestUpdate(); });
 }
 
-Paw2LayoutWidget::~Paw2LayoutWidget() { m_platform.paw2Runtime().removeListener(m_listenerToken); }
+Paw2LayoutWidget::~Paw2LayoutWidget() = default;
 
 void Paw2LayoutWidget::create() {
   auto area = ui::inputArea({});

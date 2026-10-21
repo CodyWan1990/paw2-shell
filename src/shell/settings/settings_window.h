@@ -19,6 +19,7 @@
 #include "ui/controls/scroll_view.h"
 #include "ui/controls/select_dropdown_popup.h"
 #include "ui/dialogs/layer_popup_host.h"
+#include "ui/signal.h"
 #include "wayland/toplevel_surface.h"
 
 #include <cstdint>
@@ -273,7 +274,7 @@ private:
   WaylandConnection* m_wayland = nullptr;
   zwp_keyboard_shortcuts_inhibitor_v1* m_shortcutsInhibitor = nullptr;
   CompositorPlatform* m_platform = nullptr;
-  std::size_t m_paw2ListenerToken = 0;
+  Signal<>::ScopedConnection m_paw2ListenerToken;
   // paw2's config generation the open pages were built from.
   std::uint64_t m_paw2ConfigGeneration = 0;
   bool m_paw2Connected = false;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shell/panel/panel.h"
+#include "ui/signal.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -74,6 +75,7 @@ private:
   Segmented* m_viewSwitch = nullptr;
   Button* m_randomButton = nullptr;
   std::vector<Button*> m_cards;
+  Signal<>::ScopedConnection m_presetsChanged;
   std::vector<CardImage> m_images;
   View m_view = View::Themes;
   std::size_t m_selected = 0;

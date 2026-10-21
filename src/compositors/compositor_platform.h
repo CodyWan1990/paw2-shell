@@ -2,6 +2,7 @@
 
 #include "compositors/keyboard_backend.h"
 #include "compositors/workspace_backend.h"
+#include "ui/signal.h"
 #include "wayland/wayland_connection.h"
 
 #include <chrono>
@@ -196,7 +197,7 @@ private:
   std::unique_ptr<compositors::CompositorRuntimeRegistry> m_runtimeRegistry;
   std::unique_ptr<WaylandWorkspaces> m_workspaces;
   std::unique_ptr<compositors::WorkspaceMetadataBackend> m_workspaceMetadataBackend;
-  std::size_t m_paw2ListenerToken = 0;
+  Signal<>::ScopedConnection m_paw2ListenerToken;
   std::vector<std::unique_ptr<compositors::FocusedOutputBackend>> m_focusedOutputBackends;
   std::unique_ptr<compositors::OutputPowerBackend> m_outputPowerBackend;
   mutable std::optional<bool> m_lastRequestedOutputPowerState;

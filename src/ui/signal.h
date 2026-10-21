@@ -9,9 +9,8 @@
 
 // A minimal signal/slot primitive for reactive UI updates.
 //
-// Callbacks are stored in a shared list so iteration during emit() is safe
-// even if a callback disconnects its own (or another) connection: a snapshot
-// of live slots is captured before dispatch.
+// Callbacks are stored in a shared list so emit() is safe even if a callback
+// connects or disconnects slots, its own or others'.
 //
 // ScopedConnection is move-only RAII — it disconnects on destruction. Store
 // one as a member of whatever object subscribes, and the subscription dies
@@ -87,16 +86,23 @@ public:
   }
 
   void emit(Args... args) {
-    // Snapshot live slots so connects/disconnects during dispatch are safe.
-    auto snapshot = m_state->slots;
-    for (auto& slot : snapshot) {
-      if (slot.callback) {
-        slot.callback(args...);
-      }
+    // Walk a snapshot of ids and look each one up again before calling it: a slot connected during
+    // dispatch waits for the next emit, and one disconnected during dispatch (its owner destroyed
+    // by an earlier slot) is not called. Holding the state keeps it alive if the signal goes too.
+    const auto state = m_state;
+    std::vector<std::uint64_t> ids;
+    ids.reserve(state->slots.size());
+    for (const auto& slot : state->slots) {
+      ids.push_back(slot.id);
     }
-    // Reap tombstones from the canonical list.
-    auto& slots = m_state->slots;
-    slots.erase(std::remove_if(slots.begin(), slots.end(), [](const Slot& s) { return !s.callback; }), slots.end());
+    for (const auto id : ids) {
+      const auto it = std::ranges::find(state->slots, id, &Slot::id);
+      if (it == state->slots.end() || !it->callback) {
+        continue;
+      }
+      const Callback callback = it->callback; // the slot may be erased while it runs
+      callback(args...);
+    }
   }
 
 private:

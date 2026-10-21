@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ui/signal.h"
+
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -112,9 +114,8 @@ namespace compositors::paw2 {
     [[nodiscard]] const Paw2Output* focusedOutput() const;
     [[nodiscard]] const Paw2Output* findOutput(std::string_view name) const;
 
-    // Returns a token for removeListener().
-    std::size_t addListener(Listener listener);
-    void removeListener(std::size_t token);
+    // Called on every snapshot or config change while the connection lives.
+    [[nodiscard]] Signal<>::ScopedConnection addListener(Listener listener);
 
     bool focusWorkspace(std::string_view output, std::uint32_t zeroBasedIndex);
     bool focusWindow(std::uint64_t id);
@@ -160,8 +161,7 @@ namespace compositors::paw2 {
     std::vector<std::string> m_configErrors;
     std::uint64_t m_configGeneration = 0;
 
-    std::vector<std::pair<std::size_t, Listener>> m_listeners;
-    std::size_t m_nextListenerToken = 1;
+    mutable Signal<> m_changed;
   };
 
 } // namespace compositors::paw2

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "config/config_types.h"
+#include "ui/signal.h"
 
 #include <cstddef>
 #include <filesystem>
@@ -74,7 +75,9 @@ namespace noctalia::theme {
     bool cycleWallpaper(int direction);
     bool randomWallpaper();
 
-    void addChangeCallback(std::function<void()> callback);
+    [[nodiscard]] Signal<>::ScopedConnection addChangeCallback(std::function<void()> callback) {
+      return m_changed.connect(std::move(callback));
+    }
     void registerIpc(IpcService& ipc);
 
     [[nodiscard]] std::string uniqueSlug(std::string_view title) const;
@@ -88,7 +91,7 @@ namespace noctalia::theme {
     Hooks m_hooks;
     std::vector<ThemePreset> m_presets;
     std::string m_lastAppliedId;
-    std::vector<std::function<void()>> m_changeCallbacks;
+    mutable Signal<> m_changed;
   };
 
 } // namespace noctalia::theme

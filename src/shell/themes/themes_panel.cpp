@@ -31,7 +31,7 @@ namespace {
 ThemesPanel::ThemesPanel(noctalia::theme::ThemePresetService* presets, ConfigService* config, AsyncTextureCache* textures)
     : m_presets(presets), m_config(config), m_textures(textures) {
   if (m_presets != nullptr) {
-    m_presets->addChangeCallback([this]() {
+    m_presetsChanged = m_presets->addChangeCallback([this]() {
       m_dirty = true;
       if (m_scroll != nullptr) {
         PanelManager::instance().refresh();

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "render/core/color.h"
+#include "ui/signal.h"
 
 #include <cstddef>
 #include <optional>
@@ -28,7 +29,7 @@ namespace noctalia::theme {
   private:
     CompositorPlatform& m_platform;
     ConfigService& m_config;
-    std::size_t m_runtimeListener = 0;
+    Signal<>::ScopedConnection m_runtimeListener;
     bool m_paw2Connected = false;
     std::optional<Color> m_focusRing;
     std::optional<Color> m_titlebar;

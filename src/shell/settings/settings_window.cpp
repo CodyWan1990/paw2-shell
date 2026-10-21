@@ -174,9 +174,7 @@ SettingsWindow::SettingsWindow() = default;
 SettingsWindow::~SettingsWindow() {
   destroyWindow();
   KeybindRecorder::setRecordingObserver({});
-  if (m_platform != nullptr) {
-    m_platform->paw2Runtime().removeListener(m_paw2ListenerToken);
-  }
+  m_paw2ListenerToken.disconnect();
   if (m_config != nullptr) {
     m_config->setPaw2OverrideQuery({});
   }

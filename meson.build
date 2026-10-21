@@ -1240,6 +1240,7 @@ if build_tests
     'paw2_backend',
     'paw2_config_writer',
     'settings_paw2',
+    'signal',
     'pipewire_error',
     'privacy_capture_classification',
     'plugin_bindings',

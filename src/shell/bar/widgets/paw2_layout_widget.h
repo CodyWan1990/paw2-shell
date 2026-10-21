@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shell/bar/widget.h"
+#include "ui/signal.h"
 
 #include <cstddef>
 #include <string>
@@ -39,7 +40,7 @@ private:
   wl_output* m_output = nullptr;
   bool m_showGlyph = true;
   bool m_showLabel = true;
-  std::size_t m_listenerToken = 0;
+  Signal<>::ScopedConnection m_listenerToken;
 
   Glyph* m_glyph = nullptr;
   Label* m_label = nullptr;

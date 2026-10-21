@@ -43,6 +43,32 @@ namespace compositors::paw2 {
       return it != json.end() && it->is_boolean() && it->get<bool>();
     }
 
+    // Calls `visit` for each object in the array at `key`, skipping anything else.
+    template <typename Visit> void forEachObject(const nlohmann::json& json, std::string_view key, Visit&& visit) {
+      const auto it = json.find(key);
+      if (it == json.end() || !it->is_array()) {
+        return;
+      }
+      for (const auto& entry : *it) {
+        if (entry.is_object()) {
+          visit(entry);
+        }
+      }
+    }
+
+    // The strings in the array at `key`.
+    [[nodiscard]] std::vector<std::string> jsonStrings(const nlohmann::json& json, std::string_view key) {
+      std::vector<std::string> out;
+      if (const auto it = json.find(key); it != json.end() && it->is_array()) {
+        for (const auto& entry : *it) {
+          if (entry.is_string()) {
+            out.push_back(entry.get<std::string>());
+          }
+        }
+      }
+      return out;
+    }
+
   } // namespace
 
   std::string workspaceIdFor(std::string_view output, std::uint32_t zeroBasedIndex) {
@@ -52,90 +78,64 @@ namespace compositors::paw2 {
   Paw2Snapshot parseSnapshot(const nlohmann::json& message) {
     Paw2Snapshot snapshot;
 
-    if (const auto it = message.find("outputs"); it != message.end() && it->is_array()) {
-      for (const auto& entry : *it) {
-        if (!entry.is_object()) {
-          continue;
-        }
-        Paw2Output output;
-        output.name = jsonString(entry, "name");
-        output.focused = jsonBool(entry, "focused");
-        output.activeWorkspace = jsonIndex(entry, "active");
-        output.layout = jsonString(entry, "layout");
-        if (const auto occupied = entry.find("occupied"); occupied != entry.end() && occupied->is_array()) {
-          for (const auto& flag : *occupied) {
-            output.occupied.push_back(flag.is_boolean() && flag.get<bool>());
-          }
-        }
-        if (const auto modes = entry.find("modes"); modes != entry.end() && modes->is_array()) {
-          for (const auto& mode : *modes) {
-            if (!mode.is_object()) {
-              continue;
-            }
-            output.modes.push_back(
-                Paw2OutputMode{
-                    .width = mode.value("width", 0),
-                    .height = mode.value("height", 0),
-                    .refresh = mode.value("refresh", 0.0),
-                    .current = jsonBool(mode, "current"),
-                }
-            );
-          }
-        }
-        if (!output.name.empty()) {
-          snapshot.outputs.push_back(std::move(output));
+    forEachObject(message, "outputs", [&snapshot](const nlohmann::json& entry) {
+      Paw2Output output;
+      output.name = jsonString(entry, "name");
+      output.focused = jsonBool(entry, "focused");
+      output.activeWorkspace = jsonIndex(entry, "active");
+      output.layout = jsonString(entry, "layout");
+      if (const auto occupied = entry.find("occupied"); occupied != entry.end() && occupied->is_array()) {
+        for (const auto& flag : *occupied) {
+          output.occupied.push_back(flag.is_boolean() && flag.get<bool>());
         }
       }
-    }
-
-    if (const auto it = message.find("windows"); it != message.end() && it->is_array()) {
-      for (const auto& entry : *it) {
-        if (!entry.is_object()) {
-          continue;
-        }
-        const auto id = entry.find("id");
-        if (id == entry.end() || !id->is_number_unsigned()) {
-          continue;
-        }
-        snapshot.windows.push_back(
-            Paw2Window{
-                .id = id->get<std::uint64_t>(),
-                .identifier = jsonString(entry, "identifier"),
-                .title = jsonString(entry, "title"),
-                .appId = jsonString(entry, "app_id"),
-                .output = jsonString(entry, "output"),
-                .workspace = jsonIndex(entry, "workspace"),
-                .focused = jsonBool(entry, "focused"),
-                .minimized = jsonBool(entry, "minimized"),
+      forEachObject(entry, "modes", [&output](const nlohmann::json& mode) {
+        output.modes.push_back(
+            Paw2OutputMode{
+                .width = mode.value("width", 0),
+                .height = mode.value("height", 0),
+                .refresh = mode.value("refresh", 0.0),
+                .current = jsonBool(mode, "current"),
             }
         );
+      });
+      if (!output.name.empty()) {
+        snapshot.outputs.push_back(std::move(output));
       }
-    }
+    });
 
-    if (const auto it = message.find("scratchpads"); it != message.end() && it->is_array()) {
-      for (const auto& entry : *it) {
-        if (!entry.is_object()) {
-          continue;
-        }
-        snapshot.scratchpads.push_back(
-            Paw2Scratchpad{
-                .name = jsonString(entry, "name"),
-                .appId = jsonString(entry, "app_id"),
-                .loaded = jsonBool(entry, "loaded"),
-                .visible = jsonBool(entry, "visible"),
-                .output = jsonString(entry, "output"),
-            }
-        );
+    forEachObject(message, "windows", [&snapshot](const nlohmann::json& entry) {
+      const auto id = entry.find("id");
+      if (id == entry.end() || !id->is_number_unsigned()) {
+        return;
       }
-    }
+      snapshot.windows.push_back(
+          Paw2Window{
+              .id = id->get<std::uint64_t>(),
+              .identifier = jsonString(entry, "identifier"),
+              .title = jsonString(entry, "title"),
+              .appId = jsonString(entry, "app_id"),
+              .output = jsonString(entry, "output"),
+              .workspace = jsonIndex(entry, "workspace"),
+              .focused = jsonBool(entry, "focused"),
+              .minimized = jsonBool(entry, "minimized"),
+          }
+      );
+    });
 
-    if (const auto it = message.find("layouts"); it != message.end() && it->is_array()) {
-      for (const auto& entry : *it) {
-        if (entry.is_string()) {
-          snapshot.layouts.push_back(entry.get<std::string>());
-        }
-      }
-    }
+    forEachObject(message, "scratchpads", [&snapshot](const nlohmann::json& entry) {
+      snapshot.scratchpads.push_back(
+          Paw2Scratchpad{
+              .name = jsonString(entry, "name"),
+              .appId = jsonString(entry, "app_id"),
+              .loaded = jsonBool(entry, "loaded"),
+              .visible = jsonBool(entry, "visible"),
+              .output = jsonString(entry, "output"),
+          }
+      );
+    });
+
+    snapshot.layouts = jsonStrings(message, "layouts");
 
     return snapshot;
   }
@@ -170,15 +170,10 @@ namespace compositors::paw2 {
     return it != m_snapshot.outputs.end() ? &*it : nullptr;
   }
 
-  std::size_t Paw2Runtime::addListener(Listener listener) {
-    const std::size_t token = m_nextListenerToken++;
-    m_listeners.emplace_back(token, std::move(listener));
+  Signal<>::ScopedConnection Paw2Runtime::addListener(Listener listener) {
+    auto connection = m_changed.connect(std::move(listener));
     connectIfNeeded();
-    return token;
-  }
-
-  void Paw2Runtime::removeListener(std::size_t token) {
-    std::erase_if(m_listeners, [token](const auto& entry) { return entry.first == token; });
+    return connection;
   }
 
   bool Paw2Runtime::focusWorkspace(std::string_view output, std::uint32_t zeroBasedIndex) {
@@ -426,35 +421,12 @@ namespace compositors::paw2 {
       m_trusted = true;
       m_config = json.value("values", nlohmann::json::object());
       m_configOk = json.value("ok", true);
-      m_configErrors.clear();
-      if (const auto errors = json.find("errors"); errors != json.end() && errors->is_array()) {
-        for (const auto& error : *errors) {
-          if (error.is_string()) {
-            m_configErrors.push_back(error.get<std::string>());
-          }
-        }
-      }
+      m_configErrors = jsonStrings(json, "errors");
       ++m_configGeneration;
       notify();
     }
   }
 
-  void Paw2Runtime::notify() const {
-    // A listener may add or remove listeners - a bar rebuild destroys widgets that registered one -
-    // so walk a snapshot of tokens and only call those still registered at the moment of the call.
-    std::vector<std::size_t> tokens;
-    tokens.reserve(m_listeners.size());
-    for (const auto& entry : m_listeners) {
-      tokens.push_back(entry.first);
-    }
-    for (const std::size_t token : tokens) {
-      const auto it = std::ranges::find(m_listeners, token, &decltype(m_listeners)::value_type::first);
-      if (it == m_listeners.end() || !it->second) {
-        continue;
-      }
-      const Listener listener = it->second;
-      listener();
-    }
-  }
+  void Paw2Runtime::notify() const { m_changed.emit(); }
 
 } // namespace compositors::paw2

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/timer_manager.h"
+#include "ui/signal.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -72,8 +73,9 @@ namespace compositors::paw2 {
     // Delete keybinds.toml, handing [bindings] back to config.toml.
     void releaseBindings();
 
-    std::size_t addListener(Listener listener);
-    void removeListener(std::size_t token);
+    [[nodiscard]] Signal<>::ScopedConnection addListener(Listener listener) {
+      return m_changed.connect(std::move(listener));
+    }
 
     // ── Exposed for tests ───────────────────────────────────────────────────
     [[nodiscard]] static std::string renderTomlDocument(const nlohmann::json& document);
@@ -83,6 +85,8 @@ namespace compositors::paw2 {
   private:
     void load();
     void scheduleSave();
+    // Flags a drop-in for rewriting, schedules the save and tells listeners.
+    void markDirty(bool& dropInDirty);
     void save();
     void onRuntimeChanged();
     void notify() const;
@@ -96,7 +100,7 @@ namespace compositors::paw2 {
 
     Paw2Runtime& m_runtime;
     std::filesystem::path m_dropInDir;
-    std::size_t m_runtimeListener = 0;
+    Signal<>::ScopedConnection m_runtimeListener;
 
     // shell.toml as dotted paths: everything the shell has set or claimed.
     std::map<std::string, nlohmann::json> m_owned;
@@ -120,8 +124,7 @@ namespace compositors::paw2 {
     std::vector<std::string> m_rejectedErrors;
 
     Timer m_saveTimer;
-    std::vector<std::pair<std::size_t, Listener>> m_listeners;
-    std::size_t m_nextListenerToken = 1;
+    mutable Signal<> m_changed;
   };
 
   // Splits a dotted path, e.g. "appearance.gaps" -> {"appearance", "gaps"}.

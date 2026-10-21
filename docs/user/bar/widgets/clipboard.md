@@ -1,0 +1,20 @@
+# clipboard
+
+Shows a clipboard glyph and opens or closes the clipboard panel on click. History limits, clear/delete confirmation, auto-paste, and image actions are configured under `[shell]` - see [Shell settings](../../configuration/shell.md#shell-settings) (`clipboard_*` keys).
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `glyph` | string | `"clipboard"` | Bar glyph name: paw2-shell alias, Tabler icon name, or `U+` / `0x` codepoint |
+| `custom_image` | string | `""` | Path to a custom image displayed instead of the glyph. Leave empty to use the glyph |
+| `custom_image_colorize` | bool | `false` | When `true`, tint the custom image with the widget icon color |
+
+```toml
+[widget.clipboard]
+glyph = "clipboard-list"
+```
+
+**Clear clipboard history from the command line:**
+
+```bash
+paw2-shell msg clipboard-clear
+```

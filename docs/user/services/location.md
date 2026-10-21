@@ -1,0 +1,40 @@
+# Location
+
+`[location]` is the single source of "where am I" for the whole shell. It resolves your coordinates and feeds [Weather](weather.md), [Night Light](night-light.md), and [Theme `auto`](../theming/index.md#mode). Configure under **Settings → Location**.
+
+```toml
+[location]
+auto_locate = false            # resolve coordinates from your IP address when true
+address     = "Toronto, ON"    # geocoded when auto_locate = false and non-empty
+# latitude  = 52.5200          # manual coordinates, used when auto_locate and address are off
+# longitude = 13.4050
+
+# Custom schedule - pick your own day/night times instead of computing them:
+# custom_schedule = true
+# sunset          = "20:30"    # HH:MM - night starts
+# sunrise         = "07:30"    # HH:MM - day starts
+```
+
+## Coordinates
+
+Coordinates resolve in this order: **`auto_locate` (IP) → `address` (geocoded) → manual `latitude`/`longitude`**. The first one that resolves wins. If only one of `latitude`/`longitude` is provided, the manual coordinates are ignored.
+
+Once coordinates are known, sunrise and sunset are computed astronomically for your position and change with the seasons. This is the default, and it is all most people need.
+
+## Custom schedule
+
+Set `custom_schedule = true` to drive day and night from `sunset`/`sunrise` instead, which is useful if you want night light and a dark theme on a fixed routine rather than on the actual sun.
+
+A custom schedule **overrides coordinates**: when it is on and both times are valid `HH:MM` values, the computed sunrise and sunset are not used. Coordinates are still resolved for Weather, which always needs a real position.
+
+`sunset` and `sunrise` do nothing unless `custom_schedule = true`. They are not a fallback for "coordinates failed to resolve": if no coordinates are available and no custom schedule is set, Night Light and Theme `auto` simply have no schedule to follow, and paw2-shell says so in its log and in a notification.
+
+Turning on `custom_schedule` without a valid `sunset` **and** `sunrise` is a configuration error: paw2-shell reports it (`paw2-shell config validate` flags it, Settings shows a banner) rather than silently falling back to coordinates.
+
+> **Note — Upgrading from an earlier version**
+>
+> `sunset`/`sunrise` used to schedule day and night on their own whenever coordinates were unavailable. They now require `custom_schedule = true`. paw2-shell migrates existing configs that relied on the old behavior (times set and no coordinate source) by turning `custom_schedule` on for you, and tells you to add the key to your own config file.
+
+When `auto_locate = true`, location lookup asks `ipapi.co` for approximate coordinates from your IP address. A typed `address` is looked up with Open-Meteo's geocoding API.
+
+Location resolution runs independently of Weather - `auto_locate` and `address` work even when Weather is disabled, so Night Light and Theme `auto` get real coordinates on their own.

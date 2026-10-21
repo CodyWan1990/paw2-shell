@@ -1,0 +1,15 @@
+# control-center
+
+Opens the control center panel on click.
+
+| Setting | Type | Default | Description |
+|---------|------|---------|-------------|
+| `glyph` | string | `"paw2-shell"` | Bar glyph name: paw2-shell alias, Tabler icon name, or `U+` / `0x` codepoint |
+| `custom_image` | string | `""` | Path to a custom image displayed instead of the glyph. Leave empty to use the glyph |
+| `custom_image_colorize` | bool | `false` | When `true`, tint the custom image with the widget **Color** setting (same as the glyph fallback) |
+
+```toml
+[widget.control-center]
+custom_image = "/path/to/image.png"
+custom_image_colorize = true
+```

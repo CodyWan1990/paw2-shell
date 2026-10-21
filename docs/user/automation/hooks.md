@@ -1,0 +1,142 @@
+# Hooks
+
+Hooks are advanced automation entries under `[hooks]` in the paw2-shell config stack. For hand-written hooks, put them in
+any `*.toml` file under `~/.config/paw2-shell/`. They run extra commands when specific paw2-shell events happen.
+
+Each event is a shell command string or an array of shell command strings that run in order. Use `paw2-shell msg ...` when
+a hook needs to call paw2-shell IPC.
+
+Hooks do not replace paw2-shell's built-in behavior. For example, external or IPC-initiated Wi-Fi, Bluetooth, and power
+profile changes show an OSD. `notify-send` can be useful while testing that a hook fires, but it is not required for
+paw2-shell's own feedback.
+
+| Key | When it fires |
+|-----|---------------|
+| `started` | Once after paw2-shell finishes startup (IPC ready). |
+| `wallpaper_changed` | After a persisted wallpaper path change is applied. Sets `PAW2_SHELL_WALLPAPER_PATH` and `PAW2_SHELL_WALLPAPER_CONNECTOR` (for example `DP-1`; empty when the change is not tied to a live connector). |
+| `colors_changed` | After the theme palette is resolved and terminal templates are updated. |
+| `theme_mode_changed` | After theme templates are applied, when the resolved [`[theme].mode`](../theming/index.md#mode) changes between `light` and `dark`. This is the app-facing mode, so it ignores [`shell_mode`](../theming/index.md#shell_mode). Sets `PAW2_SHELL_THEME_MODE`, `PAW2_SHELL_THEME_MODE_PREVIOUS`, and `PAW2_SHELL_THEME_MODE_CONFIGURED` (`dark`, `light`, or `auto`). |
+| `session_locked` | When the compositor confirms the session lock. |
+| `session_unlocked` | When the session leaves the locked state. |
+| `logging_out` | Immediately before the session panel runs the logout sequence. |
+| `rebooting` | Immediately before the session panel runs reboot. |
+| `shutting_down` | Immediately before the session panel runs shutdown. |
+| `wifi_enabled` / `wifi_disabled` | When NetworkManager's Wi-Fi radio toggles (not on first snapshot, and not when NetworkManager stops or starts). |
+| `bluetooth_enabled` / `bluetooth_disabled` | When the default adapter's powered state toggles (not on first snapshot). |
+| `battery_charging` | When the battery enters charging after the previous tracked battery hook state was not charging. Intermediate UPower states do not retrigger it. |
+| `battery_discharging` | When the battery enters discharging after the previous tracked battery hook state was not discharging. Intermediate UPower states do not retrigger it. |
+| `battery_plugged` | When the battery enters fully charged or pending charge after the previous tracked battery hook state was not plugged. Intermediate UPower states do not retrigger it. |
+| `battery_percentage_changed` | When the normalized whole battery percentage changes. Sets `PAW2_SHELL_BATTERY_STATE` (`charging`, `discharging`, `empty`, `fully_charged`, `pending_charge`, `pending_discharge`, or `unknown`) and `PAW2_SHELL_BATTERY_PERCENT`. |
+| `power_profile_changed` | When the active UPower power profile changes (for example `performance`, `balanced`, or `power-saver`). Sets `PAW2_SHELL_POWER_PROFILE`, `PAW2_SHELL_POWER_PROFILE_PREVIOUS`, and `PAW2_SHELL_POWER_PROFILE_ORIGIN` (`paw2-shell` or `external`). |
+
+## Battery hooks
+
+Battery hook values are exposed as environment variables, not positional arguments. For example:
+
+```toml
+[hooks]
+battery_percentage_changed = "notify-send 'Battery' \"$PAW2_SHELL_BATTERY_PERCENT% ($PAW2_SHELL_BATTERY_STATE)\""
+```
+
+To run an action only when the battery is discharging and has just crossed below a threshold, store the previous
+percentage in a small script:
+
+```toml
+[hooks]
+battery_percentage_changed = "PAW2_SHELL_BATTERY_THRESHOLD=20 ~/.config/paw2-shell/hooks/battery-threshold.sh"
+```
+
+```bash title="~/.config/paw2-shell/hooks/battery-threshold.sh"
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Use the threshold from the hook command, or fall back to 20%.
+threshold="${PAW2_SHELL_BATTERY_THRESHOLD:-20}"
+
+# Keep a tiny state file so the script can compare this event with the last one.
+state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/paw2-shell"
+state_file="$state_dir/battery-percent"
+
+# paw2-shell provides these values whenever battery_percentage_changed fires.
+percent="${PAW2_SHELL_BATTERY_PERCENT:-}"
+battery_state="${PAW2_SHELL_BATTERY_STATE:-unknown}"
+
+# Ignore the event if the percentage is missing or not a whole number.
+[[ "$percent" =~ ^[0-9]+$ ]] || exit 0
+
+mkdir -p "$state_dir"
+
+# Read the previous percentage, then save the current percentage for next time.
+previous=""
+[[ -r "$state_file" ]] && previous="$(<"$state_file")"
+printf '%s\n' "$percent" > "$state_file"
+
+# Only warn while discharging, and only after we have a previous value to compare.
+[[ "$battery_state" == "discharging" ]] || exit 0
+[[ "$previous" =~ ^[0-9]+$ ]] || exit 0
+
+# Fire once when crossing below the threshold, not every time the battery changes below it.
+if (( previous >= threshold && percent < threshold )); then
+  notify-send -u critical "Battery low" "Battery is ${percent}%."
+  # Or run any other command, for example:
+  # systemctl --user start low-battery.target
+fi
+```
+
+## Wallpaper hooks
+
+Wallpaper hook values are exposed as environment variables, not positional arguments. `PAW2_SHELL_WALLPAPER_PATH` is the
+applied path, and `PAW2_SHELL_WALLPAPER_CONNECTOR` is the output connector for that wallpaper change.
+When multiple outputs change, the hook runs once per changed connector.
+
+```toml
+[hooks]
+wallpaper_changed = "logger -t paw2-shell-hooks \"Wallpaper on $PAW2_SHELL_WALLPAPER_CONNECTOR: $PAW2_SHELL_WALLPAPER_PATH\""
+```
+
+## Examples
+
+```toml
+[hooks]
+# Start a user unit after paw2-shell IPC is ready.
+started = "systemctl --user start paw2-shell-ready.target"
+
+# Log wallpaper changes with the connector-specific payload.
+wallpaper_changed = "logger -t paw2-shell-hooks \"wallpaper: $PAW2_SHELL_WALLPAPER_CONNECTOR $PAW2_SHELL_WALLPAPER_PATH\""
+colors_changed = [
+  "systemctl --user reload foot-server.service",
+  "logger -t paw2-shell-hooks 'palette colors changed'",
+]
+theme_mode_changed = "logger -t paw2-shell-hooks \"mode: $PAW2_SHELL_THEME_MODE\""
+
+# Combine normal shell commands with paw2-shell IPC commands.
+session_locked = [
+  "playerctl pause",
+  "paw2-shell msg bar-hide",
+]
+session_unlocked = [
+  "paw2-shell msg bar-show",
+  "paw2-shell msg dpms-on && notify-send 'Session resumed'",
+]
+
+logging_out   = "logger -t paw2-shell-hooks 'logout requested'"
+rebooting     = "systemctl --user stop backup-sync.service"
+shutting_down = "systemctl --user stop backup-sync.service"
+
+# External or IPC-initiated Wi-Fi, Bluetooth, and power profile changes use OSD.
+# Use hooks only for extra side effects.
+wifi_enabled  = "logger -t paw2-shell-hooks 'Wi-Fi radio enabled'"
+wifi_disabled = "logger -t paw2-shell-hooks 'Wi-Fi radio disabled'"
+
+bluetooth_enabled  = "logger -t paw2-shell-hooks 'Bluetooth powered on'"
+bluetooth_disabled = "logger -t paw2-shell-hooks 'Bluetooth powered off'"
+
+battery_charging           = "logger -t paw2-shell-hooks 'Battery charging'"
+battery_discharging        = "logger -t paw2-shell-hooks 'Battery discharging'"
+battery_plugged            = "logger -t paw2-shell-hooks 'Battery plugged'"
+battery_percentage_changed = "logger -t paw2-shell-hooks \"Battery: $PAW2_SHELL_BATTERY_STATE $PAW2_SHELL_BATTERY_PERCENT%\""
+power_profile_changed   = "logger -t paw2-shell-hooks \"Power profile: $PAW2_SHELL_POWER_PROFILE_PREVIOUS -> $PAW2_SHELL_POWER_PROFILE ($PAW2_SHELL_POWER_PROFILE_ORIGIN)\""
+
+# Quick test while developing a hook; not needed for paw2-shell's own notifications.
+# started = "notify-send 'paw2-shell hook' 'started fired'"
+```

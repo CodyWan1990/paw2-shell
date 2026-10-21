@@ -870,19 +870,6 @@
       "on": "Wi-Fi activé"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} a rencontré trop d'erreurs et a été désactivé. Veuillez le recharger une fois le problème résolu.",
-      "body-timeouts": "{plugin} a cessé de répondre et a été désactivé. Veuillez le recharger une fois le problème résolu.",
-      "title": "Plugin désactivé"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} nécessite Noctalia {version} ou une version plus récente.",
-      "body-timeout": "L'installation de {plugin} a pris trop de temps.",
-      "title": "Plugin désactivé"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -932,11 +919,9 @@
     },
     "badges": {
       "advanced": "Avancé",
-      "community": "Communauté",
       "deprecated": "Obsolète",
       "inherited": "Hérité",
       "monitor": "Écran",
-      "official": "Officiel",
       "override": "Remplacer"
     },
     "calendar-accounts": {
@@ -1478,93 +1463,6 @@
           "imperial": "Impérial",
           "metric": "Métrique"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Parcourir les plugins",
-      "panels": {
-        "open-near-click": {
-          "description": "Où le panel sera situé après avoir cliqué sur le widget de la barre",
-          "label": "Le long de la Barre"
-        },
-        "placement": {
-          "description": "Attacher le panel à la Bar ou le faire flotter près de son bord",
-          "label": "Placement"
-        },
-        "position": {
-          "description": "Position à l'écran lorsque le panel est flottant",
-          "label": "Position"
-        }
-      },
-      "plugins": {
-        "configure": "Configurer",
-        "delete": "Supprimer",
-        "delete-confirm-desc": "Ce plugin va etre désinstallé et supprimé du disque.",
-        "delete-confirm-title": "Supprimer \"{name}\"?",
-        "deprecated": "Déprécié",
-        "empty": "Aucun plugin activé.",
-        "held-back": "ancienne version  ",
-        "held-back-hint": "v{version} nécessite l'API de plugins {required} ; cette version de Noctalia ne prend en charge que jusqu'à {current}. Mettez Noctalia à jour pour l'obtenir.",
-        "incompatible-plugin-api": "API du plugin incompatible",
-        "remove": "Enlever le plugin",
-        "requires": "A besoins de : {dependencies}",
-        "title": "Plugins",
-        "update-all": "Tout mettre à jour ({count})",
-        "update-available": "mise à jour disponible",
-        "update-to": "mettre à jour à {version}"
-      },
-      "settings": {
-        "empty": "Aucun paramètre disponible."
-      },
-      "sources": {
-        "add": "Ajouter une Source",
-        "add-title": "Ajouter une Source de Plugin",
-        "auto-update": "Mise à jour automatique des plugins",
-        "auto-update-desc": "Vérifier en arrière-plan les sources activées pour les nouvelles versions et maintenir à jour les plugins installés.",
-        "edit": "Éditer la source",
-        "edit-title": "Éditer la source du plugin",
-        "empty": "Aucune source configurée.",
-        "errors": {
-          "duplicate-name": "Une source avec cet identifiant existe déjà.",
-          "invalid-name": "L’identifiant de la source doit utiliser uniquement des lettres, chiffres, « . », « _ » ou « - », et commencer par une lettre ou un chiffre.",
-          "location-required": "L’emplacement de la source est obligatoire."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Chemin"
-        },
-        "kind-label": "Type",
-        "location-label": "Localisation",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "Identifiant de la source",
-        "name-placeholder": "my-plugins",
-        "precedence-hint": "Les sources de priorité inférieure remplacent les sources de priorité supérieure lorsqu'elles proposent le même plugin.",
-        "remove": "Retirer la source",
-        "save": "Sauvegarder",
-        "title": "Sources",
-        "update": "Mettre à jour la source"
-      },
-      "store": {
-        "add": "Ajoute à Noctalia",
-        "categories": "Catégories",
-        "category-all": "Tout",
-        "empty": "Aucun plugin trouvé",
-        "incompatible": "Incompatible",
-        "loading": "Chargement du catalogue...",
-        "no-readme": "Pas de description disponible...",
-        "open-page": "Ouvrir la page du plugin sur noctalia.dev",
-        "open-source": "Ouvrir le dépôt source du plugin",
-        "results-count": "{count} plugins",
-        "search-placeholder": "Recherche plugins...",
-        "sort-added-at-asc": "Trier par date d'ajout (du plus ancien au plus récent)",
-        "sort-added-at-desc": "Trier par date d'ajout (du plus récent au plus ancien)",
-        "sort-name-asc": "Trier par nom (A-Z)",
-        "sort-name-desc": "Trier par nom (Z-A)",
-        "sort-updated-at-asc": "Trier par date de mise à jour (du plus ancien au plus récent)",
-        "sort-updated-at-desc": "Trier par date de mise à jour (du plus récent au plus ancien)",
-        "source-all": "Toutes les sources",
-        "title": "Plugin Store"
       }
     },
     "schema": {

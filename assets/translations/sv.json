@@ -746,16 +746,6 @@
       "on": "Wi-Fi på"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "title": "Plugin avstängt"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-timeout": "{plugin} tog för lång tid att installera.",
-      "title": "Plugin inte aktivt"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -800,9 +790,7 @@
     },
     "badges": {
       "advanced": "Avancerat",
-      "community": "Community",
       "inherited": "Ärvt",
-      "official": "Officiell",
       "override": "Överskrivet"
     },
     "calendar-accounts": {
@@ -910,26 +898,6 @@
           "imperial": "Imperiska",
           "metric": "Metriska"
         }
-      }
-    },
-    "plugins": {
-      "panels": {
-        "placement": {
-          "label": "Placering"
-        }
-      },
-      "plugins": {
-        "delete-confirm-title": "Ta bort \"{name}\"?",
-        "update-available": "uppdatering tillgänglig"
-      },
-      "settings": {
-        "empty": "Inga inställningar tillgängliga."
-      },
-      "store": {
-        "sort-name-asc": "Sortera namn (A-Z)",
-        "sort-name-desc": "Sortera namn (Z-A)",
-        "sort-updated-at-asc": "Sortera uppdateringsdatum (äldst först)",
-        "sort-updated-at-desc": "Sortera uppdateringsdatum (senast först)"
       }
     },
     "schema": {

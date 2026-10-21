@@ -43,17 +43,13 @@ public:
       noctalia::theme::ThemeService* themeService = nullptr
   );
   void onOutputChange();
-  // Mark an output as driven by an external wallpaper source (e.g. an mpvpaper plugin):
-  // its Background surface is torn down so the external surface shows through. Runtime-only
-  // (not persisted) — it clears on restart and is re-asserted by the owner.
-  void setOutputExternallyManaged(const std::string& connector, bool managed);
   [[nodiscard]] std::vector<WallpaperChange> onStateChange();
   void onSecondTick();
   void onGpuResourcesInvalidated();
   void registerIpc(IpcService& ipc);
   // Apply and persist a wallpaper image. nullopt connector targets all connected
   // outputs plus the default. Returns false if the path does not exist or the
-  // connector is unknown. Shared by the wallpaper-set IPC handler and plugin scripts.
+  // connector is unknown. Used by the wallpaper-set IPC handler.
   bool applyWallpaperImage(const std::optional<std::string>& connector, const std::string& path);
   void setAutomationGate(std::function<bool()> gate);
   [[nodiscard]] bool ownsSurface(wl_surface* surface) const noexcept;
@@ -142,5 +138,4 @@ private:
   Signal<>::ScopedConnection m_paletteConn;
   Signal<> m_changed;
   std::vector<std::unique_ptr<WallpaperInstance>> m_instances;
-  std::unordered_set<std::string> m_externallyManagedOutputs;
 };

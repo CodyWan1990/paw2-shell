@@ -343,7 +343,6 @@ namespace settings {
     case SettingsSection::Paw2Displays:
     case SettingsSection::Paw2Shortcuts:
     case SettingsSection::Bar:
-    case SettingsSection::Plugins:
       return false;
     }
     return false;
@@ -379,7 +378,6 @@ namespace settings {
     case SettingsSection::Paw2Displays:
     case SettingsSection::Paw2Shortcuts:
     case SettingsSection::Bar:
-    case SettingsSection::Plugins:
       return {};
     }
     return {};

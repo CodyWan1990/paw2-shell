@@ -811,19 +811,6 @@
       "on": "Wi-Fi bekapcsolva"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "A {plugin} túl sok hibát okozott, ezért letiltásra került. A probléma kijavítása után frissítsd újra.",
-      "body-timeouts": "A {plugin} nem válaszol, ezért letiltásra került. A probléma kijavítása után frissítsd újra.",
-      "title": "Bővítmény letiltva"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "A {plugin} a plugin API {version} verzióját célozza meg. Ez a Noctalia az API {oldest}–{current} verzióit támogatja.",
-      "body-timeout": "A {plugin} telepítése túl sokáig tartott.",
-      "title": "Bővítmény nincs engedélyezve"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -873,11 +860,9 @@
     },
     "badges": {
       "advanced": "Speciális",
-      "community": "Közösség",
       "deprecated": "Elévült",
       "inherited": "Öröklött",
       "monitor": "Monitor",
-      "official": "Hivatalos",
       "override": "Felülbírálás"
     },
     "calendar-accounts": {
@@ -1342,13 +1327,6 @@
       "panel-position": {
         "auto": "Sáv követése"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Összes",
-          "none": "Nincs",
-          "official": "Hivatalos"
-        }
-      },
       "screen-position": {
         "bottom-center": "Alul középen",
         "bottom-left": "Bal alsó",
@@ -1429,85 +1407,6 @@
           "imperial": "Angolszász",
           "metric": "Metrikus"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Bővítmények böngészése",
-      "panels": {
-        "open-near-click": {
-          "description": "A panelt az azt megnyitó sáv-widget közelében, egyéb esetben pedig középen helyezze el.",
-          "label": "Sáv mentén"
-        },
-        "placement": {
-          "description": "Rögzítse a panelt a sávhoz, vagy hagyja szabadon lebegni a sáv szélének közelében",
-          "label": "Elhelyezés"
-        },
-        "position": {
-          "description": "A képernyő helyzete lebegő panel esetén",
-          "label": "Pozíció"
-        }
-      },
-      "plugins": {
-        "configure": "Beállítás",
-        "delete": "Törlés",
-        "delete-confirm-desc": "Ez a bővítmény eltávolításra kerül a merevlemezről",
-        "delete-confirm-title": "{name} törlése?",
-        "deprecated": "elavult",
-        "empty": "Nincs engedélyezett bővítmény",
-        "incompatible-plugin-api": "Összeférhetetlen bővítmény-API",
-        "remove": "Bővítmény eltávolítása",
-        "requires": "Szükséges: {dependencies}",
-        "title": "Bővítmények",
-        "update-all": "Összes frissítése ({count})",
-        "update-available": "Frissítés elérhető",
-        "update-to": "Frissítés a {version} verzióra"
-      },
-      "settings": {
-        "empty": "Nincsenek elérhető beállítások."
-      },
-      "sources": {
-        "add": "Forrás hozzáadása",
-        "add-title": "Bővítményforrás hozzáadása",
-        "auto-update": "A bővítmények automatikus frissítése",
-        "auto-update-desc": "A háttérben ellenőrizze az engedélyezett forrásokat és gondoskodjon arról, hogy a telepített bővítmények frissítve legyenek",
-        "edit": "Forrás szerkesztése",
-        "edit-title": "Bővítményforrás szerkesztése",
-        "empty": "Nincsenek beállítva források.",
-        "errors": {
-          "duplicate-name": "Már létezik forrás ezzel az azonosítóval.",
-          "invalid-name": "A forrásazonosító csak betűket, számjegyeket, „.”, „_” vagy „-” karaktereket tartalmazhat, és betűvel vagy számjeggyel kell kezdődnie.",
-          "location-required": "A forrás helyének megadása kötelező."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Útvonal"
-        },
-        "kind-label": "Típus",
-        "location-label": "Hely",
-        "location-placeholder-git": "https://github.com/én/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "Forrásazonosító",
-        "name-placeholder": "saját-bővítmények",
-        "precedence-hint": "Az alacsonyabb szintű források felülírják a magasabb szintűeket, ha ugyanazt a bővítményt kínálják",
-        "remove": "Forrás eltávolítása",
-        "save": "Mentés",
-        "title": "Források",
-        "update": "Forrás frissítése"
-      },
-      "store": {
-        "add": "Hozzáadás a Noctaliához",
-        "categories": "Kategóriák",
-        "category-all": "Összes",
-        "empty": "Nem találhatók bővítmények",
-        "incompatible": "Nem kompatibilis",
-        "loading": "A katalógus betöltése...",
-        "no-readme": "Nincs elérhető leírás.",
-        "open-page": "A bővítmény a noctalia.dev oldalon történő megnyitása",
-        "open-source": "A bővítmény forráskód-tárának megnyitása",
-        "results-count": "{count} bővítmény",
-        "search-placeholder": "Bővítmények keresése…",
-        "source-all": "Összes forrás",
-        "title": "Bővítményáruház"
       }
     },
     "schema": {

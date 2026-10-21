@@ -48,7 +48,6 @@ namespace settings {
     Paw2Displays,
     Paw2Shortcuts,
     Bar,
-    Plugins,
   };
 
   struct SettingsSectionDescriptor {

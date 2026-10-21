@@ -822,19 +822,6 @@
       "on": "Wi-Fi activat"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} ha tingut massa errors i s'ha desactivat. Torna a carregar-lo després de solucionar el problema.",
-      "body-timeouts": "{plugin} ha deixat de respondre i s'ha desactivat. Torna a carregar-lo després de solucionar el problema.",
-      "title": "Connector desactivat"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} utilitza l'API de connectors {version}; aquesta versió de Noctalia admet l'API {oldest}–{current}.",
-      "body-timeout": "{plugin} ha trigat massa a instal·lar-se.",
-      "title": "Connector no activat"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -884,11 +871,9 @@
     },
     "badges": {
       "advanced": "Avançat",
-      "community": "Comunitat",
       "deprecated": "Obsolet",
       "inherited": "Heretat",
       "monitor": "Monitor",
-      "official": "Oficial",
       "override": "Sobreescriu"
     },
     "calendar-accounts": {
@@ -1455,97 +1440,6 @@
           "imperial": "Imperial",
           "metric": "Mètric"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Explora els connectors",
-      "panels": {
-        "open-near-click": {
-          "description": "On se situa el panell quan s'obre en clicar el giny de la barra",
-          "label": "Al llarg de la barra"
-        },
-        "placement": {
-          "description": "Ancora el panell a la barra o fes-lo flotar prop del seu extrem",
-          "label": "Ubicació"
-        },
-        "position": {
-          "description": "Posició a la pantalla quan el panell flota",
-          "label": "Posició"
-        }
-      },
-      "plugins": {
-        "configure": "Configura",
-        "delete": "Elimina",
-        "delete-confirm-desc": "Aquest connector es desinstal·larà i s'eliminarà del disc.",
-        "delete-confirm-title": "Elimina \"{name}\"?",
-        "deprecated": "obsolet",
-        "empty": "Cap connector activat.",
-        "held-back": "versió anterior",
-        "held-back-hint": "v{version} necessita l'API de connectors {required}; aquesta versió de Noctalia admet fins a {current}. Actualitza Noctalia per obtenir-la.",
-        "incompatible-plugin-api": "API de connectors incompatible",
-        "remove": "Elimina el connector",
-        "requires": "Requereix: {dependencies}",
-        "title": "Plugins",
-        "update-all": "Actualitza tot ({count})",
-        "update-available": "actualització disponible",
-        "update-to": "actualitza a {version}"
-      },
-      "settings": {
-        "empty": "No hi ha paràmetres disponibles."
-      },
-      "sources": {
-        "add": "Afegeix una font",
-        "add-title": "Afegeix una font de connectors",
-        "auto-update": "Actualització automàtica de connectors",
-        "auto-update-desc": "Comprova en segon pla si hi ha versions noves a les fonts habilitades i mantén actualitzats els connectors instal·lats",
-        "edit": "Edita la font",
-        "edit-title": "Edita la font de plugins",
-        "empty": "No hi ha fonts configurades.",
-        "errors": {
-          "duplicate-name": "Ja existeix una font amb aquest ID.",
-          "invalid-name": "L'ID de la font ha d'utilitzar lletres, dígits, '.', '_' o '-', començant per una lletra o dígit.",
-          "location-required": "La ubicació de la font és obligatòria."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Camí"
-        },
-        "kind-label": "Tipus",
-        "location-label": "Ubicació",
-        "location-placeholder-git": "https://github.com/jo/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "ID de la font",
-        "name-placeholder": "els-meus-plugins",
-        "precedence-hint": "Les fonts inferiors substitueixen les superiors quan ofereixen el mateix connector.",
-        "remove": "Elimina la font",
-        "save": "Desa",
-        "title": "Fonts",
-        "update": "Actualitza la font"
-      },
-      "store": {
-        "add": "Afegeix a Noctalia",
-        "back-to-catalog": "Torna al catàleg de connectors",
-        "categories": "Categories",
-        "category-all": "Totes",
-        "empty": "No s'ha trobat cap connector",
-        "held-back": "Versió anterior",
-        "held-back-hint": "Instal·la la v{version} per a l'API de connectors {resolved}. La més recent, v{latest}, necessita l'API de connectors {latestRequired}; aquesta versió de Noctalia admet fins a {current}.",
-        "incompatible": "Incompatible",
-        "incompatible-hint": "Necessita l'API de connectors {required}; aquesta versió de Noctalia admet {oldest}–{current}.",
-        "loading": "Carregant el catàleg…",
-        "no-readme": "No hi ha cap descripció disponible.",
-        "open-page": "Obre la pàgina del connector a noctalia.dev",
-        "open-source": "Obre el repositori del codi font del connector",
-        "results-count": "{count} connectors",
-        "search-placeholder": "Cerca connectors…",
-        "sort-added-at-asc": "Ordena per data d'addició (més antics primer)",
-        "sort-added-at-desc": "Ordena per data d'addició (més recents primer)",
-        "sort-name-asc": "Ordena per nom (A-Z)",
-        "sort-name-desc": "Ordena per nom (Z-A)",
-        "sort-updated-at-asc": "Ordena per data d'actualització (més antics primer)",
-        "sort-updated-at-desc": "Ordena per data d'actualització (més recents primer)",
-        "source-all": "Totes les fonts",
-        "title": "Botiga de connectors"
       }
     },
     "schema": {
@@ -3916,8 +3810,6 @@
         "disable-hint": "Desactiva el mode fora de línia a la secció de seguretat.",
         "launcher": "L'obtenció de taxes de canvi de moneda no funcionarà.",
         "location": "Les consultes de temps i ubicació no funcionaran.",
-        "plugin-store": "El catàleg remot de connectors i les sol·licituds de descàrrega no funcionaran.",
-        "plugins": "Les sol·licituds HTTP dels connectors no funcionaran. Les fonts Git encara es podran actualitzar.",
         "security": "La consulta d'IP externa i la telemetria no funcionaran.",
         "template-store": "Les descàrregues de plantilles de la comunitat no funcionaran.",
         "templates": "Les descàrregues i actualitzacions de plantilles de la comunitat no funcionaran.",

@@ -32,7 +32,7 @@ namespace settings {
     bool scrollableBody = true;
     // When set, called instead of close(). Return true to consume (prevent close).
     std::function<bool()> onCloseRequested;
-    // Optional keyboard pre-dispatch (e.g. plugin-store grid navigation). Return true to consume.
+    // Optional keyboard pre-dispatch (e.g. store grid navigation). Return true to consume.
     std::function<bool(const KeyboardEvent&)> preDispatchKeyboard;
     // Fired when the sheet actually closes (its hosting modal popped), before the sheet body nodes
     // are destroyed. Use it to capture state that outlives the sheet, e.g. scroll position.

@@ -31,10 +31,6 @@ enum class LabelBaselineMode : std::uint8_t {
   Pictographic,
 };
 
-// Map a plugin-facing baseline token ("text", "textFixedHeight", "inkCentered",
-// "pictographic") to a mode. Returns nullopt for an unknown token.
-[[nodiscard]] std::optional<LabelBaselineMode> labelBaselineModeFromToken(std::string_view token);
-
 class Label : public InputArea {
 public:
   Label();

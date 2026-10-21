@@ -25,8 +25,8 @@ public:
   /// direction >= 0 scrolls forward (e.g. toward performance), direction < 0 backward.
   virtual void onScroll(int /*direction*/) {}
 
-  // Control Center keeps shortcut instances across panel open/close. Plugin-backed
-  // shortcuts use these hooks to pause timers and source file watches while closed.
+  // Control Center keeps shortcut instances across panel open/close. Shortcuts can use
+  // these hooks to pause timers while closed.
   virtual void onPanelClose() {}
   virtual void onPanelOpen() {}
 
@@ -41,10 +41,8 @@ public:
   struct CatalogEntry {
     std::string type;
     std::string labelKey;
-    bool literalLabel = false; // when true, labelKey holds a literal display name, not an i18n key
   };
 
-  // Rebuilt on every call from the current plugin registry state.
   [[nodiscard]] static std::vector<CatalogEntry> catalog();
   // Whether a built-in shortcut's backing feature is enabled. Drives both the
   // Settings GUI add-list and create(); disabled features cannot be added.

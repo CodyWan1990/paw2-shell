@@ -227,8 +227,8 @@ enable_scroll = false
 [widget.keyboard_layout]
 cycle_command = "hyprctl switchxkblayout all next"
 
-[widget.plugin_thing]
-type = "someone/plugin:entry"
+[widget.other_thing]
+type = "someone/other:entry"
 enable_scroll = false
 )");
     noctalia::config::LegacyConfigIssues issues;
@@ -273,9 +273,9 @@ enable_scroll = false
         "cycle_command was not dropped"
     );
 
-    // Plugin widgets still gate their own onScroll handler, so the key survives for them.
+    // A widget of a type migration does not know keeps the key.
     expect(
-        config["widget"]["plugin_thing"]["enable_scroll"].value<bool>() == std::optional<bool>{false},
+        config["widget"]["other_thing"]["enable_scroll"].value<bool>() == std::optional<bool>{false},
         "enable_scroll was dropped from a widget that still uses it"
     );
 
@@ -752,33 +752,6 @@ German = "Clock"
     expect(secondPassIssues.empty(), "keyboard layout custom_labels normalization was not idempotent");
   }
 
-  void checkPluginAutoUpdateModeMigration() {
-    for (const bool enabled : {true, false}) {
-      toml::table config = toml::parse(std::format("[plugins]\nauto_update = {}", enabled));
-      noctalia::config::LegacyConfigIssues issues;
-      noctalia::config::normalizeLegacyConfig(config, issues);
-
-      const std::string_view expected = enabled ? "all" : "none";
-      expect(
-          config["plugins"]["auto_update"].value<std::string_view>() == expected,
-          "legacy plugin auto-update boolean was not converted to its matching scope"
-      );
-      expect(
-          issues.size() == 1 && hasIssuePath(issues, "plugins.auto_update"),
-          "plugin auto-update migration did not identify its source key"
-      );
-    }
-
-    toml::table sidecar = toml::parse("config_version = 12\n[plugins]\nauto_update = false");
-    noctalia::config::schema::Diagnostics diagnostics;
-    const int applied = noctalia::config::applyPendingConfigMigrations(sidecar, 12, diagnostics);
-    expect(applied == noctalia::config::currentConfigVersion(), "plugin auto-update sidecar migration was not applied");
-    expect(
-        sidecar["plugins"]["auto_update"].value<std::string_view>() == std::optional<std::string_view>{"none"},
-        "plugin auto-update sidecar migration did not preserve false as none"
-    );
-  }
-
   void checkCalendarEventFormatsMigration() {
     toml::table sidecar = toml::parse(R"(
 config_version = 13
@@ -1053,7 +1026,6 @@ int main() {
   checkKeyboardLayoutShowGlyphMigration();
   checkKeyboardLayoutCustomLabelsMigration();
   checkWorkspacesDisplayMigration();
-  checkPluginAutoUpdateModeMigration();
   checkVersionGating();
   checkReminderFingerprint();
   checkRegistryOrdering();

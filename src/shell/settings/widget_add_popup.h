@@ -70,8 +70,7 @@ namespace settings {
   private:
     std::vector<SearchPickerOption> m_normalOptions;
     std::vector<SearchPickerOption> m_instanceOptions;
-    std::unordered_set<std::string> m_pluginEntries; // picker values that are plugin entry ids (one-click add)
-    float m_scale = 1.0F;
+      float m_scale = 1.0F;
     const Config* m_config = nullptr;
     std::vector<std::string> m_lanePath;
     Flex* m_root = nullptr;

@@ -789,19 +789,6 @@
       "on": "Wi-Fi 已開啟"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} 因錯誤過多已被停用。請修復問題後重新載入。",
-      "body-timeouts": "{plugin} 因停止回應已被停用。請修復問題後重新載入。",
-      "title": "擴充套件已停用"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}：{error}",
-      "body-incompatible": "{plugin} 目標擴充套件 API {version}；當前 Noctalia 僅支援 API {oldest}-{current}。",
-      "body-timeout": "{plugin} 安裝耗時過長。",
-      "title": "擴充套件啟用失敗"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -851,11 +838,9 @@
     },
     "badges": {
       "advanced": "進階",
-      "community": "社區",
       "deprecated": "已棄用",
       "inherited": "已繼承",
       "monitor": "螢幕",
-      "official": "官方",
       "override": "已修改"
     },
     "calendar-accounts": {

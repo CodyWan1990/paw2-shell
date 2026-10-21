@@ -22,22 +22,6 @@ namespace {
 
 } // namespace
 
-std::optional<LabelBaselineMode> labelBaselineModeFromToken(std::string_view token) {
-  if (token == "text") {
-    return LabelBaselineMode::Text;
-  }
-  if (token == "textFixedHeight") {
-    return LabelBaselineMode::TextFixedHeight;
-  }
-  if (token == "inkCentered") {
-    return LabelBaselineMode::InkCentered;
-  }
-  if (token == "pictographic") {
-    return LabelBaselineMode::Pictographic;
-  }
-  return std::nullopt;
-}
-
 Label::Label() {
   auto textNode = std::make_unique<TextNode>();
   m_textNode = static_cast<TextNode*>(addChild(std::move(textNode)));

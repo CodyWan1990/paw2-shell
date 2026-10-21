@@ -24,7 +24,6 @@
 #include "shell/settings/settings_bar_management.h"
 #include "shell/settings/settings_content.h"
 #include "shell/settings/settings_content_common.h"
-#include "shell/settings/settings_content_plugins.h"
 #include "shell/settings/settings_sidebar.h"
 #include "shell/settings/settings_window.h"
 #include "shell/tooltip/tooltip_manager.h"
@@ -147,7 +146,7 @@ namespace {
     if (path.empty()) {
       return true;
     }
-    if (path[0] == "bar" || path[0] == "widget" || path[0] == "plugins" || path[0] == "plugin_settings") {
+    if (path[0] == "bar" || path[0] == "widget") {
       return true;
     }
     if (path.size() >= 2 && path[0] == "theme" && (path[1] == "mode" || path[1] == "source")) {
@@ -455,9 +454,6 @@ namespace {
     }
     if (section == "osd") {
       return schema::writeTable(cfg.osd, schema::osdSchema());
-    }
-    if (section == "plugins") {
-      return schema::writeTable(cfg.plugins, schema::pluginsSchema());
     }
     if (section == "shell") {
       return schema::writeTable(cfg.shell, schema::shellSchema());
@@ -1129,96 +1125,6 @@ void SettingsWindow::rebuildSettingsContent() {
   logSettingsProfile("rebuildContent sections", phaseProfileWatch);
   phaseProfileWatch.reset();
 
-  if (m_selectedSection == "plugins" && m_pluginManager != nullptr) {
-    refreshPluginListIfNeeded();
-    settings::addSettingsPlugins(
-        *m_contentContainer,
-        settings::SettingsPluginsContext{
-            .scale = scale,
-            .selectedSection = m_selectedSection,
-            .searchQuery = m_pluginSearchQuery,
-            .setSearchQuery =
-                [this](std::string query) {
-                  m_pluginSearchQuery = std::move(query);
-                  m_contentScrollState.offset = 0.0F;
-                  m_pendingDeletePluginId.clear();
-                  m_pluginSearchDebounceTimer.start(kSearchDebounceInterval, [this]() { requestContentRebuild(); });
-                },
-            .plugins = m_pluginList,
-            .sources = cfg.plugins.sources,
-            .searchActive = !m_searchQuery.empty(),
-            .pageTitleRow = m_pageTitleRow,
-            .groupJumpRow = m_groupJumpRow,
-            .scrollContentToTop =
-                [this](const Node& target) {
-                  if (m_contentScrollView != nullptr) {
-                    scrollNodeToScrollViewTop(*m_contentScrollView, target, Style::spaceMd * uiScale());
-                  }
-                },
-            .expandedGroupsByPage = m_expandedSettingGroups,
-            .expandAllGroups = cfg.shell.settingsExpandAllGroups,
-            .pluginsLoading = m_pluginListDirty || m_pluginListRefreshInFlight,
-            .setEnabled =
-                [this](std::string id, bool enable) {
-                  if (enable) {
-                    (void)m_pluginManager->enable(id);
-                  } else {
-                    m_pluginManager->disable(id);
-                  }
-                  markPluginListDirty();
-                  requestSceneRebuild();
-                },
-            .isEnabling = [this](const std::string& id) { return m_pluginManager->isEnabling(id); },
-            .addSource = [this]() { openPluginSourceCreateEditor(); },
-            .setSourceEnabled =
-                [this](PluginSourceConfig source, bool enabled) {
-                  source.enabled = enabled;
-                  m_pluginManager->addSource(source);
-                  markPluginListDirty();
-                  requestSceneRebuild();
-                },
-            .editSource = [this](PluginSourceConfig source) { openPluginSourceCreateEditor(std::move(source)); },
-            .updateSource = [this](std::string source) { m_pluginManager->update(std::move(source)); },
-            .refresh =
-                [this]() {
-                  markPluginListDirty();
-                  requestSceneRebuild();
-                },
-            .autoUpdateMode = cfg.plugins.autoUpdate,
-            .setAutoUpdate =
-                [this](PluginAutoUpdateMode mode) {
-                  m_pluginManager->setAutoUpdateMode(mode);
-                  markPluginListDirty();
-                  requestSceneRebuild();
-                },
-            .updateAll = [this]() { m_pluginManager->updateAutoUpdateScope(PluginAutoUpdateMode::All); },
-            .config = &cfg,
-            .onConfigure = [this](std::string id) { openPluginSettingsEditor(std::move(id)); },
-            .onRemove =
-                [this](std::string id) {
-                  if (m_pluginManager != nullptr) {
-                    m_pluginManager->remove(id);
-                    m_pendingDeletePluginId.clear();
-                    markPluginListDirty();
-                    requestSceneRebuild();
-                  }
-                },
-            .openStore = [this]() { openPluginStore(); },
-            .pendingDeletePluginId = m_pendingDeletePluginId,
-            .requestDeleteConfirm =
-                [this](std::string id) {
-                  m_pendingDeletePluginId = std::move(id);
-                  requestSceneRebuild();
-                },
-            .cancelDelete =
-                [this]() {
-                  m_pendingDeletePluginId.clear();
-                  requestSceneRebuild();
-                },
-        }
-    );
-  }
-
   if (m_pageTitleRow != nullptr) {
     const bool hasPageTitle = !m_pageTitleRow->children().empty();
     m_pageTitleRow->setVisible(hasPageTitle);
@@ -1229,7 +1135,6 @@ void SettingsWindow::rebuildSettingsContent() {
     m_groupJumpRow->setVisible(hasJumpRow);
     m_groupJumpRow->setParticipatesInLayout(hasJumpRow);
   }
-  logSettingsProfile("rebuildContent plugins", phaseProfileWatch);
   logSettingsProfile("rebuildContent total", totalProfileWatch);
   if (noctalia::profiling::enabled()) {
     kLog.info(
@@ -1482,8 +1387,6 @@ std::unique_ptr<Flex> SettingsWindow::buildBody(
   const auto clearTransientSettingsState = [this]() { this->clearTransientSettingsState(); };
   const auto clearSearchQuery = [this]() {
     m_searchQuery.clear();
-    m_pluginSearchQuery.clear();
-    m_pluginSearchDebounceTimer.stop();
   };
 
   auto body = ui::row({

@@ -841,19 +841,6 @@
       "on": "Wi-Fi Açık"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} çok fazla hatayla karşılaştı ve devre dışı bırakıldı. Problemi çözdükten sonra yenileyin.",
-      "body-timeouts": "{plugin} yanıt vermeyi sonlandırdı ve devre dışı bırakıldı. Problemi çözdükten sonra yenileyin.",
-      "title": "Eklenti devre dışı bırakıldı"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin}, {version} eklenti API'yını hedefliyor; bu Noctalia {oldest}–{current} API'larını destekliyor.",
-      "body-timeout": "{plugin} yüklemesi zaman aşımına uğradı.",
-      "title": "Eklenti devre dışı"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -903,11 +890,9 @@
     },
     "badges": {
       "advanced": "Gelişmiş",
-      "community": "Topluluk",
       "deprecated": "Kullanımdan Kaldırıldı",
       "inherited": "Devralındı",
       "monitor": "Monitör",
-      "official": "Resmi",
       "override": "Geçersiz Kılma"
     },
     "calendar-accounts": {
@@ -1392,13 +1377,6 @@
       "panel-position": {
         "auto": "Çubuğu Takip Et"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Tümü",
-          "none": "Hiçbiri",
-          "official": "Resmi"
-        }
-      },
       "screen-position": {
         "bottom-center": "Alt Orta",
         "bottom-left": "Alt Sol",
@@ -1482,102 +1460,6 @@
           "imperial": "Emperyal",
           "metric": "Metrik"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Eklentileri Keşfet",
-      "panels": {
-        "layer": {
-          "label": "Katman"
-        },
-        "open-near-click": {
-          "description": "Çubuk bileşenine tıklayarak açıldığında panelin nerede konumlandırılacağı",
-          "label": "Çubuk Boyunca"
-        },
-        "placement": {
-          "description": "Paneli çubuğa iliştirin ya da çubuğun kenarında yüzen halde bırakın",
-          "label": "Yerleşim"
-        },
-        "position": {
-          "description": "Panel yüzer haldeyken ekrandaki konumu",
-          "label": "Konum"
-        }
-      },
-      "plugins": {
-        "configure": "Yapılandır",
-        "delete": "Sil",
-        "delete-confirm-desc": "Bu eklenti kaldırılacak ve diskten tamamen silinecek.",
-        "delete-confirm-title": "\"{name}\"i sil?",
-        "deprecated": "kullanımdan kaldırıldı",
-        "empty": "Etkin eklenti yok.",
-        "held-back": "eski sürüm",
-        "held-back-hint": "v{version} sürümü {required} eklenti API'sine ihtiyaç duyuyor; Noctalia sürümünüz en fazla {current} destekliyor. Yüklemek için Noctalia'yı güncelleyin.",
-        "incompatible-plugin-api": "uyumsuz eklenti API'si",
-        "remove": "Eklentiyi kaldır",
-        "requires": "Gereksinimler: {dependencies}",
-        "search-empty": "\"{query}\" aramasına eşleşen eklenti yok",
-        "search-placeholder": "Yüklü eklentilerde ara",
-        "title": "Eklentiler",
-        "update-all": "Tümünü güncelle ({count})",
-        "update-available": "güncelleme mevcut",
-        "update-to": "v{version} sürümüne güncelle"
-      },
-      "settings": {
-        "empty": "Mevcut ayar yok."
-      },
-      "sources": {
-        "add": "Kaynak Ekle",
-        "add-title": "Eklenti Kaynağı Ekle",
-        "auto-update": "Eklentileri Otomatik Güncelle",
-        "auto-update-desc": "Arka planda etkin kaynaklardaki yeni sürümleri denetle ve yüklü eklentileri güncel tut",
-        "edit": "Kaynağı düzenle",
-        "edit-title": "Eklenti kaynağını düzenle",
-        "empty": "Hiçbir kaynak yapılandırılmamış.",
-        "errors": {
-          "duplicate-name": "Bu ID'ye sahip bir kaynak zaten var.",
-          "invalid-name": "Kaynak ID'si harf, rakam, '.', '_' veya '-' içermeli ve harf ya da rakamla başlamalıdır.",
-          "location-required": "Kaynak konumu gereklidir."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Dosya Yolu"
-        },
-        "kind-label": "Tür",
-        "location-label": "Konum",
-        "location-placeholder-git": "https://github.com/ben/noctalia-eklentilerim",
-        "location-placeholder-path": "~/dev/noctalia-eklentilerim",
-        "name-label": "Kaynak ID'si",
-        "name-placeholder": "eklentilerim",
-        "precedence-hint": "Aynı eklentiyi sunduklarında alt sıradaki kaynaklar üst sıradakileri ezer.",
-        "remove": "Kaynağı kaldır",
-        "save": "Kaydet",
-        "title": "Kaynaklar",
-        "update": "Kaynağı güncelle"
-      },
-      "store": {
-        "add": "Noctalia'ya Ekle",
-        "back-to-catalog": "Eklenti kataloğuna dön",
-        "categories": "Kategoriler",
-        "category-all": "Tümü",
-        "empty": "Eklenti bulunamadı",
-        "held-back": "Eski sürüm",
-        "held-back-hint": "Eklenti API'si {resolved} için v{version} kuruluyor. En yeni v{latest} sürümü, eklenti API'si {latestRequired} gerektirir; Noctalia sürümünüz en fazla {current} destekliyor.",
-        "incompatible": "Uyumsuz",
-        "incompatible-hint": "Eklenti API'si {required} gerektirir; Noctalia sürümünüz {oldest}–{current} arasını destekliyor.",
-        "loading": "Katalog yükleniyor...",
-        "no-readme": "Açıklama mevcut değil.",
-        "open-page": "Eklentinin sayfasını noctalia.dev'de aç",
-        "open-source": "Eklentinin kaynak kod deposunu aç",
-        "results-count": "{count} eklenti",
-        "search-placeholder": "Eklentilerde ara...",
-        "sort-added-at-asc": "Eklenme tarihine göre sırala (eskiden yeniye)",
-        "sort-added-at-desc": "Eklenme tarihine göre sırala (yeniden eskiye)",
-        "sort-name-asc": "İsme göre sırala (A-Z)",
-        "sort-name-desc": "İsme göre sırala (Z-A)",
-        "sort-updated-at-asc": "Güncellenme tarihine göre sırala (eskiden yeniye)",
-        "sort-updated-at-desc": "Güncellenme tarihine göre sırala (yeniden eskiye)",
-        "source-all": "Tüm kaynaklar",
-        "title": "Eklenti Mağazası"
       }
     },
     "schema": {
@@ -3242,9 +3124,6 @@
           },
           "settings-close": {
             "label": "Ayarları kapat"
-          },
-          "settings-open-plugin": {
-            "label": "Eklenti ayarlarını kapat"
           }
         },
         "default": "Varsayılan",
@@ -3952,8 +3831,6 @@
         "disable-hint": "Güvenlik bölümünden Çevrimdışı Modu devre dışı bırakın.",
         "launcher": "Döviz kuru çekimi çalışmayacak.",
         "location": "Hava durumu ve konum sorgulamaları çalışmayacak.",
-        "plugin-store": "Uzak eklenti kataloğu ve indirme istekleri çalışmayacak.",
-        "plugins": "Eklenti HTTP istekleri çalışmayacak. Git kaynakları yine de güncellenebilir.",
         "security": "Harici IP sorgulama ve telemetri çalışmayacak.",
         "template-store": "Topluluk şablonu indirmeleri çalışmayacak.",
         "templates": "Topluluk şablonu indirmeleri ve güncellemeleri çalışmayacak.",

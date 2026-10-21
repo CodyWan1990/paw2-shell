@@ -286,7 +286,7 @@ namespace {
   }
 
   // Integer-valued slider: commits std::int64_t so the stored value matches the
-  // schema's Int type (plugin manifest int settings).
+  // schema's Int type.
   std::unique_ptr<Flex> makeIntSliderRow(
       std::string_view labelText, const std::string& key, double fallback, double minVal, double maxVal, double step,
       const Settings& s, DesktopWidgetsEditor* editor
@@ -301,8 +301,7 @@ namespace {
       std::string_view labelText, const std::string& key, int fallback, int minVal, int maxVal, int step,
       const std::optional<std::string>& valueSuffix, const Settings& s, DesktopWidgetsEditor* editor
   ) {
-    // A plugin manifest may declare minValue > maxValue; order the range so both
-    // the clamp and the stepper below get a valid [min, max].
+    // Order the range so both the clamp and the stepper below get a valid [min, max].
     if (maxVal < minVal) {
       std::swap(minVal, maxVal);
     }
@@ -718,7 +717,7 @@ namespace {
       if (!isSpecVisible(spec, s, specs)) {
         continue;
       }
-      // Plugin manifest specs carry literal labels; built-in specs carry i18n keys.
+      // Some specs carry literal labels; the rest carry i18n keys.
       const auto label = !spec.literalLabel.empty() ? spec.literalLabel : i18n::tr(spec.labelKey);
 
       switch (spec.control) {

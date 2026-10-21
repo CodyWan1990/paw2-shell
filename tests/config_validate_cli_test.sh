@@ -43,10 +43,6 @@ case "$warn_output" in
   *) fail "warning-only config did not report the nonexistent provider setting" ;;
 esac
 case "$warn_output" in
-  *"shell.launcher.providers.author/my-plugin:entry: plugin 'author/my-plugin' is not enabled"*) ;;
-  *) fail "warning-only config did not report the disabled plugin provider setting" ;;
-esac
-case "$warn_output" in
   *"duplicates the prefix of"*) ;;
   *) fail "warning-only config did not report the duplicate provider prefix" ;;
 esac

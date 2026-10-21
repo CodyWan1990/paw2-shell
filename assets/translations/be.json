@@ -882,19 +882,6 @@
       "on": "Wi-Fi уключаны"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} выклікала надта шмат памылак і была адключана. Уключыце яе ізноў пасля выпраўлення праблемы.",
-      "body-timeouts": "{plugin} перастала адказваць і была адключана. Уключыце яе ізноў пасля выпраўлення праблемы.",
-      "title": "Убудова адключана"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} разлічаны на API {version}; ваша Noctalia падтрымлівае API {oldest}–{current}.",
-      "body-timeout": "{plugin} усталёўвалася надта доўга.",
-      "title": "Убудова не ўключана"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -944,11 +931,9 @@
     },
     "badges": {
       "advanced": "Пашыраныя",
-      "community": "Ад супольнасці",
       "deprecated": "Састарэла",
       "inherited": "Узята з іншых налад",
       "monitor": "Манітор",
-      "official": "Афіцыйны",
       "override": "Перавызначэнне"
     },
     "calendar-accounts": {
@@ -1436,13 +1421,6 @@
       "panel-position": {
         "auto": "Кіравацца панэлі"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Усе",
-          "none": "Нічога",
-          "official": "Афіцыйныя"
-        }
-      },
       "screen-position": {
         "bottom-center": "Унізе па цэнтры",
         "bottom-left": "Унізе злева",
@@ -1523,97 +1501,6 @@
           "imperial": "Імперскія",
           "metric": "Метрычныя"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Даследаванне ўбудоў",
-      "panels": {
-        "open-near-click": {
-          "description": "Адкрываць панэль побач з віджэтам, які яе актывіраваў",
-          "label": "Побач з панэллю"
-        },
-        "placement": {
-          "description": "Ці прымацоўваць панэль да краю",
-          "label": "Размяшчэнне"
-        },
-        "position": {
-          "description": "Пазіцыя экрана пры нефіксаванай панэлі",
-          "label": "Пазіцыя"
-        }
-      },
-      "plugins": {
-        "configure": "Наладзіць",
-        "delete": "Выдаліць",
-        "delete-confirm-desc": "Гэта ўбудова будзе дэінсталявана і выдалена з дыску.",
-        "delete-confirm-title": "Выдаліць «{name}»?",
-        "deprecated": "састарэлая",
-        "empty": "Няма ўключаных убудоў.",
-        "held-back": "старэйшая версія",
-        "held-back-hint": "v{version} патрабуе API {required}; ваша Noctalia падтрымлівае версіі да {current}. Абнавіце Noctalia, каб атрымаць.",
-        "incompatible-plugin-api": "несумяшчальны API",
-        "remove": "Выдаліць убудову",
-        "requires": "Патрабуе {dependencies}",
-        "title": "Убудовы",
-        "update-all": "Абнавіць усе ({count})",
-        "update-available": "даступна абнаўленне",
-        "update-to": "абнавіць да {version}"
-      },
-      "settings": {
-        "empty": "Няма даступных налад."
-      },
-      "sources": {
-        "add": "Дадаць крыніцу",
-        "add-title": "Дадаць крыніцу ўбудоў",
-        "auto-update": "Абнаўляць аўтаматычна",
-        "auto-update-desc": "Правяраць уключаныя крыніцы на новыя версіі ў фоне і трымаць усталяваныя ўбудовы актуальнымі",
-        "edit": "Рэдагаваць крыніцу",
-        "edit-title": "Рэдагаваць крыніцу ўбудоў",
-        "empty": "Няма сканфігураваных крыніц.",
-        "errors": {
-          "duplicate-name": "Крыніца з гэтым ID ужо існуе.",
-          "invalid-name": "ID крыніцы павінна змяшчаць літары, лічбы, кропкі, ‹_› або ‹-›, а таксама пачынацца з літары або лічбы.",
-          "location-required": "Патрабуецца месцазнаходжанне крыніцы."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Шлях"
-        },
-        "kind-label": "Тып",
-        "location-label": "Месцазнаходжанне",
-        "location-placeholder-git": "https://github.com/ja/ubudovy-noctalia",
-        "location-placeholder-path": "~/dev/ubudovy-noctalia",
-        "name-label": "ID крыніцы",
-        "name-placeholder": "maje-ubudovy",
-        "precedence-hint": "Крыніцы ніжэй перавызначаюць крыніцы вышэй, калі ёсць аднолькавыя ўбудовы.",
-        "remove": "Выдаліць крыніцы",
-        "save": "Захаваць",
-        "title": "Крыніцы",
-        "update": "Абнавіць крыніцу"
-      },
-      "store": {
-        "add": "Дадаць у Noctalia",
-        "back-to-catalog": "Вярнуцца ў каталог",
-        "categories": "Катэгорыі",
-        "category-all": "Усе",
-        "empty": "Убудоў не знойдзена",
-        "held-back": "Старэйшая версія",
-        "held-back-hint": "Усталюе {version} для API {resolved}. Найноўшая версія {latest} патрабуе API {latestRequired}; ваша Noctalia падтрымлівае версіі да {current}.",
-        "incompatible": "Несумяшчальная",
-        "incompatible-hint": "Патрабуе API {required}; ваша Noctalia падтрымлівае API {oldest}–{current}.",
-        "loading": "Загрузка каталога…",
-        "no-readme": "Апісання няма",
-        "open-page": "Адкрыць старонку ўбудовы на noctalia.dev",
-        "open-source": "Адкрыць рэпазіторый убудовы",
-        "results-count": "{count} убудовы(-оў)",
-        "search-placeholder": "Шукаць убудовы…",
-        "sort-added-at-asc": "Сартаваць па даце дадавання (спачатку старыя)",
-        "sort-added-at-desc": "Сартаваць па даце дадавання (спачатку новыя)",
-        "sort-name-asc": "Сартаваць па назве (ад A да Z)",
-        "sort-name-desc": "Сартаваць па назве (ад Z да A)",
-        "sort-updated-at-asc": "Сартаваць па даце абнаўлення (спачатку старыя)",
-        "sort-updated-at-desc": "Сартаваць па даце абнаўлення (спачатку новыя)",
-        "source-all": "Усе крыніцы",
-        "title": "Крама ўбудоў"
       }
     },
     "schema": {

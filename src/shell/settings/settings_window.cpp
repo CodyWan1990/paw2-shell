@@ -17,8 +17,6 @@
 #include "render/core/async_texture_cache.h"
 #include "render/render_context.h"
 #include "render/text/font_weight_catalog.h"
-#include "scripting/plugin_registry.h"
-#include "shell/settings/settings_content_plugins.h"
 #include "shell/settings/settings_dialog_presenter.h"
 #include "shell/settings/settings_paw2.h"
 #include "shell/tooltip/tooltip_manager.h"
@@ -513,7 +511,6 @@ void SettingsWindow::openToBarWidget(std::string barName, std::string widgetName
   clearTransientSettingsState();
   clearStatusMessage();
   m_searchQuery.clear();
-  m_pluginSearchQuery.clear();
   m_selectedSection = "bar";
   m_selectedBarName = std::move(barName);
   m_selectedMonitorOverride.clear();
@@ -526,29 +523,6 @@ void SettingsWindow::openToBarWidget(std::string barName, std::string widgetName
   if (wasOpen && isOpen()) {
     requestSceneRebuild();
   }
-}
-
-bool SettingsWindow::openToPlugin(std::string pluginId) {
-  const auto* manifest = scripting::PluginRegistry::instance().findManifest(pluginId);
-  if (manifest == nullptr || !settings::pluginHasSettings(*manifest)) {
-    return false;
-  }
-
-  clearTransientSettingsState();
-  clearStatusMessage();
-  m_searchQuery.clear();
-  m_pluginSearchQuery.clear();
-  m_selectedSection = "plugins";
-  m_pendingOpenPluginSettingsId = std::move(pluginId);
-  m_contentScrollState.offset = 0.0F;
-  m_sidebarScrollState.offset = 0.0F;
-
-  const bool wasOpen = isOpen();
-  open();
-  if (wasOpen && isOpen()) {
-    requestSceneRebuild();
-  }
-  return true;
 }
 
 // paw2 sends a snapshot on every window change, but the paw2 pages only change with its config,
@@ -692,13 +666,10 @@ void SettingsWindow::destroyWindow() {
   m_pendingResetPageScope.clear();
   m_pendingResetSettingPaths.clear();
   m_searchQuery.clear();
-  m_pluginSearchQuery.clear();
-  m_pluginSearchDebounceTimer.stop();
   m_selectedSection.clear();
   m_selectedBarName.clear();
   m_selectedMonitorOverride.clear();
   m_pendingOpenWidgetInspectorName.clear();
-  m_pendingOpenPluginSettingsId.clear();
   m_editingWidgetName.clear();
   m_editingCapsuleGroupId.clear();
   m_selectedLaneWidgets.clear();
@@ -710,7 +681,7 @@ void SettingsWindow::destroyWindow() {
   m_contentScrollState = {};
   m_expandedSettingGroups.clear();
 
-  // Plugin-store thumbnails are the only async textures this window holds; drop the
+  // Store thumbnails are the only async textures this window holds; drop the
   // zero-ref residents once the scene (and with it every Image) is gone.
   if (m_asyncTextures != nullptr) {
     DeferredCall::callLater([asyncTextures = m_asyncTextures]() { asyncTextures->trimUnused(0); });
@@ -840,17 +811,9 @@ void SettingsWindow::prepareFrame(bool needsUpdate, bool needsLayout) {
 }
 
 void SettingsWindow::maybeOpenPendingEditor() {
-  const bool pending = !m_pendingOpenWidgetInspectorName.empty() || !m_pendingOpenPluginSettingsId.empty();
-  if (!pending || m_surface == nullptr || m_wayland == nullptr || m_config == nullptr) {
+  if (m_pendingOpenWidgetInspectorName.empty() || m_surface == nullptr || m_wayland == nullptr || m_config == nullptr) {
     return;
   }
-  if (!m_pendingOpenPluginSettingsId.empty()) {
-    std::string pluginId = std::move(m_pendingOpenPluginSettingsId);
-    m_pendingOpenPluginSettingsId.clear();
-    openPluginSettingsEditor(std::move(pluginId));
-    return;
-  }
-
   std::string widgetName = std::move(m_pendingOpenWidgetInspectorName);
   m_pendingOpenWidgetInspectorName.clear();
   // The inspector takes a per-lane path {"bar", name, <lane>} (same shape the lane-card gear passes);
@@ -917,42 +880,6 @@ void SettingsWindow::scheduleDeferredRebuild() {
   });
 }
 
-void SettingsWindow::markPluginListDirty() {
-  m_pluginListDirty = true;
-  ++m_pluginListRefreshGeneration;
-}
-
-void SettingsWindow::refreshPluginListIfNeeded() {
-  if (m_pluginManager == nullptr || m_config == nullptr || !m_pluginListDirty || m_pluginListRefreshInFlight) {
-    return;
-  }
-
-  m_pluginListRefreshInFlight = true;
-  const std::uint64_t generation = m_pluginListRefreshGeneration;
-  auto* manager = m_pluginManager;
-  PluginsConfig pluginsSnapshot = m_config->config().plugins;
-  std::thread([this, manager, generation, pluginsSnapshot = std::move(pluginsSnapshot)]() {
-    // Refresh the browsable catalog (throttled) so newly published plugins and update
-    // badges appear on open, then list against the fetched revision.
-    manager->fetchStaleCatalogs(pluginsSnapshot);
-    auto plugins = manager->list(pluginsSnapshot, scripting::CatalogAccess::Network);
-    DeferredCall::callLater([this, generation, plugins = std::move(plugins)]() mutable {
-      m_pluginListRefreshInFlight = false;
-      if (generation != m_pluginListRefreshGeneration) {
-        refreshPluginListIfNeeded();
-        return;
-      }
-      m_pluginList = std::move(plugins);
-      m_pluginListDirty = false;
-      if (isOpen() && m_selectedSection == "plugins") {
-        requestContentRebuild(
-            /*refreshRegistry=*/false, /*refreshFilterRow=*/false, /*rebuildEditorSheet=*/m_pluginStoreSheetOpen
-        );
-      }
-    });
-  }).detach();
-}
-
 void SettingsWindow::clearStatusMessage() {
   m_statusMessage.clear();
   m_statusIsError = false;
@@ -960,7 +887,6 @@ void SettingsWindow::clearStatusMessage() {
 
 void SettingsWindow::clearTransientSettingsState() {
   m_pendingOpenWidgetInspectorName.clear();
-  m_pendingOpenPluginSettingsId.clear();
   m_editingWidgetName.clear();
   m_editingCapsuleGroupId.clear();
   m_selectedLaneWidgets.clear();
@@ -1275,21 +1201,6 @@ void SettingsWindow::onFontChanged() {
 }
 
 void SettingsWindow::onExternalOptionsChanged() { requestSceneRebuild(); }
-
-void SettingsWindow::onPluginsChanged() {
-  markPluginListDirty();
-  if (isOpen() && m_selectedSection == "plugins") {
-    // The plugin store's body shows install progress, so it needs the rebuild; any other
-    // editor sheet would just lose its focus for an unrelated plugin event.
-    requestContentRebuild(
-        /*refreshRegistry=*/false, /*refreshFilterRow=*/false, /*rebuildEditorSheet=*/m_pluginStoreSheetOpen
-    );
-  }
-}
-
-void SettingsWindow::invalidatePluginSourceCache(const std::string& sourceName) {
-  m_pluginFileCache.invalidateSource(sourceName);
-}
 
 void SettingsWindow::refreshIdleLiveStatusText() {
   if (m_idleLiveStatusLabel == nullptr) {

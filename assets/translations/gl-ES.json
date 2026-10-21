@@ -758,19 +758,6 @@
       "on": "Wi-Fi activado"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} tivo demasiados erros e desactivouse. Recárgao despois de solucionar o problema.",
-      "body-timeouts": "{plugin} deixou de responder e desactivouse. Recárgao despois de solucionar o problema.",
-      "title": "Plugin desactivado"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} require Noctalia {version} ou unha versión máis recente.",
-      "body-timeout": "{plugin} tardou demasiado en instalarse.",
-      "title": "Plugin non activado"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -819,11 +806,9 @@
     },
     "badges": {
       "advanced": "Avanzado",
-      "community": "Comunidade",
       "deprecated": "Obsoleto",
       "inherited": "Herdado",
       "monitor": "Monitor",
-      "official": "Oficial",
       "override": "Sobreescribir"
     },
     "calendar-accounts": {
@@ -1349,76 +1334,6 @@
           "imperial": "Imperial",
           "metric": "Métrico"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Explorar complementos",
-      "panels": {
-        "open-near-click": {
-          "description": "Abre o panel preto do widget da barra que o activou",
-          "label": "Abrir preto do clic"
-        },
-        "placement": {
-          "description": "Anexa o panel á barra ou déixao flotando preto do bordo da barra",
-          "label": "Colocación"
-        },
-        "position": {
-          "description": "Posición na pantalla cando o panel está flotando",
-          "label": "Posición"
-        }
-      },
-      "plugins": {
-        "configure": "Configurar",
-        "delete": "Eliminar",
-        "delete-confirm-desc": "Este plugin desinstalarase e eliminarase do disco.",
-        "delete-confirm-title": "Eliminar \"{name}\"?",
-        "deprecated": "obsoleto",
-        "empty": "Non hai complementos activados.",
-        "remove": "Eliminar complemento",
-        "requires": "Require: {dependencies}",
-        "title": "Complementos"
-      },
-      "settings": {
-        "empty": "Non hai axustes dispoñibles."
-      },
-      "sources": {
-        "add": "Engadir orixe",
-        "add-title": "Engadir orixe de complementos",
-        "edit": "Editar orixe",
-        "edit-title": "Editar orixe de complementos",
-        "empty": "Non hai orixes configuradas.",
-        "errors": {
-          "duplicate-name": "Xa existe unha orixe con este ID.",
-          "invalid-name": "O ID da orixe debe usar letras, díxitos, '.', '_' ou '-', e comezar cunha letra ou un díxito.",
-          "location-required": "A localización da orixe é obrigatoria."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Ruta"
-        },
-        "kind-label": "Tipo",
-        "location-label": "Localización",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "ID da orixe",
-        "name-placeholder": "my-plugins",
-        "precedence-hint": "As orixes de abaixo substitúen as de arriba cando ofrecen o mesmo complemento.",
-        "remove": "Eliminar orixe",
-        "save": "Gardar",
-        "title": "Orixes",
-        "update": "Actualizar"
-      },
-      "store": {
-        "add": "Engadir a Noctalia",
-        "categories": "Categorías",
-        "category-all": "Todos",
-        "empty": "Non se atoparon complementos",
-        "incompatible": "Incompatible",
-        "loading": "Cargando catálogo...",
-        "no-readme": "Non hai descrición dispoñible.",
-        "results-count": "{count} complementos",
-        "search-placeholder": "Buscar complementos...",
-        "title": "Tenda de complementos"
       }
     },
     "schema": {

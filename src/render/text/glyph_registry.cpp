@@ -34,8 +34,6 @@ const std::unordered_map<std::string, std::string_view> kAliases = {
     {"capslock", "keyboard"},
     {"numlock", "keyboard"},
     {"scrolllock", "keyboard"},
-    {"plugin", "plug-connected"},
-    {"official-plugin", "shield-filled"},
     {"package", "box"},
 
     // Toast / warnings

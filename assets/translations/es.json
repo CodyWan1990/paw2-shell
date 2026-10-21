@@ -946,19 +946,6 @@
       "on": "Wi-Fi Encendido"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} alcanzó demasiados errores y se desactivó. Recárgalo después de solucionar el problema.",
-      "body-timeouts": "{plugin} dejó de responder y se desactivó. Recárgalo después de solucionar el problema.",
-      "title": "Plugin desactivado"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} apunta a la API de complementos {version}; este Noctalia admite la API {oldest}–{current}.",
-      "body-timeout": "{plugin} tardó demasiado en instalarse.",
-      "title": "Complemento no habilitado"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -1008,11 +995,9 @@
     },
     "badges": {
       "advanced": "Avanzado",
-      "community": "Comunidad",
       "deprecated": "Obsoleto",
       "inherited": "Heredado",
       "monitor": "Monitor",
-      "official": "Oficial",
       "override": "Sobrescrito"
     },
     "calendar-accounts": {
@@ -1525,13 +1510,6 @@
       "panel-position": {
         "auto": "Seguir barra"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Todos",
-          "none": "Ninguno",
-          "official": "Oficial"
-        }
-      },
       "screen-position": {
         "bottom-center": "Centro inferior",
         "bottom-left": "Inferior izquierda",
@@ -1619,104 +1597,6 @@
           "imperial": "Imperial",
           "metric": "Métrico"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Explorar plugins",
-      "panels": {
-        "layer": {
-          "description": "Capa de tipo «layer-shell» utilizada cuando el panel está flotando",
-          "label": "Capa"
-        },
-        "open-near-click": {
-          "description": "Posición del panel al abrirlo haciendo clic en el widget de la barra",
-          "label": "A lo largo de la barra"
-        },
-        "placement": {
-          "description": "Anclar el panel a la barra o flotarlo cerca del borde de la barra",
-          "label": "Ubicación"
-        },
-        "position": {
-          "description": "Posición en pantalla cuando el panel está flotando",
-          "label": "Posición"
-        }
-      },
-      "plugins": {
-        "configure": "Configurar",
-        "delete": "Eliminar",
-        "delete-confirm-desc": "Este complemento será desinstalado y removido del disco.",
-        "delete-confirm-title": "¿Borrar \"{name}\"?",
-        "deprecated": "obsoleto",
-        "empty": "No hay complementos activados.",
-        "held-back": "versión antigua",
-        "held-back-hint": "v{version} requiere la API de complementos {required}; esta versión de Noctalia admite hasta la {current}. Actualiza Noctalia para obtenerla.",
-        "incompatible-plugin-api": "API de complemento incompatible",
-        "remove": "Eliminar complemento",
-        "requires": "Requiere: {dependencies}",
-        "search-empty": "Ningún plugin coincide con «{query}».",
-        "search-placeholder": "Buscar complementos instalados",
-        "title": "Complementos",
-        "update-all": "Actualizar los ({count})",
-        "update-available": "actualización disponible",
-        "update-to": "actualizar a {version}"
-      },
-      "settings": {
-        "empty": "No hay configuraciones disponibles."
-      },
-      "sources": {
-        "add": "Añadir fuente",
-        "add-title": "Añadir fuente de complemento",
-        "auto-update": "Auto-actualizar plugins",
-        "auto-update-desc": "Comprobar si hay nuevas versiones en las fuentes habilitadas en segundo plano y mantener actualizados los complementos instalados",
-        "edit": "Editar fuente",
-        "edit-title": "Editar fuente del complemento",
-        "empty": "No hay fuentes configuradas.",
-        "errors": {
-          "duplicate-name": "Ya existe una fuente con este ID.",
-          "invalid-name": "El ID de fuente debe usar letras, dígitos, '.', '_' o '-', comenzando con una letra o dígito.",
-          "location-required": "Se requiere la ubicación de la fuente."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Ruta"
-        },
-        "kind-label": "Tipo",
-        "location-label": "Ubicación",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "ID de fuente",
-        "name-placeholder": "my-plugins",
-        "precedence-hint": "Las fuentes inferiores anulan a las superiores cuando ofrecen el mismo complemento.",
-        "remove": "Eliminar fuente",
-        "save": "Guardar",
-        "title": "Fuentes",
-        "update": "Actualizar fuente"
-      },
-      "store": {
-        "add": "Añadir a Noctalia",
-        "back-to-catalog": "Volver al catálogo de plugins",
-        "categories": "Categorías",
-        "category-all": "Todo",
-        "empty": "No se encontraron complementos",
-        "held-back": "Versión antigua",
-        "held-back-hint": "Instala la versión v{version} para la API de complemento {resolved}. La versión más reciente, v{latest}, requiere la API de plugin {latestRequired}; esta versión de Noctalia admite hasta la {current}.",
-        "incompatible": "Incompatible",
-        "incompatible-hint": "Requiere la API de complementos {required}; esta versión de Noctalia es compatible con {oldest}–{current}.",
-        "installed": "Instalado",
-        "loading": "Cargando catálogo…",
-        "no-readme": "No hay descripción disponible.",
-        "open-page": "Abrir la página de complementos en noctalia.dev",
-        "open-source": "Abrir repositorio del complemento",
-        "results-count": "{count} plugins",
-        "search-placeholder": "Buscar complementos…",
-        "sort-added-at-asc": "Ordenar por fecha de incorporación (de la más antigua a la más reciente)",
-        "sort-added-at-desc": "Ordenar por fecha de incorporación (los más recientes primero)",
-        "sort-name-asc": "Ordenar por nombre (A-Z)",
-        "sort-name-desc": "Ordenar por nombre (A-Z)",
-        "sort-updated-at-asc": "Ordenar por fecha de actualización (la más antigua primero)",
-        "sort-updated-at-desc": "Ordenar por fecha de actualización (de más reciente a más antiguo)",
-        "source-all": "Todas las fuentes",
-        "title": "Tienda de complementos"
       }
     },
     "schema": {
@@ -3855,14 +3735,6 @@
             "description": "Alternar un panel por ID, opcionalmente con contexto (por ejemplo, launcher /emo, control-center audio)",
             "label": "Alternar panel"
           },
-          "plugin": {
-            "description": "Enviar un evento a una entrada de un complemento",
-            "label": "Enviar evento del complemento"
-          },
-          "plugins": {
-            "description": "Administrar complementos y fuentes (listar/habilitar/deshabilitar/actualizar, listar/agregar/eliminar fuentes)",
-            "label": "Administrar complementos"
-          },
           "power-cycle": {
             "description": "Recorrer la lista de perfiles ordenados de UPower, avanzando por defecto (salto de línea)",
             "label": "Perfil de energía"
@@ -3894,10 +3766,6 @@
           "settings-open": {
             "description": "Abrir la ventana de configuración, o enfocarla si ya está abierta, opcionalmente en una sección específica",
             "label": "Abrir configuración"
-          },
-          "settings-open-plugin": {
-            "description": "Abrir la ventana de configuración en la configuración de un complemento (por ejemplo, noctalia/notes)",
-            "label": "Abrir la configuración del complemento"
           },
           "settings-open-widget": {
             "description": "Abrir la ventana de configuración en un widget de la barra; desde un gesto de widget, apunta a ese widget",
@@ -4774,8 +4642,6 @@
         "disable-hint": "Desactive el modo sin conexión en la sección de Seguridad.",
         "launcher": "La obtención del tipo de cambio no funcionará.",
         "location": "Las búsquedas de información meteorológica y ubicación no funcionarán.",
-        "plugin-store": "Las solicitudes de descarga y catálogo de complementos remotos no funcionarán.",
-        "plugins": "Las solicitudes HTTP del complemento no funcionarán. Las fuentes de Git aún se pueden actualizar.",
         "security": "La búsqueda de IP externa y la telemetría no funcionarán.",
         "template-store": "Las descargas de plantillas de la comunidad no funcionarán.",
         "templates": "Las descargas y actualizaciones de plantillas de la comunidad no funcionarán.",

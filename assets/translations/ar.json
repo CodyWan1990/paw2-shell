@@ -855,19 +855,6 @@
       "on": "Wi‑Fi مفعّل"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "تعرض الإضافة {plugin} لأخطاء كثيرة وتم تعطيلها. أعد تحميلها بعد إصلاح المشكلة.",
-      "body-timeouts": "توقفت الإضافة {plugin} عن الاستجابة وتم تعطيلها. أعد تحميلها بعد إصلاح المشكلة.",
-      "title": "تم تعطيل الإضافة"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} يستهدف واجهة API للإضافات {version}؛ يدعم هذا الإصدار من Noctalia واجهة API من {oldest} إلى {current}.",
-      "body-timeout": "استغرق تثبيت {plugin} وقتاً طويلاً.",
-      "title": "لم يتم تفعيل الإضافة"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -917,11 +904,9 @@
     },
     "badges": {
       "advanced": "متقدم",
-      "community": "مجتمعي",
       "deprecated": "مهجور",
       "inherited": "موروث",
       "monitor": "الشاشة",
-      "official": "رسمي",
       "override": "تجاوز"
     },
     "calendar-accounts": {
@@ -1411,13 +1396,6 @@
       "panel-position": {
         "auto": "متابعة الشريط"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "الكل",
-          "none": "لا شيء",
-          "official": "الرسمية"
-        }
-      },
       "screen-position": {
         "bottom-center": "أسفل الوسط",
         "bottom-left": "أسفل اليسار",
@@ -1501,102 +1479,6 @@
           "imperial": "إمبراطوري",
           "metric": "متري"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "تصفح الإضافات",
-      "panels": {
-        "layer": {
-          "description": "طبقة الغلاف المستخدمة عندما تكون اللوحة عائمة",
-          "label": "طبقة"
-        },
-        "open-near-click": {
-          "description": "فتح اللوحة بالقرب من ودجت الذي أنشطها",
-          "label": "الفتح بالقرب من النقر"
-        },
-        "placement": {
-          "description": "ربط اللوحة بالشريط أو جعلها تعوم بالقرب من حافته",
-          "label": "الموضع"
-        },
-        "position": {
-          "description": "موقع الشاشة عندما تكون اللوحة عائمة",
-          "label": "الموقع"
-        }
-      },
-      "plugins": {
-        "configure": "تكوين",
-        "delete": "حذف",
-        "delete-confirm-desc": "سيتم إلغاء تثبيت هذه الإضافة وإزالتها من القرص.",
-        "delete-confirm-title": "حذف \"{name}\"؟",
-        "deprecated": "مهجور",
-        "empty": "لا توجد إضافات مفعّلة.",
-        "held-back": "إصدار أقدم",
-        "held-back-hint": "يحتاج v{version} إلى واجهة API للإضافات {required}؛ هذا الإصدار من Noctalia يدعم حتى {current}. قم بترقية Noctalia للحصول عليه.",
-        "incompatible-plugin-api": "واجهة API للإضافات غير متوافقة",
-        "remove": "إزالة الإضافة",
-        "requires": "يتطلب: {dependencies}",
-        "title": "الإضافات",
-        "update-all": "تحديث الكل ({count})",
-        "update-available": "يتوفر تحديث",
-        "update-to": "التحديث إلى {version}"
-      },
-      "settings": {
-        "empty": "لا توجد إعدادات متاحة."
-      },
-      "sources": {
-        "add": "إضافة مصدر",
-        "add-title": "إضافة مصدر إضافات",
-        "auto-update": "تحديث الإضافات تلقائياً",
-        "auto-update-desc": "التحقق من المصادر المفعّلة عن إصدارات جديدة في الخلفية والحفاظ على تحديث الإضافات المثبتة",
-        "edit": "تعديل المصدر",
-        "edit-title": "تعديل مصدر الإضافات",
-        "empty": "لم يتم تكوين أي مصادر.",
-        "errors": {
-          "duplicate-name": "يوجد مصدر بهذا المعرف بالفعل.",
-          "invalid-name": "يجب أن يستخدم المعرف أحرفاً أو أرقاماً أو '.' أو '_' أو '-' بدءاً بحرف أو رقم.",
-          "location-required": "مسار المصدر مطلوب."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "مسار"
-        },
-        "kind-label": "النوع",
-        "location-label": "الموقع",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "معرّف المصدر",
-        "name-placeholder": "إضافاتي",
-        "precedence-hint": "المصادر الأدنى تتجاوز الأعلى عندما تقدم نفس الإضافة.",
-        "remove": "إزالة المصدر",
-        "save": "حفظ",
-        "title": "المصادر",
-        "update": "تحديث"
-      },
-      "store": {
-        "add": "إضافة إلى Noctalia",
-        "back-to-catalog": "العودة إلى كتالوج الإضافات",
-        "categories": "الفئات",
-        "category-all": "الكل",
-        "empty": "لم يتم العثور على إضافات",
-        "held-back": "إصدار أقدم",
-        "held-back-hint": "يثبّت v{version} لواجهة API للإضافات {resolved}. يتطلب أحدث إصدار v{latest} واجهة API للإضافات {latestRequired}؛ ويدعم هذا الإصدار من Noctalia حتى {current}.",
-        "incompatible": "غير متوافق",
-        "incompatible-hint": "يتطلب واجهة API للإضافات {required}؛ ويدعم هذا الإصدار من Noctalia من {oldest} إلى {current}.",
-        "installed": "مثبت",
-        "loading": "جاري تحميل الكتالوج...",
-        "no-readme": "لا يوجد وصف متاح.",
-        "open-page": "فتح صفحة الإضافة على noctalia.dev",
-        "open-source": "فتح مستودع مصدر الإضافة",
-        "results-count": "{count} إضافة",
-        "search-placeholder": "البحث في الإضافات...",
-        "sort-added-at-asc": "الترتيب حسب تاريخ الإضافة (الأقدم أولاً)",
-        "sort-added-at-desc": "الترتيب حسب تاريخ الإضافة (الأحدث أولاً)",
-        "sort-name-asc": "الترتيب حسب الاسم (أ-ي)",
-        "sort-name-desc": "الترتيب حسب الاسم (ي-أ)",
-        "sort-updated-at-asc": "الترتيب حسب تاريخ التحديث (الأقدم أولاً)",
-        "sort-updated-at-desc": "الترتيب حسب تاريخ التحديث (الأحدث أولاً)",
-        "source-all": "جميع المصادر",
-        "title": "متجر الإضافات"
       }
     },
     "schema": {
@@ -4077,8 +3959,6 @@
         "disable-hint": "عطّل وضع عدم الاتصال في قسم الأمان.",
         "launcher": "لن يعمل جلب أسعار صرف العملات.",
         "location": "لن تعمل عمليات البحث عن الطقس والموقع.",
-        "plugin-store": "لن تعمل طلبات كتالوج الإضافات عن بُعد وتنزيلها.",
-        "plugins": "لن تعمل طلبات HTTP الخاصة بالإضافات. لا تزال مصادر Git قادرة على التحديث.",
         "security": "لن يعمل البحث عن IP الخارجي والقياس عن بُعد.",
         "template-store": "لن تعمل تنزيلات قوالب المجتمع.",
         "templates": "لن تعمل تنزيلات قوالب المجتمع وتحديثاتها.",

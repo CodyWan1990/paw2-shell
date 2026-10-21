@@ -132,7 +132,7 @@ void setResolvedThemeLight(bool light) noexcept;
 
 void setPalette(const Palette& p);
 
-// Snapshot accessor safe to call from non-main threads (e.g. plugin script workers).
+// Snapshot accessor safe to call from non-main threads (e.g. worker threads).
 [[nodiscard]] Color colorForRoleSnapshot(ColorRole role);
 
 [[nodiscard]] inline ColorSpec scrollbarTrackColor() noexcept {

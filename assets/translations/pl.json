@@ -1208,39 +1208,6 @@
         }
       }
     },
-    "plugins": {
-      "plugins": {
-        "configure": "Skonfiguruj",
-        "empty": "Brak włączonych wtyczek.",
-        "title": "Wtyczki"
-      },
-      "settings": {
-        "empty": "Brak dostępnych ustawień."
-      },
-      "sources": {
-        "add": "Dodaj Źródło",
-        "add-title": "Dodaj Źródło Wtyczek",
-        "empty": "Źródło nie skonfigurowane.",
-        "errors": {
-          "duplicate-name": "Źródło z tym ID już istnieje.",
-          "invalid-name": "ID Źródła musi zawierać litery, cyfry, '.', '_' albo '-', zaczynając od litery lub cyfry.",
-          "location-required": "Lokalizacja źródła jest wymagana."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Ścieżka"
-        },
-        "kind-label": "Rodzaj",
-        "location-label": "Lokalizacja",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "ID Źródła",
-        "name-placeholder": "moje-wtyczki",
-        "remove": "Usuń źródło",
-        "title": "Źródła",
-        "update": "Aktualizacja źródła"
-      }
-    },
     "schema": {
       "appearance": {
         "animation-speed": {

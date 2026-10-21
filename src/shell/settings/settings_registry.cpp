@@ -113,7 +113,6 @@ namespace settings {
         {SettingsSection::Paw2Displays, "paw2-displays", "device-desktop"},
         {SettingsSection::Paw2Shortcuts, "paw2-shortcuts", "keyboard"},
         {SettingsSection::Bar, "bar", "crop-3-2", false},
-        {SettingsSection::Plugins, "plugins", "puzzle", true, true},
     }};
 
     const SettingsSectionDescriptor& descriptorFor(SettingsSection section) {
@@ -348,7 +347,7 @@ namespace settings {
         if (!ShortcutRegistry::isAvailable(shortcut.type, cfg)) {
           continue;
         }
-        std::string label = shortcut.literalLabel ? std::move(shortcut.labelKey) : i18n::tr(shortcut.labelKey);
+        std::string label = i18n::tr(shortcut.labelKey);
         opts.push_back(SelectOption{std::move(shortcut.type), std::move(label)});
       }
       return opts;

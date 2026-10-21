@@ -42,7 +42,6 @@
 #include "launcher/emoji_provider.h"
 #include "launcher/math_provider.h"
 #include "launcher/panel_provider.h"
-#include "launcher/plugin_launcher_provider.h"
 #include "launcher/session_provider.h"
 #include "launcher/wallpaper_provider.h"
 #include "launcher/window_provider.h"
@@ -56,17 +55,11 @@
 #include "render/backend/render_backend.h"
 #include "render/core/texture_manager.h"
 #include "render/text/font_weight_catalog.h"
-#include "scripting/plugin_ipc.h"
-#include "scripting/plugin_manifest.h"
-#include "scripting/plugin_panel_shell.h"
-#include "scripting/plugin_registry.h"
-#include "scripting/plugin_runtime_context.h"
 #include "shell/clipboard/clipboard_panel.h"
 #include "shell/clipboard/clipboard_paste.h"
 #include "shell/control_center/control_center_panel.h"
 #include "shell/greeter/greeter_appearance_sync.h"
 #include "shell/launcher/launcher_panel.h"
-#include "shell/panel/plugin_panel.h"
 #include "shell/polkit/polkit_panel.h"
 #include "shell/screenshot/screenshot_action_panel.h"
 #include "shell/session/session_ipc.h"
@@ -140,8 +133,6 @@ void Application::initUiRenderSurfacesAndSettings() {
       m_wayland, &m_configService, &m_renderContext, &m_dependencyService, m_upowerService.get(), &m_idleManager,
       &m_compositorPlatform, m_accountsService.get()
   );
-  m_settingsWindow.setPluginManager(&m_pluginManager);
-  m_settingsWindow.setPluginRecommendations(&m_pluginRecommendations);
   m_settingsWindow.setIpcService(&m_ipcService);
   m_settingsWindow.setAsyncTextureCache(&m_asyncTextureCache);
   m_settingsWindow.setOpenDesktopWidgetEditor([this]() {
@@ -612,7 +603,6 @@ void Application::initPanelManagerAndPanels() {
       .ipc = &m_ipcService,
       .wallpaper = &m_wallpaper,
       .calendar = &m_calendarService,
-      .scriptApi = &m_scriptApi,
       .fileWatcher = &m_fileWatcher,
       .clipboard = &m_clipboardService,
       .accounts = m_accountsService.get(),
@@ -673,9 +663,7 @@ void Application::initPanelManagerAndPanels() {
         i18n::tr("notifications.internal.screen-time-reset-success")
     );
   });
-  reloadPluginLauncherProviders();
   reloadDmenuProviders();
-  reloadPluginPanels();
   m_compositorPlatform.setOverviewChangeCallback([this]() {
     m_bar.scheduleSmartAutoHideReevaluation();
     m_dock.scheduleSmartAutoHideReevaluation();
@@ -878,14 +866,10 @@ void Application::initBarDockAndLayout() {
       .clipboard = &m_clipboardService,
       .fileWatcher = &m_fileWatcher,
       .screenshots = &m_screenshotService,
-      .scriptApi = &m_scriptApi,
   });
   m_idleInhibitor.setAnchorSurfacesProvider([this]() { return m_bar.caffeineAnchorSurfaces(); });
   m_panelManager.setOpenWidgetSettingsCallback([this](std::string barName, std::string widgetName) {
     m_settingsWindow.openToBarWidget(std::move(barName), std::move(widgetName));
-  });
-  m_panelManager.setOpenPluginSettingsCallback([this](std::string pluginId) {
-    return m_settingsWindow.openToPlugin(std::move(pluginId));
   });
   m_panelManager.setAttachedPanelGeometryCallback(
       [this](wl_output* output, std::string_view barName, std::optional<AttachedPanelGeometry> geometry) {
@@ -974,12 +958,6 @@ void Application::initWidgetControllersAndCallbacks() {
   auto shouldRefreshControlCenter = [this]() { return m_panelManager.isOpenPanel("control-center"); };
 
   m_dock.initialize(m_compositorPlatform, &m_configService, &m_renderContext);
-  const DesktopWidgetScriptDeps desktopWidgetScriptDeps{
-      .scriptApi = &m_scriptApi,
-      .fileWatcher = &m_fileWatcher,
-      .clipboard = &m_clipboardService,
-      .configService = &m_configService,
-  };
   const DesktopWidgetRuntimeServices desktopWidgetRuntime{
       .calendar = &m_calendarService,
       .pipewire = m_pipewireService.get(),
@@ -988,7 +966,7 @@ void Application::initWidgetControllersAndCallbacks() {
       .mpris = m_mprisService.get(),
       .httpClient = &m_httpClient,
       .sysmon = m_systemMonitor.get(),
-      .scriptDeps = desktopWidgetScriptDeps,
+      .config = &m_configService,
   };
   const DesktopWidgetServices lockscreenWidgetServices{
       .wayland = m_wayland,

@@ -48,7 +48,6 @@ Provided by system packages at build time and linked dynamically where applicabl
 Bundled in `third_party/` and built from source:
 
 - **[fzy](https://github.com/jhawthorn/fzy)** — Fuzzy matching algorithm used by the launcher, search pickers, and other shell ranking (MIT)
-- **[Luau](https://luau.org/)** — Lua dialect used for scripting (MIT)
 - **[Material Color Utilities](https://github.com/material-foundation/material-color-utilities)** — Material 3 palette generation (Apache-2.0)
 - **[Wuffs](https://github.com/google/wuffs)** — Memory-safe image decoders (Apache-2.0)
 

@@ -839,19 +839,6 @@
       "on": "WLAN ein"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} hat zu viele Fehler verursacht und wurde deaktiviert. Lade es nach der Behebung des Problems neu.",
-      "body-timeouts": "{plugin} reagiert nicht mehr und wurde deaktiviert. Lade es nach der Behebung des Problems neu.",
-      "title": "Plugin deaktiviert"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} erfordert Plugin-API {version}; diese Noctalia-Version unterstützt API {oldest}–{current}.",
-      "body-timeout": "{plugin} hat zu lange zum Installieren benötigt.",
-      "title": "Plugin nicht aktiviert"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -901,11 +888,9 @@
     },
     "badges": {
       "advanced": "Erweitert",
-      "community": "Community",
       "deprecated": "Veraltet",
       "inherited": "Geerbt",
       "monitor": "Monitor",
-      "official": "Offiziell",
       "override": "Überschreiben"
     },
     "calendar-accounts": {
@@ -1392,13 +1377,6 @@
       "panel-position": {
         "auto": "Leiste folgen"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Alle Quellen",
-          "none": "Keine",
-          "official": "Nur offizielle"
-        }
-      },
       "screen-position": {
         "bottom-center": "Unten mittig",
         "bottom-left": "Unten links",
@@ -1479,97 +1457,6 @@
           "imperial": "Imperial",
           "metric": "Metrisch"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Plugins durchsuchen",
-      "panels": {
-        "open-near-click": {
-          "description": "Wo das Panel platziert wird, wenn es durch Klicken auf das Leisten-Widget geöffnet wird",
-          "label": "An der Leiste"
-        },
-        "placement": {
-          "description": "Hefte das Panel an die Leiste an oder lasse es in der Nähe des Leistenrands schweben",
-          "label": "Platzierung"
-        },
-        "position": {
-          "description": "Bildschirmposition des schwebenden Panels",
-          "label": "Position"
-        }
-      },
-      "plugins": {
-        "configure": "Konfigurieren",
-        "delete": "Löschen",
-        "delete-confirm-desc": "Dieses Plugin wird deinstalliert und von der Festplatte entfernt.",
-        "delete-confirm-title": "\"{name}\" löschen?",
-        "deprecated": "veraltet",
-        "empty": "Keine aktivierten Plugins.",
-        "held-back": "ältere Version",
-        "held-back-hint": "v{version} benötigt Plugin-API {required}; diese Noctalia-Version unterstützt bis zu {current}. Aktualisiere Noctalia, um es zu erhalten.",
-        "incompatible-plugin-api": "inkompatible Plugin-API",
-        "remove": "Plugin entfernen",
-        "requires": "Erfordert: {dependencies}",
-        "title": "Plugins",
-        "update-all": "Alle aktualisieren ({count})",
-        "update-available": "Update verfügbar",
-        "update-to": "auf {version} aktualisieren"
-      },
-      "settings": {
-        "empty": "Keine Einstellungen verfügbar."
-      },
-      "sources": {
-        "add": "Quelle hinzufügen",
-        "add-title": "Plugin-Quelle hinzufügen",
-        "auto-update": "Plugins automatisch aktualisieren",
-        "auto-update-desc": "Überprüfe aktivierte Quellen im Hintergrund auf neue Versionen und halte installierte Plugins aktuell",
-        "edit": "Quelle bearbeiten",
-        "edit-title": "Plugin-Quelle bearbeiten",
-        "empty": "Keine Quellen konfiguriert.",
-        "errors": {
-          "duplicate-name": "Eine Quelle mit dieser ID existiert bereits.",
-          "invalid-name": "Quell-ID muss aus Buchstaben, Ziffern, '.', '_' oder '-' bestehen und mit einem Buchstaben oder einer Ziffer beginnen.",
-          "location-required": "Speicherort ist erforderlich."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Pfad"
-        },
-        "kind-label": "Typ",
-        "location-label": "Speicherort",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "Quell-ID",
-        "name-placeholder": "my-plugins",
-        "precedence-hint": "Niedrigere Quellen überschreiben höhere, wenn sie dasselbe Plugin anbieten.",
-        "remove": "Quelle entfernen",
-        "save": "Speichern",
-        "title": "Quellen",
-        "update": "Quelle aktualisieren"
-      },
-      "store": {
-        "add": "Zu Noctalia hinzufügen",
-        "back-to-catalog": "Zurück zum Plugin-Katalog",
-        "categories": "Kategorien",
-        "category-all": "Alle",
-        "empty": "Keine Plugins gefunden",
-        "held-back": "Ältere Version",
-        "held-back-hint": "Installiert v{version} für Plugin-API {resolved}. Das neueste v{latest} benötigt Plugin-API {latestRequired}; diese Noctalia-Version unterstützt bis zu {current}.",
-        "incompatible": "Inkompatibel",
-        "incompatible-hint": "Benötigt Plugin-API {required}; diese Noctalia-Version unterstützt {oldest}–{current}.",
-        "loading": "Katalog wird geladen…",
-        "no-readme": "Keine Beschreibung vorhanden.",
-        "open-page": "Plugin-Seite auf noctalia.dev öffnen",
-        "open-source": "Quell-Repository des Plugins öffnen",
-        "results-count": "{count} Plugins",
-        "search-placeholder": "Suche Plugins…",
-        "sort-added-at-asc": "Nach Hinzufügedatum sortieren (älteste zuerst)",
-        "sort-added-at-desc": "Nach Hinzufügedatum sortieren (neueste zuerst)",
-        "sort-name-asc": "Nach Name sortieren (A-Z)",
-        "sort-name-desc": "Nach Name sortieren (Z-A)",
-        "sort-updated-at-asc": "Nach Aktualisierungsdatum sortieren (älteste zuerst)",
-        "sort-updated-at-desc": "Nach Aktualisierungsdatum sortieren (neueste zuerst)",
-        "source-all": "Alle Quellen",
-        "title": "Plugin Store"
       }
     },
     "schema": {
@@ -3952,8 +3839,6 @@
         "disable-hint": "Deaktiviere den Offline-Modus im Abschnitt Sicherheit.",
         "launcher": "Das Abrufen von Währungskursen wird nicht funktionieren.",
         "location": "Wetter- und Standortabfragen werden nicht funktionieren.",
-        "plugin-store": "Fernzugriff auf den Plugin-Katalog und Download-Anfragen werden nicht funktionieren.",
-        "plugins": "Plugin-HTTP-Anfragen werden nicht funktionieren; Git-Quellen können weiterhin aktualisiert werden.",
         "security": "Externe IP-Abfrage und Telemetrie werden nicht funktionieren.",
         "template-store": "Community-Template-Downloads werden nicht funktionieren.",
         "templates": "Community-Template-Downloads und -Aktualisierungen werden nicht funktionieren.",

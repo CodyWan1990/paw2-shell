@@ -955,19 +955,6 @@
       "on": "Wi-Fi 已开启"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} 因错误过多已被禁用。请修复问题后重新加载。",
-      "body-timeouts": "{plugin} 因停止响应已被禁用。请修复问题后重新加载。",
-      "title": "插件已禁用"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}：{error}",
-      "body-incompatible": "{plugin} 面向插件 API {version}；当前 Noctalia 仅支持 API {oldest}–{current}。",
-      "body-timeout": "{plugin} 安装超时。",
-      "title": "插件启用失败"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -1017,11 +1004,9 @@
     },
     "badges": {
       "advanced": "高级",
-      "community": "社区",
       "deprecated": "已弃用",
       "inherited": "已继承",
       "monitor": "屏幕",
-      "official": "官方",
       "override": "已覆盖"
     },
     "calendar-accounts": {
@@ -1534,13 +1519,6 @@
       "panel-position": {
         "auto": "跟随状态栏"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "所有源",
-          "none": "无",
-          "official": "仅官方源"
-        }
-      },
       "screen-position": {
         "bottom-center": "底部居中",
         "bottom-left": "左下角",
@@ -1628,117 +1606,6 @@
           "imperial": "英制",
           "metric": "公制"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "浏览插件",
-      "panels": {
-        "layer": {
-          "description": "面板处于浮动模式时使用的 layer-shell 层级",
-          "label": "层级"
-        },
-        "open-near-click": {
-          "description": "面板相对于状态栏的显示位置",
-          "label": "相对状态栏"
-        },
-        "placement": {
-          "description": "将面板附着于状态栏，或在状态栏边缘附近浮动",
-          "label": "显示模式"
-        },
-        "position": {
-          "description": "面板悬浮时的屏幕位置",
-          "label": "屏幕位置"
-        }
-      },
-      "plugins": {
-        "configure": "配置",
-        "delete": "删除",
-        "delete-confirm-desc": "该插件将被卸载，并从磁盘中删除。",
-        "delete-confirm-title": "确认删除“{name}”？",
-        "deprecated": "已弃用",
-        "empty": "未启用任何插件。",
-        "held-back": "较旧版本",
-        "held-back-hint": "v{version} 需要插件 API {required}；当前 Noctalia 最高支持 API {current}。请升级 Noctalia 以使用该版本。",
-        "incompatible-plugin-api": "插件 API 不兼容",
-        "remove": "移除插件",
-        "requires": "依赖：{dependencies}",
-        "search-empty": "没有找到与“{query}”匹配的插件。",
-        "search-placeholder": "搜索已安装插件",
-        "title": "插件",
-        "update-all": "全部更新（{count}）",
-        "update-available": "有可用更新",
-        "update-to": "更新至 {version}"
-      },
-      "settings": {
-        "empty": "无可用设置。"
-      },
-      "sources": {
-        "add": "添加源",
-        "add-title": "添加插件源",
-        "auto-update": "自动更新插件",
-        "auto-update-desc": "在后台检查已启用的源是否有更新，并使已安装插件保持最新版本",
-        "edit": "编辑源",
-        "edit-title": "编辑插件源",
-        "empty": "未配置任何源。",
-        "errors": {
-          "duplicate-name": "已存在相同 ID 的源。",
-          "invalid-name": "源 ID 仅限字母、数字、\".\"、\"_\" 或 \"-\"，且必须以字母或数字开头。",
-          "location-required": "必须填写源位置。"
-        },
-        "kind": {
-          "git": "Git",
-          "path": "路径"
-        },
-        "kind-label": "类型",
-        "location-label": "位置",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "源 ID",
-        "name-placeholder": "my-plugins",
-        "precedence-hint": "若多个源提供同一插件，列表中靠下的源将覆盖靠上的源。",
-        "remove": "移除源",
-        "save": "保存",
-        "title": "源",
-        "update": "更新源"
-      },
-      "store": {
-        "add": "添加到 Noctalia",
-        "back-to-catalog": "返回插件目录",
-        "categories": "类别",
-        "category-all": "全部",
-        "empty": "未找到插件",
-        "held-back": "较旧版本",
-        "held-back-hint": "将安装适用于插件 API {resolved} 的 {version} 版本。最新版本 {latest} 需要插件 API {latestRequired}；当前 Noctalia 最高支持 API {current}。",
-        "incompatible": "不兼容",
-        "incompatible-hint": "需要插件 API {required}；当前 Noctalia 仅支持 API {oldest}–{current}。",
-        "installed": "已安装",
-        "loading": "正在加载目录…",
-        "no-readme": "没有可用的描述。",
-        "not-listed": "未列出",
-        "open-page": "在 noctalia.dev 上打开插件页面",
-        "open-source": "打开插件源码仓库",
-        "recommend": "推荐",
-        "recommendation-error": "更改未确认。您之前的推荐保持不变。请重试相同更改以同步状态。",
-        "recommendation-not-recommendable": "此插件无法接受此推荐。",
-        "recommendation-pending": "正在发送推荐…",
-        "recommendation-protocol-error": "服务返回了意外响应。您之前的推荐保持不变。",
-        "recommendation-rate-limited": "请求过多。请稍候再重试此更改。",
-        "recommendation-retry": "重试推荐更改",
-        "recommendation-state-error": "无法读取或保存推荐状态。请检查 state.toml 后重试。",
-        "recommendation-unavailable": "推荐暂时不可用。您之前的推荐保持不变。您可以稍后重试。",
-        "remove-recommendation": "取消推荐",
-        "results-count": "共 {count} 个插件",
-        "search-placeholder": "搜索插件…",
-        "sort-added-at-asc": "按添加日期排序（最旧优先）",
-        "sort-added-at-desc": "按添加日期排序（最新优先）",
-        "sort-most-recommended": "最多推荐",
-        "sort-name-asc": "按名称排序（A-Z）",
-        "sort-name-desc": "按名称排序（Z-A）",
-        "sort-trending": "热门",
-        "sort-updated-at-asc": "按更新日期排序（最旧优先）",
-        "sort-updated-at-desc": "按更新日期排序（最新优先）",
-        "source-all": "全部",
-        "title": "插件商店"
       }
     },
     "schema": {
@@ -3889,14 +3756,6 @@
             "description": "按 ID 切换指定面板，可附带上下文（如 launcher /emo、control-center audio）",
             "label": "切换面板"
           },
-          "plugin": {
-            "description": "向插件入口分发事件",
-            "label": "发送插件事件"
-          },
-          "plugins": {
-            "description": "管理插件和源（列出/启用/禁用/更新插件，列出/添加/移除源）",
-            "label": "管理插件"
-          },
           "power-cycle": {
             "description": "依次切换 UPower 配置列表，默认向前循环",
             "label": "循环切换电源配置"
@@ -3928,10 +3787,6 @@
           "settings-open": {
             "description": "打开设置窗口；若已打开则聚焦，可选择跳转到指定设置分组",
             "label": "打开设置"
-          },
-          "settings-open-plugin": {
-            "description": "打开设置窗口并显示插件设置（如 noctalia/notes）",
-            "label": "打开插件设置"
           },
           "settings-open-widget": {
             "description": "打开设置窗口并显示状态栏小组件设置；从小组件操作触发时，显示对应小组件设置",
@@ -4812,8 +4667,6 @@
         "disable-hint": "可以在“安全”设置中禁用“离线模式”。",
         "launcher": "无法获取货币汇率。",
         "location": "无法查询天气和位置。",
-        "plugin-store": "无法访问远程插件目录和下载插件。",
-        "plugins": "无法发起插件 HTTP 请求。Git 源仍可更新。",
         "security": "无法查询外部 IP 或发送遥测数据。",
         "template-store": "无法下载社区模板。",
         "templates": "无法下载和更新社区模板。",

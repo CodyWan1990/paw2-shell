@@ -11,10 +11,6 @@
 #include "idle/idle_inhibitor.h"
 #include "notification/notification_manager.h"
 #include "pipewire/pipewire_service.h"
-#include "scripting/plugin_manifest.h"
-#include "scripting/plugin_registry.h"
-#include "scripting/plugin_runtime_context.h"
-#include "shell/control_center/plugin_shortcut.h"
 #include "shell/control_center/shortcut_services.h"
 #include "shell/keyboard_layout_label.h"
 #include "shell/panel/panel_manager.h"
@@ -568,19 +564,11 @@ namespace {
 } // namespace
 
 std::vector<ShortcutRegistry::CatalogEntry> ShortcutRegistry::catalog() {
-  // Built-in shortcuts plus every currently active plugin [[shortcut]] entry.
-  auto result = kBuiltinShortcuts
+  return kBuiltinShortcuts
       | std::views::transform([](const BuiltinShortcutDescriptor& shortcut) {
                   return CatalogEntry{.type = std::string(shortcut.type), .labelKey = std::string(shortcut.labelKey)};
                 })
       | std::ranges::to<std::vector>();
-  scripting::PluginRegistry::instance().ensureScanned();
-  for (const auto& entry : scripting::PluginRegistry::instance().entriesOfKind(scripting::PluginEntryKind::Shortcut)) {
-    std::string id = entry.fullId();
-    std::string label = entry.manifest->name.empty() ? id : entry.manifest->name;
-    result.push_back(CatalogEntry{.type = std::move(id), .labelKey = std::move(label), .literalLabel = true});
-  }
-  return result;
 }
 
 bool ShortcutRegistry::isAvailable(std::string_view type, const Config& config) {
@@ -589,33 +577,6 @@ bool ShortcutRegistry::isAvailable(std::string_view type, const Config& config) 
 }
 
 std::unique_ptr<Shortcut> ShortcutRegistry::create(std::string_view type, const ShortcutServices& s) {
-  if (auto entry = scripting::PluginRegistry::instance().resolve(type);
-      entry.has_value() && entry->entry->kind == scripting::PluginEntryKind::Shortcut) {
-    if (s.scriptApi == nullptr) {
-      return nullptr;
-    }
-    auto seeded = scripting::seedEntrySettings(*entry->entry, {});
-    static const std::unordered_map<std::string, WidgetSettingValue> kNoPluginOverrides;
-    const auto* overrides = &kNoPluginOverrides;
-    if (s.config != nullptr) {
-      const auto& pluginSettings = s.config->config().plugins.pluginSettings;
-      if (const auto psIt = pluginSettings.find(entry->manifest->id); psIt != pluginSettings.end()) {
-        overrides = &psIt->second;
-      }
-    }
-    scripting::mergePluginSettings(*entry->manifest, *overrides, seeded);
-    return std::make_unique<PluginShortcut>(scripting::PluginRuntimeContext{
-        .entryId = entry->fullId(),
-        .sourcePath = entry->sourcePath,
-        .pluginDir = entry->pluginDir,
-        .settings = std::move(seeded),
-        .scriptApi = *s.scriptApi,
-        .fileWatcher = s.fileWatcher,
-        .httpClient = s.httpClient,
-        .clipboard = s.clipboard,
-        .platform = s.platform,
-    });
-  }
   const auto* shortcut = findBuiltinShortcut(type);
   if (shortcut == nullptr || (s.config != nullptr && !isAvailable(type, s.config->config()))) {
     return nullptr;

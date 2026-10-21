@@ -484,10 +484,6 @@ void GlesRenderBackend::setBlendMode(RenderBlendMode mode) {
     glEnable(GL_BLEND);
     glBlendFuncSeparate(GL_ONE, GL_ONE_MINUS_SRC_ALPHA, GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     break;
-  case RenderBlendMode::DestinationOut:
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_ZERO, GL_ONE_MINUS_SRC_ALPHA);
-    break;
   }
   m_blendMode = mode;
 }
@@ -643,11 +639,6 @@ void GlesRenderBackend::drawWallpaper(const WallpaperDrawParams& params) {
   m_wallpaperProgram.draw(params);
 }
 
-void GlesRenderBackend::drawWallpaperMask(const WallpaperMaskDrawParams& params) {
-  m_wallpaperMaskProgram.ensureInitialized();
-  m_wallpaperMaskProgram.draw(params);
-}
-
 void GlesRenderBackend::drawLockscreenTransition(const LockscreenTransitionDrawParams& params) {
   m_lockscreenTransitionProgram.ensureInitialized();
   m_lockscreenTransitionProgram.draw(params);
@@ -713,7 +704,6 @@ void GlesRenderBackend::destroyGpuObjects() {
   m_effectProgram.destroy();
   m_graphProgram.destroy();
   m_wallpaperProgram.destroy();
-  m_wallpaperMaskProgram.destroy();
   m_lockscreenTransitionProgram.destroy();
   m_blurProgram.destroy();
   m_fullscreenTextureProgram.destroy();
@@ -733,7 +723,6 @@ void GlesRenderBackend::abandonGpuObjects() noexcept {
   m_effectProgram.abandon();
   m_graphProgram.abandon();
   m_wallpaperProgram.abandon();
-  m_wallpaperMaskProgram.abandon();
   m_lockscreenTransitionProgram.abandon();
   m_blurProgram.abandon();
   m_fullscreenTextureProgram.abandon();

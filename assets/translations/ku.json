@@ -575,11 +575,6 @@
       "on": "Wi-Fi neçalak e"
     }
   },
-  "plugins": {
-    "enable-failed": {
-      "body-error": "{plugin}: {error}"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -623,9 +618,7 @@
       "reset": "Ji nû ve saz bike"
     },
     "badges": {
-      "advanced": "Pêşketî",
-      "community": "Civak",
-      "official": "Fermî"
+      "advanced": "Pêşketî"
     },
     "calendar-accounts": {
       "color-label": "Reng",
@@ -918,35 +911,6 @@
           "crop": "Jê bike",
           "repeat": "Dûbare bike"
         }
-      }
-    },
-    "plugins": {
-      "plugins": {
-        "delete": "Jê bibe",
-        "delete-confirm-title": "\"{name}\" jê bibe?",
-        "title": "Pêvek"
-      },
-      "sources": {
-        "edit": "Çavkaniyê biguhêrîne",
-        "edit-title": "Çavkaniya pêvekê biguhêrîne",
-        "kind": {
-          "git": "Git",
-          "path": "Rêgeh"
-        },
-        "kind-label": "Kind",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "Çavkaniya NB",
-        "remove": "Çavkaniyê rake",
-        "save": "Tomar bike",
-        "title": "Çavkanî",
-        "update": "Rojane bike"
-      },
-      "store": {
-        "add": "Tevlî Noctalia bike",
-        "categories": "Beş",
-        "category-all": "Hemû",
-        "title": "Markêta pêvekan"
       }
     },
     "schema": {

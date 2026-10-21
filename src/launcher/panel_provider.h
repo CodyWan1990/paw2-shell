@@ -6,7 +6,7 @@ class PanelManager;
 class ControlCenterPanel;
 class ConfigService;
 
-// Lists every panel PanelManager knows about (built-in or plugin-registered),
+// Lists every panel PanelManager knows about,
 // plus Control Center's currently-visible tabs as their own rows, and toggles
 // whichever one is selected. Names/glyphs come from panel_catalog; ids in
 // shell.launcher.panels.ignored are left out.

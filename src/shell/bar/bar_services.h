@@ -29,10 +29,6 @@ class GammaService;
 namespace noctalia::theme {
   class ThemeService;
 }
-namespace scripting {
-  class ScriptApiContext;
-}
-
 struct BarServices {
   CompositorPlatform& platform;
   ConfigService& config;
@@ -60,5 +56,4 @@ struct BarServices {
   ClipboardService* clipboard = nullptr;
   FileWatcher* fileWatcher = nullptr;
   ScreenshotService* screenshots = nullptr;
-  scripting::ScriptApiContext* scriptApi = nullptr;
 };

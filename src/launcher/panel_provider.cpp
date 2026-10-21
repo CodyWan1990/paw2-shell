@@ -19,8 +19,7 @@ namespace {
 
   constexpr std::size_t kMaxResults = 50;
   // Synthetic id prefix for a Control Center tab row ("cc-tab:media"). Never
-  // collides with a real panel id: built-ins have no colon and plugin ids are
-  // "author/plugin:entry" (a slash always precedes the colon).
+  // collides with a real panel id: those have no colon.
   constexpr std::string_view kControlCenterTabPrefix = "cc-tab:";
 
 } // namespace

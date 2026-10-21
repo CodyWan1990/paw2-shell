@@ -106,7 +106,7 @@ private:
   std::function<void()> m_onDismissed;
   ShellConfig::ShadowConfig m_shadowConfig;
   // Deferred popup callbacks must not dereference this after an owner (for
-  // example, a plugin panel being unregistered) destroys the popup.
+  // example, a panel being unregistered) destroys the popup.
   std::shared_ptr<bool> m_alive = std::make_shared<bool>(true);
 
   ParentKeyboardGrab m_parentKeyboard;

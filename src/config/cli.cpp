@@ -338,7 +338,7 @@ namespace noctalia::config {
           parsed->positionals.empty() ? std::string{} : std::string(parsed->positionals.front());
 
       // Validation reports through diagnostics below; silence incidental INFO logs
-      // (e.g. the plugin registry scan) so only validation results reach the user.
+      // so only validation results reach the user.
       setLogLevel(LogLevel::Warn);
       schema::Diagnostics diagnostics;
 

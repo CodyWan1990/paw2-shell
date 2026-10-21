@@ -31,10 +31,6 @@ class Label;
 class Shortcut;
 class Wallpaper;
 class ClipboardService;
-namespace scripting {
-  class ScriptApiContext;
-}
-
 struct ShortcutPad {
   // Survives HomeTab::onClose(); button/glyph/label are nulled with the scene.
   std::unique_ptr<Shortcut> shortcut;
@@ -165,7 +161,4 @@ private:
   Timer m_clockTimer;
 
   std::vector<ShortcutPad> m_shortcutPads;
-  // Plugin config as of the last shortcut grid build. A plugin shortcut seeds its Luau
-  // runtime at construction, so a change here must block instance reuse.
-  PluginsConfig m_lastPlugins;
 };

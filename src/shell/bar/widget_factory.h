@@ -36,10 +36,6 @@ class GammaService;
 namespace noctalia::theme {
   class ThemeService;
 }
-namespace scripting {
-  class ScriptApiContext;
-}
-
 class WidgetFactory {
 public:
   explicit WidgetFactory(const BarServices& services);
@@ -47,7 +43,7 @@ public:
 
   [[nodiscard]] std::unique_ptr<Widget> create(
       const std::string& name, wl_output* output, float contentScale = 1.0F, const std::string& barPosition = "top",
-      const std::string& barName = "default", float widgetSpacing = 6.0F, bool enableScroll = true
+      const std::string& barName = "default", float widgetSpacing = 6.0F
   ) const;
 
 private:
@@ -78,5 +74,4 @@ private:
   FileWatcher* m_fileWatcher;
   ScreenshotService* m_screenshots;
   RenderContext* m_renderContext = nullptr;
-  scripting::ScriptApiContext* m_scriptApi = nullptr;
 };

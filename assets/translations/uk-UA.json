@@ -953,19 +953,6 @@
       "on": "Wi-Fi Увімкнено"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "Додаток «{plugin}» було вимкнено через завелику кількість помилок у роботі. Усунь їх причину й перезапусти його.",
-      "body-timeouts": "Додаток «{plugin}» не відповідає, тож його було вимкнено. Усунь причину цього й перезапусти його.",
-      "title": "Додаток вимкнутий."
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} очікує API {version}; ця версія Noctalia підтримує API {oldest}–{current}.",
-      "body-timeout": "Установлення додатку «{plugin}» тривало надто довго.",
-      "title": "Додаток не увімкнено."
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -1015,11 +1002,9 @@
     },
     "badges": {
       "advanced": "Додаткові",
-      "community": "Спільнота",
       "deprecated": "Застаріло",
       "inherited": "Успадковано",
       "monitor": "Монітор",
-      "official": "Офіційні",
       "override": "Змінено"
     },
     "calendar-accounts": {
@@ -1532,12 +1517,6 @@
       "panel-position": {
         "auto": "Біля панелі"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Усі",
-          "none": "Немає"
-        }
-      },
       "screen-position": {
         "bottom-center": "Унизу посередині",
         "bottom-left": "Унизу ліворуч",
@@ -1618,87 +1597,6 @@
           "imperial": "Імперська",
           "metric": "Метрика"
         }
-      }
-    },
-    "plugins": {
-      "panels": {
-        "position": {
-          "label": ""
-        }
-      },
-      "plugins": {
-        "configure": "Налаштувати",
-        "delete": "Видалити",
-        "delete-confirm-desc": "Цей додаток буде видалено з оболонки й диску.",
-        "delete-confirm-title": "Видалити «{name}»?",
-        "empty": "Немає ввімкнених додатків.",
-        "held-back": "",
-        "held-back-hint": "v{version} вимагає API {required}; ця версія оболонки Noctalia підтримує версії до API {current}. Онови оболонку Noctalia щоб мати змогу встановити цей додаток.",
-        "incompatible-plugin-api": "Несумісний API",
-        "remove": "Вилучити додаток",
-        "requires": "Вимагає: {dependencies}",
-        "title": "Додатки",
-        "update-all": "Оновити всі ({count} шт.)",
-        "update-available": "доступне оновлення",
-        "update-to": "Оновити до {version}"
-      },
-      "settings": {
-        "empty": "Немає доступних параметрів."
-      },
-      "sources": {
-        "add": "Додати джерело",
-        "add-title": "Додавання джерела додатків",
-        "auto-update": "Оновлювати автоматично",
-        "auto-update-desc": "Підтримувати додатки в актуальному стані, автоматично перевіряючи наявність оновлень у вибраних джерелах.",
-        "edit": "Редагувати джерело",
-        "edit-title": "Редагування джерела додатків",
-        "empty": "Джерела не налаштовані.",
-        "errors": {
-          "duplicate-name": "Джерело з таким ідентифікатором уже існує.",
-          "invalid-name": "Ідентифікатор джерела мусить містити літери, цифри, а також символи «., _, і -», і має починатися з літери чи цифри.",
-          "location-required": "Адресу джерела  обов'язково треба вказати."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Шлях"
-        },
-        "kind-label": "Тип",
-        "location-label": "Адреса",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "Ідентифікатор джерела",
-        "name-placeholder": "my-plugins",
-        "precedence-hint": "Джерела нижче мають вищий приорітет понад джерелами нижче, якщо вони мають той самий додаток.",
-        "remove": "Прибрати джерело",
-        "save": "Зберегти",
-        "title": "Джерела",
-        "update": "Оновити джерело"
-      },
-      "store": {
-        "add": "Додати до Noctalia",
-        "back-to-catalog": "Назад до каталогу додатків",
-        "categories": "Категорії",
-        "category-all": "Усі",
-        "empty": "Додатки не знайдені.",
-        "held-back": "Старіша версія",
-        "held-back-hint": "Встановлює v{version} для API {resolved}. Найновіша v{latest} потребує API {latestRequired}; ця версія оболонки Noctalia підтримує тільки до API {current}.",
-        "incompatible": "Несумісно",
-        "incompatible-hint": "Потребує API {required}; ця версія оболонки Noctalia підтримує {oldest}–{current}.",
-        "installed": "Встановлено",
-        "loading": "Триває завантаження каталогу…",
-        "no-readme": "Немає доступного опису.",
-        "open-page": "Відкрити сторінку додатка на noctalia.dev",
-        "open-source": "Відкрити репозиторій із початковим кодом додатка",
-        "results-count": "Доступно додатків: {count}",
-        "search-placeholder": "Введи назву додатка…",
-        "sort-added-at-asc": "Сортувати по даті додавання (старіші перші)",
-        "sort-added-at-desc": "Сортувати по даті додавання (новіші перші)",
-        "sort-name-asc": "Сортувати по назві (А-Я)",
-        "sort-name-desc": "Сортувати по назві (Я-А)",
-        "sort-updated-at-asc": "Сортувати по даті оновлення (старіші перші)",
-        "sort-updated-at-desc": "Сортувати по даті оновлення (новіші перші)",
-        "source-all": "Усі джерела",
-        "title": "Крамниця додатків"
       }
     },
     "schema": {

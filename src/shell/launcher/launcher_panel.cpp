@@ -1438,10 +1438,6 @@ void LauncherPanel::addProvider(std::unique_ptr<LauncherProvider> provider) {
   m_providers.push_back(std::move(provider));
 }
 
-void LauncherPanel::clearDynamicProviders() {
-  std::erase_if(m_providers, [](const std::unique_ptr<LauncherProvider>& provider) { return provider->isDynamic(); });
-}
-
 void LauncherPanel::clearProvidersWithIdPrefix(std::string_view prefix) {
   std::erase_if(m_providers, [&](const std::unique_ptr<LauncherProvider>& provider) {
     return provider->id().starts_with(prefix);

@@ -752,13 +752,6 @@
       "on": "Wi‑Fi zapnuta"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} narazil na příliš mnoho chyb a byl zakázán. Po opravě problému jej znovu načtěte.",
-      "body-timeouts": "{plugin} přestal reagovat a byl zakázán. Po opravě problému jej znovu načtěte.",
-      "title": "Plugin zakázán"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -807,10 +800,8 @@
     },
     "badges": {
       "advanced": "Pokročilé",
-      "community": "Komunita",
       "inherited": "Zděděno",
       "monitor": "Monitor",
-      "official": "Oficiální",
       "override": "Přepsání"
     },
     "calendar-accounts": {
@@ -1290,72 +1281,6 @@
           "imperial": "Imperiální",
           "metric": "Metrické"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Procházet pluginy",
-      "panels": {
-        "open-near-click": {
-          "description": "Otevřít panel poblíž widgetu lišty, který jej přepnul",
-          "label": "Otevřít u kliknutí"
-        },
-        "placement": {
-          "description": "Připojit panel k liště nebo jej vznášet poblíž jejího okraje",
-          "label": "Umístění"
-        },
-        "position": {
-          "description": "Pozice na obrazovce, když panel plovoucí",
-          "label": "Pozice"
-        }
-      },
-      "plugins": {
-        "configure": "Konfigurovat",
-        "deprecated": "zastaralé",
-        "empty": "Žádné povolené pluginy.",
-        "remove": "Odebrat plugin",
-        "requires": "Vyžaduje: {dependencies}",
-        "title": "Pluginy"
-      },
-      "settings": {
-        "empty": "Nejsou k dispozici žádná nastavení."
-      },
-      "sources": {
-        "add": "Přidat zdroj",
-        "add-title": "Přidat zdroj pluginů",
-        "edit": "Upravit zdroj",
-        "edit-title": "Upravit zdroj pluginů",
-        "empty": "Nejsou nakonfigurovány žádné zdroje.",
-        "errors": {
-          "duplicate-name": "Zdroj s tímto ID již existuje.",
-          "invalid-name": "ID zdroje musí obsahovat písmena, číslice, '.', '_' nebo '-' a začínat písmenem nebo číslicí.",
-          "location-required": "Umístění zdroje je povinné."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Cesta"
-        },
-        "kind-label": "Typ",
-        "location-label": "Umístění",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "ID zdroje",
-        "name-placeholder": "moje-pluginy",
-        "precedence-hint": "Zdroje níže přepisují zdroje výše, pokud nabízejí stejný plugin.",
-        "remove": "Odebrat zdroj",
-        "save": "Uložit",
-        "title": "Zdroje",
-        "update": "Aktualizovat"
-      },
-      "store": {
-        "add": "Přidat do Noctalie",
-        "category-all": "Vše",
-        "empty": "Nebyly nalezeny žádné pluginy",
-        "incompatible": "Nekompatibilní",
-        "loading": "Načítání katalogu...",
-        "no-readme": "Popis není k dispozici.",
-        "results-count": "{count} pluginů",
-        "search-placeholder": "Hledat pluginy...",
-        "title": "Obchod s pluginy"
       }
     },
     "schema": {

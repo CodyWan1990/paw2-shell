@@ -4,7 +4,6 @@
 #include "core/log.h"
 #include "render/render_context.h"
 #include "render/scene/node.h"
-#include "scripting/plugin_id.h"
 #include "shell/desktop/desktop_widget_layout.h"
 #include "shell/lockscreen/lock_screen.h"
 #include "shell/lockscreen/lock_surface.h"
@@ -62,26 +61,6 @@ void LockscreenWidgetsHost::hide() {
 void LockscreenWidgetsHost::rebuild(const LockscreenWidgetsSnapshot& snapshot, LockScreen& lockScreen) {
   m_snapshot = snapshot;
   if (!m_visible) {
-    return;
-  }
-  syncSurfaces(lockScreen);
-}
-
-void LockscreenWidgetsHost::reloadPluginWidgets(LockScreen& lockScreen) {
-  if (!m_visible) {
-    return;
-  }
-  // Match on the id syntax, not the registry: a plugin disabled by this reload has
-  // already left the registry, and its instances must go down with it.
-  const auto before = m_instances.size();
-  std::erase_if(m_instances, [this](std::unique_ptr<WidgetInstance>& instance) {
-    if (!scripting::isValidPluginEntryId(instance->state.type)) {
-      return false;
-    }
-    detachFromSurface(*instance);
-    return true;
-  });
-  if (m_instances.size() == before) {
     return;
   }
   syncSurfaces(lockScreen);

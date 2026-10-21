@@ -5,8 +5,6 @@
 #include "render/animation/animation_manager.h"
 #include "render/scene/input_dispatcher.h"
 #include "render/scene/node.h"
-#include "scripting/plugin_file_cache.h"
-#include "scripting/plugin_manager.h"
 #include "shell/settings/config_export_dialog_modal.h"
 #include "shell/settings/search_picker_popup.h"
 #include "shell/settings/settings_control_factory.h"
@@ -59,10 +57,6 @@ struct wl_output;
 struct wl_surface;
 struct zwp_keyboard_shortcuts_inhibitor_v1;
 
-namespace scripting {
-  class PluginRecommendations;
-}
-
 namespace noctalia::theme {
   struct GeneratedPalette;
 }
@@ -86,9 +80,6 @@ public:
 
   void open(std::string context = "");
   void openToBarWidget(std::string barName, std::string widgetName);
-  // Opens the window on the plugins section with the plugin's settings editor.
-  // Returns false when the plugin is unknown, disabled, or exposes no settings.
-  [[nodiscard]] bool openToPlugin(std::string pluginId);
   void close();
   // Closes the window for a widget editor while preserving the active section for its return.
   void closeForWidgetEditor();
@@ -111,18 +102,11 @@ public:
   void onFontChanged();
   void requestRedraw();
   void onExternalOptionsChanged();
-  void onPluginsChanged();
-  // Drop cached plugin-store files for a source that just advanced its git revision.
-  void invalidatePluginSourceCache(const std::string& sourceName);
   void setOpenDesktopWidgetEditor(std::function<void()> callback) { m_openDesktopWidgetEditor = std::move(callback); }
   void setOpenLockscreenWidgetEditor(std::function<void()> callback) {
     m_openLockscreenWidgetEditor = std::move(callback);
   }
   void setOpenWallpaperPanel(std::function<void()> callback) { m_openWallpaperPanel = std::move(callback); }
-  void setPluginRecommendations(scripting::PluginRecommendations* recommendations) {
-    m_pluginRecommendations = recommendations;
-  }
-  void setPluginManager(scripting::PluginManager* manager) { m_pluginManager = manager; }
   void setSyncGreeterAppearance(std::function<void()> callback) { m_syncGreeterAppearance = std::move(callback); }
   void setResetLauncherUsage(std::function<void()> callback) { m_resetLauncherUsage = std::move(callback); }
   void setResetScreenTime(std::function<void()> callback) { m_resetScreenTime = std::move(callback); }
@@ -134,7 +118,7 @@ public:
   // Source for the bar widget gesture action picker.
   void setIpcService(IpcService* service) { m_ipcService = service; }
   void setClipboardService(ClipboardService* service) { m_clipboardService = service; }
-  // Backs plugin-store thumbnails; trimmed when the window closes.
+  // Backs store thumbnails; trimmed when the window closes.
   void setAsyncTextureCache(AsyncTextureCache* cache) { m_asyncTextures = cache; }
   void initializeDialogPresenter(
       ColorPickerDialogPresenter& colorFallback, GlyphPickerDialogPresenter& glyphFallback,
@@ -206,8 +190,6 @@ private:
   void
   requestContentRebuild(bool refreshRegistry = false, bool refreshFilterRow = false, bool rebuildEditorSheet = false);
   void scheduleDeferredRebuild();
-  void markPluginListDirty();
-  void refreshPluginListIfNeeded();
   void maybeOpenPendingEditor();
   void applyPendingContentScrollTarget(float margin);
   void scrollFocusedAreaIntoView(class InputArea* area);
@@ -233,9 +215,6 @@ private:
   void openCalendarAccountEditor(std::optional<std::string> accountId);
   void openWidgetInspectorEditor(std::vector<std::string> laneListPath, std::string widgetName);
   void openCapsuleGroupEditor(std::vector<std::string> laneListPath, std::string groupId);
-  void openPluginSourceCreateEditor(std::optional<PluginSourceConfig> existing = std::nullopt);
-  void openPluginSettingsEditor(std::string pluginId);
-  void openPluginStore();
   void openCommunityTemplateStore();
   void openPaletteInspector();
   void openBarWidgetEditorSheet(
@@ -282,19 +261,6 @@ private:
   std::vector<std::pair<std::string, std::vector<compositors::paw2::Paw2OutputMode>>> m_paw2Displays;
   IdleManager* m_idleManager = nullptr;
   ConfigService* m_config = nullptr;
-  scripting::PluginManager* m_pluginManager = nullptr;
-  scripting::PluginRecommendations* m_pluginRecommendations = nullptr;
-  // Cached PluginManager::list() — discovery can spawn git, so refresh it off the UI path.
-  std::vector<scripting::PluginStatus> m_pluginList;
-  bool m_pluginListDirty = true;
-  bool m_pluginListRefreshInFlight = false;
-  std::uint64_t m_pluginListRefreshGeneration = 0;
-  // The plugin store sheet is the sheet currently on screen, so plugin events may rebuild
-  // the sheet body; any other editor sheet must be left alone.
-  bool m_pluginStoreSheetOpen = false;
-  // Plugin catalog scroll state outlives both the store sheet and its async file callbacks.
-  ScrollViewState m_pluginStoreScrollState;
-  scripting::PluginFileCache m_pluginFileCache;
   RenderContext* m_renderContext = nullptr;
   DependencyService* m_dependencies = nullptr;
   UPowerService* m_upower = nullptr;
@@ -363,13 +329,10 @@ private:
   bool m_deferFocusScrollToLayout = false;
   Node* m_pendingContentScrollTarget = nullptr;
   std::string m_searchQuery;
-  std::string m_pluginSearchQuery;
   Timer m_searchDebounceTimer;
-  Timer m_pluginSearchDebounceTimer;
-  // Set by openToBarWidget (e.g. middle-click on a bar widget) / openToPlugin and consumed after
+  // Set by openToBarWidget (e.g. middle-click on a bar widget) and consumed after
   // the Settings scene is available so the requested editor can be mounted into it.
   std::string m_pendingOpenWidgetInspectorName;
-  std::string m_pendingOpenPluginSettingsId;
   std::string m_editingWidgetName;
   std::string m_editingCapsuleGroupId;
   std::vector<std::string> m_selectedLaneWidgets;
@@ -397,7 +360,6 @@ private:
   std::string m_pendingDeleteMonitorOverrideMatch;
   std::string m_renamingDockMonitorOverride;
   std::string m_pendingDeleteDockMonitorOverride;
-  std::string m_pendingDeletePluginId;
   std::string m_selectedBarName;
   std::string m_selectedMonitorOverride;
   std::string m_selectedSection;

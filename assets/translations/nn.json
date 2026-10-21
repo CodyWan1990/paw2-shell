@@ -845,19 +845,6 @@
       "on": "Wi-Fi på"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} råkå for mange feil og vart avslegen. Lasta henne inn att etter du har løyst problemet.",
-      "body-timeouts": "{plugin} heldt opp å svara og vart avslegen. Lasta henne inn att etter du har løyst problemet.",
-      "title": "Utviding avslegen"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} vil ha plugin API {version}; denne Noctalia stør API {oldest} – {current}",
-      "body-timeout": "{plugin} tok for lang tid til å installera.",
-      "title": "Utviding ikkje påslegen"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -907,11 +894,9 @@
     },
     "badges": {
       "advanced": "Avansert",
-      "community": "Samfunn",
       "deprecated": "Utgått",
       "inherited": "Ervd",
       "monitor": "Skjerm",
-      "official": "Offisiell",
       "override": "Overstyr"
     },
     "calendar-accounts": {
@@ -1476,97 +1461,6 @@
           "imperial": "Britisk",
           "metric": "Metrisk"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Leita i Utvidingar",
-      "panels": {
-        "open-near-click": {
-          "description": "Der fjøla er når du opnar henne med eit trykk på stongnøytelen",
-          "label": "Langs med stonga"
-        },
-        "placement": {
-          "description": "Bind fjøla til stonga eller flyt henne nær stongranda",
-          "label": "Stadsetjing"
-        },
-        "position": {
-          "description": "Stad på skjermen når fjøla flyt",
-          "label": "Stad"
-        }
-      },
-      "plugins": {
-        "configure": "Måta til",
-        "delete": "Sletta",
-        "delete-confirm-desc": "Denne utvidinga vert desinstallert og sletta frå disken.",
-        "delete-confirm-title": "Sletta \"{name}\"?",
-        "deprecated": "utgått",
-        "empty": "Fann ingen utvidingar. Legg til brunn, eller sjå etter nettverket.",
-        "held-back": "eldre utgåve",
-        "held-back-hint": "v{version} krev utvidings-API {required}; denne Noctalia stør opp til {current}. Få ei nyare Noctalia for å få henne.",
-        "incompatible-plugin-api": "usemjande utvidings-API",
-        "remove": "Sletta utviding",
-        "requires": "Krev: {dependencies}",
-        "title": "Utvidingar",
-        "update-all": "Oppdater alle ({count})",
-        "update-available": "ny utgåve tilgjengeleg",
-        "update-to": "oppdater til {version}"
-      },
-      "settings": {
-        "empty": "Ingen innstillingar tilgjengelege"
-      },
-      "sources": {
-        "add": "Legg til brunn",
-        "add-title": "Legg til utvidingsbrunn",
-        "auto-update": "Oppdater utvidingar automatisk",
-        "auto-update-desc": "Sjå i påslegne brunnar etter nye utgåver i bakgrunnen og haldt installerte utvidingar à jour",
-        "edit": "Brigda brunn",
-        "edit-title": "Brigda utvidingsbrunn",
-        "empty": "Ingen brunnar tilmåta.",
-        "errors": {
-          "duplicate-name": "Ein brunn med denne ID finst alt.",
-          "invalid-name": "Brunn-ID må bruka bokstavar, tal, '.', '_' eller '-', og byrja med bokstav eller tal.",
-          "location-required": "Brunnstad er påkravd."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Spor"
-        },
-        "kind-label": "Slag",
-        "location-label": "Stad",
-        "location-placeholder-git": "https://github.com/me/noctalia-utvidingar",
-        "location-placeholder-path": "~/dev/noctalia-utvidingar",
-        "name-label": "Brunn-ID",
-        "name-placeholder": "utvidingane-mine",
-        "precedence-hint": "Brunnar lægre ned på lista overstyrer høgre brunnar når dei båe byd på same utvidinga.",
-        "remove": "Sletta brunn",
-        "save": "Lagra",
-        "title": "Brunnar",
-        "update": "Oppdater brunn"
-      },
-      "store": {
-        "add": "Legg til i Noctalia",
-        "back-to-catalog": "Attende til utvidingskatalogen",
-        "categories": "Klasser",
-        "category-all": "Alle",
-        "empty": "Ingen utvidingar funne",
-        "held-back": "Eldre utgåve",
-        "held-back-hint": "Installerer v{version} for utvidings-API {resolved}. Den nyaste v{latest} krev utvidings-API {latestRequired}; denne Noctalia stør opp til {current}.",
-        "incompatible": "Usemjande",
-        "incompatible-hint": "Krev utvidings-API {required}; denne Noctalia stør {oldest} – {current}.",
-        "loading": "Lastar inn katalog ...",
-        "no-readme": "Ingen skildring tilgjengeleg.",
-        "open-page": "Opna utvidingssida på noctalia.dev",
-        "open-source": "Opna kodelageret for utvidinga",
-        "results-count": "{count} utvidingar",
-        "search-placeholder": "Leita i utvidingar ...",
-        "sort-added-at-asc": "Sorter med dato lagt til (eldst fyrst)",
-        "sort-added-at-desc": "Sorter med dato lagt til (nyast fyrst)",
-        "sort-name-asc": "Sorter med namn (A-Å)",
-        "sort-name-desc": "Sorter med namn (Å-A)",
-        "sort-updated-at-asc": "Sorter med dato oppdatert (eldst fyrst)",
-        "sort-updated-at-desc": "Sorter med dato oppdatert (nyast fyrst)",
-        "source-all": "Alle brunnar",
-        "title": "Utvidingsbua"
       }
     },
     "schema": {
@@ -3912,8 +3806,6 @@
         "disable-hint": "Slå av avnetes-modus i Tryggleik.",
         "launcher": "Noctalia kjem ikkje til å kunna henta valutakurs.",
         "location": "Vêr og stadfinning kjem ikkje til å verka.",
-        "plugin-store": "Utvidingskatalogen og -nedlasting kjem ikkje til å verka.",
-        "plugins": "HTTP-spurnader frå utvidingar kjem ikkje til å verka. Git-brunnar kan oppdatera enno.",
         "security": "Ekstern IP-finning og telemetri kjem ikkje til å verka.",
         "template-store": "Nedlasting av malar frå samfunnet kjem ikkje til å verka.",
         "templates": "Nedlasting og oppdatering av malar frå samfunnet kjem ikkje til å verka.",

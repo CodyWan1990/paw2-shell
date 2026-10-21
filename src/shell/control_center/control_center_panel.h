@@ -59,10 +59,6 @@ class ClipboardService;
 namespace noctalia::theme {
   class ThemeService;
 }
-namespace scripting {
-  class ScriptApiContext;
-}
-
 class AccountsService;
 class ThumbnailService;
 

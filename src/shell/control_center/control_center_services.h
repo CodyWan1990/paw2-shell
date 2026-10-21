@@ -37,10 +37,6 @@ class GammaService;
 namespace noctalia::theme {
   class ThemeService;
 }
-namespace scripting {
-  class ScriptApiContext;
-}
-
 struct ControlCenterServices {
   NotificationManager* notifications = nullptr;
   PipeWireService* audio = nullptr;
@@ -69,7 +65,6 @@ struct ControlCenterServices {
   IpcService* ipc = nullptr;
   Wallpaper* wallpaper = nullptr;
   CalendarService* calendar = nullptr;
-  scripting::ScriptApiContext* scriptApi = nullptr;
   FileWatcher* fileWatcher = nullptr;
   ClipboardService* clipboard = nullptr;
   AccountsService* accounts = nullptr;
@@ -92,7 +87,6 @@ struct ControlCenterServices {
         .dependencies = dependencies,
         .platform = platform,
         .ipc = ipc,
-        .scriptApi = scriptApi,
         .fileWatcher = fileWatcher,
         .httpClient = httpClient,
         .clipboard = clipboard,

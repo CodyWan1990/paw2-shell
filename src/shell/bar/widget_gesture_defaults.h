@@ -22,13 +22,11 @@ namespace noctalia::bar {
   // there is no widget there, so `settings-open-widget` has nothing to open.
   [[nodiscard]] std::span<const GestureBinding> deadZoneGestureDefaults() noexcept;
 
-  // Layer 2: what a widget type declares for itself, empty when it declares none. For a plugin
-  // [[widget]] type this is the manifest's `actions` table, so plugin widgets get defaults the same
-  // way built-in ones do. `config` is read only by types whose defaults genuinely differ per
-  // setting, e.g. a volume widget bound to the microphone needs the mic verbs.
+  // Layer 2: what a widget type declares for itself, empty when it declares none. `config` is read
+  // only by types whose defaults genuinely differ per setting, e.g. a volume widget bound to the
+  // microphone needs the mic verbs.
   //
-  // The returned bindings borrow from the type tables and from the loaded manifest, both of which
-  // outlive a resolve pass.
+  // The returned bindings borrow from the type tables, which outlive a resolve pass.
   [[nodiscard]] std::vector<GestureBinding>
   gestureDefaultsForType(std::string_view type, const WidgetConfig* config = nullptr);
 

@@ -985,19 +985,6 @@
       "on": "Wi-Fi attivato"
     }
   },
-  "plugins": {
-    "auto-disabled": {
-      "body-errors": "{plugin} ha generato troppi errori ed è stato disabilitato. Ricaricalo dopo aver risolto il problema.",
-      "body-timeouts": "{plugin} ha smesso di rispondere ed è stato disabilitato. Ricaricalo dopo aver risolto il problema.",
-      "title": "Plugin disabilitato"
-    },
-    "enable-failed": {
-      "body-error": "{plugin}: {error}",
-      "body-incompatible": "{plugin} richiede API plugin {versione}; questo Noctalia supporta API {oldest}–{current}.",
-      "body-timeout": "L'installazione di {plugin} ha richiesto troppo tempo.",
-      "title": "Plugin non abilitato"
-    }
-  },
   "power": {
     "battery": {
       "states": {
@@ -1047,11 +1034,9 @@
     },
     "badges": {
       "advanced": "Avanzato",
-      "community": "Community",
       "deprecated": "Deprecato",
       "inherited": "Ereditato",
       "monitor": "Monitor",
-      "official": "Ufficiale",
       "override": "Override"
     },
     "calendar-accounts": {
@@ -1564,13 +1549,6 @@
       "panel-position": {
         "auto": "Segui la barra"
       },
-      "plugins": {
-        "auto-update": {
-          "all": "Tutti",
-          "none": "Nessuno",
-          "official": "Ufficiali"
-        }
-      },
       "screen-position": {
         "bottom-center": "Basso centro",
         "bottom-left": "Basso sinistra",
@@ -1681,117 +1659,6 @@
           "imperial": "Imperiale",
           "metric": "Metrico"
         }
-      }
-    },
-    "plugins": {
-      "browse-store": "Sfoglia plugin",
-      "panels": {
-        "layer": {
-          "description": "Layer-shell utilizzata quando il pannello è flottante",
-          "label": "Layer"
-        },
-        "open-near-click": {
-          "description": "Dove si posiziona il pannello quando viene aperto cliccando sul widget della barra",
-          "label": "Lungo la barra"
-        },
-        "placement": {
-          "description": "Attacca il pannello alla barra o posizionalo vicino al bordo della barra",
-          "label": "Posizione"
-        },
-        "position": {
-          "description": "Posizione dello schermo quando il pannello è mobile",
-          "label": "Posizione"
-        }
-      },
-      "plugins": {
-        "configure": "Configura",
-        "delete": "Cancella",
-        "delete-confirm-desc": "Questo plugin verrà disinstallato e rimosso dal disco.",
-        "delete-confirm-title": "Cancellare \"{name}\"?",
-        "deprecated": "deprecato",
-        "empty": "Nessun plugin abilitato.",
-        "held-back": "versione precedente",
-        "held-back-hint": "v{version} necessita plugin API {required}; questo Noctalia supporta fino a {current}. Aggiorna Noctalia per sfruttarlo.",
-        "incompatible-plugin-api": "API plugin incompatibile",
-        "remove": "Rimuovi plugin",
-        "requires": "Richiede: {dependencies}",
-        "search-empty": "Nessun plugin corrisponde a \"{query}\".",
-        "search-placeholder": "Cerca i plugin installati",
-        "title": "Elenco plugin",
-        "update-all": "Aggiorna tutti ({count})",
-        "update-available": "aggiornamento disponibile",
-        "update-to": "aggiorna alla {version}"
-      },
-      "settings": {
-        "empty": "Nessuna impostazione disponibile."
-      },
-      "sources": {
-        "add": "Aggiungi sorgente",
-        "add-title": "Aggiungi sorgente plugin",
-        "auto-update": "Aggiorna plugin automaticamente",
-        "auto-update-desc": "Controlla in background nuove versioni per le sorgenti abilitate e mantieni aggiornati i plugin installati",
-        "edit": "Configura sorgente",
-        "edit-title": "Configura sorgente plugin",
-        "empty": "Nessuna sorgente configurata.",
-        "errors": {
-          "duplicate-name": "Esiste già una sorgente con questo ID",
-          "invalid-name": "L'ID sorgente deve includere lettere, numeri, '.', '_' o '-', iniziare con una lettera o un numero.",
-          "location-required": "È richiesto un indirizzo sorgente"
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Percorso"
-        },
-        "kind-label": "Tipo",
-        "location-label": "Indirizzo",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "ID sorgente",
-        "name-placeholder": "miei-plugin",
-        "precedence-hint": "Sorgenti inferiori prevalgono su quelle in alto se offrono lo stesso plugin.",
-        "remove": "Rimuovi sorgente",
-        "save": "Salva",
-        "title": "Sorgenti",
-        "update": "Aggiorna sorgente"
-      },
-      "store": {
-        "add": "Aggiungi a Noctalia",
-        "back-to-catalog": "Torna al catalogo dei plugin",
-        "categories": "Categorie",
-        "category-all": "Tutti",
-        "empty": "Nessun plugin trovato",
-        "held-back": "Versione precedente",
-        "held-back-hint": "Installa v{version} per plugin API {resolved}. Il più recente v{latest} necessita plugin API {latestRequired}; questo Noctalia supporta fino a {current}.",
-        "incompatible": "Incompatibile",
-        "incompatible-hint": "Richiede plugin API {richiesto}; questo Noctalia supporta {oldest}–{current}.",
-        "installed": "Installato",
-        "loading": "Caricamento catalogo...",
-        "no-readme": "Nessuna descrizione disponibile.",
-        "not-listed": "Non in elenco",
-        "open-page": "Apri la pagina plugin su noctalia.dev",
-        "open-source": "Apri il repository dei sorgenti dei plugin",
-        "recommend": "Raccomandato",
-        "recommendation-error": "Il cambiamento non è stato confermato. La tua raccomandazione precedente non è cambiata. Riprova lo stesso cambiamento per riconciliarlo.",
-        "recommendation-not-recommendable": "Questo plugin non può accettare questa raccomandazione.",
-        "recommendation-pending": "Invio raccomandazione...",
-        "recommendation-protocol-error": "Il servizio ha ritornato una risposta inaspettata. La tua raccomandazione precedente è invariata.",
-        "recommendation-rate-limited": "Troppe richieste. Aspetta prima di riprovare questo cambiamento.",
-        "recommendation-retry": "Riprova cambiamento raccomandazione",
-        "recommendation-state-error": "Lo stato delle raccomandazioni non può essere letto o salvato. Controlla state.toml prima di riprovare.",
-        "recommendation-unavailable": "Raccomandazioni temporaneamente non disponibili. Le tue precedenti raccomandazioni sono invariate. Puoi riprovare fra poco.",
-        "remove-recommendation": "Rimuovi raccomandazione",
-        "results-count": "{count} plugin",
-        "search-placeholder": "Ricerca plugin...",
-        "sort-added-at-asc": "Ordina per data di aggiunta (prima il più vecchio)",
-        "sort-added-at-desc": "Ordina per data di aggiunta (prima il più recente)",
-        "sort-most-recommended": "Più raccomandati",
-        "sort-name-asc": "Ordina per nome (A-Z)",
-        "sort-name-desc": "Ordina per nome (Z-A)",
-        "sort-trending": "Popolare",
-        "sort-updated-at-asc": "Ordina per data di aggiornamento (prima il più vecchio)",
-        "sort-updated-at-desc": "Ordina per data di aggiornamento (prima il più recente)",
-        "source-all": "Tutte le sorgenti",
-        "title": "Plugin Store"
       }
     },
     "schema": {
@@ -3982,14 +3849,6 @@
             "description": "Attiva/disattiva un pannello tramite ID, eventualmente con contesto (ad esempio, launcher /emo, audio del centro di controllo).",
             "label": "Attiva/disattiva pannello"
           },
-          "plugin": {
-            "description": "Invia un evento a una voce del plugin",
-            "label": "Invio evento plugin"
-          },
-          "plugins": {
-            "description": "Gestisci plugin e sorgenti (elenco/abilita/disabilita/aggiorna, elenco sorgenti/aggiungi/rimuovi)",
-            "label": "Gestisci i plugin"
-          },
           "power-cycle": {
             "description": "Scorri l'elenco dei profili ordinati di UPower, in avanti per impostazione predefinita (avvolge)",
             "label": "Ruota tra profili energetici"
@@ -4021,10 +3880,6 @@
           "settings-open": {
             "description": "Apri la finestra delle impostazioni oppure, se è già aperta, metti a fuoco la finestra e, facoltativamente, seleziona una sezione specifica.",
             "label": "Apri impostazioni"
-          },
-          "settings-open-plugin": {
-            "description": "Apri la finestra delle impostazioni del plugin (ad esempio, noctalia/notes)",
-            "label": "Apri le impostazioni del plugin"
           },
           "settings-open-widget": {
             "description": "Apri la finestra delle impostazioni in un widget della barra; da un gesto del widget, seleziona quel widget",
@@ -4905,8 +4760,6 @@
         "disable-hint": "Disattiva la modalità offline nella sezione Sicurezza.",
         "launcher": "Il recupero del tasso di cambio valuta non funzionerà.",
         "location": "Le ricerche su meteo e posizione non funzioneranno.",
-        "plugin-store": "Il catalogo dei plugin remoti e le richieste di download non funzioneranno.",
-        "plugins": "Le richieste HTTP dei plugin non funzioneranno. Le origini Git possono ancora essere aggiornate.",
         "security": "La ricerca dell'IP esterno e la telemetria non funzioneranno.",
         "template-store": "I download dei template della community non funzioneranno.",
         "templates": "I download e gli aggiornamenti dei template della community non funzioneranno.",

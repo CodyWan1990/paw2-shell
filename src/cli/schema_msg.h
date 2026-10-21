@@ -33,37 +33,6 @@ namespace noctalia::cli {
       Command{"custom", "Use a custom palette", {}, {}, {}, kMsgColorSchemeSetCustomPositionals, {}, false},
   };
 
-  inline constexpr std::array kMsgPluginsEnablePositionals{
-      Positional{"author/plugin", {}, {}, true, false, false, "plugins_disabled"},
-  };
-  inline constexpr std::array kMsgPluginsDisablePositionals{
-      Positional{"author/plugin", {}, {}, true, false, false, "plugins_enabled"},
-  };
-  inline constexpr std::array kMsgPluginsUpdatePositionals{
-      Positional{"source-name", {}, {}, true, false, false},
-  };
-  inline constexpr std::array<std::string_view, 2> kMsgPluginSourceKindChoices{"git", "path"};
-  inline constexpr std::array kMsgPluginsSourceAddPositionals{
-      Positional{"name", {}, {}, true, false, false},
-      Positional{"kind", {}, kMsgPluginSourceKindChoices, true, false, false},
-      Positional{"location", {}, {}, true, false, false},
-  };
-  inline constexpr std::array kMsgPluginsSourceRemovePositionals{
-      Positional{"name", {}, {}, true, false, false},
-  };
-  inline constexpr std::array kMsgPluginsSourceSubcommands{
-      Command{"list", "List plugin sources", {}, {}, {}, {}, {}, false},
-      Command{"add", "Add a plugin source", {}, {}, {}, kMsgPluginsSourceAddPositionals, {}, false},
-      Command{"remove", "Remove a plugin source", {}, {}, {}, kMsgPluginsSourceRemovePositionals, {}, false},
-  };
-  inline constexpr std::array kMsgPluginsSubcommands{
-      Command{"list", "List installed plugins", {}, {}, {}, {}, {}, false},
-      Command{"enable", "Enable a plugin", {}, {}, {}, kMsgPluginsEnablePositionals, {}, false},
-      Command{"disable", "Disable a plugin", {}, {}, {}, kMsgPluginsDisablePositionals, {}, false},
-      Command{"update", "Update a plugin source", {}, {}, {}, kMsgPluginsUpdatePositionals, {}, false},
-      Command{"source", "Manage plugin sources", {}, {}, {}, {}, kMsgPluginsSourceSubcommands, false},
-  };
-
   inline constexpr std::array<std::string_view, 7> kMsgBarAutoHideSetStateChoices{"on",    "off", "smart", "true",
                                                                                   "false", "1",   "0"};
   inline constexpr std::array<std::string_view, 2> kMsgBarLayerSetLayerChoices{"top", "overlay"};
@@ -175,12 +144,6 @@ namespace noctalia::cli {
       Positional{"id", {}, {}, true, false, false},
       Positional{"context", {}, {}, false, false, false},
   };
-  inline constexpr std::array kMsgPluginPositionals{
-      Positional{"author/plugin:entry", {}, {}, true, false, false, "plugin_prefix"},
-      Positional{"target[:bar-name]", {}, {}, true, false, false},
-      Positional{"event", {}, {}, true, false, false},
-      Positional{"payload", {}, {}, false, false, false},
-  };
   inline constexpr std::array kMsgPowerCyclePositionals{
       Positional{"direction", {}, kMsgPowerCycleDirectionChoices, false, false, false},
   };
@@ -195,9 +158,6 @@ namespace noctalia::cli {
   };
   inline constexpr std::array kMsgSettingsOpenPositionals{
       Positional{"context", {}, {}, false, false, false},
-  };
-  inline constexpr std::array kMsgSettingsOpenPluginPositionals{
-      Positional{"plugin-id", {}, {}, true, false, false},
   };
   inline constexpr std::array kMsgSettingsOpenWidgetPositionals{
       Positional{"bar-name", {}, {}, false, false, false},
@@ -607,19 +567,6 @@ namespace noctalia::cli {
         {},
         false
     };
-    inline constexpr Command plugin{
-        "plugin", "Dispatch an event to a plugin entry", {}, {}, {}, kMsgPluginPositionals, {}, false
-    };
-    inline constexpr Command plugins{
-        "plugins",
-        "Manage plugins and sources (list/enable/disable/update, source list/add/remove)",
-        {},
-        {},
-        {},
-        {},
-        kMsgPluginsSubcommands,
-        false
-    };
     inline constexpr Command powerCycle{
         "power-cycle",
         "Step through UPower's ordered profile list, forward by default (wraps)",
@@ -662,16 +609,6 @@ namespace noctalia::cli {
         {},
         {},
         kMsgSettingsOpenPositionals,
-        {},
-        false
-    };
-    inline constexpr Command settingsOpenPlugin{
-        "settings-open-plugin",
-        "Open the settings window at a plugin's settings (e.g. noctalia/notes)",
-        {},
-        {},
-        {},
-        kMsgSettingsOpenPluginPositionals,
         {},
         false
     };
@@ -942,8 +879,6 @@ namespace noctalia::cli {
       msg::panelClose,
       msg::panelOpen,
       msg::panelToggle,
-      msg::plugin,
-      msg::plugins,
       msg::powerCycle,
       msg::powerSet,
       msg::screenshotAnnotate,
@@ -952,7 +887,6 @@ namespace noctalia::cli {
       msg::session,
       msg::settingsClose,
       msg::settingsOpen,
-      msg::settingsOpenPlugin,
       msg::settingsOpenWidget,
       msg::settingsToggle,
       msg::status,

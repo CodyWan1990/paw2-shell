@@ -438,37 +438,6 @@ namespace FileUtils {
     return {};
   }
 
-  // Git-source repo caches. Host-managed, re-fetchable, so they live under the
-  // state dir — never config.
-  [[nodiscard]] inline std::string pluginSourcesDir() {
-    const std::string base = stateDir();
-    if (base.empty()) {
-      return {};
-    }
-    return base + "/plugins/sources";
-  }
-
-  // Exported runtime files for enabled git-source plugins. Re-derivable from
-  // source repos; path sources and local dev plugins do not use this directory.
-  [[nodiscard]] inline std::string pluginMaterializedDir() {
-    const std::string base = stateDir();
-    if (base.empty()) {
-      return {};
-    }
-    return base + "/plugins/materialized";
-  }
-
-  // Persistent per-plugin data directory. Survives plugin updates (unlike the
-  // materialized runtime dir) and honors the NOCTALIA_STATE_HOME override.
-  // Caller is responsible for creating it. Empty if no state home resolves.
-  [[nodiscard]] inline std::string pluginDataDir(const std::string& pluginId) {
-    const std::string base = stateDir();
-    if (base.empty() || pluginId.empty()) {
-      return {};
-    }
-    return base + "/plugins/data/" + pluginId;
-  }
-
   [[nodiscard]] inline std::vector<std::uint8_t> readBinaryFile(const std::string& path) {
     if (path.empty()) {
       return {};

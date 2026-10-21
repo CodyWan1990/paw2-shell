@@ -36,10 +36,6 @@ public:
   void setEventEnabled(std::string_view event, bool enabled);
   void setVolume(float volume);
 
-  [[nodiscard]] std::optional<std::string>
-  loadPluginSound(std::uint64_t ownerId, const std::string& name, const std::filesystem::path& path);
-  void playPluginSound(std::uint64_t ownerId, const std::string& name);
-  void unloadPluginSounds(std::uint64_t ownerId);
 
   static void onProcess(void* userdata);
   static void onStreamStateChanged(void* userdata, pw_stream_state oldState, pw_stream_state state, const char* error);
@@ -76,7 +72,5 @@ private:
   bool m_shellSoundsEnabled = true;
   std::set<std::string, std::less<>> m_disabledEvents;
   std::unordered_map<std::string, std::shared_ptr<const SoundBuffer>> m_buffers;
-  std::unordered_map<std::uint64_t, std::unordered_map<std::string, std::shared_ptr<const SoundBuffer>>>
-      m_pluginBuffers;
   std::vector<std::unique_ptr<ActiveStream>> m_active;
 };

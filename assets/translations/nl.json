@@ -786,7 +786,6 @@
       "advanced": "Geavanceerd",
       "inherited": "Overgenomen",
       "monitor": "Monitor",
-      "official": "Officieel",
       "override": "Overschrijven"
     },
     "calendar-accounts": {
@@ -1232,47 +1231,6 @@
           "imperial": "Imperiaal",
           "metric": "Metrisch"
         }
-      }
-    },
-    "plugins": {
-      "plugins": {
-        "configure": "Configureren",
-        "delete": "Verwijder",
-        "deprecated": "verouderd",
-        "empty": "Er zijn geen plugins gevonden. Voeg een bron toe of controleer je netwerk.",
-        "held-back": "Oudere versie",
-        "remove": "Verwijder plugin",
-        "title": "Plugins",
-        "update-available": "Update alles"
-      },
-      "settings": {
-        "empty": "Geen instellingen beschikbaar."
-      },
-      "sources": {
-        "add": "Voeg bron toe",
-        "add-title": "Voeg plugin bron toe",
-        "edit": "Bron bewerken",
-        "edit-title": "Plugin bron bewerken",
-        "empty": "Geen bronnen geconfigureerd",
-        "errors": {
-          "duplicate-name": "Een bron met deze naam bestaat al.",
-          "invalid-name": "De naam van de bron moet bestaan uit letters, cijfers, ‘.’, ‘_’ of ‘-’, en moet beginnen met een letter of een cijfer.",
-          "location-required": "Bronlocatie is vereist."
-        },
-        "kind": {
-          "git": "Git",
-          "path": "Pad"
-        },
-        "kind-label": "Soort",
-        "location-label": "Locatie",
-        "location-placeholder-git": "https://github.com/me/noctalia-plugins",
-        "location-placeholder-path": "~/dev/noctalia-plugins",
-        "name-label": "Naam",
-        "name-placeholder": "mijn-plugins",
-        "remove": "Verwijder bron",
-        "save": "Opslaan",
-        "title": "Bronnen",
-        "update": "Update"
       }
     },
     "schema": {

@@ -1,12 +1,10 @@
 #pragma once
 
 #include "render/animation/animation_manager.h"
-#include "render/core/shared_texture_cache.h"
 #include "render/scene/input_dispatcher.h"
 #include "render/scene/node.h"
 #include "shell/desktop/desktop_widget_factory.h"
 #include "shell/desktop/desktop_widgets_controller.h"
-#include "shell/desktop/wallpaper_mask.h"
 #include "wayland/layer_surface.h"
 
 #include <memory>
@@ -30,16 +28,11 @@ public:
   void show(const DesktopWidgetsSnapshot& snapshot);
   void hide();
   void rebuild(const DesktopWidgetsSnapshot& snapshot);
-  // Destroy and recreate every plugin-backed instance so its Luau runtime is re-seeded.
-  // Needed because plugin-level settings live outside the widget snapshot, so syncInstances()
-  // cannot see them change.
-  void reloadPluginWidgets();
   void onOutputChange();
   void onSecondTick();
   void requestUpdate();
   void requestLayout();
   void requestRedraw();
-  void setWallpaperMasks(const OutputWallpaperMaskMap& masks);
   bool onPointerEvent(const PointerEvent& event);
 
 private:
@@ -57,35 +50,17 @@ private:
     float intrinsicHeight = 0.0F;
   };
 
-  struct LoadedWallpaperMask {
-    OutputWallpaperMask descriptor;
-    SharedTextureCache::Lease mask;
-    // Held until the mask's source dimensions have been checked against the wallpaper's.
-    SharedTextureCache::Lease wallpaper;
-    bool validated = false;
-  };
-
   void syncInstances();
   void createInstance(const DesktopWidgetState& state, const WaylandOutput& output);
   void buildScene(DesktopWidgetInstance& instance);
   void prepareFrame(DesktopWidgetInstance& instance, bool needsUpdate, bool needsLayout);
   [[nodiscard]] DesktopWidgetInstance* findInstance(const std::string& id);
-  // Coverage of the wallpaper as drawn on the output with this key; empty (full resolution) if the output is unknown.
-  [[nodiscard]] TextureCoverage wallpaperMaskCoverage(const std::string& outputName) const;
-  // Re-targets every mask after output geometry or the wallpaper fill mode may have changed.
-  void refreshWallpaperMasks();
-  // Checks a pending mask against its wallpaper once both are decoded; erases the entry if they do not match.
-  void validateWallpaperMask(const std::string& outputName);
-  void onWallpaperMaskTextureChanged(const std::string& outputName);
-  void updateWallpaperMask(DesktopWidgetInstance& instance);
 
   WaylandConnection* m_wayland = nullptr;
   ConfigService* m_config = nullptr;
   RenderContext* m_renderContext = nullptr;
-  SharedTextureCache* m_textureCache = nullptr;
   std::unique_ptr<DesktopWidgetFactory> m_factory;
   DesktopWidgetsSnapshot m_snapshot;
   bool m_visible = false;
   std::vector<std::unique_ptr<DesktopWidgetInstance>> m_instances;
-  std::unordered_map<std::string, LoadedWallpaperMask> m_wallpaperMasks;
 };

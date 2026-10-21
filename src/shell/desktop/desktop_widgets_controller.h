@@ -3,7 +3,6 @@
 #include "config/config_types.h"
 #include "shell/desktop/desktop_widget_layout.h"
 #include "shell/desktop/desktop_widget_services.h"
-#include "shell/desktop/wallpaper_mask.h"
 #include "ui/dialogs/layer_popup_host.h"
 
 #include <cstdint>
@@ -42,8 +41,6 @@ public:
   void requestUpdate();
   void requestLayout();
   void requestRedraw();
-  void setWallpaperMask(std::uint64_t ownerId, const std::string& outputName, std::optional<OutputWallpaperMask> mask);
-  void clearWallpaperMasks(std::uint64_t ownerId);
 
   void enterEdit();
   void exitEdit();
@@ -79,8 +76,6 @@ private:
   void applyVisibility();
   void handleConfigReload();
   void normalizeSnapshot();
-  void syncWallpaperMasks();
-  void pruneWallpaperMasks();
   [[nodiscard]] bool runtimeWantsVisible() const noexcept;
 
   WaylandConnection* m_wayland = nullptr;
@@ -90,7 +85,6 @@ private:
 
   DesktopWidgetsSnapshot m_snapshot;
   desktop_widgets::PlacementMapper m_placementMapper;
-  OutputWallpaperMaskMap m_wallpaperMasks;
   bool m_initialized = false;
   bool m_displaySuppressed = false;
   RuntimeVisibility m_runtimeVisibility = RuntimeVisibility::FollowConfig;

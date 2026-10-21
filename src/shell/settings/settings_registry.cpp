@@ -1,6 +1,7 @@
 #include "shell/settings/settings_registry.h"
 
 #include "compositors/paw2/paw2_config_writer.h"
+#include "config/config_service.h"
 #include "config/config_types.h"
 #include "config/schema/config_schema.h"
 #include "config/schema/ranges.h"
@@ -3304,180 +3305,202 @@ namespace settings {
         "urgency"
     ));
 
-    // Bar: register every configured bar so global search can surface settings from all of them.
-    for (const auto& bar : cfg.bars) {
+    // A bar's page and each of its monitor-override pages share one set of controls. An override page shows
+    // the effective values, writes to its own table, and lets colours fall back to the bar ("inherit").
+    const auto addBarSettings = [&](const BarConfig& bar, const BarMonitorOverride* ovr) {
       constexpr SettingsSection section = SettingsSection::Bar;
-      const std::vector<std::string> root = {"bar", bar.name};
-      auto path = [&](std::string key) {
-        std::vector<std::string> p = root;
+      BarConfig eff = bar;
+      std::vector<std::string> root = {"bar", bar.name};
+      if (ovr != nullptr) {
+        ConfigService::applyMonitorOverride(eff, *ovr);
+        root.insert(root.end(), {"monitor", ovr->match});
+      }
+      const auto path = [&root](std::string key) {
+        auto p = root;
         p.push_back(std::move(key));
         return p;
       };
+      // Rows that hide on another setting re-resolve the bar (and its override) from the live config.
+      const auto whenBar = [barName = bar.name, match = ovr != nullptr ? std::optional(ovr->match) : std::nullopt](
+                               std::function<bool(const BarConfig&)> predicate
+                           ) -> SettingVisibility {
+        return [barName, match, predicate = std::move(predicate)](const Config& c) {
+          const BarConfig* b = findBar(c, barName);
+          if (b == nullptr) {
+            return false;
+          }
+          BarConfig current = *b;
+          if (match.has_value()) {
+            if (const BarMonitorOverride* o = findMonitorOverride(*b, *match); o != nullptr) {
+              ConfigService::applyMonitorOverride(current, *o);
+            }
+          }
+          return predicate(current);
+        };
+      };
+      const std::string inheritLabel = ovr != nullptr ? tr("common.states.inherit") : std::string{};
+      // An override row shows only the override's own colour; anything unset inherits the bar's.
+      const auto colorPicker = [&](const std::optional<ColorSpec>& own, ColorSpecPickerSetting base) {
+        return ovr != nullptr ? colorSpecPicker(own, true, inheritLabel) : std::move(base);
+      };
+
       entries.push_back(makeEntry(
           section, "general", tr("settings.schema.shared.enabled.label"), tr("settings.schema.bar.enabled.description"),
-          path("enabled"), ToggleSetting{bar.enabled}, "visible"
+          path("enabled"), ToggleSetting{eff.enabled}, "visible"
       ));
       entries.push_back(makeEntry(
           section, "general", tr("settings.schema.shared.position.label"),
-          tr("settings.schema.bar.position.description"), path("position"), positionSelect(bar.position), "edge"
+          tr("settings.schema.bar.position.description"), path("position"), positionSelect(eff.position), "edge"
       ));
       entries.push_back(makeEntry(
           section, "general", tr("settings.schema.shared.auto-hide.label"),
           tr("settings.schema.bar.auto-hide.description"), path("auto_hide"),
-          autoHideModeSelect(barAutoHideMode(bar.autoHide, bar.smartAutoHide), path("smart_auto_hide")),
+          autoHideModeSelect(barAutoHideMode(eff.autoHide, eff.smartAutoHide), path("smart_auto_hide")),
           "autohide smart workspace"
       ));
       entries.push_back(keyedEntry(
           section, "general", "bar.auto-hide-delay", path("auto_hide_delay_ms"),
           StepperSetting{
-              .value = bar.autoHideDelayMs,
+              .value = eff.autoHideDelayMs,
               .minValue = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.min.value()),
               .maxValue = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.max.value()),
               .step = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.step.value()),
               .valueSuffix = "ms",
           },
-          "autohide delay wait", false, [barName = bar.name](const Config& c) {
-            const BarConfig* b = findBar(c, barName);
-            return b != nullptr && b->autoHide && !b->smartAutoHide;
-          }
+          "autohide delay wait", false, whenBar([](const BarConfig& b) { return b.autoHide && !b.smartAutoHide; })
       ));
-      const SettingVisibility autoHideOn = [barName = bar.name](const Config& c) {
-        const BarConfig* b = findBar(c, barName);
-        return b != nullptr && b->isAutoHideEnabled();
-      };
       entries.push_back(keyedEntry(
           section, "general", "bar.show-on-workspace-switch", path("show_on_workspace_switch"),
-          ToggleSetting{bar.showOnWorkspaceSwitch}, "workspace reveal peek autohide", false, autoHideOn
+          ToggleSetting{eff.showOnWorkspaceSwitch}, "workspace reveal peek autohide", false,
+          whenBar([](const BarConfig& b) { return b.isAutoHideEnabled(); })
       ));
       entries.push_back(makeEntry(
           section, "general", tr("settings.schema.shared.reserve-space.label"),
-          tr("settings.schema.bar.reserve-space.description"), path("reserve_space"), ToggleSetting{bar.reserveSpace},
+          tr("settings.schema.bar.reserve-space.description"), path("reserve_space"), ToggleSetting{eff.reserveSpace},
           "exclusive zone"
       ));
       entries.push_back(keyedEntry(
           section, "general", "bar.layer", path("layer"),
           asSegmented(plainSelect(
-              {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}}, bar.layer
+              {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}}, eff.layer
           )),
           "layer shell z-order"
       ));
       entries.push_back(keyedEntry(
           section, "layout", "bar.thickness", path("thickness"),
-          SliderSetting{bar.thickness, 10.0F, 120.0F, 1.0F, true}, "height width"
+          SliderSetting{eff.thickness, 10.0F, 120.0F, 1.0F, true}, "height width"
       ));
       entries.push_back(keyedEntry(
-          section, "layout", "bar.content-scale", path("scale"), SliderSetting{bar.scale, 0.5F, 4.0F, 0.05F, false},
+          section, "layout", "bar.content-scale", path("scale"), SliderSetting{eff.scale, 0.5F, 4.0F, 0.05F, false},
           "zoom size"
       ));
       entries.push_back(keyedEntry(
           section, "layout", "bar.font-scale", path("font_scale"),
-          sliderFor(bar.fontScale, noctalia::config::schema::kBarFontScaleRange, false), "text zoom size"
+          sliderFor(eff.fontScale, noctalia::config::schema::kBarFontScaleRange, false), "text zoom size"
       ));
       entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.shared.ends-margin.label"),
-          tr("settings.schema.bar.ends-margin.description"), path("margin_ends"), barMarginStepper(bar.marginEnds),
+          tr("settings.schema.bar.ends-margin.description"), path("margin_ends"), barMarginStepper(eff.marginEnds),
           "gap inset"
       ));
       entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.shared.edge-margin.label"),
-          tr("settings.schema.bar.edge-margin.description"), path("margin_edge"), barMarginStepper(bar.marginEdge),
+          tr("settings.schema.bar.edge-margin.description"), path("margin_edge"), barMarginStepper(eff.marginEdge),
           "gap inset"
       ));
       entries.push_back(makeEntry(
           section, "layout", tr("settings.schema.shared.opposite-edge-margin.label"),
           tr("settings.schema.bar.opposite-edge-margin.description"), path("margin_opposite_edge"),
-          barMarginStepper(bar.marginOppositeEdge), "gap inset strut"
+          barMarginStepper(eff.marginOppositeEdge), "gap inset strut"
       ));
       entries.push_back(keyedEntry(
           section, "layout", "bar.content-padding", path("padding"),
-          SliderSetting{bar.padding, 0.0F, 80.0F, 1.0F, true}, "inset"
+          SliderSetting{eff.padding, 0.0F, 80.0F, 1.0F, true}, "inset"
       ));
       entries.push_back(makeEntry(
           section, "shape", tr("settings.schema.shared.corner-radius.label"),
           tr("settings.schema.bar.corner-radius.description"), path("radius"),
-          barReservedSlider(bar.radius, 80.0F, 1.0F, true), "rounded"
+          barReservedSlider(eff.radius, 80.0F, 1.0F, true), "rounded"
       ));
-      entries.push_back(makeEntry(
-          section, "shape", tr("settings.schema.shared.corner-top-left.label"),
-          tr("settings.schema.bar.corner-top-left.description"), path("radius_top_left"),
-          barCornerSlider(bar.radiusTopLeft), "rounded corner", true
-      ));
-      entries.push_back(makeEntry(
-          section, "shape", tr("settings.schema.shared.corner-top-right.label"),
-          tr("settings.schema.bar.corner-top-right.description"), path("radius_top_right"),
-          barCornerSlider(bar.radiusTopRight), "rounded corner", true
-      ));
-      entries.push_back(makeEntry(
-          section, "shape", tr("settings.schema.shared.corner-bottom-left.label"),
-          tr("settings.schema.bar.corner-bottom-left.description"), path("radius_bottom_left"),
-          barCornerSlider(bar.radiusBottomLeft), "rounded corner", true
-      ));
-      entries.push_back(makeEntry(
-          section, "shape", tr("settings.schema.shared.corner-bottom-right.label"),
-          tr("settings.schema.bar.corner-bottom-right.description"), path("radius_bottom_right"),
-          barCornerSlider(bar.radiusBottomRight), "rounded corner", true
-      ));
+      const std::pair<const char*, std::int32_t BarConfig::*> corners[] = {
+          {"top-left", &BarConfig::radiusTopLeft},
+          {"top-right", &BarConfig::radiusTopRight},
+          {"bottom-left", &BarConfig::radiusBottomLeft},
+          {"bottom-right", &BarConfig::radiusBottomRight},
+      };
+      for (const auto& [corner, field] : corners) {
+        std::string key = "radius_" + std::string(corner);
+        std::ranges::replace(key, '-', '_');
+        entries.push_back(makeEntry(
+            section, "shape", tr("settings.schema.shared.corner-" + std::string(corner) + ".label"),
+            tr("settings.schema.bar.corner-" + std::string(corner) + ".description"), path(std::move(key)),
+            barCornerSlider(eff.*field), "rounded corner", true
+        ));
+      }
       entries.push_back(keyedEntry(
           section, "shape", "bar.concave-edge-corners", path("concave_edge_corners"),
-          ToggleSetting{bar.concaveEdgeCorners}, "rounded corner carve", false, [barName = bar.name](const Config& c) {
-            const BarConfig* b = findBar(c, barName);
-            return b != nullptr && b->marginEdge == 0;
-          }
+          ToggleSetting{eff.concaveEdgeCorners}, "rounded corner carve", false,
+          whenBar([](const BarConfig& b) { return b.marginEdge == 0; })
       ));
-      entries.push_back(
-          keyedEntry(section, "shape", "bar.border", path("border"), colorSpecPicker(bar.border), "outline color", true)
-      );
+      entries.push_back(keyedEntry(
+          section, "shape", "bar.border", path("border"),
+          colorPicker(ovr != nullptr ? ovr->border : std::nullopt, colorSpecPicker(bar.border)), "outline color", true
+      ));
       entries.push_back(keyedEntry(
           section, "shape", "bar.border-width", path("border_width"),
-          barReservedSlider(bar.borderWidth, 20.0F, 0.5F, false), "outline stroke", true
+          barReservedSlider(eff.borderWidth, 20.0F, 0.5F, false), "outline stroke", true
       ));
       entries.push_back(makeEntry(
           section, "effects", tr("settings.schema.shared.background-opacity.label"),
           tr("settings.schema.bar.background-opacity.description"), path("background_opacity"),
-          SliderSetting{bar.backgroundOpacity, 0.0F, 1.0F, 0.01F, false}, "alpha transparency translucent opacity"
+          SliderSetting{eff.backgroundOpacity, 0.0F, 1.0F, 0.01F, false}, "alpha transparency translucent opacity"
       ));
       if (env.backgroundEffectBlurSupported) {
         entries.push_back(keyedEntry(
-            section, "effects", "bar.compositor-blur", path("compositor_blur"), ToggleSetting{bar.compositorBlur},
+            section, "effects", "bar.compositor-blur", path("compositor_blur"), ToggleSetting{eff.compositorBlur},
             "blur frosted background effect wayland"
         ));
       }
       entries.push_back(makeEntry(
           section, "effects", tr("settings.schema.shared.shadow.label"), tr("settings.schema.bar.shadow.description"),
-          path("shadow"), ToggleSetting{bar.shadow}, "shadow"
+          path("shadow"), ToggleSetting{eff.shadow}, "shadow"
       ));
       entries.push_back(makeEntry(
           section, "effects", tr("settings.schema.shared.contact-shadow.label"),
           tr("settings.schema.bar.contact-shadow.description"), path("contact_shadow"),
-          ToggleSetting{bar.contactShadow}, "shadow contact panel attached"
+          ToggleSetting{eff.contactShadow}, "shadow contact panel attached"
       ));
       entries.push_back(keyedEntry(
-          section, "layout", "bar.panel-overlap", path("panel_overlap"), barPanelOverlapStepper(bar.panelOverlap),
+          section, "layout", "bar.panel-overlap", path("panel_overlap"), barPanelOverlapStepper(eff.panelOverlap),
           "seam gap overlap attached panel fractional scale", true
       ));
-      const std::string barResolvedFontFamily =
-          bar.fontFamily && !bar.fontFamily->empty() ? *bar.fontFamily : cfg.shell.fontFamily;
       {
-        SettingControl fontFamilyControl = TextSetting{
-            .value = bar.fontFamily.value_or(""), .placeholder = cfg.shell.fontFamily, .browseFileExtensions = {}
-        };
+        // The field holds only this level's own family; the placeholder shows what it falls back to.
+        const std::optional<std::string>& ownFamily = ovr != nullptr ? ovr->fontFamily : bar.fontFamily;
+        const std::string inheritedFamily =
+            ovr != nullptr ? bar.fontFamily.value_or(cfg.shell.fontFamily) : cfg.shell.fontFamily;
+        SettingControl fontFamilyControl =
+            TextSetting{.value = ownFamily.value_or(""), .placeholder = inheritedFamily, .browseFileExtensions = {}};
         if (!env.fontFamilies.empty()) {
           fontFamilyControl = SearchPickerSetting{
               .options = env.fontFamilies,
-              .selectedValue = bar.fontFamily.value_or(""),
-              .placeholder = cfg.shell.fontFamily,
+              .selectedValue = ownFamily.value_or(""),
+              .placeholder = inheritedFamily,
               .emptyText = tr("ui.controls.search-picker.empty"),
               .preferredHeight = 280.0F,
           };
         }
         entries.push_back(keyedEntry(
-            section, "widgets", "bar.font-family", path("font_family"), std::move(fontFamilyControl), "typeface font"
+            section, "widgets", "bar.font-family", path("font_family"), std::move(fontFamilyControl), "typeface font",
+            ovr != nullptr
         ));
       }
-      {
+      if (ovr == nullptr) {
         std::vector<SelectOption> fontWeightOptions;
-        const auto widgetOptions =
-            buildLabelFontWeightSelectOptions(barResolvedFontFamily, FontWeightSelectKind::BarDefault, bar.fontWeight);
+        const auto widgetOptions = buildLabelFontWeightSelectOptions(
+            bar.fontFamily && !bar.fontFamily->empty() ? *bar.fontFamily : cfg.shell.fontFamily,
+            FontWeightSelectKind::BarDefault, bar.fontWeight
+        );
         fontWeightOptions.reserve(widgetOptions.size());
         for (const auto& option : widgetOptions) {
           fontWeightOptions.push_back(SelectOption{option.value, tr(option.labelKey)});
@@ -3490,417 +3513,128 @@ namespace settings {
       }
       entries.push_back(keyedEntry(
           section, "widgets", "bar.widget-spacing", path("widget_spacing"),
-          SliderSetting{bar.widgetSpacing, 0.0F, 32.0F, 1.0F, true}, "gap"
+          SliderSetting{eff.widgetSpacing, 0.0F, 32.0F, 1.0F, true}, "gap"
       ));
       entries.push_back(keyedEntry(
-          section, "widgets", "bar.widget-color", path("color"), colorSpecPicker(bar.widgetColor, true),
+          section, "widgets", "bar.widget-color", path("color"),
+          colorPicker(ovr != nullptr ? ovr->widgetColor : std::nullopt, colorSpecPicker(bar.widgetColor, true)),
           "color foreground", true
       ));
       entries.push_back(keyedEntry(
-          section, "widgets", "bar.widget-icon-color", path("icon_color"), colorSpecPicker(bar.widgetIconColor, true),
+          section, "widgets", "bar.widget-icon-color", path("icon_color"),
+          colorPicker(ovr != nullptr ? ovr->widgetIconColor : std::nullopt, colorSpecPicker(bar.widgetIconColor, true)),
           "color icon", true
       ));
+      if (ovr == nullptr) {
+        entries.push_back(keyedEntry(
+            section, "widgets", "bar.hover-highlight", path("hover_highlight"), ToggleSetting{bar.hoverHighlight},
+            "hover highlight mouse pointer"
+        ));
+        entries.push_back(keyedEntry(
+            section, "widgets", "bar.show-tooltip", path("show_tooltip"), ToggleSetting{bar.showTooltip},
+            "tooltip hover"
+        ));
+      }
       entries.push_back(keyedEntry(
-          section, "widgets", "bar.hover-highlight", path("hover_highlight"), ToggleSetting{bar.hoverHighlight},
-          "hover highlight mouse pointer"
-      ));
-      entries.push_back(keyedEntry(
-          section, "widgets", "bar.show-tooltip", path("show_tooltip"), ToggleSetting{bar.showTooltip}, "tooltip hover"
-      ));
-      entries.push_back(keyedEntry(
-          section, "capsules", "bar.widget-capsules", path("capsule"), ToggleSetting{bar.widgetCapsuleDefault}, "pill"
+          section, "capsules", "bar.widget-capsules", path("capsule"), ToggleSetting{eff.widgetCapsuleDefault}, "pill"
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-thickness", path("capsule_thickness"),
-          SliderSetting{bar.capsuleThickness, 0.1F, 1.0F, 0.01F, false}, "pill thickness size", true
+          SliderSetting{eff.capsuleThickness, 0.1F, 1.0F, 0.01F, false}, "pill thickness size", true
       ));
-      const SettingVisibility capsuleOn = [on = bar.widgetCapsuleDefault](const Config&) { return on; };
-      {
-        auto e = keyedEntry(
-            section, "capsules", "bar.capsule-radius", path("capsule_radius"),
-            OptionalStepperSetting{
-                .value = radiusStepperValue(bar.widgetCapsuleRadius),
-                .minValue = 0,
-                .maxValue = 80,
-                .step = 1,
-                .fallbackValue = radiusStepperFallback(bar.widgetCapsuleRadius),
-                .unsetLabel = tr("common.states.auto"),
-                .customLabel = tr("common.states.custom")
-            },
-            "pill rounded radius", true
-        );
-        entries.push_back(std::move(e));
-      }
+      const SettingVisibility capsuleOn = [on = eff.widgetCapsuleDefault](const Config&) { return on; };
       entries.push_back(keyedEntry(
-          section, "capsules", "bar.capsule-fill", path("capsule_fill"), colorSpecPicker(bar.widgetCapsuleFill),
+          section, "capsules", "bar.capsule-radius", path("capsule_radius"),
+          OptionalStepperSetting{
+              .value = radiusStepperValue(ovr != nullptr ? ovr->widgetCapsuleRadius : bar.widgetCapsuleRadius),
+              .minValue = 0,
+              .maxValue = 80,
+              .step = 1,
+              .fallbackValue = radiusStepperFallback(bar.widgetCapsuleRadius),
+              .unsetLabel = ovr != nullptr ? inheritLabel : tr("common.states.auto"),
+              .customLabel = tr("common.states.custom")
+          },
+          "pill rounded radius", true
+      ));
+      entries.push_back(keyedEntry(
+          section, "capsules", "bar.capsule-fill", path("capsule_fill"),
+          colorPicker(ovr != nullptr ? ovr->widgetCapsuleFill : std::nullopt, colorSpecPicker(bar.widgetCapsuleFill)),
           "color pill", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-foreground", path("capsule_foreground"),
-          colorSpecPicker(bar.widgetCapsuleForeground, true), "color foreground pill", true, capsuleOn
+          colorPicker(
+              ovr != nullptr ? ovr->widgetCapsuleForeground : std::nullopt,
+              colorSpecPicker(bar.widgetCapsuleForeground, true)
+          ),
+          "color foreground pill", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-border", path("capsule_border"),
-          colorSpecPicker(bar.widgetCapsuleBorder, true), "color pill outline", true, capsuleOn
+          colorPicker(
+              ovr != nullptr && ovr->widgetCapsuleBorderSpecified ? ovr->widgetCapsuleBorder : std::nullopt,
+              colorSpecPicker(bar.widgetCapsuleBorder, true)
+          ),
+          "color pill outline", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-border-width", path("capsule_border_width"),
-          sliderFor(bar.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange, false),
+          sliderFor(eff.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange, false),
           "pill outline width", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-padding", path("capsule_padding"),
-          SliderSetting{bar.widgetCapsulePadding, 0.0F, 48.0F, 1.0F, false}, "pill inset", true, capsuleOn
+          SliderSetting{eff.widgetCapsulePadding, 0.0F, 48.0F, 1.0F, false}, "pill inset", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
           section, "capsules", "bar.capsule-opacity", path("capsule_opacity"),
-          SliderSetting{bar.widgetCapsuleOpacity, 0.0F, 1.0F, 0.01F, false}, "pill alpha", true, capsuleOn
+          SliderSetting{eff.widgetCapsuleOpacity, 0.0F, 1.0F, 0.01F, false}, "pill alpha", true, capsuleOn
       ));
       entries.push_back(keyedEntry(
-          section, "widget-list", "bar.start-widgets", path("start"), ListSetting{.items = bar.startWidgets}, "left"
+          section, "widget-list", "bar.start-widgets", path("start"), ListSetting{.items = eff.startWidgets}, "left"
       ));
       entries.push_back(keyedEntry(
-          section, "widget-list", "bar.center-widgets", path("center"), ListSetting{.items = bar.centerWidgets},
+          section, "widget-list", "bar.center-widgets", path("center"), ListSetting{.items = eff.centerWidgets},
           "middle"
       ));
       entries.push_back(keyedEntry(
-          section, "widget-list", "bar.end-widgets", path("end"), ListSetting{.items = bar.endWidgets}, "right"
+          section, "widget-list", "bar.end-widgets", path("end"), ListSetting{.items = eff.endWidgets}, "right"
       ));
-      // One row per gesture, from the same closed set widget actions use. An unset row shows the
-      // built-in default as its placeholder, so "empty" never reads as "does nothing".
+      // One row per gesture, from the same closed set widget actions use. An unset row shows what it falls
+      // back to (the bar's action on an override page, else the built-in default) as its placeholder.
       for (const auto gesture : noctalia::bar::allGestures()) {
         const std::string key(noctalia::bar::gestureConfigKey(gesture));
-        const auto configured = bar.deadZone.actions.find(key);
+        const auto& ownActions = ovr != nullptr ? ovr->deadZone.actions : std::optional(bar.deadZone.actions);
+        std::string configured;
+        if (ownActions.has_value()) {
+          if (const auto own = ownActions->find(key); own != ownActions->end()) {
+            configured = own->second;
+          }
+        }
+        const auto inherited = bar.deadZone.actions.find(key);
+        auto gesturePath = path("dead_zone");
+        gesturePath.insert(gesturePath.end(), {"actions", key});
         entries.push_back(makeEntry(
             section, "dead-zone", tr(std::string(noctalia::bar::gestureLabelKey(gesture))),
-            tr("settings.schema.bar.dead-zone-action.description"),
-            std::vector<std::string>{"bar", bar.name, "dead_zone", "actions", key},
+            tr("settings.schema.bar.dead-zone-action.description"), std::move(gesturePath),
             GestureActionSetting{
                 .gestureKey = key,
-                .configured = configured != bar.deadZone.actions.end() ? configured->second : std::string{},
-                .defaultAction = deadZoneDefault(gesture),
+                .configured = std::move(configured),
+                .defaultAction = ovr != nullptr && inherited != bar.deadZone.actions.end() ? inherited->second
+                                                                                           : deadZoneDefault(gesture),
             },
             "bar empty margin dead zone action command gesture " + key
         ));
       }
-    }
+    };
 
-    // Bar monitor overrides (all bars).
+    // Register every bar and override so global search can surface settings from all of them.
+    for (const auto& bar : cfg.bars) {
+      addBarSettings(bar, nullptr);
+    }
     for (const auto& bar : cfg.bars) {
       for (const auto& ovr : bar.monitorOverrides) {
-        constexpr SettingsSection section = SettingsSection::Bar;
-        const std::vector<std::string> root = {"bar", bar.name, "monitor", ovr.match};
-        auto monitorPath = [&](std::string key) {
-          std::vector<std::string> p = root;
-          p.push_back(std::move(key));
-          return p;
-        };
-
-        entries.push_back(makeEntry(
-            section, "general", tr("settings.schema.shared.enabled.label"),
-            tr("settings.schema.bar.enabled.description"), monitorPath("enabled"),
-            ToggleSetting{ovr.enabled.value_or(bar.enabled)}, "visible"
-        ));
-        entries.push_back(makeEntry(
-            section, "general", tr("settings.schema.shared.position.label"),
-            tr("settings.schema.bar.position.description"), monitorPath("position"),
-            positionSelect(ovr.position.value_or(bar.position)), "edge"
-        ));
-        entries.push_back(makeEntry(
-            section, "general", tr("settings.schema.shared.auto-hide.label"),
-            tr("settings.schema.bar.auto-hide.description"), monitorPath("auto_hide"),
-            autoHideModeSelect(
-                barAutoHideMode(ovr.autoHide.value_or(bar.autoHide), ovr.smartAutoHide.value_or(bar.smartAutoHide)),
-                monitorPath("smart_auto_hide")
-            ),
-            "autohide smart workspace"
-        ));
-        entries.push_back(keyedEntry(
-            section, "general", "bar.auto-hide-delay", monitorPath("auto_hide_delay_ms"),
-            StepperSetting{
-                .value = ovr.autoHideDelayMs.value_or(bar.autoHideDelayMs),
-                .minValue = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.min.value()),
-                .maxValue = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.max.value()),
-                .step = static_cast<int>(noctalia::config::schema::kBarAutoHideDelayMsRange.step.value()),
-                .valueSuffix = "ms",
-            },
-            "autohide delay wait", false, [barName = bar.name, match = ovr.match](const Config& c) {
-              const BarConfig* b = findBar(c, barName);
-              if (b == nullptr) {
-                return false;
-              }
-              const BarMonitorOverride* o = findMonitorOverride(*b, match);
-              const bool autoHide = o != nullptr ? o->autoHide.value_or(b->autoHide) : b->autoHide;
-              const bool smartAutoHide = o != nullptr ? o->smartAutoHide.value_or(b->smartAutoHide) : b->smartAutoHide;
-              return autoHide && !smartAutoHide;
-            }
-        ));
-        const SettingVisibility monitorAutoHideOn = [barName = bar.name, match = ovr.match](const Config& c) {
-          const BarConfig* b = findBar(c, barName);
-          if (b == nullptr) {
-            return false;
-          }
-          const BarMonitorOverride* o = findMonitorOverride(*b, match);
-          return o != nullptr ? o->isAutoHideEnabled(b->autoHide, b->smartAutoHide) : b->isAutoHideEnabled();
-        };
-        entries.push_back(keyedEntry(
-            section, "general", "bar.show-on-workspace-switch", monitorPath("show_on_workspace_switch"),
-            ToggleSetting{ovr.showOnWorkspaceSwitch.value_or(bar.showOnWorkspaceSwitch)},
-            "workspace reveal peek autohide", false, monitorAutoHideOn
-        ));
-        entries.push_back(makeEntry(
-            section, "general", tr("settings.schema.shared.reserve-space.label"),
-            tr("settings.schema.bar.reserve-space.description"), monitorPath("reserve_space"),
-            ToggleSetting{ovr.reserveSpace.value_or(bar.reserveSpace)}, "exclusive zone"
-        ));
-        entries.push_back(keyedEntry(
-            section, "general", "bar.layer", monitorPath("layer"),
-            asSegmented(plainSelect(
-                {{"top", "settings.options.layer.top"}, {"overlay", "settings.options.layer.overlay"}},
-                ovr.layer.value_or(bar.layer)
-            )),
-            "layer shell z-order"
-        ));
-        entries.push_back(keyedEntry(
-            section, "layout", "bar.thickness", monitorPath("thickness"),
-            SliderSetting{ovr.thickness.value_or(bar.thickness), 10.0F, 120.0F, 1.0F, true}, "height width"
-        ));
-        entries.push_back(keyedEntry(
-            section, "layout", "bar.content-scale", monitorPath("scale"),
-            SliderSetting{ovr.scale.value_or(bar.scale), 0.5F, 4.0F, 0.05F, false}, "zoom size"
-        ));
-        entries.push_back(keyedEntry(
-            section, "layout", "bar.font-scale", monitorPath("font_scale"),
-            sliderFor(ovr.fontScale.value_or(bar.fontScale), noctalia::config::schema::kBarFontScaleRange, false),
-            "text zoom size"
-        ));
-        entries.push_back(makeEntry(
-            section, "layout", tr("settings.schema.shared.ends-margin.label"),
-            tr("settings.schema.bar.ends-margin.description"), monitorPath("margin_ends"),
-            barMarginStepper(ovr.marginEnds.value_or(bar.marginEnds)), "gap inset"
-        ));
-        entries.push_back(makeEntry(
-            section, "layout", tr("settings.schema.shared.edge-margin.label"),
-            tr("settings.schema.bar.edge-margin.description"), monitorPath("margin_edge"),
-            barMarginStepper(ovr.marginEdge.value_or(bar.marginEdge)), "gap inset"
-        ));
-        entries.push_back(makeEntry(
-            section, "layout", tr("settings.schema.shared.opposite-edge-margin.label"),
-            tr("settings.schema.bar.opposite-edge-margin.description"), monitorPath("margin_opposite_edge"),
-            barMarginStepper(ovr.marginOppositeEdge.value_or(bar.marginOppositeEdge)), "gap inset strut"
-        ));
-        entries.push_back(keyedEntry(
-            section, "layout", "bar.content-padding", monitorPath("padding"),
-            SliderSetting{ovr.padding.value_or(bar.padding), 0.0F, 80.0F, 1.0F, true}, "inset"
-        ));
-        entries.push_back(makeEntry(
-            section, "shape", tr("settings.schema.shared.corner-radius.label"),
-            tr("settings.schema.bar.corner-radius.description"), monitorPath("radius"),
-            barReservedSlider(ovr.radius.value_or(bar.radius), 80.0F, 1.0F, true), "rounded"
-        ));
-        entries.push_back(makeEntry(
-            section, "shape", tr("settings.schema.shared.corner-top-left.label"),
-            tr("settings.schema.bar.corner-top-left.description"), monitorPath("radius_top_left"),
-            barCornerSlider(ovr.radiusTopLeft.value_or(bar.radiusTopLeft)), "rounded corner", true
-        ));
-        entries.push_back(makeEntry(
-            section, "shape", tr("settings.schema.shared.corner-top-right.label"),
-            tr("settings.schema.bar.corner-top-right.description"), monitorPath("radius_top_right"),
-            barCornerSlider(ovr.radiusTopRight.value_or(bar.radiusTopRight)), "rounded corner", true
-        ));
-        entries.push_back(makeEntry(
-            section, "shape", tr("settings.schema.shared.corner-bottom-left.label"),
-            tr("settings.schema.bar.corner-bottom-left.description"), monitorPath("radius_bottom_left"),
-            barCornerSlider(ovr.radiusBottomLeft.value_or(bar.radiusBottomLeft)), "rounded corner", true
-        ));
-        entries.push_back(makeEntry(
-            section, "shape", tr("settings.schema.shared.corner-bottom-right.label"),
-            tr("settings.schema.bar.corner-bottom-right.description"), monitorPath("radius_bottom_right"),
-            barCornerSlider(ovr.radiusBottomRight.value_or(bar.radiusBottomRight)), "rounded corner", true
-        ));
-        entries.push_back(keyedEntry(
-            section, "shape", "bar.concave-edge-corners", monitorPath("concave_edge_corners"),
-            ToggleSetting{ovr.concaveEdgeCorners.value_or(bar.concaveEdgeCorners)}, "rounded corner carve", false,
-            [barName = bar.name, match = ovr.match](const Config& c) {
-              const BarConfig* b = findBar(c, barName);
-              if (b == nullptr) {
-                return false;
-              }
-              const BarMonitorOverride* mo = findMonitorOverride(*b, match);
-              const std::int32_t marginEdge = mo && mo->marginEdge.has_value() ? *mo->marginEdge : b->marginEdge;
-              return marginEdge == 0;
-            }
-        ));
-        entries.push_back(keyedEntry(
-            section, "shape", "bar.border", monitorPath("border"),
-            colorSpecPicker(ovr.border, true, tr("common.states.inherit")), "outline color", true
-        ));
-        entries.push_back(keyedEntry(
-            section, "shape", "bar.border-width", monitorPath("border_width"),
-            barReservedSlider(ovr.borderWidth.value_or(bar.borderWidth), 20.0F, 0.5F, false), "outline stroke", true
-        ));
-        entries.push_back(makeEntry(
-            section, "effects", tr("settings.schema.shared.background-opacity.label"),
-            tr("settings.schema.bar.background-opacity.description"), monitorPath("background_opacity"),
-            SliderSetting{ovr.backgroundOpacity.value_or(bar.backgroundOpacity), 0.0F, 1.0F, 0.01F, false},
-            "alpha transparency translucent opacity"
-        ));
-        if (env.backgroundEffectBlurSupported) {
-          entries.push_back(keyedEntry(
-              section, "effects", "bar.compositor-blur", monitorPath("compositor_blur"),
-              ToggleSetting{ovr.compositorBlur.value_or(bar.compositorBlur)}, "blur frosted background effect wayland"
-          ));
-        }
-        entries.push_back(makeEntry(
-            section, "effects", tr("settings.schema.shared.shadow.label"), tr("settings.schema.bar.shadow.description"),
-            monitorPath("shadow"), ToggleSetting{ovr.shadow.value_or(bar.shadow)}, "shadow"
-        ));
-        entries.push_back(makeEntry(
-            section, "effects", tr("settings.schema.shared.contact-shadow.label"),
-            tr("settings.schema.bar.contact-shadow.description"), monitorPath("contact_shadow"),
-            ToggleSetting{ovr.contactShadow.value_or(bar.contactShadow)}, "shadow contact panel attached"
-        ));
-        entries.push_back(keyedEntry(
-            section, "layout", "bar.panel-overlap", monitorPath("panel_overlap"),
-            barPanelOverlapStepper(ovr.panelOverlap.value_or(bar.panelOverlap)),
-            "seam gap overlap attached panel fractional scale", true
-        ));
-        {
-          const std::string monitorInheritedFontFamily = bar.fontFamily.value_or(cfg.shell.fontFamily);
-          SettingControl fontFamilyControl = TextSetting{
-              .value = ovr.fontFamily.value_or(""),
-              .placeholder = monitorInheritedFontFamily,
-              .browseFileExtensions = {}
-          };
-          if (!env.fontFamilies.empty()) {
-            fontFamilyControl = SearchPickerSetting{
-                .options = env.fontFamilies,
-                .selectedValue = ovr.fontFamily.value_or(""),
-                .placeholder = monitorInheritedFontFamily,
-                .emptyText = tr("ui.controls.search-picker.empty"),
-                .preferredHeight = 280.0F,
-            };
-          }
-          entries.push_back(keyedEntry(
-              section, "widgets", "bar.font-family", monitorPath("font_family"), std::move(fontFamilyControl),
-              "typeface font", true
-          ));
-        }
-        entries.push_back(keyedEntry(
-            section, "widgets", "bar.widget-spacing", monitorPath("widget_spacing"),
-            SliderSetting{ovr.widgetSpacing.value_or(bar.widgetSpacing), 0.0F, 32.0F, 1.0F, true}, "gap"
-        ));
-        entries.push_back(keyedEntry(
-            section, "widgets", "bar.widget-color", monitorPath("color"),
-            colorSpecPicker(ovr.widgetColor, true, tr("common.states.inherit")), "color foreground", true
-        ));
-        entries.push_back(keyedEntry(
-            section, "widgets", "bar.widget-icon-color", monitorPath("icon_color"),
-            colorSpecPicker(ovr.widgetIconColor, true, tr("common.states.inherit")), "color icon", true
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.widget-capsules", monitorPath("capsule"),
-            ToggleSetting{ovr.widgetCapsuleDefault.value_or(bar.widgetCapsuleDefault)}, "pill"
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-thickness", monitorPath("capsule_thickness"),
-            SliderSetting{ovr.capsuleThickness.value_or(bar.capsuleThickness), 0.1F, 1.0F, 0.01F, false},
-            "pill thickness size", true
-        ));
-        const SettingVisibility monitorCapsuleOn =
-            [on = ovr.widgetCapsuleDefault.value_or(bar.widgetCapsuleDefault)](const Config&) { return on; };
-        {
-          auto e = keyedEntry(
-              section, "capsules", "bar.capsule-radius", monitorPath("capsule_radius"),
-              OptionalStepperSetting{
-                  .value = radiusStepperValue(ovr.widgetCapsuleRadius),
-                  .minValue = 0,
-                  .maxValue = 80,
-                  .step = 1,
-                  .fallbackValue = radiusStepperFallback(bar.widgetCapsuleRadius),
-                  .unsetLabel = tr("common.states.inherit"),
-                  .customLabel = tr("common.states.custom")
-              },
-              "pill rounded radius", true
-          );
-          entries.push_back(std::move(e));
-        }
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-fill", monitorPath("capsule_fill"),
-            colorSpecPicker(ovr.widgetCapsuleFill, true, tr("common.states.inherit")), "color pill", true,
-            monitorCapsuleOn
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-foreground", monitorPath("capsule_foreground"),
-            colorSpecPicker(ovr.widgetCapsuleForeground, true, tr("common.states.inherit")), "color foreground pill",
-            true, monitorCapsuleOn
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-border", monitorPath("capsule_border"),
-            colorSpecPicker(
-                ovr.widgetCapsuleBorderSpecified ? ovr.widgetCapsuleBorder : std::optional<ColorSpec>{}, true,
-                tr("common.states.inherit")
-            ),
-            "color pill outline", true, monitorCapsuleOn
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-border-width", monitorPath("capsule_border_width"),
-            sliderFor(
-                ovr.widgetCapsuleBorderWidth.value_or(bar.widgetCapsuleBorderWidth),
-                noctalia::config::schema::kBarCapsuleBorderWidthRange, false
-            ),
-            "pill outline width", true, monitorCapsuleOn
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-padding", monitorPath("capsule_padding"),
-            SliderSetting{ovr.widgetCapsulePadding.value_or(bar.widgetCapsulePadding), 0.0F, 48.0F, 1.0F, false},
-            "pill inset", true, monitorCapsuleOn
-        ));
-        entries.push_back(keyedEntry(
-            section, "capsules", "bar.capsule-opacity", monitorPath("capsule_opacity"),
-            SliderSetting{ovr.widgetCapsuleOpacity.value_or(bar.widgetCapsuleOpacity), 0.0F, 1.0F, 0.01F, false},
-            "pill alpha", true, monitorCapsuleOn
-        ));
-        entries.push_back(keyedEntry(
-            section, "widget-list", "bar.start-widgets", monitorPath("start"),
-            ListSetting{.items = ovr.startWidgets.value_or(bar.startWidgets)}, "left"
-        ));
-        entries.push_back(keyedEntry(
-            section, "widget-list", "bar.center-widgets", monitorPath("center"),
-            ListSetting{.items = ovr.centerWidgets.value_or(bar.centerWidgets)}, "middle"
-        ));
-        entries.push_back(keyedEntry(
-            section, "widget-list", "bar.end-widgets", monitorPath("end"),
-            ListSetting{.items = ovr.endWidgets.value_or(bar.endWidgets)}, "right"
-        ));
-        for (const auto gesture : noctalia::bar::allGestures()) {
-          const std::string key(noctalia::bar::gestureConfigKey(gesture));
-          std::vector<std::string> gesturePath = root;
-          gesturePath.emplace_back("dead_zone");
-          gesturePath.emplace_back("actions");
-          gesturePath.emplace_back(key);
-
-          const auto& overrideActions = ovr.deadZone.actions;
-          std::string configured;
-          if (overrideActions.has_value()) {
-            const auto overridden = overrideActions->find(key);
-            if (overridden != overrideActions->end()) {
-              configured = overridden->second;
-            }
-          }
-          const auto inherited = bar.deadZone.actions.find(key);
-          entries.push_back(makeEntry(
-              section, "dead-zone", tr(std::string(noctalia::bar::gestureLabelKey(gesture))),
-              tr("settings.schema.bar.dead-zone-action.description"), std::move(gesturePath),
-              GestureActionSetting{
-                  .gestureKey = key,
-                  .configured = std::move(configured),
-                  .defaultAction =
-                      inherited != bar.deadZone.actions.end() ? inherited->second : deadZoneDefault(gesture),
-              },
-              "bar empty margin dead zone action command gesture " + key
-          ));
-        }
+        addBarSettings(bar, &ovr);
       }
     }
 

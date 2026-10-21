@@ -947,6 +947,125 @@ void ConfigService::checkReload() {
   fireReloadCallbacks();
 }
 
+void ConfigService::applyMonitorOverride(BarConfig& bar, const BarMonitorOverride& ovr) {
+  if (ovr.position)
+    bar.position = *ovr.position;
+  if (ovr.enabled)
+    bar.enabled = *ovr.enabled;
+  if (ovr.autoHide)
+    bar.autoHide = *ovr.autoHide;
+  if (ovr.autoHideDelayMs)
+    bar.autoHideDelayMs = *ovr.autoHideDelayMs;
+  if (ovr.smartAutoHide)
+    bar.smartAutoHide = *ovr.smartAutoHide;
+  if (ovr.showOnWorkspaceSwitch)
+    bar.showOnWorkspaceSwitch = *ovr.showOnWorkspaceSwitch;
+  if (ovr.reserveSpace)
+    bar.reserveSpace = *ovr.reserveSpace;
+  if (ovr.layer)
+    bar.layer = *ovr.layer;
+  if (ovr.thickness)
+    bar.thickness = *ovr.thickness;
+  if (ovr.backgroundOpacity)
+    bar.backgroundOpacity = *ovr.backgroundOpacity;
+  if (ovr.compositorBlur)
+    bar.compositorBlur = *ovr.compositorBlur;
+  if (ovr.border)
+    bar.border = *ovr.border;
+  if (ovr.borderWidth)
+    bar.borderWidth = *ovr.borderWidth;
+  if (ovr.radius) {
+    bar.radius = *ovr.radius;
+    bar.radiusTopLeft = *ovr.radius;
+    bar.radiusTopRight = *ovr.radius;
+    bar.radiusBottomLeft = *ovr.radius;
+    bar.radiusBottomRight = *ovr.radius;
+  }
+  if (ovr.radiusTopLeft)
+    bar.radiusTopLeft = *ovr.radiusTopLeft;
+  if (ovr.radiusTopRight)
+    bar.radiusTopRight = *ovr.radiusTopRight;
+  if (ovr.radiusBottomLeft)
+    bar.radiusBottomLeft = *ovr.radiusBottomLeft;
+  if (ovr.radiusBottomRight)
+    bar.radiusBottomRight = *ovr.radiusBottomRight;
+  if (ovr.concaveEdgeCorners)
+    bar.concaveEdgeCorners = *ovr.concaveEdgeCorners;
+  if (ovr.marginEnds)
+    bar.marginEnds = *ovr.marginEnds;
+  if (ovr.marginEdge)
+    bar.marginEdge = *ovr.marginEdge;
+  if (ovr.marginOppositeEdge)
+    bar.marginOppositeEdge = *ovr.marginOppositeEdge;
+  if (ovr.padding)
+    bar.padding = *ovr.padding;
+  if (ovr.widgetSpacing)
+    bar.widgetSpacing = *ovr.widgetSpacing;
+  if (ovr.shadow)
+    bar.shadow = *ovr.shadow;
+  if (ovr.contactShadow)
+    bar.contactShadow = *ovr.contactShadow;
+  if (ovr.panelOverlap)
+    bar.panelOverlap = *ovr.panelOverlap;
+  if (ovr.capsuleThickness)
+    bar.capsuleThickness = *ovr.capsuleThickness;
+  if (ovr.fontFamily)
+    bar.fontFamily = *ovr.fontFamily;
+  if (ovr.startWidgets)
+    bar.startWidgets = *ovr.startWidgets;
+  if (ovr.centerWidgets)
+    bar.centerWidgets = *ovr.centerWidgets;
+  if (ovr.endWidgets)
+    bar.endWidgets = *ovr.endWidgets;
+  if (ovr.scale)
+    bar.scale = *ovr.scale;
+  if (ovr.fontScale)
+    bar.fontScale = *ovr.fontScale;
+  if (ovr.widgetCapsuleDefault)
+    bar.widgetCapsuleDefault = *ovr.widgetCapsuleDefault;
+  if (ovr.widgetCapsuleFill)
+    bar.widgetCapsuleFill = *ovr.widgetCapsuleFill;
+  if (ovr.widgetCapsuleBorderSpecified) {
+    bar.widgetCapsuleBorderSpecified = true;
+    bar.widgetCapsuleBorder = ovr.widgetCapsuleBorder;
+  }
+  if (ovr.widgetCapsuleForeground) {
+    bar.widgetCapsuleForeground = *ovr.widgetCapsuleForeground;
+  }
+  if (ovr.widgetColor) {
+    bar.widgetColor = *ovr.widgetColor;
+  }
+  if (ovr.widgetIconColor) {
+    bar.widgetIconColor = *ovr.widgetIconColor;
+  }
+  if (ovr.widgetCapsuleGroups) {
+    bar.widgetCapsuleGroups = *ovr.widgetCapsuleGroups;
+  }
+  if (ovr.widgetCapsulePadding) {
+    bar.widgetCapsulePadding = std::clamp(static_cast<float>(*ovr.widgetCapsulePadding), 0.0F, 48.0F);
+  }
+  if (ovr.widgetCapsuleRadius.has_value()) {
+    bar.widgetCapsuleRadius = std::clamp(*ovr.widgetCapsuleRadius, 0.0, 80.0);
+  }
+  if (ovr.widgetCapsuleOpacity) {
+    bar.widgetCapsuleOpacity = std::clamp(static_cast<float>(*ovr.widgetCapsuleOpacity), 0.0F, 1.0F);
+  }
+  if (ovr.widgetCapsuleBorderWidth) {
+    bar.widgetCapsuleBorderWidth = noctalia::config::schema::applyRange(
+        *ovr.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange
+    );
+  }
+  if (ovr.hoverHighlight) {
+    bar.hoverHighlight = *ovr.hoverHighlight;
+  }
+  if (ovr.showTooltip) {
+    bar.showTooltip = *ovr.showTooltip;
+  }
+  if (ovr.deadZone.actions) {
+    bar.deadZone.actions = *ovr.deadZone.actions;
+  }
+}
+
 BarConfig ConfigService::resolveForOutput(const BarConfig& base, const WaylandOutput& output) {
   BarConfig resolved = base;
 
@@ -957,122 +1076,7 @@ BarConfig ConfigService::resolveForOutput(const BarConfig& base, const WaylandOu
 
     kLog.debug("monitor override \"{}\" matched output {} ({})", ovr.match, output.connectorName, output.description);
 
-    if (ovr.position)
-      resolved.position = *ovr.position;
-    if (ovr.enabled)
-      resolved.enabled = *ovr.enabled;
-    if (ovr.autoHide)
-      resolved.autoHide = *ovr.autoHide;
-    if (ovr.autoHideDelayMs)
-      resolved.autoHideDelayMs = *ovr.autoHideDelayMs;
-    if (ovr.smartAutoHide)
-      resolved.smartAutoHide = *ovr.smartAutoHide;
-    if (ovr.showOnWorkspaceSwitch)
-      resolved.showOnWorkspaceSwitch = *ovr.showOnWorkspaceSwitch;
-    if (ovr.reserveSpace)
-      resolved.reserveSpace = *ovr.reserveSpace;
-    if (ovr.layer)
-      resolved.layer = *ovr.layer;
-    if (ovr.thickness)
-      resolved.thickness = *ovr.thickness;
-    if (ovr.backgroundOpacity)
-      resolved.backgroundOpacity = *ovr.backgroundOpacity;
-    if (ovr.compositorBlur)
-      resolved.compositorBlur = *ovr.compositorBlur;
-    if (ovr.border)
-      resolved.border = *ovr.border;
-    if (ovr.borderWidth)
-      resolved.borderWidth = *ovr.borderWidth;
-    if (ovr.radius) {
-      resolved.radius = *ovr.radius;
-      resolved.radiusTopLeft = *ovr.radius;
-      resolved.radiusTopRight = *ovr.radius;
-      resolved.radiusBottomLeft = *ovr.radius;
-      resolved.radiusBottomRight = *ovr.radius;
-    }
-    if (ovr.radiusTopLeft)
-      resolved.radiusTopLeft = *ovr.radiusTopLeft;
-    if (ovr.radiusTopRight)
-      resolved.radiusTopRight = *ovr.radiusTopRight;
-    if (ovr.radiusBottomLeft)
-      resolved.radiusBottomLeft = *ovr.radiusBottomLeft;
-    if (ovr.radiusBottomRight)
-      resolved.radiusBottomRight = *ovr.radiusBottomRight;
-    if (ovr.concaveEdgeCorners)
-      resolved.concaveEdgeCorners = *ovr.concaveEdgeCorners;
-    if (ovr.marginEnds)
-      resolved.marginEnds = *ovr.marginEnds;
-    if (ovr.marginEdge)
-      resolved.marginEdge = *ovr.marginEdge;
-    if (ovr.marginOppositeEdge)
-      resolved.marginOppositeEdge = *ovr.marginOppositeEdge;
-    if (ovr.padding)
-      resolved.padding = *ovr.padding;
-    if (ovr.widgetSpacing)
-      resolved.widgetSpacing = *ovr.widgetSpacing;
-    if (ovr.shadow)
-      resolved.shadow = *ovr.shadow;
-    if (ovr.contactShadow)
-      resolved.contactShadow = *ovr.contactShadow;
-    if (ovr.panelOverlap)
-      resolved.panelOverlap = *ovr.panelOverlap;
-    if (ovr.capsuleThickness)
-      resolved.capsuleThickness = *ovr.capsuleThickness;
-    if (ovr.fontFamily)
-      resolved.fontFamily = *ovr.fontFamily;
-    if (ovr.startWidgets)
-      resolved.startWidgets = *ovr.startWidgets;
-    if (ovr.centerWidgets)
-      resolved.centerWidgets = *ovr.centerWidgets;
-    if (ovr.endWidgets)
-      resolved.endWidgets = *ovr.endWidgets;
-    if (ovr.scale)
-      resolved.scale = *ovr.scale;
-    if (ovr.fontScale)
-      resolved.fontScale = *ovr.fontScale;
-    if (ovr.widgetCapsuleDefault)
-      resolved.widgetCapsuleDefault = *ovr.widgetCapsuleDefault;
-    if (ovr.widgetCapsuleFill)
-      resolved.widgetCapsuleFill = *ovr.widgetCapsuleFill;
-    if (ovr.widgetCapsuleBorderSpecified) {
-      resolved.widgetCapsuleBorderSpecified = true;
-      resolved.widgetCapsuleBorder = ovr.widgetCapsuleBorder;
-    }
-    if (ovr.widgetCapsuleForeground) {
-      resolved.widgetCapsuleForeground = *ovr.widgetCapsuleForeground;
-    }
-    if (ovr.widgetColor) {
-      resolved.widgetColor = *ovr.widgetColor;
-    }
-    if (ovr.widgetIconColor) {
-      resolved.widgetIconColor = *ovr.widgetIconColor;
-    }
-    if (ovr.widgetCapsuleGroups) {
-      resolved.widgetCapsuleGroups = *ovr.widgetCapsuleGroups;
-    }
-    if (ovr.widgetCapsulePadding) {
-      resolved.widgetCapsulePadding = std::clamp(static_cast<float>(*ovr.widgetCapsulePadding), 0.0F, 48.0F);
-    }
-    if (ovr.widgetCapsuleRadius.has_value()) {
-      resolved.widgetCapsuleRadius = std::clamp(*ovr.widgetCapsuleRadius, 0.0, 80.0);
-    }
-    if (ovr.widgetCapsuleOpacity) {
-      resolved.widgetCapsuleOpacity = std::clamp(static_cast<float>(*ovr.widgetCapsuleOpacity), 0.0F, 1.0F);
-    }
-    if (ovr.widgetCapsuleBorderWidth) {
-      resolved.widgetCapsuleBorderWidth = noctalia::config::schema::applyRange(
-          *ovr.widgetCapsuleBorderWidth, noctalia::config::schema::kBarCapsuleBorderWidthRange
-      );
-    }
-    if (ovr.hoverHighlight) {
-      resolved.hoverHighlight = *ovr.hoverHighlight;
-    }
-    if (ovr.showTooltip) {
-      resolved.showTooltip = *ovr.showTooltip;
-    }
-    if (ovr.deadZone.actions) {
-      resolved.deadZone.actions = *ovr.deadZone.actions;
-    }
+    applyMonitorOverride(resolved, ovr);
     break; // first match wins
   }
 

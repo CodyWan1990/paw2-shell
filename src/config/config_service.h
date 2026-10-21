@@ -190,6 +190,8 @@ public:
   bool renameOverrideTable(const std::vector<std::string>& oldPath, const std::vector<std::string>& newPath);
 
   [[nodiscard]] static BarConfig resolveForOutput(const BarConfig& base, const WaylandOutput& output);
+  // Applies the fields a monitor override sets on top of `bar`.
+  static void applyMonitorOverride(BarConfig& bar, const BarMonitorOverride& ovr);
   [[nodiscard]] static DockConfig resolveForOutput(const DockConfig& base, const WaylandOutput& output);
 
   // Recursively overlays `overlay` onto `base` (tables merge, everything else

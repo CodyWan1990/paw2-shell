@@ -102,8 +102,19 @@ namespace ui {
     }
   } // namespace
 
+  void applySectionCardStyle(Flex& card, float scale, float fillOpacity) {
+    card.setCardStyle(scale, fillOpacity);
+    card.setDirection(FlexDirection::Vertical);
+    card.setAlign(FlexAlign::Stretch);
+    card.setGap(Style::spaceSm * scale);
+    card.setPadding(Style::spaceMd * scale);
+  }
+
   std::unique_ptr<Flex> flex(FlexDirection direction, FlexProps props) {
     auto flex = std::make_unique<Flex>();
+    if (props.cardStyleScale.has_value()) {
+      applySectionCardStyle(*flex, *props.cardStyleScale, props.cardStyleFillOpacity.value_or(1.0F));
+    }
     applyFlexProps(*flex, direction, props);
     if (props.configure) {
       props.configure(*flex);
@@ -786,6 +797,24 @@ namespace ui {
     }
     if (props.onScrollChanged) {
       control->setOnScrollChanged(std::move(props.onScrollChanged));
+    }
+    if (props.transparent.value_or(false)) {
+      control->clearFill();
+      control->clearBorder();
+    }
+    if (Flex* content = control->content(); content != nullptr) {
+      if (props.contentDirection.has_value()) {
+        content->setDirection(*props.contentDirection);
+      }
+      if (props.contentAlign.has_value()) {
+        content->setAlign(*props.contentAlign);
+      }
+      if (props.contentGap.has_value()) {
+        content->setGap(*props.contentGap);
+      }
+      if (props.contentOut != nullptr) {
+        *props.contentOut = content;
+      }
     }
     applyNodeProps(*control, props);
     if (props.configure) {

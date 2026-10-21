@@ -91,9 +91,7 @@ std::vector<ListEditorOption> ListEditor::remainingOptions() const {
 }
 
 void ListEditor::rebuildRows() {
-  while (!children().empty()) {
-    removeChild(children().back().get());
-  }
+  clearChildren();
 
   const float labelCellWidth = kLabelCellWidth * m_scale;
   const float itemRowHeight = kItemRowHeight * m_scale;

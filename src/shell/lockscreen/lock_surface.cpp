@@ -1679,9 +1679,7 @@ void LockSurface::rebuildSessionButtons() {
   }
   m_lastSessionActionKeys = std::move(keys);
 
-  while (!m_sessionRow->children().empty()) {
-    m_sessionRow->removeChild(m_sessionRow->children().front().get());
-  }
+  m_sessionRow->clearChildren();
   m_sessionButtons.clear();
 
   if (m_sessionActions == nullptr) {

@@ -192,9 +192,7 @@ void ThemesPanel::rebuildCards() {
     return;
   }
   Flex* strip = m_scroll->content();
-  while (!strip->children().empty()) {
-    (void)strip->removeChild(strip->children().back().get());
-  }
+  strip->clearChildren();
   strip->setDirection(FlexDirection::Horizontal);
   strip->setGap(Style::spaceMd * contentScale());
   m_cards.clear();

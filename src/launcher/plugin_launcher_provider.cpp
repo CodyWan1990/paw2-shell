@@ -4,6 +4,7 @@
 #include "i18n/i18n.h"
 #include "notification/notifications.h"
 #include "scripting/plugin_runtime_context.h"
+#include "util/file_utils.h"
 
 #include <chrono>
 #include <fstream>
@@ -13,15 +14,6 @@
 namespace {
   constexpr Logger kLog("plugin-launcher");
 
-  std::string readFile(const std::filesystem::path& path) {
-    std::ifstream file(path);
-    if (!file) {
-      return {};
-    }
-    std::stringstream ss;
-    ss << file.rdbuf();
-    return ss.str();
-  }
 } // namespace
 
 PluginLauncherProvider::PluginLauncherProvider(
@@ -48,7 +40,7 @@ PluginLauncherProvider::~PluginLauncherProvider() {
 }
 
 void PluginLauncherProvider::initialize() {
-  std::string code = readFile(m_sourcePath);
+  std::string code = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   if (code.empty()) {
     kLog.warn("launcher provider '{}': empty or unreadable source {}", m_entryId, m_sourcePath.string());
     return;
@@ -134,7 +126,7 @@ void PluginLauncherProvider::setupScriptWatch() {
 void PluginLauncherProvider::teardownScriptWatch() { m_scriptWatcher.stop(); }
 
 void PluginLauncherProvider::reloadScript() {
-  std::string code = readFile(m_sourcePath);
+  std::string code = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   auto name = m_sourcePath.filename().string();
   if (code.empty()) {
     kLog.warn("launcher provider '{}': failed to reload '{}'", m_entryId, m_sourcePath.string());

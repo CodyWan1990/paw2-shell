@@ -2618,9 +2618,7 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
   instance.widgetByRoot.clear();
   instance.hoverHighlightWidget = nullptr;
   if (instance.hoverUnderlay != nullptr) {
-    while (!instance.hoverUnderlay->children().empty()) {
-      instance.hoverUnderlay->removeChild(instance.hoverUnderlay->children().back().get());
-    }
+    instance.hoverUnderlay->clearChildren();
   }
 
   // Hover overlay: sits above the capsule fill (same zIndex, later sibling) and below the
@@ -3062,9 +3060,7 @@ void Bar::rebuildInstanceContents(BarInstance& instance, const BarConfig& newCon
     if (node == nullptr) {
       return;
     }
-    while (!node->children().empty()) {
-      node->removeChild(node->children().back().get());
-    }
+    node->clearChildren();
   };
   clearChildren(instance.startSection);
   clearChildren(instance.centerSection);

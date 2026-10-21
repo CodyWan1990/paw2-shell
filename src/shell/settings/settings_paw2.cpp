@@ -27,14 +27,9 @@ namespace settings {
 
     // {"paw2", "appearance", "gaps"} -> "appearance.gaps"
     [[nodiscard]] std::string dottedPaw2Path(const std::vector<std::string>& path, std::size_t from = 1) {
-      std::string dotted;
-      for (std::size_t i = from; i < path.size(); ++i) {
-        if (!dotted.empty()) {
-          dotted.push_back('.');
-        }
-        dotted += path[i];
-      }
-      return dotted;
+      return StringUtils::join(
+          {path.begin() + static_cast<std::ptrdiff_t>(std::min(from, path.size())), path.end()}, "."
+      );
     }
 
     [[nodiscard]] bool isMonitorPath(const std::vector<std::string>& path) {

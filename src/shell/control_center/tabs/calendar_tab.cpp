@@ -87,9 +87,8 @@ std::unique_ptr<Flex> CalendarTab::create() {
   auto calendarCard = ui::column({
       .out = &m_card,
       .gap = Style::spaceMd * scale,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) {
-        control_center::applySectionCardStyle(card, scale, opacity);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
 
   calendarCard->addChild(
@@ -189,9 +188,8 @@ std::unique_ptr<Flex> CalendarTab::create() {
       {.out = &m_eventsCard,
        .gap = Style::spaceSm * scale,
        .flexGrow = 2.0F,
-       .configure = [scale, opacity = panelCardOpacity()](
-                        Flex& card
-                    ) { control_center::applySectionCardStyle(card, scale, opacity); }},
+       .cardStyleScale = scale,
+       .cardStyleFillOpacity = panelCardOpacity()},
       ui::label({
           .out = &m_eventsTitle,
           .text = i18n::tr("control-center.calendar.events"),

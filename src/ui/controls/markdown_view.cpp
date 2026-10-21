@@ -533,9 +533,7 @@ void MarkdownView::setMarkdown(const std::string& markdown, float scale, float f
 
 void MarkdownView::clear() {
   m_wrappableLabels.clear();
-  while (!children().empty()) {
-    removeChild(children().back().get());
-  }
+  clearChildren();
 }
 
 LayoutSize MarkdownView::doMeasure(Renderer& renderer, const LayoutConstraints& constraints) {

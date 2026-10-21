@@ -14,6 +14,7 @@
 #include "ui/controls/countdown_ring.h"
 #include "ui/controls/flex.h"
 #include "ui/controls/grid_view.h"
+#include "ui/grid_nav.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 #include "util/string_utils.h"
@@ -483,8 +484,6 @@ bool SessionPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, b
     }
   }
 
-  const std::size_t lastIndex = m_visibleButtons.size() - 1;
-
   const auto cancelCountdownOnSelectionChange = [this](std::optional<std::size_t> nextIndex) {
     if (m_pendingCountdown.has_value() && (!nextIndex.has_value() || *nextIndex != m_pendingCountdown->index)) {
       cancelCountdown();
@@ -502,46 +501,9 @@ bool SessionPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, b
     return true;
   };
 
-  if (KeybindMatcher::matches(KeybindAction::Left, sym, modifiers)) {
-    if (!m_selectedIndex.has_value()) {
-      return moveSelection(lastIndex);
-    }
-    if (*m_selectedIndex > 0) {
-      return moveSelection(*m_selectedIndex - 1);
-    }
-    return true;
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Right, sym, modifiers)) {
-    if (!m_selectedIndex.has_value()) {
-      return moveSelection(0);
-    }
-    if (*m_selectedIndex < lastIndex) {
-      return moveSelection(*m_selectedIndex + 1);
-    }
-    return true;
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Up, sym, modifiers)) {
-    const std::size_t columns = visibleColumnCount();
-    if (!m_selectedIndex.has_value()) {
-      return moveSelection(lastIndex);
-    }
-    if (*m_selectedIndex >= columns) {
-      return moveSelection(*m_selectedIndex - columns);
-    }
-    return true;
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Down, sym, modifiers)) {
-    const std::size_t columns = visibleColumnCount();
-    if (!m_selectedIndex.has_value()) {
-      return moveSelection(0);
-    }
-    if (*m_selectedIndex + columns <= lastIndex) {
-      return moveSelection(*m_selectedIndex + columns);
-    }
-    return true;
+  if (const auto delta = ui::gridNavDelta(sym, modifiers, visibleColumnCount())) {
+    const std::size_t next = ui::gridNavTarget(m_selectedIndex, *delta, m_visibleButtons.size(), false);
+    return next == m_selectedIndex || moveSelection(next);
   }
 
   if (KeybindMatcher::matches(KeybindAction::Validate, sym, modifiers)) {

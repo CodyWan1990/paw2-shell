@@ -121,11 +121,6 @@ namespace {
 
   std::string noctaliaVersionLine() { return std::format("Noctalia {}", noctalia::build_info::displayVersion()); }
 
-  void applyHomeCardStyle(Flex& card, float scale, float fillOpacity) {
-    applySectionCardStyle(card, scale, fillOpacity);
-    card.setGap(Style::spaceSm * scale);
-  }
-
   void applyShortcutButtonStyle(Button& button, bool enabled, bool active, float fillOpacity) {
     const bool on = enabled && active;
     button.setVariant(on ? ButtonVariant::Primary : ButtonVariant::Default);
@@ -211,7 +206,8 @@ std::unique_ptr<Flex> HomeTab::create() {
       .justify = FlexJustify::Center,
       .fillHeight = true,
       .flexGrow = 1.0F,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applyHomeCardStyle(card, scale, opacity); },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
 
   {
@@ -388,7 +384,8 @@ std::unique_ptr<Flex> HomeTab::create() {
       .fillWidth = true,
       .fillHeight = true,
       .flexGrow = kHomeMediaCardFlexGrow,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applyHomeCardStyle(card, scale, opacity); },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
 
   const float artSize = Style::controlHeightLg * 1.22F * scale;
@@ -467,14 +464,8 @@ std::unique_ptr<Flex> HomeTab::create() {
        .fillWidth = true,
        .fillHeight = true,
        .flexGrow = kHomeDateTimeCardFlexGrow,
-       .configure =
-           [scale, opacity = panelCardOpacity()](Flex& card) {
-             applyHomeCardStyle(card, scale, opacity);
-             card.setDirection(FlexDirection::Horizontal);
-             card.setAlign(FlexAlign::Center);
-             card.setJustify(FlexJustify::Center);
-             card.setGap(Style::spaceLg * scale);
-           }},
+       .cardStyleScale = scale,
+       .cardStyleFillOpacity = panelCardOpacity()},
       ui::label({
           .out = &m_timeLabel,
           .text = formatShellTime(m_config),

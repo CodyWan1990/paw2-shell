@@ -139,22 +139,19 @@ void SetupWizardPanel::create() {
        .paddingH = 28.0F * scale}
   );
 
+  Flex* content = nullptr;
   auto scroll = ui::scrollView({
       .contentScale = scale,
       .scrollbarVisible = true,
       .viewportPaddingH = 0.0F,
       .viewportPaddingV = 0.0F,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scrollView) {
-        scrollView.clearFill();
-        scrollView.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceLg * scale,
+      .contentOut = &content,
   });
-
-  auto* content = scroll->content();
-  content->setDirection(FlexDirection::Vertical);
-  content->setAlign(FlexAlign::Stretch);
-  content->setGap(Style::spaceLg * scale);
 
   // Header
   {

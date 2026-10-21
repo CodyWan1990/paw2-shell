@@ -1,8 +1,8 @@
 #include "shell/wallpaper/panel/wallpaper_panel.h"
 
 #include "config/config_service.h"
-#include "core/input/keybind_matcher.h"
 #include "core/deferred_call.h"
+#include "core/input/keybind_matcher.h"
 #include "core/log.h"
 #include "core/random.h"
 #include "core/ui_phase.h"
@@ -21,6 +21,7 @@
 #include "theme/theme_service.h"
 #include "ui/builders.h"
 #include "ui/dialogs/color_picker_dialog.h"
+#include "ui/grid_nav.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 #include "util/file_utils.h"
@@ -39,16 +40,6 @@
 #include <utility>
 
 namespace {
-
-  [[nodiscard]] bool isDescendantOf(const Node* node, const Node* ancestor) {
-    if (node == nullptr || ancestor == nullptr)
-      return false;
-    for (const Node* p = node->parent(); p != nullptr; p = p->parent()) {
-      if (p == ancestor)
-        return true;
-    }
-    return false;
-  }
 
   constexpr Logger kLog("wp-panel");
   constexpr auto kFilterDebounceInterval = std::chrono::milliseconds(120);
@@ -1080,7 +1071,7 @@ bool WallpaperPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers,
     }
   }
 
-  if (focused != nullptr && !isDescendantOf(focused, m_grid)) {
+  if (focused != nullptr && !focused->isDescendantOf(m_grid)) {
     return false;
   }
 
@@ -1627,55 +1618,11 @@ bool WallpaperPanel::handleKeyEvent(std::uint32_t sym, std::uint32_t modifiers) 
     return false;
   }
 
-  // Approximate column count from current grid layout. VirtualGridView does
-  // not expose its column count directly, so we recompute from viewport width.
-  std::size_t columns = 1;
-  if (m_grid != nullptr) {
-    const float viewportW = m_grid->scrollView().contentViewportWidth();
-    const float cellW = kMinTileWidth * contentScale();
-    const float gap = Style::spaceMd * contentScale();
-    if (cellW > 0.0F) {
-      columns = std::max<std::size_t>(1, static_cast<std::size_t>((viewportW + gap) / (cellW + gap)));
-    }
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Left, sym, modifiers)) {
-    if (!hasVisibleSelection()) {
-      return true;
-    }
-    if (m_selectedVisibleIndex > 0) {
-      selectVisibleIndex(m_selectedVisibleIndex - 1);
-    }
-    return true;
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Right, sym, modifiers)) {
-    if (!hasVisibleSelection()) {
-      selectVisibleIndex(0);
-    } else if (m_selectedVisibleIndex + 1 < m_visibleEntries.size()) {
-      selectVisibleIndex(m_selectedVisibleIndex + 1);
-    }
-    return true;
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Up, sym, modifiers)) {
-    if (!hasVisibleSelection()) {
-      selectVisibleIndex(0);
-    } else if (m_selectedVisibleIndex >= columns) {
-      selectVisibleIndex(m_selectedVisibleIndex - columns);
-    }
-    return true;
-  }
-
-  if (KeybindMatcher::matches(KeybindAction::Down, sym, modifiers)) {
-    if (!hasVisibleSelection()) {
-      selectVisibleIndex(0);
-    } else {
-      const std::size_t nextIndex = m_selectedVisibleIndex + columns;
-      if (nextIndex < m_visibleEntries.size()) {
-        selectVisibleIndex(nextIndex);
-      }
-    }
+  const std::size_t columns = m_grid != nullptr ? m_grid->layoutColumnCount() : 1;
+  if (const auto delta = ui::gridNavDelta(sym, modifiers, columns)) {
+    const std::optional<std::size_t> current =
+        hasVisibleSelection() ? std::optional<std::size_t>(m_selectedVisibleIndex) : std::nullopt;
+    selectVisibleIndex(ui::gridNavTarget(current, *delta, m_visibleEntries.size(), false));
     return true;
   }
 

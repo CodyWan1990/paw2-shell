@@ -4,6 +4,7 @@
 #include "config/atomic_file.h"
 #include "core/log.h"
 #include "core/toml.h"
+#include "util/file_utils.h"
 
 #include <algorithm>
 #include <array>
@@ -30,13 +31,8 @@ namespace compositors::paw2 {
                                          "# touches; delete this file to hand its tables back to config.toml.\n\n";
 
     [[nodiscard]] std::filesystem::path defaultConfigDir() {
-      if (const char* xdg = std::getenv("XDG_CONFIG_HOME"); xdg != nullptr && xdg[0] != '\0') {
-        return std::filesystem::path(xdg) / "paw2";
-      }
-      if (const char* home = std::getenv("HOME"); home != nullptr && home[0] != '\0') {
-        return std::filesystem::path(home) / ".config" / "paw2";
-      }
-      return {};
+      const std::string base = FileUtils::xdgConfigHome();
+      return base.empty() ? std::filesystem::path{} : std::filesystem::path(base) / "paw2";
     }
 
     [[nodiscard]] std::string topTable(std::string_view path) {
@@ -145,15 +141,6 @@ namespace compositors::paw2 {
       }
     }
 
-    [[nodiscard]] std::optional<std::string> readFile(const std::filesystem::path& path) {
-      std::ifstream in(path, std::ios::binary);
-      if (!in) {
-        return std::nullopt;
-      }
-      std::stringstream buffer;
-      buffer << in.rdbuf();
-      return buffer.str();
-    }
 
   } // namespace
 
@@ -180,7 +167,7 @@ namespace compositors::paw2 {
   Paw2ConfigWriter::~Paw2ConfigWriter() { m_runtime.removeListener(m_runtimeListener); }
 
   void Paw2ConfigWriter::load() {
-    const auto text = readFile(shellDropIn());
+    const auto text = FileUtils::readTextFile(shellDropIn());
     if (!text.has_value()) {
       return;
     }
@@ -441,7 +428,7 @@ namespace compositors::paw2 {
     }
     if (m_keybindsDirty) {
       if (!m_keybindsLastGood.has_value()) {
-        m_keybindsLastGood = readFile(keybindsDropIn()).value_or(std::string{});
+        m_keybindsLastGood = FileUtils::readTextFile(keybindsDropIn()).value_or(std::string{});
       }
       (void)writeFile(keybindsDropIn(), nlohmann::json{{"bindings", bindingsWithEdits()}});
     }

@@ -293,9 +293,7 @@ void ThemeEditorPanel::rebuildWallpaperList() {
     return;
   }
   const float scale = contentScale();
-  while (!m_wallpaperList->children().empty()) {
-    (void)m_wallpaperList->removeChild(m_wallpaperList->children().back().get());
-  }
+  m_wallpaperList->clearChildren();
   m_thumbs.clear();
   m_wallpaperList->setGap(Style::spaceXs * scale);
 

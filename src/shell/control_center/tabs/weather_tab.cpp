@@ -70,8 +70,9 @@ std::unique_ptr<Flex> WeatherTab::create() {
       .padding = Style::spaceXs * scale,
       .clipChildren = true,
       .flexGrow = 1.0F,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) {
-        applySectionCardStyle(card, scale, opacity);
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
+      .configure = [scale](Flex& card) {
         card.setDirection(FlexDirection::Horizontal);
         card.setPadding(Style::spaceXs * scale, Style::spaceXs * scale);
         card.setGap(Style::spaceSm * scale);
@@ -201,8 +202,9 @@ std::unique_ptr<Flex> WeatherTab::create() {
       .out = &m_detailsCard,
       .align = FlexAlign::Stretch,
       .gap = 0.0F,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) {
-        applySectionCardStyle(card, scale, opacity);
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
+      .configure = [scale](Flex& card) {
         card.setPadding(Style::spaceMd * scale);
         card.setGap(0.0F);
       },
@@ -269,8 +271,9 @@ std::unique_ptr<Flex> WeatherTab::create() {
       .gap = Style::spaceXs * scale,
       .fillHeight = true,
       .flexGrow = 2.0F,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& column) {
-        applySectionCardStyle(column, scale, opacity);
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
+      .configure = [scale](Flex& column) {
         column.setGap(Style::spaceXs * scale);
         column.setPadding(Style::spaceMd * scale, Style::spaceMd * scale);
         column.setClipChildren(true);

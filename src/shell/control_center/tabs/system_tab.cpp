@@ -169,10 +169,9 @@ namespace {
   ) {
     auto card = ui::column({
         .flexGrow = grow,
-        .configure = [scale, fillOpacity](Flex& section) {
-          applySectionCardStyle(section, scale, fillOpacity);
-          section.setGap(Style::spaceXs * scale);
-        },
+        .cardStyleScale = scale,
+        .cardStyleFillOpacity = fillOpacity,
+        .configure = [scale](Flex& section) { section.setGap(Style::spaceXs * scale); },
     });
 
     addTitle(*card, title, scale);

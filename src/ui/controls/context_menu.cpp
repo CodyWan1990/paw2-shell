@@ -264,9 +264,7 @@ void ContextMenuControl::doLayout(Renderer& renderer) {
 
 void ContextMenuControl::rebuild(Renderer& renderer) {
   uiAssertNotRendering("ContextMenuControl::rebuild");
-  while (!children().empty()) {
-    removeChild(children().back().get());
-  }
+  clearChildren();
 
   setSize(m_menuWidth, preferredHeight());
 

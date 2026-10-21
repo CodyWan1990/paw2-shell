@@ -360,7 +360,8 @@ std::unique_ptr<Flex> BluetoothTab::create() {
   auto pairingCard = ui::column({
       .out = &m_pairingCard,
       .visible = false,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
 
   pairingCard->addChild(
@@ -502,15 +503,12 @@ std::unique_ptr<Flex> BluetoothTab::create() {
       .viewportPaddingH = 0.0F,
       .viewportPaddingV = 0.0F,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scrollView) {
-        scrollView.clearFill();
-        scrollView.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceMd * scale,
+      .contentOut = &m_list,
   });
-  m_list = listScroll->content();
-  m_list->setDirection(FlexDirection::Vertical);
-  m_list->setAlign(FlexAlign::Stretch);
-  m_list->setGap(Style::spaceMd * scale);
 
   tab->addChild(std::move(listScroll));
   return tab;
@@ -813,9 +811,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
   m_rescanButton = nullptr;
   m_deviceRows.clear();
 
-  while (!m_list->children().empty()) {
-    m_list->removeChild(m_list->children().front().get());
-  }
+  m_list->clearChildren();
 
   if (m_service == nullptr) {
     m_list->addChild(
@@ -834,7 +830,8 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
   // Adapter card: power + discoverable toggles
   {
     auto adapterCard = ui::column({
-        .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+        .cardStyleScale = scale,
+        .cardStyleFillOpacity = panelCardOpacity(),
     });
 
     auto powerRow = ui::row(
@@ -974,7 +971,8 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
         break;
       }
       auto card = ui::column({
-          .configure = [scale, opacity = panelCardOpacity()](Flex& c) { applySectionCardStyle(c, scale, opacity); },
+          .cardStyleScale = scale,
+          .cardStyleFillOpacity = panelCardOpacity(),
       });
       card->addChild(makeCardHeaderRow(sectionText, scale));
       bucketCard = card.get();

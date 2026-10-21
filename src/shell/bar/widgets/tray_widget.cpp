@@ -455,9 +455,7 @@ void TrayWidget::rebuild(Renderer& renderer) {
 
   clearHoverOverlays();
 
-  while (!m_container->children().empty()) {
-    m_container->removeChild(m_container->children().back().get());
-  }
+  m_container->clearChildren();
 
   auto attachHover = [this](InputArea& area, float size) {
     if (!barCapsuleSpec().hoverHighlight) {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "util/app_dir_name.h"
+
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -8,6 +9,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <iterator>
 #include <optional>
 #include <string>
 #include <string_view>
@@ -373,20 +375,35 @@ namespace FileUtils {
     return text;
   }
 
+  // Whole file as text, or nullopt when it can't be opened.
+  [[nodiscard]] inline std::optional<std::string> readTextFile(const std::filesystem::path& path) {
+    std::ifstream in(path, std::ios::binary);
+    if (!in) {
+      return std::nullopt;
+    }
+    return std::string(std::istreambuf_iterator<char>(in), std::istreambuf_iterator<char>());
+  }
+
+  // $XDG_CONFIG_HOME, else ~/.config; empty when neither is set.
+  [[nodiscard]] inline std::string xdgConfigHome() {
+    const char* xdg = std::getenv("XDG_CONFIG_HOME");
+    if (xdg != nullptr && xdg[0] != '\0') {
+      return xdg;
+    }
+    const char* home = std::getenv("HOME");
+    if (home != nullptr && home[0] != '\0') {
+      return std::string(home) + "/.config";
+    }
+    return {};
+  }
+
   [[nodiscard]] inline std::string configDir() {
     const char* noctalia = std::getenv("NOCTALIA_CONFIG_HOME");
     if (noctalia != nullptr && noctalia[0] != '\0') {
       return std::string(noctalia) + "/" + kAppDirName;
     }
-    const char* xdg = std::getenv("XDG_CONFIG_HOME");
-    if (xdg != nullptr && xdg[0] != '\0') {
-      return std::string(xdg) + "/" + kAppDirName;
-    }
-    const char* home = std::getenv("HOME");
-    if (home != nullptr && home[0] != '\0') {
-      return std::string(home) + "/.config/" + kAppDirName;
-    }
-    return {};
+    const std::string base = xdgConfigHome();
+    return base.empty() ? std::string{} : base + "/" + kAppDirName;
   }
 
   [[nodiscard]] inline std::string stateDir() {

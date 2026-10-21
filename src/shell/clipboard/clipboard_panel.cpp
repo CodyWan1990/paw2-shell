@@ -53,70 +53,22 @@ namespace {
     return std::ceil(std::max(kListThumbSize * scale, textHeight) + Style::spaceXs * scale * 2.0F);
   }
 
-  [[nodiscard]] bool isDescendantOf(const Node* node, const Node* ancestor) {
-    if (node == nullptr || ancestor == nullptr) {
-      return false;
-    }
-    for (const Node* current = node; current != nullptr; current = current->parent()) {
-      if (current == ancestor) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  void replaceAll(std::string& text, std::string_view needle, std::string_view replacement) {
-    if (needle.empty()) {
-      return;
-    }
-
-    std::size_t pos = 0;
-    while ((pos = text.find(needle, pos)) != std::string::npos) {
-      text.replace(pos, needle.size(), replacement);
-      pos += replacement.size();
-    }
-  }
-
   std::string buildImageActionCommand(std::string command, std::string_view imagePath) {
     const bool hasPathPlaceholder = command.contains("{path}");
     const bool hasStdinPlaceholder = command.contains("{stdin}");
     const std::string quotedPath = StringUtils::shellQuote(imagePath);
 
     if (hasPathPlaceholder) {
-      replaceAll(command, "{path}", quotedPath);
+      command = StringUtils::replaceAll(command, "{path}", quotedPath);
     }
     if (hasStdinPlaceholder) {
-      replaceAll(command, "{stdin}", "-");
+      command = StringUtils::replaceAll(command, "{stdin}", "-");
     }
 
     if (!hasPathPlaceholder || hasStdinPlaceholder) {
       return "cat -- " + quotedPath + " | " + command;
     }
     return command;
-  }
-
-  std::string collapseWhitespace(std::string_view text) {
-    std::string out;
-    out.reserve(text.size());
-
-    bool lastWasSpace = true;
-    for (char ch : text) {
-      const bool isWhitespace = (ch == ' ' || ch == '\n' || ch == '\t' || ch == '\r');
-      if (isWhitespace) {
-        if (!lastWasSpace) {
-          out.push_back(' ');
-        }
-        lastWasSpace = true;
-        continue;
-      }
-      out.push_back(ch);
-      lastWasSpace = false;
-    }
-
-    if (!out.empty() && out.back() == ' ') {
-      out.pop_back();
-    }
-    return out;
   }
 
   std::string formatBytes(std::size_t bytes) {
@@ -335,7 +287,7 @@ namespace {
       }
 
       const std::string rawTitle = entryTitle(entry);
-      m_title->setText(m_isImage ? rawTitle : collapseWhitespace(rawTitle));
+      m_title->setText(m_isImage ? rawTitle : StringUtils::windowTitleSingleLine(rawTitle));
       m_meta->setText(formatTimeAgo(entry.capturedAt) + "  •  " + formatBytes(entry.byteSize));
 
       if (m_glyph != nullptr) {
@@ -981,7 +933,7 @@ bool ClipboardPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers,
 
   auto& dispatcher = PanelManager::instance().inputDispatcher();
   InputArea* focused = dispatcher.focusedArea();
-  if (focused != nullptr && !isDescendantOf(focused, m_listGrid)) {
+  if (focused != nullptr && !focused->isDescendantOf(m_listGrid)) {
     return false;
   }
 
@@ -1139,9 +1091,7 @@ void ClipboardPanel::rebuildPreview(Renderer& renderer, float width, float heigh
 
   updatePreviewActions();
 
-  while (!m_previewContent->children().empty()) {
-    m_previewContent->removeChild(m_previewContent->children().front().get());
-  }
+  m_previewContent->clearChildren();
   m_previewImage = nullptr;
 
   const auto& history = m_clipboard != nullptr ? m_clipboard->history() : std::deque<ClipboardEntry>{};

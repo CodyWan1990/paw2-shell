@@ -6,6 +6,7 @@
 #include "notification/notifications.h"
 #include "scripting/plugin_runtime_context.h"
 #include "shell/panel/panel_manager.h"
+#include "util/file_utils.h"
 
 #include <algorithm>
 #include <chrono>
@@ -16,15 +17,6 @@
 namespace {
   constexpr Logger kLog("plugin-shortcut");
 
-  std::string readFile(const std::filesystem::path& path) {
-    std::ifstream file(path);
-    if (!file) {
-      return {};
-    }
-    std::stringstream ss;
-    ss << file.rdbuf();
-    return ss.str();
-  }
 } // namespace
 
 PluginShortcut::PluginShortcut(scripting::PluginRuntimeContext context)
@@ -49,7 +41,7 @@ PluginShortcut::~PluginShortcut() {
 }
 
 void PluginShortcut::start() {
-  std::string code = readFile(m_sourcePath);
+  std::string code = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   if (code.empty()) {
     kLog.warn("shortcut '{}': empty or unreadable source {}", m_entryId, m_sourcePath.string());
     return;
@@ -159,7 +151,7 @@ void PluginShortcut::resetPresentation() {
 }
 
 void PluginShortcut::reloadScript(bool notifyUser) {
-  std::string code = readFile(m_sourcePath);
+  std::string code = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   auto name = m_sourcePath.filename().string();
   if (code.empty()) {
     kLog.warn("shortcut '{}': failed to reload '{}'", m_entryId, m_sourcePath.string());

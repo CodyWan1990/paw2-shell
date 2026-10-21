@@ -141,6 +141,10 @@ public:
   // Insert at a specific vector position to control Flex layout order (not rendering order — use zIndex for that).
   virtual Node* insertChildAt(std::size_t index, std::unique_ptr<Node> child);
   virtual std::unique_ptr<Node> removeChild(Node* child);
+  // Removes (and destroys) every child, last first.
+  void clearChildren();
+  // True when this node is `ancestor` or sits anywhere below it.
+  [[nodiscard]] bool isDescendantOf(const Node* ancestor) const noexcept;
 
   virtual void setAnimationManager(AnimationManager* mgr);
   [[nodiscard]] AnimationManager* animationManager() const noexcept { return m_animationManager; }

@@ -134,6 +134,10 @@ namespace ui {
     std::optional<float> opacity = std::nullopt;
     std::optional<bool> visible = std::nullopt;
     std::optional<bool> participatesInLayout = std::nullopt;
+    // Section-card look: card fill/border/radius, stretch align, spaceSm gap and
+    // spaceMd padding. Applied first, so the explicit props above still win.
+    std::optional<float> cardStyleScale = std::nullopt;
+    std::optional<float> cardStyleFillOpacity = std::nullopt;
     std::function<void(Flex&)> configure = nullptr;
   };
 
@@ -420,6 +424,11 @@ namespace ui {
     std::optional<float> opacity = std::nullopt;
     std::optional<bool> visible = std::nullopt;
     std::optional<bool> participatesInLayout = std::nullopt;
+    std::optional<bool> transparent = std::nullopt; // drop the default fill and border
+    std::optional<FlexDirection> contentDirection = std::nullopt;
+    std::optional<FlexAlign> contentAlign = std::nullopt;
+    std::optional<float> contentGap = std::nullopt;
+    Flex** contentOut = nullptr;
     std::function<void(float)> onScrollChanged = nullptr;
     std::function<void(ScrollView&)> configure = nullptr;
   };
@@ -604,6 +613,9 @@ namespace ui {
     std::optional<bool> participatesInLayout = std::nullopt;
     std::function<void(ProgressBar&)> configure = nullptr;
   };
+
+  // Card fill/border/radius plus the section layout defaults used by FlexProps::cardStyleScale.
+  void applySectionCardStyle(Flex& card, float scale = 1.0F, float fillOpacity = 1.0F);
 
   [[nodiscard]] std::unique_ptr<Flex> flex(FlexDirection direction, FlexProps props);
   [[nodiscard]] std::unique_ptr<Input> input(InputProps props);

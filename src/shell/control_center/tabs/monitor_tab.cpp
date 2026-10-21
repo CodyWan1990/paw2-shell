@@ -85,15 +85,12 @@ std::unique_ptr<Flex> MonitorTab::create() {
       .viewportPaddingH = 0.0F,
       .viewportPaddingV = 0.0F,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scrollView) {
-        scrollView.clearFill();
-        scrollView.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceMd * scale,
+      .contentOut = &m_cardsLayout,
   });
-  m_cardsLayout = cardsScroll->content();
-  m_cardsLayout->setDirection(FlexDirection::Vertical);
-  m_cardsLayout->setAlign(FlexAlign::Stretch);
-  m_cardsLayout->setGap(Style::spaceMd * scale);
   tab->addChild(std::move(cardsScroll));
 
   // Empty state (shown when no displays are known)
@@ -307,10 +304,9 @@ void MonitorTab::rebuildCards(Renderer& /*renderer*/) {
   for (const auto& display : displays) {
     // Card container
     auto card = ui::column({
-        .configure = [scale, opacity = panelCardOpacity()](Flex& section) {
-          applySectionCardStyle(section, scale, opacity);
-          section.setGap(Style::spaceMd * scale);
-        },
+        .cardStyleScale = scale,
+        .cardStyleFillOpacity = panelCardOpacity(),
+        .configure = [scale](Flex& section) { section.setGap(Style::spaceMd * scale); },
     });
 
     Glyph* iconPtr = nullptr;

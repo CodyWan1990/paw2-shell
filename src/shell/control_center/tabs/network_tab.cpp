@@ -629,7 +629,8 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   auto currentCard = ui::column({
       .out = &m_currentCard,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   addTitle(*currentCard, i18n::tr("control-center.network.current-connection"), scale);
 
@@ -676,10 +677,9 @@ std::unique_ptr<Flex> NetworkTab::create() {
   auto passwordCard = ui::column({
       .out = &m_passwordCard,
       .visible = false,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) {
-        applySectionCardStyle(card, scale, opacity);
-        card.setGap(Style::spaceMd * scale);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
+      .configure = [scale](Flex& card) { card.setGap(Style::spaceMd * scale); },
   });
 
   passwordCard->addChild(
@@ -842,6 +842,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   passwordCard->addChild(std::move(inputRow));
 
+  Flex* scrollContent = nullptr;
   auto listScroll = ui::scrollView({
       .out = &m_listScroll,
       .contentScale = contentScale(),
@@ -849,17 +850,14 @@ std::unique_ptr<Flex> NetworkTab::create() {
       .viewportPaddingH = 0.0F,
       .viewportPaddingV = 0.0F,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scrollView) {
-        scrollView.clearFill();
-        scrollView.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceMd * scale,
+      .contentOut = &scrollContent,
   });
   // The password card scrolls with the list so a tall 802.1X form stays reachable.
   // m_list is a separate column because rebuildApList() clears all of its children.
-  Flex* scrollContent = listScroll->content();
-  scrollContent->setDirection(FlexDirection::Vertical);
-  scrollContent->setAlign(FlexAlign::Stretch);
-  scrollContent->setGap(Style::spaceMd * scale);
   scrollContent->addChild(std::move(passwordCard));
   scrollContent->addChild(
       ui::column({
@@ -1411,9 +1409,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
   m_cellularRows.clear();
   m_apRows.clear();
 
-  while (!m_list->children().empty()) {
-    m_list->removeChild(m_list->children().front().get());
-  }
+  m_list->clearChildren();
 
   if (!networkAvailable()) {
     m_list->addChild(
@@ -1428,7 +1424,8 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
 
     if (!vpns.empty()) {
       auto vpnCard = ui::column({
-          .configure = [scale, opacity](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+          .cardStyleScale = scale,
+          .cardStyleFillOpacity = opacity,
       });
 
       auto vpnHeader = makeCardHeaderRow(i18n::tr("control-center.network.vpns"), scale);
@@ -1478,7 +1475,8 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
 
     if (m_modem != nullptr && !m_modem->modems().empty()) {
       auto cellularCard = ui::column({
-          .configure = [scale, opacity](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+          .cardStyleScale = scale,
+          .cardStyleFillOpacity = opacity,
       });
 
       auto cellularHeader = makeCardHeaderRow(i18n::tr("control-center.network.cellular"), scale);
@@ -1504,7 +1502,8 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
 
     {
       auto wifiCard = ui::column({
-          .configure = [scale, opacity](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+          .cardStyleScale = scale,
+          .cardStyleFillOpacity = opacity,
       });
 
       auto wifiHeader = makeCardHeaderRow(i18n::tr("control-center.network.wifi"), scale);

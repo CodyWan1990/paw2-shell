@@ -145,9 +145,7 @@ namespace calendar_view {
 
   void rebuildMonth(const MonthBuildOptions& options) {
     uiAssertNotRendering("calendar_view::rebuildMonth");
-    while (!options.grid.children().empty()) {
-      options.grid.removeChild(options.grid.children().front().get());
-    }
+    options.grid.clearChildren();
 
     const State state = stateForOffset(options.monthOffset);
     const int year = state.displayYear;
@@ -413,9 +411,7 @@ namespace calendar_view {
     if (options.state != nullptr) {
       options.state->linkOverlays.clear();
     }
-    while (!content->children().empty()) {
-      content->removeChild(content->children().front().get());
-    }
+    content->clearChildren();
 
     std::tm selected{};
     selected.tm_year = options.selected.year - 1900;

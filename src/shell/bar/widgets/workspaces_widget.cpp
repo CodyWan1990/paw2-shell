@@ -246,9 +246,7 @@ void WorkspacesWidget::doUpdate(Renderer& renderer) {
       m_items.clear();
       if (m_container != nullptr) {
         m_container->setFrameSize(0.0F, 0.0F);
-        while (!m_container->children().empty()) {
-          m_container->removeChild(m_container->children().back().get());
-        }
+        m_container->clearChildren();
       }
       m_rebuildPending = true;
       if (root() != nullptr) {
@@ -346,9 +344,7 @@ void WorkspacesWidget::rebuild(Renderer& renderer) {
   m_hoveredArea = nullptr;
   m_hoverOverlay = nullptr;
   m_hoverProgress = 0.0F;
-  while (!m_container->children().empty()) {
-    m_container->removeChild(m_container->children().back().get());
-  }
+  m_container->clearChildren();
   m_items.clear();
 
   struct RebuildEntry {

@@ -310,14 +310,6 @@ namespace noctalia::theme {
       return path.parent_path() / (path.filename().string() + ".md5");
     }
 
-    std::optional<std::string> readTextFile(const std::filesystem::path& path) {
-      std::ifstream in(path, std::ios::binary);
-      if (!in)
-        return std::nullopt;
-      std::stringstream buf;
-      buf << in.rdbuf();
-      return buf.str();
-    }
 
     bool writeTextFile(const std::filesystem::path& path, std::string_view text) {
       std::error_code ec;
@@ -560,7 +552,7 @@ namespace noctalia::theme {
         const std::string currentMd5 = util::fileMd5Hex(path);
         if (auto it = metadata.fileMd5s.find(std::string(kTemplateToml)); it != metadata.fileMd5s.end()) {
           if (currentMd5 != it->second) {
-            const auto current = readTextFile(path);
+            const auto current = FileUtils::readTextFile(path);
             if (current.has_value() && *current == desired) {
               recordCachedFile(metadata, kTemplateToml, path);
               return;
@@ -569,7 +561,7 @@ namespace noctalia::theme {
             return;
           }
         } else {
-          const auto current = readTextFile(path);
+          const auto current = FileUtils::readTextFile(path);
           if (!current.has_value() || *current != desired) {
             kLog.warn("community template '{}' metadata is untracked in the cache; skipping catalog update", info.id);
             return;

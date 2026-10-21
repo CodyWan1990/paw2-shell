@@ -6,6 +6,7 @@
 #include "scripting/plugin_runtime_context.h"
 #include "ui/builders.h"
 #include "ui/controls/flex.h"
+#include "util/file_utils.h"
 
 #include <cstdlib>
 #include <format>
@@ -18,15 +19,6 @@ namespace {
   constexpr Logger kLog("plugin-desktop-widget");
   constexpr int kDefaultUpdateIntervalMs = 1000;
 
-  std::string readFile(const std::filesystem::path& path) {
-    std::ifstream f(path);
-    if (!f) {
-      return {};
-    }
-    std::stringstream ss;
-    ss << f.rdbuf();
-    return ss.str();
-  }
 
 } // namespace
 
@@ -71,7 +63,7 @@ void PluginDesktopWidget::create() {
     kLog.warn("plugin desktop widget '{}': no source path", m_entryId);
     return;
   }
-  std::string source = readFile(m_sourcePath);
+  std::string source = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   if (source.empty()) {
     kLog.warn("plugin desktop widget '{}': failed to read '{}'", m_entryId, m_sourcePath.string());
     return;
@@ -222,7 +214,7 @@ void PluginDesktopWidget::setupScriptWatch() {
 void PluginDesktopWidget::teardownScriptWatch() { m_scriptWatcher.stop(); }
 
 void PluginDesktopWidget::reloadScript() {
-  std::string source = readFile(m_sourcePath);
+  std::string source = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   auto name = m_sourcePath.filename().string();
   if (source.empty() || m_runtime == nullptr) {
     kLog.warn("hot reload: failed to reload '{}'", name);

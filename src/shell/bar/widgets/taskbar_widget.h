@@ -183,7 +183,6 @@ private:
   void doUpdate(Renderer& renderer) override;
 
   void rebuild(Renderer& renderer);
-  void clearChildren(Flex* flex) const;
   void buildTaskButtons(Renderer& renderer);
   void updateModels();
   void syncWorkspaceGroupingCapability();

@@ -11,6 +11,7 @@
 #include "ui/controls/input.h"
 #include "ui/controls/label.h"
 #include "ui/controls/virtual_grid_view.h"
+#include "ui/grid_nav.h"
 #include "ui/palette.h"
 #include "ui/style.h"
 #include "util/string_utils.h"
@@ -25,15 +26,6 @@ namespace settings {
 
     // Sentinel for the Enabled chip — not a real catalog category value.
     constexpr std::string_view kEnabledFilter = "__enabled__";
-
-    [[nodiscard]] bool containsInsensitive(std::string_view haystack, std::string_view needle) {
-      if (needle.empty()) {
-        return true;
-      }
-      return !std::ranges::search(haystack, needle, [](char a, char b) {
-                return std::tolower(static_cast<unsigned char>(a)) == std::tolower(static_cast<unsigned char>(b));
-              }).empty();
-    }
 
     class TemplateStoreAdapter final : public VirtualGridAdapter {
     public:
@@ -246,9 +238,9 @@ namespace settings {
         continue;
       }
       if (!m_searchQuery.empty()) {
-        const bool match = containsInsensitive(entry.displayName, m_searchQuery)
-            || containsInsensitive(entry.id, m_searchQuery)
-            || containsInsensitive(entry.category, m_searchQuery);
+        const bool match = StringUtils::containsInsensitive(entry.displayName, m_searchQuery)
+            || StringUtils::containsInsensitive(entry.id, m_searchQuery)
+            || StringUtils::containsInsensitive(entry.category, m_searchQuery);
         if (!match) {
           continue;
         }
@@ -575,32 +567,10 @@ namespace settings {
       return false;
     }
 
-    const int columns = m_grid != nullptr ? static_cast<int>(std::max<std::size_t>(1, m_grid->layoutColumnCount())) : 1;
-
-    if (KeySymbol::isPageUp(sym)) {
-      const int stride = m_grid != nullptr ? static_cast<int>(m_grid->pageItemStride()) : columns;
-      moveSelection(-stride);
-      return true;
-    }
-    if (KeySymbol::isPageDown(sym)) {
-      const int stride = m_grid != nullptr ? static_cast<int>(m_grid->pageItemStride()) : columns;
-      moveSelection(stride);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Left, sym, modifiers)) {
-      moveSelection(-1);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Right, sym, modifiers)) {
-      moveSelection(1);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Up, sym, modifiers)) {
-      moveSelection(-columns);
-      return true;
-    }
-    if (KeybindMatcher::matches(KeybindAction::Down, sym, modifiers)) {
-      moveSelection(columns);
+    const std::size_t columns = m_grid != nullptr ? m_grid->layoutColumnCount() : 1;
+    const std::size_t stride = m_grid != nullptr ? m_grid->pageItemStride() : columns;
+    if (const auto delta = ui::gridNavDelta(sym, modifiers, columns, std::max<std::size_t>(stride, 1))) {
+      moveSelection(static_cast<int>(*delta));
       return true;
     }
     if (KeybindMatcher::matches(KeybindAction::Validate, sym, modifiers)) {

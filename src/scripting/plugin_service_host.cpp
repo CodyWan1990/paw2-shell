@@ -7,6 +7,7 @@
 #include "scripting/plugin_ipc.h"
 #include "scripting/plugin_manifest.h"
 #include "scripting/plugin_registry.h"
+#include "util/file_utils.h"
 
 #include <algorithm>
 #include <chrono>
@@ -22,15 +23,6 @@ namespace scripting {
   namespace {
     constexpr Logger kLog("plugin-service");
 
-    std::string readFile(const std::filesystem::path& path) {
-      std::ifstream file(path);
-      if (!file) {
-        return {};
-      }
-      std::stringstream ss;
-      ss << file.rdbuf();
-      return ss.str();
-    }
   } // namespace
 
   PluginServiceHost::PluginServiceHost(
@@ -95,7 +87,7 @@ namespace scripting {
       const std::string& entryId, const std::filesystem::path& source, const std::filesystem::path& pluginDir,
       ScriptSettings seeded
   ) {
-    std::string code = readFile(source);
+    std::string code = FileUtils::readTextFile(source).value_or(std::string{});
     if (code.empty()) {
       kLog.warn("service '{}': empty or unreadable source {}", entryId, source.string());
       return nullptr;
@@ -194,7 +186,7 @@ namespace scripting {
         kLog.info("reconfigured service '{}' in place after settings change", id);
         continue;
       }
-      std::string code = readFile(entry.sourcePath);
+      std::string code = FileUtils::readTextFile(entry.sourcePath).value_or(std::string{});
       if (code.empty()) {
         kLog.warn("service '{}': empty or unreadable source on refresh {}", id, entry.sourcePath.string());
         continue;
@@ -256,7 +248,7 @@ namespace scripting {
   void PluginServiceHost::teardownScriptWatch(Service& service) { service.scriptWatcher.stop(); }
 
   void PluginServiceHost::reloadService(Service& service) {
-    std::string code = readFile(service.sourcePath);
+    std::string code = FileUtils::readTextFile(service.sourcePath).value_or(std::string{});
     auto name = service.sourcePath.filename().string();
     if (code.empty()) {
       kLog.warn("service '{}': failed to reload '{}'", service.entryId, service.sourcePath.string());

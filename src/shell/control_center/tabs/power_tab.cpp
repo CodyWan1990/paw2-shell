@@ -124,20 +124,17 @@ std::unique_ptr<Flex> PowerTab::create() {
       .gap = Style::spaceMd * scale,
   });
 
+  Flex* content = nullptr;
   auto scroll = ui::scrollView({
       .contentScale = scale,
       .scrollbarVisible = true,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scrollView) {
-        scrollView.clearFill();
-        scrollView.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceMd * scale,
+      .contentOut = &content,
   });
-
-  auto* content = scroll->content();
-  content->setDirection(FlexDirection::Vertical);
-  content->setAlign(FlexAlign::Stretch);
-  content->setGap(Style::spaceMd * scale);
 
   buildStatusCard(*content, scale);
   buildProfilesCard(*content, scale);
@@ -157,9 +154,8 @@ void PowerTab::buildChargingCard(Flex& root, float scale) {
 
   auto card = ui::column({
       .visible = false,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& section) {
-        applySectionCardStyle(section, scale, opacity);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   m_chargingCard = card.get();
   card->addChild(makeCardHeaderRow(i18n::tr("control-center.power.charging.title"), scale));
@@ -179,9 +175,8 @@ void PowerTab::buildStatusCard(Flex& root, float scale) {
   }
 
   auto card = ui::column({
-      .configure = [scale, opacity = panelCardOpacity()](Flex& section) {
-        applySectionCardStyle(section, scale, opacity);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   m_statusCard = card.get();
 
@@ -275,9 +270,8 @@ void PowerTab::buildProfilesCard(Flex& root, float scale) {
   }
 
   auto card = ui::column({
-      .configure = [scale, opacity = panelCardOpacity()](Flex& section) {
-        applySectionCardStyle(section, scale, opacity);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   m_profilesCard = card.get();
 
@@ -334,9 +328,8 @@ void PowerTab::buildHealthCard(Flex& root, float scale) {
 
   auto card = ui::column({
       .visible = false,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& section) {
-        applySectionCardStyle(section, scale, opacity);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   m_healthCard = card.get();
 
@@ -381,9 +374,8 @@ void PowerTab::buildPeripheralsCard(Flex& root, float scale) {
 
   auto card = ui::column({
       .visible = false,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& section) {
-        applySectionCardStyle(section, scale, opacity);
-      },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   m_peripheralsCard = card.get();
 

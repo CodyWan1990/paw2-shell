@@ -1685,11 +1685,9 @@ std::unique_ptr<Flex> AudioTab::createDeviceVolumeCard(DeviceVolumeCardSpec card
   return ui::column(
       {
           .flexGrow = 1.0F,
-          .configure =
-              [scale, opacity = panelCardOpacity()](Flex& column) {
-                applySectionCardStyle(column, scale, opacity);
-                column.setGap(Style::spaceXs * scale);
-              },
+          .cardStyleScale = scale,
+          .cardStyleFillOpacity = panelCardOpacity(),
+          .configure = [scale](Flex& column) { column.setGap(Style::spaceXs * scale); },
       },
       ui::row(
           {
@@ -1921,7 +1919,8 @@ std::unique_ptr<Flex> AudioTab::create() {
   auto programCard = ui::column({
       .out = &m_programCard,
       .flexGrow = 1.0F,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
   addTitle(*programCard, i18n::tr("control-center.audio.application-volumes"), scale);
 
@@ -1932,16 +1931,12 @@ std::unique_ptr<Flex> AudioTab::create() {
       .viewportPaddingH = 0.0F,
       .viewportPaddingV = 0.0F,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scroll) {
-        scroll.clearFill();
-        scroll.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceSm * scale,
+      .contentOut = &m_programList,
   });
-
-  m_programList = programScroll->content();
-  m_programList->setDirection(FlexDirection::Vertical);
-  m_programList->setAlign(FlexAlign::Stretch);
-  m_programList->setGap(Style::spaceSm * scale);
 
   programCard->addChild(std::move(programScroll));
   tab->addChild(std::move(programCard));
@@ -2238,9 +2233,7 @@ void AudioTab::rebuildProgramVolumes(Renderer& renderer) {
     return;
   }
 
-  while (!m_programList->children().empty()) {
-    m_programList->removeChild(m_programList->children().front().get());
-  }
+  m_programList->clearChildren();
   m_programRows.clear();
 
   if (m_audio == nullptr) {
@@ -2373,12 +2366,8 @@ void AudioTab::rebuildLists(Renderer& renderer) {
         && m_lastInputListKey == "unavailable") {
       return;
     }
-    while (!m_outputList->children().empty()) {
-      m_outputList->removeChild(m_outputList->children().front().get());
-    }
-    while (!m_inputList->children().empty()) {
-      m_inputList->removeChild(m_inputList->children().front().get());
-    }
+    m_outputList->clearChildren();
+    m_inputList->clearChildren();
     addEmptyState(
         *m_outputList, i18n::tr("control-center.audio.unavailable-title"),
         i18n::tr("control-center.audio.unavailable-body"), scale
@@ -2405,12 +2394,8 @@ void AudioTab::rebuildLists(Renderer& renderer) {
     return;
   }
 
-  while (!m_outputList->children().empty()) {
-    m_outputList->removeChild(m_outputList->children().front().get());
-  }
-  while (!m_inputList->children().empty()) {
-    m_inputList->removeChild(m_inputList->children().front().get());
-  }
+  m_outputList->clearChildren();
+  m_inputList->clearChildren();
 
   if (state.sinks.empty()) {
     addEmptyState(

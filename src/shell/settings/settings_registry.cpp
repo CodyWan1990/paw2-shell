@@ -337,17 +337,6 @@ namespace settings {
       }
     }
 
-    std::string pathText(const std::vector<std::string>& path) {
-      std::string out;
-      for (const auto& part : path) {
-        if (!out.empty()) {
-          out.push_back('.');
-        }
-        out += part;
-      }
-      return out;
-    }
-
     SettingEntry makeEntry(
         SettingsSection section, std::string group, std::string title, std::string subtitle,
         std::vector<std::string> path, SettingControl control, std::string tags = {}, bool advanced = false
@@ -360,7 +349,7 @@ namespace settings {
           + " "
           + subtitle
           + " "
-          + pathText(path)
+          + StringUtils::join(path, ".")
           + " "
           + tags;
       if (advanced) {
@@ -539,16 +528,6 @@ namespace settings {
     }
 
     // "Super+h Super+Left" -> {"Super+h", "Super+Left"}
-    [[nodiscard]] std::vector<std::string> paw2Chords(std::string_view chords) {
-      std::vector<std::string> list;
-      for (const auto chord : StringUtils::split(chords, ' ')) {
-        if (!chord.empty()) {
-          list.emplace_back(chord);
-        }
-      }
-      return list;
-    }
-
     void appendPaw2ShortcutEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
       constexpr auto section = SettingsSection::Paw2Shortcuts;
       const std::string text = "settings.schema.paw2.bindings";
@@ -614,11 +593,13 @@ namespace settings {
             value.has_value() && value->is_array()) {
           keys = value->get<std::vector<std::string>>();
         } else {
-          keys = paw2Chords(action.defaults);
+          keys = StringUtils::splitWhitespace(action.defaults);
         }
         const std::string defaults = action.defaults.empty()
             ? i18n::tr(text + ".no-default")
-            : i18n::tr(text + ".default", "keys", StringUtils::join(paw2Chords(action.defaults), ", "));
+            : i18n::tr(
+                  text + ".default", "keys", StringUtils::join(StringUtils::splitWhitespace(action.defaults), ", ")
+              );
         entries.push_back(makeEntry(
             section, std::string(action.group), i18n::tr(key), defaults, std::move(path),
             ListSetting{.items = std::move(keys), .recordKeys = true},

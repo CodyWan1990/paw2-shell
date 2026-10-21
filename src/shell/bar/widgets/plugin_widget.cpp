@@ -12,6 +12,7 @@
 #include "ui/builders.h"
 #include "ui/palette.h"
 #include "ui/style.h"
+#include "util/file_utils.h"
 
 #include <algorithm>
 #include <atomic>
@@ -90,14 +91,6 @@ namespace {
     return next.fetch_add(1, std::memory_order_relaxed);
   }
 
-  std::string readFile(const std::filesystem::path& path) {
-    std::ifstream f(path);
-    if (!f)
-      return {};
-    std::stringstream ss;
-    ss << f.rdbuf();
-    return ss.str();
-  }
 
 } // namespace
 
@@ -260,7 +253,7 @@ void PluginWidget::create() {
     kLog.warn("plugin widget '{}': no source path", m_entryId);
     return;
   }
-  std::string source = readFile(m_sourcePath);
+  std::string source = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   if (source.empty()) {
     kLog.warn("plugin widget '{}': failed to read '{}'", m_entryId, m_sourcePath.string());
     return;
@@ -847,7 +840,7 @@ void PluginWidget::setupScriptWatch() {
 void PluginWidget::teardownScriptWatch() { m_scriptWatcher.stop(); }
 
 void PluginWidget::reloadScript() {
-  std::string source = readFile(m_sourcePath);
+  std::string source = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   auto name = m_sourcePath.filename().string();
   if (source.empty() || !m_runtime) {
     kLog.warn("hot reload: failed to reload '{}'", name);

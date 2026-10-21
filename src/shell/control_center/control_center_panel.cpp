@@ -151,10 +151,7 @@ void ControlCenterPanel::create() {
         .fillWidth = false,
         .fillHeight = true,
         .width = sidebarScrollWidth,
-        .configure = [](ScrollView& scrollView) {
-          scrollView.clearFill();
-          scrollView.clearBorder();
-        },
+        .transparent = true,
     });
 
     auto sidebarNav = std::make_unique<RovingListNavHost>(RovingListNavController::Options{

@@ -389,6 +389,24 @@ std::unique_ptr<Node> Node::removeChild(Node* child) {
   return removed;
 }
 
+void Node::clearChildren() {
+  while (!m_children.empty()) {
+    removeChild(m_children.back().get());
+  }
+}
+
+bool Node::isDescendantOf(const Node* ancestor) const noexcept {
+  if (ancestor == nullptr) {
+    return false;
+  }
+  for (const Node* current = this; current != nullptr; current = current->m_parent) {
+    if (current == ancestor) {
+      return true;
+    }
+  }
+  return false;
+}
+
 void Node::markPaintDirty() { propagatePaintDirty(); }
 
 void Node::markLayoutDirty() {

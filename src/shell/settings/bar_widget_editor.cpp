@@ -22,6 +22,7 @@
 #include "ui/dialogs/glyph_picker_dialog.h"
 #include "ui/palette.h"
 #include "ui/style.h"
+#include "util/string_utils.h"
 
 #include <algorithm>
 #include <cctype>
@@ -229,17 +230,6 @@ namespace settings {
               },
           })
       );
-    }
-
-    std::string pathKey(const std::vector<std::string>& path) {
-      std::string out;
-      for (const auto& part : path) {
-        if (!out.empty()) {
-          out.push_back('.');
-        }
-        out += part;
-      }
-      return out;
     }
 
     std::vector<std::string> pathWithLastSegment(std::vector<std::string> path, std::string segment) {
@@ -1364,7 +1354,7 @@ namespace settings {
           continue;
         }
         const auto path = widgetSettingPath(std::string(widgetName), key);
-        const std::string deleteKey = pathKey(path);
+        const std::string deleteKey = StringUtils::join(path, ".");
         const bool overridden = ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(path);
         const bool pendingDelete = ctx.pendingDeleteWidgetSettingPath == deleteKey;
 

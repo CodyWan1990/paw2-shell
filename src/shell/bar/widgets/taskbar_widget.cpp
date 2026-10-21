@@ -801,14 +801,10 @@ void TaskbarWidget::rebuild(Renderer& renderer) {
   m_dragFloatTile = nullptr;
   m_dragSpacer = nullptr;
   m_dragParked = false;
-  clearChildren(m_taskStrip);
-  buildTaskButtons(renderer);
-}
-
-void TaskbarWidget::clearChildren(Flex* flex) const {
-  while (flex != nullptr && !flex->children().empty()) {
-    flex->removeChild(flex->children().back().get());
+  if (m_taskStrip != nullptr) {
+    m_taskStrip->clearChildren();
   }
+  buildTaskButtons(renderer);
 }
 
 void TaskbarWidget::buildTaskButtons(Renderer& renderer) {

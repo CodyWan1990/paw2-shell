@@ -1058,18 +1058,12 @@ void SettingsWindow::rebuildSettingsContent() {
   m_idleLiveStatusLabel = nullptr;
   m_sessionActionSummaryLabels.clear();
   m_sessionActionsEditState.reset();
-  while (!m_contentContainer->children().empty()) {
-    m_contentContainer->removeChild(m_contentContainer->children().back().get());
-  }
+  m_contentContainer->clearChildren();
   if (m_pageTitleRow != nullptr) {
-    while (!m_pageTitleRow->children().empty()) {
-      m_pageTitleRow->removeChild(m_pageTitleRow->children().back().get());
-    }
+    m_pageTitleRow->clearChildren();
   }
   if (m_groupJumpRow != nullptr) {
-    while (!m_groupJumpRow->children().empty()) {
-      m_groupJumpRow->removeChild(m_groupJumpRow->children().back().get());
-    }
+    m_groupJumpRow->clearChildren();
   }
   logSettingsProfile("rebuildContent clear", phaseProfileWatch);
   phaseProfileWatch.reset();
@@ -1559,6 +1553,7 @@ std::unique_ptr<Flex> SettingsWindow::buildBody(
       })
   );
 
+  Flex* content = nullptr;
   auto scroll = ui::scrollView({
       .out = &m_contentScrollView,
       .state = &m_contentScrollState,
@@ -1567,19 +1562,14 @@ std::unique_ptr<Flex> SettingsWindow::buildBody(
       .viewportPaddingH = 0.0F,
       .viewportPaddingV = Style::spaceSm * scale,
       .flexGrow = 1.0F,
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceMd * scale,
+      .contentOut = &content,
       .onScrollChanged = [this](float /*offset*/) { dismissOpenSelectDropdown(); },
-      .configure =
-          [](ScrollView& scrollView) {
-            scrollView.clearFill();
-            scrollView.clearBorder();
-          },
   });
-
-  auto* content = m_contentScrollView->content();
   m_contentContainer = content;
-  content->setDirection(FlexDirection::Vertical);
-  content->setAlign(FlexAlign::Stretch);
-  content->setGap(Style::spaceMd * scale);
   rebuildSettingsContent();
 
   contentColumn->addChild(std::move(scroll));

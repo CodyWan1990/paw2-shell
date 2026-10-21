@@ -796,9 +796,7 @@ void FileDialogView::rebuildBreadcrumb() {
     return;
   }
 
-  while (!m_breadcrumbRow->children().empty()) {
-    m_breadcrumbRow->removeChild(m_breadcrumbRow->children().back().get());
-  }
+  m_breadcrumbRow->clearChildren();
 
   const float scale = contentScale();
 

@@ -76,37 +76,6 @@ namespace {
     return std::min(rawBoost, kTypedUsageScoreCap);
   }
 
-  [[nodiscard]] bool isDescendantOf(const Node* node, const Node* ancestor) {
-    if (node == nullptr || ancestor == nullptr) {
-      return false;
-    }
-    for (const Node* current = node; current != nullptr; current = current->parent()) {
-      if (current == ancestor) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  [[nodiscard]] std::string singleLinePreview(std::string_view text) {
-    std::string preview;
-    preview.reserve(text.size());
-    bool lastWasSpace = false;
-    for (const char c : text) {
-      const bool whitespace = c == '\n' || c == '\r' || c == '\t' || c == '\f' || c == '\v';
-      if (whitespace) {
-        if (!lastWasSpace) {
-          preview.push_back(' ');
-          lastWasSpace = true;
-        }
-        continue;
-      }
-      preview.push_back(c);
-      lastWasSpace = c == ' ';
-    }
-    return preview;
-  }
-
   [[nodiscard]] bool isDetailPresentation(const LauncherResult& result) { return result.presentation == "detail"; }
 
   [[nodiscard]] std::string providerOverviewId(std::string_view prefix) {
@@ -336,7 +305,7 @@ namespace {
       const bool showAppIcon = m_style.showIcons && !m_badgeVisible;
       const bool showLeadingVisual = m_badgeVisible || showAppIcon;
       if (m_badgeVisible) {
-        m_badgeLabel->setText(singleLinePreview(result.badge));
+        m_badgeLabel->setText(StringUtils::windowTitleSingleLine(result.badge));
         m_badgeLabel->setSize(iconSize, iconSize);
         m_badgeLabel->setVisible(true);
         m_badgeLabel->setParticipatesInLayout(true);
@@ -374,7 +343,7 @@ namespace {
       m_originGlyph->setParticipatesInLayout(hasOrigin);
       const float originWidth = hasOrigin ? Style::fontSizeBody * m_style.scale + gap : 0.0F;
       const float textWidth = std::max(0.0F, width - leadingWidth - pinnedWidth - originWidth - horizontalPad);
-      m_title->setText(singleLinePreview(result.title));
+      m_title->setText(StringUtils::windowTitleSingleLine(result.title));
       m_title->setMaxWidth(textWidth);
 
       const bool showSubtitle = !m_style.compact && !result.subtitle.empty();
@@ -383,7 +352,7 @@ namespace {
         m_subtitle->setText("");
       } else {
         m_subtitle->setVisible(true);
-        m_subtitle->setText(singleLinePreview(result.subtitle));
+        m_subtitle->setText(StringUtils::windowTitleSingleLine(result.subtitle));
         m_subtitle->setMaxWidth(textWidth);
       }
 
@@ -606,7 +575,7 @@ namespace {
 
       const float horizontalPad = Style::spaceSm * m_style.scale * 2.0F;
       const float textWidth = std::max(0.0F, width - horizontalPad);
-      m_title->setText(singleLinePreview(result.title));
+      m_title->setText(StringUtils::windowTitleSingleLine(result.title));
       m_title->setMaxWidth(textWidth);
 
       applyVisualState();
@@ -1512,7 +1481,7 @@ void LauncherPanel::create() {
             if (m_input == nullptr) {
               return;
             }
-            const std::string preview = singleLinePreview(text);
+            const std::string preview = StringUtils::windowTitleSingleLine(text);
             if (preview != text) {
               m_input->setValue(preview);
             }
@@ -2266,7 +2235,7 @@ void LauncherPanel::showSessionActions() {
     m_launcherProviderViewId = std::move(previous.providerViewId);
     queueResultsTransition(ResultsTransition::NavigationBackward);
     if (m_input != nullptr) {
-      m_input->setValue(singleLinePreview(previous.query));
+      m_input->setValue(StringUtils::windowTitleSingleLine(previous.query));
     }
     if (m_grid != nullptr) {
       m_grid->scrollView().setScrollOffset(0.0F);
@@ -2331,7 +2300,7 @@ void LauncherPanel::onOpen(std::string_view context) {
     m_input->setPlaceholder(
         m_scopedPlaceholder.empty() ? i18n::tr("launcher.search-placeholder") : m_scopedPlaceholder
     );
-    m_input->setValue(singleLinePreview(initialValue));
+    m_input->setValue(StringUtils::windowTitleSingleLine(initialValue));
   }
   if (m_grid != nullptr) {
     m_grid->scrollView().setScrollOffset(0.0F);
@@ -2457,7 +2426,7 @@ void LauncherPanel::setQuery(std::string query) {
     m_sessionReturnView.reset();
   }
   m_launcherProviderViewId.clear();
-  m_input->setValue(singleLinePreview(query));
+  m_input->setValue(StringUtils::windowTitleSingleLine(query));
   if (m_grid != nullptr) {
     m_grid->scrollView().setScrollOffset(0.0F);
   }
@@ -2487,8 +2456,8 @@ bool LauncherPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, 
   InputArea* const focused = dispatcher.focusedArea();
   if (focused != nullptr) {
     const bool onInput = (m_input != nullptr && focused == m_input->inputArea());
-    const bool inResults = (m_grid != nullptr && isDescendantOf(focused, m_grid))
-        || (m_launcherSections != nullptr && isDescendantOf(focused, m_launcherSections));
+    const bool inResults = (m_grid != nullptr && focused->isDescendantOf(m_grid))
+        || (m_launcherSections != nullptr && focused->isDescendantOf(m_launcherSections));
     if (!onInput && !inResults) {
       return false;
     }
@@ -3309,7 +3278,7 @@ void LauncherPanel::bindDetailResult() {
   const bool hasSubtitle = !result.subtitle.empty();
   m_detailSubtitle->setVisible(hasSubtitle);
   m_detailSubtitle->setParticipatesInLayout(hasSubtitle);
-  m_detailSubtitle->setText(singleLinePreview(result.subtitle));
+  m_detailSubtitle->setText(StringUtils::windowTitleSingleLine(result.subtitle));
   m_detailBody->setText(result.title.empty() ? result.id : result.title);
   m_detailScroll->setScrollOffset(0.0F);
 }

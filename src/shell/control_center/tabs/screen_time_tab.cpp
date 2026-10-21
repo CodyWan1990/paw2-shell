@@ -190,26 +190,24 @@ std::unique_ptr<Flex> ScreenTimeTab::create() {
       )
   );
 
+  Flex* content = nullptr;
   auto scroll = ui::scrollView({
       .out = &m_scroll,
       .contentScale = scale,
       .scrollbarVisible = true,
       .flexGrow = 1.0F,
-      .configure = [](ScrollView& scrollView) {
-        scrollView.clearFill();
-        scrollView.clearBorder();
-      },
+      .transparent = true,
+      .contentDirection = FlexDirection::Vertical,
+      .contentAlign = FlexAlign::Stretch,
+      .contentGap = Style::spaceLg * scale,
+      .contentOut = &content,
   });
-
-  auto* content = scroll->content();
-  content->setDirection(FlexDirection::Vertical);
-  content->setAlign(FlexAlign::Stretch);
-  content->setGap(Style::spaceLg * scale);
 
   auto usageCard = ui::column({
       .out = &m_usageCard,
       .gap = Style::spaceMd * scale,
-      .configure = [scale, opacity = panelCardOpacity()](Flex& card) { applySectionCardStyle(card, scale, opacity); },
+      .cardStyleScale = scale,
+      .cardStyleFillOpacity = panelCardOpacity(),
   });
 
   usageCard->addChild(

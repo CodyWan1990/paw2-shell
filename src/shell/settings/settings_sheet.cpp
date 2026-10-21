@@ -141,22 +141,17 @@ namespace settings {
           .viewportPaddingH = 0.0F,
           .viewportPaddingV = 0.0F,
           .flexGrow = 1.0F,
-          .onScrollChanged =
-              [this](float /*offset*/) {
-                if (m_dismissSelectDropdown) {
-                  m_dismissSelectDropdown();
-                }
-              },
-          .configure =
-              [](ScrollView& scrollView) {
-                scrollView.clearFill();
-                scrollView.clearBorder();
-              },
+          .transparent = true,
+          .contentDirection = FlexDirection::Vertical,
+          .contentAlign = FlexAlign::Stretch,
+          .contentGap = Style::spaceMd * m_scale,
+          .contentOut = &m_body,
+          .onScrollChanged = [this](float /*offset*/) {
+            if (m_dismissSelectDropdown) {
+              m_dismissSelectDropdown();
+            }
+          },
       });
-      m_body = m_scrollView->content();
-      m_body->setDirection(FlexDirection::Vertical);
-      m_body->setAlign(FlexAlign::Stretch);
-      m_body->setGap(Style::spaceMd * m_scale);
       if (m_populateBody) {
         m_populateBody(*m_body);
       }

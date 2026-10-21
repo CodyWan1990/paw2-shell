@@ -142,10 +142,6 @@ namespace {
     return resolved.empty() ? std::string() : resolved;
   }
 
-  void applyNotificationCardStyle(Flex& card, float scale, float fillOpacity) {
-    applySectionCardStyle(card, scale, fillOpacity);
-  }
-
   std::string relativeMetaLine(const Notification& n) {
     if (n.receivedWallClock.has_value()) {
       return formatTimeAgo(*n.receivedWallClock);
@@ -309,7 +305,7 @@ namespace {
   class NotificationHistoryRow final : public Flex {
   public:
     explicit NotificationHistoryRow(float scale, float fillOpacity) : m_scale(scale) {
-      applyNotificationCardStyle(*this, scale, fillOpacity);
+      applySectionCardStyle(*this, scale, fillOpacity);
       setFillWidth(true);
 
       m_header = static_cast<Flex*>(addChild(
@@ -439,9 +435,7 @@ namespace {
         m_body->measure(renderer);
       }
 
-      while (!m_actionsRow->children().empty()) {
-        m_actionsRow->removeChild(m_actionsRow->children().back().get());
-      }
+      m_actionsRow->clearChildren();
       m_actionsRow->setVisible(false);
       if (showHistoryActions && !entry.notification.actions.empty()) {
         std::vector<std::unique_ptr<Button>> buttons;
@@ -714,12 +708,11 @@ std::unique_ptr<Flex> NotificationsTab::create() {
               .out = &m_emptyCard,
               .align = FlexAlign::Center,
               .gap = Style::spaceSm * scale,
+              .paddingV = Style::spaceLg * scale,
+              .paddingH = Style::spaceMd * scale,
               .visible = false,
-              .configure =
-                  [scale, opacity = panelCardOpacity()](Flex& empty) {
-                    applyNotificationCardStyle(empty, scale, opacity);
-                    empty.setPadding(Style::spaceLg * scale, Style::spaceMd * scale);
-                  },
+              .cardStyleScale = scale,
+              .cardStyleFillOpacity = panelCardOpacity(),
           },
           ui::label({
               .out = &m_emptyTitle,

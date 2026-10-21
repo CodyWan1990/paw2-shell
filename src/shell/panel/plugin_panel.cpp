@@ -13,6 +13,7 @@
 #include "ui/controls/scroll_view.h"
 #include "ui/scroll_into_view.h"
 #include "ui/style.h"
+#include "util/file_utils.h"
 #include "wayland/layer_surface.h"
 
 #include <algorithm>
@@ -47,15 +48,6 @@ namespace {
     return LayerShellKeyboard::OnDemand;
   }
 
-  std::string readFile(const std::filesystem::path& path) {
-    std::ifstream f(path);
-    if (!f) {
-      return {};
-    }
-    std::stringstream ss;
-    ss << f.rdbuf();
-    return ss.str();
-  }
 
 } // namespace
 
@@ -208,7 +200,7 @@ void PluginPanel::startScript() {
     kLog.warn("plugin panel '{}': no source path", m_entryId);
     return;
   }
-  std::string source = readFile(m_sourcePath);
+  std::string source = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   if (source.empty()) {
     kLog.warn("plugin panel '{}': failed to read '{}'", m_entryId, m_sourcePath.string());
     return;
@@ -517,7 +509,7 @@ void PluginPanel::teardownScriptWatch() { m_scriptWatcher.stop(); }
 void PluginPanel::reloadScript() {
   ++m_openGeneration;
   closeContextMenu();
-  std::string source = readFile(m_sourcePath);
+  std::string source = FileUtils::readTextFile(m_sourcePath).value_or(std::string{});
   auto name = m_sourcePath.filename().string();
   if (source.empty() || m_runtime == nullptr) {
     kLog.warn("hot reload: failed to reload '{}'", name);

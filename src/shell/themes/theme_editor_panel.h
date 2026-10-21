@@ -76,16 +76,20 @@ private:
   bool m_confirmingDelete = false;
   std::vector<themes::PaletteChoice> m_choices;
 
-  Flex* m_rootLayout = nullptr;
-  Label* m_heading = nullptr;
-  Input* m_titleInput = nullptr;
-  Segmented* m_sourceSwitch = nullptr;
-  Select* m_paletteSelect = nullptr;
-  Flex* m_wallpaperList = nullptr;
-  Image* m_preview = nullptr;
-  Label* m_previewNote = nullptr;
-  Button* m_saveButton = nullptr;
-  Button* m_deleteButton = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    Label* heading = nullptr;
+    Input* titleInput = nullptr;
+    Segmented* sourceSwitch = nullptr;
+    Select* paletteSelect = nullptr;
+    Flex* wallpaperList = nullptr;
+    Image* preview = nullptr;
+    Label* previewNote = nullptr;
+    Button* saveButton = nullptr;
+    Button* deleteButton = nullptr;
+  };
+  Ui m_ui;
   struct Thumb {
     Image* image = nullptr;
     std::string path;

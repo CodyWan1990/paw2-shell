@@ -1533,7 +1533,7 @@ void AudioTab::openDeviceMenu(DeviceVolumeCardState& card, const DeviceMenuModel
   });
 
   m_deviceMenuPopup->setOnDismissed([this, parentSurface = parentCtx->surface]() {
-    m_openDeviceMenuCard = nullptr;
+    m_ui.openDeviceMenuCard = nullptr;
     PanelManager::instance().clearActivePopup();
     PanelManager::instance().endAttachedPopup(parentSurface);
   });
@@ -1560,7 +1560,7 @@ void AudioTab::openDeviceMenu(DeviceVolumeCardState& card, const DeviceMenuModel
       }
   );
   if (m_deviceMenuPopup->isOpen()) {
-    m_openDeviceMenuCard = &card;
+    m_ui.openDeviceMenuCard = &card;
   }
 }
 
@@ -1673,7 +1673,7 @@ bool AudioTab::dismissTransientUi() {
   }
   m_deviceMenuPopup->close();
   PanelManager::instance().clearActivePopup();
-  m_openDeviceMenuCard = nullptr;
+  m_ui.openDeviceMenuCard = nullptr;
   m_openProgramRoutingMenuStreamId = 0;
   return true;
 }
@@ -1733,11 +1733,11 @@ std::unique_ptr<Flex> AudioTab::createDeviceVolumeCard(DeviceVolumeCardSpec card
               .onClick =
                   [this, state = &card.state, menu = card.deviceMenu]() {
                     const bool wasOpen = m_deviceMenuPopup != nullptr && m_deviceMenuPopup->isOpen();
-                    const bool wasOpenForThisCard = wasOpen && m_openDeviceMenuCard == state;
+                    const bool wasOpenForThisCard = wasOpen && m_ui.openDeviceMenuCard == state;
                     if (wasOpen) {
                       m_deviceMenuPopup->close();
                       PanelManager::instance().clearActivePopup();
-                      m_openDeviceMenuCard = nullptr;
+                      m_ui.openDeviceMenuCard = nullptr;
                     }
                     if (!wasOpenForThisCard) {
                       openDeviceMenu(*state, menu);
@@ -1846,7 +1846,7 @@ std::unique_ptr<Flex> AudioTab::create() {
 
   auto tab = ui::column(
       {
-          .out = &m_rootLayout,
+          .out = &m_ui.rootLayout,
           .align = FlexAlign::Stretch,
           .gap = Style::spaceMd * scale,
       },
@@ -1917,7 +1917,6 @@ std::unique_ptr<Flex> AudioTab::create() {
   );
 
   auto programCard = ui::column({
-      .out = &m_programCard,
       .flexGrow = 1.0F,
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
@@ -1925,7 +1924,6 @@ std::unique_ptr<Flex> AudioTab::create() {
   addTitle(*programCard, i18n::tr("control-center.audio.application-volumes"), scale);
 
   auto programScroll = ui::scrollView({
-      .out = &m_programScroll,
       .contentScale = scale,
       .scrollbarVisible = true,
       .viewportPaddingH = 0.0F,
@@ -1935,7 +1933,7 @@ std::unique_ptr<Flex> AudioTab::create() {
       .contentDirection = FlexDirection::Vertical,
       .contentAlign = FlexAlign::Stretch,
       .contentGap = Style::spaceSm * scale,
-      .contentOut = &m_programList,
+      .contentOut = &m_ui.programList,
   });
 
   programCard->addChild(std::move(programScroll));
@@ -1954,14 +1952,14 @@ std::unique_ptr<Flex> AudioTab::create() {
 }
 
 void AudioTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_rootLayout == nullptr) {
+  if (m_ui.rootLayout == nullptr) {
     return;
   }
 
   syncValueLabelWidths(renderer);
 
-  m_rootLayout->setSize(contentWidth, bodyHeight);
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->setSize(contentWidth, bodyHeight);
+  m_ui.rootLayout->layout(renderer);
 }
 
 void AudioTab::doUpdate(Renderer& renderer) {
@@ -2078,14 +2076,7 @@ void AudioTab::onClose() {
   m_outputDeviceVolume.volumeDebounceTimer.stop();
   m_inputDeviceVolume.volumeDebounceTimer.stop();
   m_programSinkDebounceTimer.stop();
-  m_rootLayout = nullptr;
-  m_deviceColumn = nullptr;
-  m_outputCard = nullptr;
-  m_inputCard = nullptr;
-  m_outputScroll = nullptr;
-  m_inputScroll = nullptr;
-  m_outputList = nullptr;
-  m_inputList = nullptr;
+  m_ui = {};
   m_outputDeviceVolume = {};
   m_inputDeviceVolume = {};
   m_lastEffectsProfileListKey.clear();
@@ -2093,9 +2084,6 @@ void AudioTab::onClose() {
   m_lastInputWidth = -1.0F;
   m_lastOutputListKey.clear();
   m_lastInputListKey.clear();
-  m_programCard = nullptr;
-  m_programScroll = nullptr;
-  m_programList = nullptr;
   m_programRows.clear();
   m_lastProgramListKey.clear();
   m_lastProgramSliderMax = -1.0F;
@@ -2105,7 +2093,6 @@ void AudioTab::onClose() {
     PanelManager::instance().clearActivePopup();
     m_deviceMenuPopup->close();
   }
-  m_openDeviceMenuCard = nullptr;
   m_openProgramRoutingMenuStreamId = 0;
   m_pendingSinkId = 0;
   m_pendingSourceId = 0;
@@ -2200,7 +2187,7 @@ void AudioTab::syncEffectsProfileControls(Renderer& /*renderer*/) {
 
 void AudioTab::rebuildProgramVolumes(Renderer& renderer) {
   uiAssertNotRendering("AudioTab::rebuildProgramVolumes");
-  if (m_programList == nullptr) {
+  if (m_ui.programList == nullptr) {
     return;
   }
 
@@ -2233,12 +2220,12 @@ void AudioTab::rebuildProgramVolumes(Renderer& renderer) {
     return;
   }
 
-  m_programList->clearChildren();
+  m_ui.programList->clearChildren();
   m_programRows.clear();
 
   if (m_audio == nullptr) {
     addEmptyState(
-        *m_programList, i18n::tr("control-center.audio.unavailable-title"),
+        *m_ui.programList, i18n::tr("control-center.audio.unavailable-title"),
         i18n::tr("control-center.audio.unavailable-body"), scale
     );
     m_lastProgramListKey = nextKey;
@@ -2250,7 +2237,7 @@ void AudioTab::rebuildProgramVolumes(Renderer& renderer) {
 
   if (state.programOutputs.empty()) {
     addEmptyState(
-        *m_programList, i18n::tr("control-center.audio.no-application-audio"),
+        *m_ui.programList, i18n::tr("control-center.audio.no-application-audio"),
         i18n::tr("control-center.audio.no-application-audio-body"), scale
     );
   } else {
@@ -2273,12 +2260,12 @@ void AudioTab::rebuildProgramVolumes(Renderer& renderer) {
         }
       });
       m_programRows.push_back(row.get());
-      m_programList->addChild(std::move(row));
+      m_ui.programList->addChild(std::move(row));
     }
   }
 
   syncValueLabelWidths(renderer);
-  m_programList->layout(renderer);
+  m_ui.programList->layout(renderer);
   m_lastProgramListKey = nextKey;
   m_lastProgramSliderMax = sliderMax;
 }
@@ -2347,12 +2334,15 @@ void AudioTab::flushPendingProgramVolumes(bool) {
 
 void AudioTab::rebuildLists(Renderer& renderer) {
   uiAssertNotRendering("AudioTab::rebuildLists");
-  if (m_outputList == nullptr || m_inputList == nullptr || m_outputScroll == nullptr || m_inputScroll == nullptr) {
+  if (m_ui.outputList == nullptr
+      || m_ui.inputList == nullptr
+      || m_ui.outputScroll == nullptr
+      || m_ui.inputScroll == nullptr) {
     return;
   }
 
-  const float outputWidth = m_outputScroll->contentViewportWidth();
-  const float inputWidth = m_inputScroll->contentViewportWidth();
+  const float outputWidth = m_ui.outputScroll->contentViewportWidth();
+  const float inputWidth = m_ui.inputScroll->contentViewportWidth();
 
   if (outputWidth <= 0.0F || inputWidth <= 0.0F) {
     return;
@@ -2366,14 +2356,14 @@ void AudioTab::rebuildLists(Renderer& renderer) {
         && m_lastInputListKey == "unavailable") {
       return;
     }
-    m_outputList->clearChildren();
-    m_inputList->clearChildren();
+    m_ui.outputList->clearChildren();
+    m_ui.inputList->clearChildren();
     addEmptyState(
-        *m_outputList, i18n::tr("control-center.audio.unavailable-title"),
+        *m_ui.outputList, i18n::tr("control-center.audio.unavailable-title"),
         i18n::tr("control-center.audio.unavailable-body"), scale
     );
     addEmptyState(
-        *m_inputList, i18n::tr("control-center.audio.unavailable-title"),
+        *m_ui.inputList, i18n::tr("control-center.audio.unavailable-title"),
         i18n::tr("control-center.audio.unavailable-body"), scale
     );
     m_lastOutputWidth = outputWidth;
@@ -2394,12 +2384,12 @@ void AudioTab::rebuildLists(Renderer& renderer) {
     return;
   }
 
-  m_outputList->clearChildren();
-  m_inputList->clearChildren();
+  m_ui.outputList->clearChildren();
+  m_ui.inputList->clearChildren();
 
   if (state.sinks.empty()) {
     addEmptyState(
-        *m_outputList, i18n::tr("control-center.audio.no-output-devices"),
+        *m_ui.outputList, i18n::tr("control-center.audio.no-output-devices"),
         i18n::tr("control-center.audio.no-output-devices-body"), scale
     );
   } else {
@@ -2411,13 +2401,13 @@ void AudioTab::rebuildLists(Renderer& renderer) {
         PanelManager::instance().refresh();
       });
       row->setDevice(sink);
-      m_outputList->addChild(std::move(row));
+      m_ui.outputList->addChild(std::move(row));
     }
   }
 
   if (state.sources.empty()) {
     addEmptyState(
-        *m_inputList, i18n::tr("control-center.audio.no-input-devices"),
+        *m_ui.inputList, i18n::tr("control-center.audio.no-input-devices"),
         i18n::tr("control-center.audio.no-input-devices-body"), scale
     );
   } else {
@@ -2429,12 +2419,12 @@ void AudioTab::rebuildLists(Renderer& renderer) {
         PanelManager::instance().refresh();
       });
       row->setDevice(source);
-      m_inputList->addChild(std::move(row));
+      m_ui.inputList->addChild(std::move(row));
     }
   }
 
-  m_outputList->layout(renderer);
-  m_inputList->layout(renderer);
+  m_ui.outputList->layout(renderer);
+  m_ui.inputList->layout(renderer);
 
   m_lastOutputWidth = outputWidth;
   m_lastInputWidth = inputWidth;

@@ -111,7 +111,7 @@ void ControlCenterPanel::create() {
   }
 
   auto rootLayout = ui::row({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::panelPadding * scale,
       .padding = 0.0F,
@@ -119,7 +119,7 @@ void ControlCenterPanel::create() {
 
   if (m_showSidebar) {
     auto sidebar = ui::column({
-        .out = &m_sidebar,
+        .out = &m_ui.sidebar,
         .align = FlexAlign::Start,
         .gap = 0.0F,
         .padding = Style::spaceMd * scale,
@@ -134,15 +134,15 @@ void ControlCenterPanel::create() {
     auto sidebarScrollArea = ui::inputArea({});
     sidebarScrollArea->setParticipatesInLayout(false);
     sidebarScrollArea->setZIndex(-1);
-    m_sidebarScrollArea = sidebarScrollArea.get();
-    wireSidebarScroll(m_sidebarScrollArea);
+    m_ui.sidebarScrollArea = sidebarScrollArea.get();
+    wireSidebarScroll(m_ui.sidebarScrollArea);
     sidebar->addChild(std::move(sidebarScrollArea));
 
     const std::optional<float> sidebarScrollWidth =
         m_compact ? std::optional<float>{Style::controlHeightSm * scale} : std::nullopt;
 
     auto sidebarScroll = ui::scrollView({
-        .out = &m_sidebarScrollView,
+        .out = &m_ui.sidebarScrollView,
         .state = &m_sidebarScrollState,
         .contentScale = scale,
         .scrollbarVisible = true,
@@ -170,7 +170,7 @@ void ControlCenterPanel::create() {
       sidebarNav->setAlign(FlexAlign::Start);
     }
     sidebarNav->setGap(Style::spaceXs * scale);
-    m_sidebarNav = sidebarNav.get();
+    m_ui.sidebarNav = sidebarNav.get();
 
     for (const auto& tab : kTabs) {
       const std::size_t idx = tabIndex(tab.id);
@@ -217,7 +217,7 @@ void ControlCenterPanel::create() {
   }
 
   auto content = ui::column({
-      .out = &m_content,
+      .out = &m_ui.content,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
       .clipChildren = true,
@@ -235,10 +235,10 @@ void ControlCenterPanel::create() {
       PanelManager::instance().refresh();
     }
   });
-  m_contentDismissArea = static_cast<InputArea*>(content->addChild(std::move(dismissArea)));
+  m_ui.contentDismissArea = static_cast<InputArea*>(content->addChild(std::move(dismissArea)));
 
   auto header = ui::row({
-      .out = &m_contentHeader,
+      .out = &m_ui.contentHeader,
       .align = FlexAlign::Center,
       .justify = FlexJustify::SpaceBetween,
       .gap = Style::spaceSm * scale,
@@ -246,7 +246,7 @@ void ControlCenterPanel::create() {
 
   header->addChild(
       ui::label({
-          .out = &m_contentTitle,
+          .out = &m_ui.contentTitle,
           .text = i18n::tr("control-center.tabs.home"),
           .fontSize = Style::fontSizeTitle * scale,
           .fontWeight = FontWeight::Bold,
@@ -256,7 +256,7 @@ void ControlCenterPanel::create() {
   );
 
   auto headerActions = ui::row({
-      .out = &m_contentHeaderActions,
+      .out = &m_ui.contentHeaderActions,
       .align = FlexAlign::Center,
       .gap = Style::spaceSm * scale,
   });
@@ -266,14 +266,13 @@ void ControlCenterPanel::create() {
     m_tabHeaderActions[i] = actions.get();
     if (actions != nullptr) {
       actions->setVisible(false);
-      m_contentHeaderActions->addChild(std::move(actions));
+      m_ui.contentHeaderActions->addChild(std::move(actions));
     }
   }
 
   if (Style::closeButtonsEnabled()) {
-    m_contentHeaderActions->addChild(
+    m_ui.contentHeaderActions->addChild(
         ui::button({
-            .out = &m_closeButton,
             .glyph = "close",
             .onClick = []() { PanelManager::instance().close(); },
             .configure = [scale](Button& button) { panel_button_style::configureHeaderIconButton(button, scale); },
@@ -285,7 +284,7 @@ void ControlCenterPanel::create() {
   content->addChild(std::move(header));
 
   auto bodies = ui::column({
-      .out = &m_tabBodies,
+      .out = &m_ui.tabBodies,
       .align = FlexAlign::Stretch,
       .gap = 0.0F,
       .clipChildren = true,
@@ -298,7 +297,7 @@ void ControlCenterPanel::create() {
     container->setParticipatesInLayout(false);
     container->setVisible(false);
     m_tabContainers[i] = container.get();
-    m_tabBodies->addChild(std::move(container));
+    m_ui.tabBodies->addChild(std::move(container));
   }
 
   content->addChild(std::move(bodies));
@@ -320,13 +319,13 @@ void ControlCenterPanel::onPanelCardOpacityChanged(float opacity) {
       tab->setPanelCardOpacity(opacity);
     }
   }
-  if (m_sidebar != nullptr) {
-    m_sidebar->setFill(colorSpecFromRole(ColorRole::SurfaceVariant, opacity));
+  if (m_ui.sidebar != nullptr) {
+    m_ui.sidebar->setFill(colorSpecFromRole(ColorRole::SurfaceVariant, opacity));
   }
 }
 
 void ControlCenterPanel::doLayout(Renderer& renderer, float width, float height) {
-  if (m_rootLayout == nullptr || m_content == nullptr || m_tabBodies == nullptr) {
+  if (m_ui.rootLayout == nullptr || m_ui.content == nullptr || m_ui.tabBodies == nullptr) {
     return;
   }
 
@@ -334,34 +333,34 @@ void ControlCenterPanel::doLayout(Renderer& renderer, float width, float height)
     layoutFullSidebarWidth(renderer);
   }
 
-  m_rootLayout->setSize(width, height);
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->setSize(width, height);
+  m_ui.rootLayout->layout(renderer);
 
   const float contentInnerWidth =
-      std::max(0.0F, m_content->width() - (m_content->paddingLeft() + m_content->paddingRight()));
-  const float bodyWidth = m_tabBodies->width();
-  const float bodyHeight = m_tabBodies->height();
+      std::max(0.0F, m_ui.content->width() - (m_ui.content->paddingLeft() + m_ui.content->paddingRight()));
+  const float bodyWidth = m_ui.tabBodies->width();
+  const float bodyHeight = m_ui.tabBodies->height();
   const float bodyContentHeight = tabContentHeight(bodyHeight);
 
-  if (m_sidebarScrollArea != nullptr && m_sidebar != nullptr) {
-    m_sidebarScrollArea->setPosition(0.0F, 0.0F);
-    m_sidebarScrollArea->setSize(m_sidebar->width(), m_sidebar->height());
+  if (m_ui.sidebarScrollArea != nullptr && m_ui.sidebar != nullptr) {
+    m_ui.sidebarScrollArea->setPosition(0.0F, 0.0F);
+    m_ui.sidebarScrollArea->setSize(m_ui.sidebar->width(), m_ui.sidebar->height());
   }
 
-  if (m_contentDismissArea != nullptr) {
-    m_contentDismissArea->setPosition(0.0F, 0.0F);
-    m_contentDismissArea->setFrameSize(m_content->width(), m_content->height());
+  if (m_ui.contentDismissArea != nullptr) {
+    m_ui.contentDismissArea->setPosition(0.0F, 0.0F);
+    m_ui.contentDismissArea->setFrameSize(m_ui.content->width(), m_ui.content->height());
   }
 
-  if (m_contentHeader != nullptr) {
-    m_contentHeader->setSize(contentInnerWidth, 0.0F);
+  if (m_ui.contentHeader != nullptr) {
+    m_ui.contentHeader->setSize(contentInnerWidth, 0.0F);
   }
 
-  if (m_contentTitle != nullptr) {
-    const float actionsWidth = m_contentHeaderActions != nullptr ? m_contentHeaderActions->width() : 0.0F;
-    const float headerGap = m_contentHeader != nullptr ? m_contentHeader->gap() : 0.0F;
+  if (m_ui.contentTitle != nullptr) {
+    const float actionsWidth = m_ui.contentHeaderActions != nullptr ? m_ui.contentHeaderActions->width() : 0.0F;
+    const float headerGap = m_ui.contentHeader != nullptr ? m_ui.contentHeader->gap() : 0.0F;
     const float titleWidth = std::max(0.0F, contentInnerWidth - actionsWidth - headerGap);
-    m_contentTitle->setMaxWidth(titleWidth);
+    m_ui.contentTitle->setMaxWidth(titleWidth);
   }
 
   for (auto* container : m_tabContainers) {
@@ -419,14 +418,14 @@ bool ControlCenterPanel::isContextActive(std::string_view context) const {
 }
 
 bool ControlCenterPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, bool pressed, bool preedit) {
-  if (!m_showSidebar || m_sidebarNav == nullptr || m_sidebarScrollView == nullptr || m_content == nullptr) {
+  if (!m_showSidebar || m_ui.sidebarNav == nullptr || m_ui.sidebarScrollView == nullptr || m_ui.content == nullptr) {
     return false;
   }
 
   const SplitPaneFocusConfig panes{
-      .sidebarFocus = m_sidebarNav->focusArea(),
-      .sidebarRoot = m_sidebarScrollView,
-      .contentRoot = m_content,
+      .sidebarFocus = m_ui.sidebarNav->focusArea(),
+      .sidebarRoot = m_ui.sidebarScrollView,
+      .contentRoot = m_ui.content,
       .headerFocus = nullptr,
   };
   auto& dispatcher = PanelManager::instance().inputDispatcher();
@@ -446,19 +445,8 @@ void ControlCenterPanel::onClose() {
     tab->setActive(false);
     tab->onClose();
   }
-  m_rootLayout = nullptr;
-  m_sidebar = nullptr;
-  m_sidebarScrollView = nullptr;
+  m_ui = {};
   m_sidebarScrollState = {};
-  m_sidebarNav = nullptr;
-  m_sidebarScrollArea = nullptr;
-  m_content = nullptr;
-  m_contentDismissArea = nullptr;
-  m_contentHeader = nullptr;
-  m_contentHeaderActions = nullptr;
-  m_contentTitle = nullptr;
-  m_closeButton = nullptr;
-  m_tabBodies = nullptr;
   m_tabButtons.fill(nullptr);
   m_tabContainers.fill(nullptr);
   m_tabHeaderActions.fill(nullptr);
@@ -591,22 +579,22 @@ void ControlCenterPanel::updateTabChrome(TabId tab) {
       m_tabButtons[idx]->setVisible(tabEnabled);
       m_tabButtons[idx]->setVariant(meta.id == tab ? ButtonVariant::TabActive : ButtonVariant::Tab);
     }
-    if (meta.id == tab && m_contentTitle != nullptr) {
-      m_contentTitle->setText(i18n::tr(meta.titleKey));
+    if (meta.id == tab && m_ui.contentTitle != nullptr) {
+      m_ui.contentTitle->setText(i18n::tr(meta.titleKey));
     }
     if (m_tabHeaderActions[idx] != nullptr) {
       m_tabHeaderActions[idx]->setVisible(tabEnabled && meta.id == tab);
     }
   }
 
-  if (m_contentTitle != nullptr) {
-    m_contentTitle->setVisible(true);
+  if (m_ui.contentTitle != nullptr) {
+    m_ui.contentTitle->setVisible(true);
   }
-  if (m_contentHeaderActions != nullptr) {
-    m_contentHeaderActions->setVisible(true);
+  if (m_ui.contentHeaderActions != nullptr) {
+    m_ui.contentHeaderActions->setVisible(true);
   }
-  if (m_sidebarNav != nullptr) {
-    m_sidebarNav->notifyExternalSelectionChanged();
+  if (m_ui.sidebarNav != nullptr) {
+    m_ui.sidebarNav->notifyExternalSelectionChanged();
   }
 }
 
@@ -681,14 +669,14 @@ int ControlCenterPanel::visibleTabOrdinal(TabId tab) const {
 }
 
 void ControlCenterPanel::applyTabTransitionLayout() {
-  if (m_tabBodies == nullptr) {
+  if (m_ui.tabBodies == nullptr) {
     return;
   }
-  layoutTabContainers(m_tabBodies->width(), m_tabBodies->height());
+  layoutTabContainers(m_ui.tabBodies->width(), m_ui.tabBodies->height());
 }
 
 void ControlCenterPanel::startTabTransition(TabId from, TabId to) {
-  if (m_animations == nullptr || m_tabBodies == nullptr) {
+  if (m_animations == nullptr || m_ui.tabBodies == nullptr) {
     applyTabContainerVisibility(to);
     resetTabContainerTransforms();
     return;
@@ -729,7 +717,7 @@ void ControlCenterPanel::startTabTransition(TabId from, TabId to) {
         PanelManager::instance().requestLayout();
         PanelManager::instance().requestRedraw();
       },
-      m_tabBodies
+      m_ui.tabBodies
   );
 }
 
@@ -801,7 +789,7 @@ void ControlCenterPanel::selectTab(TabId tab, bool animated) {
 
   updateTabChrome(tab);
 
-  if (tabChanged && animated && m_animations != nullptr && m_tabBodies != nullptr) {
+  if (tabChanged && animated && m_animations != nullptr && m_ui.tabBodies != nullptr) {
     startTabTransition(previousTab, tab);
   } else {
     m_tabTransitionActive = false;
@@ -867,7 +855,7 @@ ControlCenterPanel::TabId ControlCenterPanel::tabFromContext(std::string_view co
 std::size_t ControlCenterPanel::tabIndex(TabId id) { return static_cast<std::size_t>(id); }
 
 void ControlCenterPanel::layoutFullSidebarWidth(Renderer& renderer) {
-  if (m_sidebarScrollView == nullptr || m_sidebarNav == nullptr) {
+  if (m_ui.sidebarScrollView == nullptr || m_ui.sidebarNav == nullptr) {
     return;
   }
 
@@ -891,26 +879,26 @@ void ControlCenterPanel::layoutFullSidebarWidth(Renderer& renderer) {
 
   // Scrollbar gutter lives inside the scroll viewport; reserve it only when the nav overflows.
   float targetWidth = contentWidth;
-  const float scrollHeight = m_sidebarScrollView->height();
+  const float scrollHeight = m_ui.sidebarScrollView->height();
   if (scrollHeight > 0.0F) {
     LayoutConstraints navConstraints;
     navConstraints.setExactWidth(contentWidth);
-    const float navHeight = m_sidebarNav->measure(renderer, navConstraints).height;
+    const float navHeight = m_ui.sidebarNav->measure(renderer, navConstraints).height;
     if (navHeight > scrollHeight + 0.5F) {
-      targetWidth = contentWidth + m_sidebarScrollView->scrollbarGutter();
+      targetWidth = contentWidth + m_ui.sidebarScrollView->scrollbarGutter();
     }
   }
 
-  if (std::abs(m_sidebarScrollView->width() - targetWidth) > 0.5F) {
-    m_sidebarScrollView->setSize(targetWidth, m_sidebarScrollView->height());
+  if (std::abs(m_ui.sidebarScrollView->width() - targetWidth) > 0.5F) {
+    m_ui.sidebarScrollView->setSize(targetWidth, m_ui.sidebarScrollView->height());
   }
 }
 
 void ControlCenterPanel::scrollSidebarNodeIntoView(const Node* node) {
-  if (node == nullptr || m_sidebarScrollView == nullptr) {
+  if (node == nullptr || m_ui.sidebarScrollView == nullptr) {
     return;
   }
-  scrollNodeIntoScrollView(*m_sidebarScrollView, &m_sidebarScrollState, *node, Style::spaceXs * contentScale());
+  scrollNodeIntoScrollView(*m_ui.sidebarScrollView, &m_sidebarScrollState, *node, Style::spaceXs * contentScale());
   PanelManager::instance().requestLayout();
 }
 
@@ -919,10 +907,12 @@ void ControlCenterPanel::scrollFocusedInputIntoView(InputArea* area) {
     return;
   }
 
-  if (m_sidebarScrollView != nullptr && m_sidebarScrollView->content() != nullptr) {
+  if (m_ui.sidebarScrollView != nullptr && m_ui.sidebarScrollView->content() != nullptr) {
     for (const Node* node = area; node != nullptr; node = node->parent()) {
-      if (node == m_sidebarScrollView->content()) {
-        scrollNodeIntoScrollView(*m_sidebarScrollView, &m_sidebarScrollState, *area, Style::spaceXs * contentScale());
+      if (node == m_ui.sidebarScrollView->content()) {
+        scrollNodeIntoScrollView(
+            *m_ui.sidebarScrollView, &m_sidebarScrollState, *area, Style::spaceXs * contentScale()
+        );
         PanelManager::instance().requestLayout();
         return;
       }

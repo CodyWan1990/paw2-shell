@@ -147,7 +147,7 @@ void PolkitPanel::create() {
   const float scale = contentScale();
   const float iconSize = scaled(48.0F);
   auto root = ui::column({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
       .padding = Style::spaceLg * scale,
@@ -156,22 +156,22 @@ void PolkitPanel::create() {
   auto focusArea = ui::inputArea({});
   focusArea->setFocusable(true);
   focusArea->setVisible(false);
-  m_focusArea = static_cast<InputArea*>(root->addChild(std::move(focusArea)));
+  m_ui.focusArea = static_cast<InputArea*>(root->addChild(std::move(focusArea)));
 
   auto iconContainer = ui::node({
-      .out = &m_iconContainer,
+      .out = &m_ui.iconContainer,
       .width = iconSize,
       .height = iconSize,
   });
   auto iconFallback = ui::glyph({
-      .out = &m_fallbackIcon,
+      .out = &m_ui.fallbackIcon,
       .glyph = "shield-lock",
       .glyphSize = iconSize * 0.65F,
       .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
   });
   iconContainer->addChild(std::move(iconFallback));
   auto iconImage = ui::image({
-      .out = &m_icon,
+      .out = &m_ui.icon,
       .fit = ImageFit::Contain,
       .visible = false,
   });
@@ -182,14 +182,13 @@ void PolkitPanel::create() {
       ui::column(
           {.align = FlexAlign::Stretch, .flexGrow = 1.0F},
           ui::label({
-              .out = &m_titleLabel,
               .text = i18n::tr("auth.polkit.title"),
               .fontSize = Style::fontSizeTitle * scale,
               .fontWeight = FontWeight::Bold,
               .color = colorSpecFromRole(ColorRole::Primary),
           }),
           ui::label({
-              .out = &m_messageLabel,
+              .out = &m_ui.messageLabel,
               .fontSize = Style::fontSizeBody * scale,
               .color = colorSpecFromRole(ColorRole::OnSurface),
               .maxLines = 6,
@@ -201,20 +200,20 @@ void PolkitPanel::create() {
   auto bottomContent = ui::column(
       {.align = FlexAlign::Stretch, .gap = Style::spaceSm * scale},
       ui::label({
-          .out = &m_promptLabel,
+          .out = &m_ui.promptLabel,
           .fontSize = Style::fontSizeBody * scale,
           .color = colorSpecFromRole(ColorRole::OnSurface),
           .maxLines = 3,
       }),
       ui::input({
-          .out = &m_input,
+          .out = &m_ui.input,
           .placeholder = i18n::tr("auth.polkit.password-placeholder"),
           .passwordMode = true,
           .surfaceOpacity = panelCardOpacity(),
           .onChange =
               [this](const std::string& value) {
-                if (m_submitButton != nullptr) {
-                  m_submitButton->setEnabled(m_lastResponseRequired && !value.empty());
+                if (m_ui.submitButton != nullptr) {
+                  m_ui.submitButton->setEnabled(m_lastResponseRequired && !value.empty());
                 }
               },
           .onSubmit = [this](const std::string& value) { submit(value); },
@@ -222,7 +221,7 @@ void PolkitPanel::create() {
               [this](std::uint32_t sym, std::uint32_t modifiers) { return handleInputKeyEvent(sym, modifiers); },
       }),
       ui::label({
-          .out = &m_supplementaryLabel,
+          .out = &m_ui.supplementaryLabel,
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
           .maxLines = 4,
@@ -236,7 +235,6 @@ void PolkitPanel::create() {
               .fillWidth = true,
           },
           ui::button({
-              .out = &m_cancelButton,
               .text = i18n::tr("common.actions.cancel"),
               .variant = ButtonVariant::Outline,
               .onClick =
@@ -246,7 +244,7 @@ void PolkitPanel::create() {
                   },
           }),
           ui::button({
-              .out = &m_submitButton,
+              .out = &m_ui.submitButton,
               .text = i18n::tr("auth.polkit.authenticate"),
               .variant = ButtonVariant::Primary,
               .onClick = [this]() { submit(); },
@@ -267,8 +265,8 @@ void PolkitPanel::onOpen(std::string_view /*context*/) {
     m_trackedRequestCookie = agent->pendingRequest().cookie;
     m_hasTrackedRequest = true;
   }
-  if (m_input != nullptr) {
-    m_input->setValue("");
+  if (m_ui.input != nullptr) {
+    m_ui.input->setValue("");
   }
 }
 
@@ -286,18 +284,7 @@ void PolkitPanel::onClose() {
   m_lastResponseRequired = false;
   clearReleasedRoot();
 
-  m_rootLayout = nullptr;
-  m_focusArea = nullptr;
-  m_titleLabel = nullptr;
-  m_messageLabel = nullptr;
-  m_promptLabel = nullptr;
-  m_supplementaryLabel = nullptr;
-  m_input = nullptr;
-  m_submitButton = nullptr;
-  m_cancelButton = nullptr;
-  m_iconContainer = nullptr;
-  m_icon = nullptr;
-  m_fallbackIcon = nullptr;
+  m_ui = {};
 }
 
 void PolkitPanel::cancelAuth() {
@@ -319,26 +306,26 @@ bool PolkitPanel::handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, bo
 InputArea* PolkitPanel::initialFocusArea() const {
   PolkitAgent* agent = m_agentProvider != nullptr ? m_agentProvider() : nullptr;
   if (agent != nullptr && !agent->isResponseRequired()) {
-    return m_focusArea;
+    return m_ui.focusArea;
   }
-  return m_input != nullptr ? m_input->inputArea() : m_focusArea;
+  return m_ui.input != nullptr ? m_ui.input->inputArea() : m_ui.focusArea;
 }
 
 void PolkitPanel::doLayout(Renderer& renderer, float width, float height) {
-  if (m_rootLayout == nullptr) {
+  if (m_ui.rootLayout == nullptr) {
     return;
   }
-  m_rootLayout->setSize(width, height);
-  m_rootLayout->layout(renderer);
-  if (m_iconContainer != nullptr) {
-    if (m_icon != nullptr && m_icon->visible()) {
-      m_icon->setSize(m_iconContainer->width(), m_iconContainer->height());
-      m_icon->setPosition(0.0F, 0.0F);
+  m_ui.rootLayout->setSize(width, height);
+  m_ui.rootLayout->layout(renderer);
+  if (m_ui.iconContainer != nullptr) {
+    if (m_ui.icon != nullptr && m_ui.icon->visible()) {
+      m_ui.icon->setSize(m_ui.iconContainer->width(), m_ui.iconContainer->height());
+      m_ui.icon->setPosition(0.0F, 0.0F);
     }
-    if (m_fallbackIcon != nullptr && m_fallbackIcon->visible()) {
-      const float ox = std::round((m_iconContainer->width() - m_fallbackIcon->width()) * 0.5F);
-      const float oy = std::round((m_iconContainer->height() - m_fallbackIcon->height()) * 0.5F);
-      m_fallbackIcon->setPosition(ox, oy);
+    if (m_ui.fallbackIcon != nullptr && m_ui.fallbackIcon->visible()) {
+      const float ox = std::round((m_ui.iconContainer->width() - m_ui.fallbackIcon->width()) * 0.5F);
+      const float oy = std::round((m_ui.iconContainer->height() - m_ui.fallbackIcon->height()) * 0.5F);
+      m_ui.fallbackIcon->setPosition(ox, oy);
     }
   }
 }
@@ -346,13 +333,13 @@ void PolkitPanel::doLayout(Renderer& renderer, float width, float height) {
 void PolkitPanel::doUpdate(Renderer& renderer) {
   PolkitAgent* agent = m_agentProvider != nullptr ? m_agentProvider() : nullptr;
   if (agent == nullptr
-      || m_messageLabel == nullptr
-      || m_promptLabel == nullptr
-      || m_supplementaryLabel == nullptr
-      || m_submitButton == nullptr
-      || m_input == nullptr
-      || m_icon == nullptr
-      || m_fallbackIcon == nullptr) {
+      || m_ui.messageLabel == nullptr
+      || m_ui.promptLabel == nullptr
+      || m_ui.supplementaryLabel == nullptr
+      || m_ui.submitButton == nullptr
+      || m_ui.input == nullptr
+      || m_ui.icon == nullptr
+      || m_ui.fallbackIcon == nullptr) {
     return;
   }
   const PolkitRequest request = agent->pendingRequest();
@@ -375,23 +362,23 @@ void PolkitPanel::doUpdate(Renderer& renderer) {
     promptText = supplementaryText;
     supplementaryText.clear();
   }
-  m_messageLabel->setText(wrapLongRuns(request.message.empty() ? request.actionId : request.message));
-  m_promptLabel->setText(promptText);
-  m_promptLabel->setColor(
+  m_ui.messageLabel->setText(wrapLongRuns(request.message.empty() ? request.actionId : request.message));
+  m_ui.promptLabel->setText(promptText);
+  m_ui.promptLabel->setColor(
       isInvalidPassword ? colorSpecFromRole(ColorRole::Error) : colorSpecFromRole(ColorRole::OnSurface)
   );
-  m_promptLabel->setVisible(!promptText.empty());
-  m_supplementaryLabel->setText(supplementaryText);
-  m_supplementaryLabel->setVisible(!supplementaryText.empty());
-  m_supplementaryLabel->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));
-  m_input->setVisible(needsInput);
-  m_submitButton->setVisible(needsInput);
-  m_submitButton->setEnabled(needsInput && !m_input->value().empty());
+  m_ui.promptLabel->setVisible(!promptText.empty());
+  m_ui.supplementaryLabel->setText(supplementaryText);
+  m_ui.supplementaryLabel->setVisible(!supplementaryText.empty());
+  m_ui.supplementaryLabel->setColor(colorSpecFromRole(ColorRole::OnSurfaceVariant));
+  m_ui.input->setVisible(needsInput);
+  m_ui.submitButton->setVisible(needsInput);
+  m_ui.submitButton->setEnabled(needsInput && !m_ui.input->value().empty());
   if (needsInput != m_lastResponseRequired) {
     if (auto* manager = PanelManager::current(); manager != nullptr && manager->isOpenPanel("polkit")) {
       manager->relayoutActivePanelPreferredSize();
       if (needsInput) {
-        manager->focusArea(m_input->inputArea());
+        manager->focusArea(m_ui.input->inputArea());
       }
     }
   }
@@ -406,46 +393,46 @@ void PolkitPanel::doUpdate(Renderer& renderer) {
 
 void PolkitPanel::resolveIcon(Renderer& renderer, const PolkitRequest& request) {
   const float iconSize = scaled(48.0F);
-  if (m_iconContainer != nullptr) {
-    m_iconContainer->setSize(iconSize, iconSize);
+  if (m_ui.iconContainer != nullptr) {
+    m_ui.iconContainer->setSize(iconSize, iconSize);
   }
 
   if (request.isInternal) {
     const auto logoPath = paths::assetPath("paw2.svg");
-    m_fallbackIcon->setVisible(false);
-    m_icon->setSize(iconSize, iconSize);
-    m_icon->setSourceFile(renderer, logoPath.string(), static_cast<int>(std::round(iconSize)), true);
-    m_icon->setVisible(true);
+    m_ui.fallbackIcon->setVisible(false);
+    m_ui.icon->setSize(iconSize, iconSize);
+    m_ui.icon->setSourceFile(renderer, logoPath.string(), static_cast<int>(std::round(iconSize)), true);
+    m_ui.icon->setVisible(true);
     return;
   }
 
   if (!request.iconName.empty()) {
     const std::string& resolved = m_iconResolver.resolve(request.iconName, static_cast<int>(std::round(iconSize)));
     if (!resolved.empty()) {
-      m_fallbackIcon->setVisible(false);
-      m_icon->setSize(iconSize, iconSize);
-      m_icon->setSourceFile(renderer, resolved, static_cast<int>(std::round(iconSize)), true);
-      m_icon->setVisible(true);
+      m_ui.fallbackIcon->setVisible(false);
+      m_ui.icon->setSize(iconSize, iconSize);
+      m_ui.icon->setSourceFile(renderer, resolved, static_cast<int>(std::round(iconSize)), true);
+      m_ui.icon->setVisible(true);
       return;
     }
   }
 
-  m_icon->clear(renderer);
-  m_icon->setVisible(false);
-  m_fallbackIcon->setVisible(true);
+  m_ui.icon->clear(renderer);
+  m_ui.icon->setVisible(false);
+  m_ui.fallbackIcon->setVisible(true);
 }
 
 void PolkitPanel::submit(std::string_view response) {
   PolkitAgent* agent = m_agentProvider != nullptr ? m_agentProvider() : nullptr;
-  if (agent == nullptr || m_input == nullptr) {
+  if (agent == nullptr || m_ui.input == nullptr) {
     return;
   }
-  const std::string password = response.empty() ? m_input->value() : std::string(response);
+  const std::string password = response.empty() ? m_ui.input->value() : std::string(response);
   if (password.empty()) {
     return;
   }
   agent->submitResponse(password);
-  m_input->setValue("");
+  m_ui.input->setValue("");
 }
 
 bool PolkitPanel::handleInputKeyEvent(std::uint32_t sym, std::uint32_t modifiers) {
@@ -455,14 +442,14 @@ bool PolkitPanel::handleInputKeyEvent(std::uint32_t sym, std::uint32_t modifiers
   }
   const bool shift = (modifiers & KeyMod::Shift) != 0;
   if (KeybindMatcher::matches(KeybindAction::Left, sym, modifiers)) {
-    if (m_input != nullptr) {
-      m_input->moveCaretLeft(shift);
+    if (m_ui.input != nullptr) {
+      m_ui.input->moveCaretLeft(shift);
     }
     return true;
   }
   if (KeybindMatcher::matches(KeybindAction::Right, sym, modifiers)) {
-    if (m_input != nullptr) {
-      m_input->moveCaretRight(shift);
+    if (m_ui.input != nullptr) {
+      m_ui.input->moveCaretRight(shift);
     }
     return true;
   }
@@ -470,7 +457,7 @@ bool PolkitPanel::handleInputKeyEvent(std::uint32_t sym, std::uint32_t modifiers
 }
 
 void PolkitPanel::onPanelCardOpacityChanged(float opacity) {
-  if (m_input != nullptr) {
-    m_input->setSurfaceOpacity(opacity);
+  if (m_ui.input != nullptr) {
+    m_ui.input->setSurfaceOpacity(opacity);
   }
 }

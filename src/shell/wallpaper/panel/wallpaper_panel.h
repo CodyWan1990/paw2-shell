@@ -136,30 +136,27 @@ private:
   WallpaperScanner* m_scanner = nullptr;
   noctalia::theme::ThemeService* m_themeService = nullptr;
 
-  // UI nodes (owned by the root flex tree).
-  Flex* m_rootLayout = nullptr;
-  Flex* m_toolbar = nullptr;
-  Flex* m_favoritesOptionsColumn = nullptr;
-  Label* m_title = nullptr;
-  Button* m_backButton = nullptr;
-  Segmented* m_favoriteThemeSegmented = nullptr;
-  Segmented* m_favoritePaletteSourceSegmented = nullptr;
-  Select* m_favoritePaletteDetailSelect = nullptr;
-  Select* m_monitorSelect = nullptr;
-  Input* m_filterInput = nullptr;
-  Button* m_favoriteCurrentButton = nullptr;
-  Toggle* m_flattenToggle = nullptr;
-  Label* m_flattenLabel = nullptr;
-  Button* m_sortButton = nullptr;
-  Button* m_refreshButton = nullptr;
-  Button* m_colorButton = nullptr;
-  Button* m_closeButton = nullptr;
-  VirtualGridView* m_grid = nullptr;
-  Flex* m_loadingBox = nullptr;
-  Spinner* m_spinner = nullptr;
-  Flex* m_pickBar = nullptr;
-  Label* m_pickCount = nullptr;
-  Button* m_pickAddButton = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    // UI nodes (owned by the root flex tree).
+    Flex* rootLayout = nullptr;
+    Button* backButton = nullptr;
+    Segmented* favoriteThemeSegmented = nullptr;
+    Segmented* favoritePaletteSourceSegmented = nullptr;
+    Select* favoritePaletteDetailSelect = nullptr;
+    Select* monitorSelect = nullptr;
+    Input* filterInput = nullptr;
+    Button* favoriteCurrentButton = nullptr;
+    Toggle* flattenToggle = nullptr;
+    Button* sortButton = nullptr;
+    VirtualGridView* grid = nullptr;
+    Flex* loadingBox = nullptr;
+    Spinner* spinner = nullptr;
+    Flex* pickBar = nullptr;
+    Label* pickCount = nullptr;
+    Button* pickAddButton = nullptr;
+  };
+  Ui m_ui;
   std::unique_ptr<WallpaperGridAdapter> m_adapter;
 
   // Pick mode: tiles toggle in and out of m_picked instead of applying.

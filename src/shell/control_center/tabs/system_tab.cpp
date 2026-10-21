@@ -211,7 +211,7 @@ std::unique_ptr<Flex> SystemTab::create() {
   const float sc = contentScale();
 
   auto tab = ui::column({
-      .out = &m_root,
+      .out = &m_ui.root,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * sc,
   });
@@ -228,19 +228,19 @@ std::unique_ptr<Flex> SystemTab::create() {
     // CPU card
     {
       auto card = ui::column({
-          .out = &m_cpuCard,
+          .out = &m_ui.cpuCard,
           .flexGrow = 1.0F,
           .configure = [sc, opacity = panelCardOpacity()](Flex& section) { applyGraphCardStyle(section, sc, opacity); },
       });
 
       makeHeaderRow(*card, i18n::tr("control-center.system.titles.cpu"), sc);
-      m_cpuGraph = addGraph(*card);
+      m_ui.cpuGraph = addGraph(*card);
       auto* legend = makeLegendRow(*card, sc);
-      m_cpuLegend = legend;
-      auto* cpuPctGroup = makeIconLabel(*legend, "cpu-usage", sc, &m_cpuPctIcon);
-      m_cpuPctLabel = makeValueLabel(*cpuPctGroup, sc);
-      auto* cpuTempGroup = makeIconLabel(*legend, "cpu-temperature", sc, &m_cpuTempIcon);
-      m_cpuTempLabel = makeValueLabel(*cpuTempGroup, sc);
+      m_ui.cpuLegend = legend;
+      auto* cpuPctGroup = makeIconLabel(*legend, "cpu-usage", sc, &m_ui.cpuPctIcon);
+      m_ui.cpuPctLabel = makeValueLabel(*cpuPctGroup, sc);
+      auto* cpuTempGroup = makeIconLabel(*legend, "cpu-temperature", sc, &m_ui.cpuTempIcon);
+      m_ui.cpuTempLabel = makeValueLabel(*cpuTempGroup, sc);
 
       row->addChild(std::move(card));
     }
@@ -248,17 +248,17 @@ std::unique_ptr<Flex> SystemTab::create() {
     // Memory card
     {
       auto card = ui::column({
-          .out = &m_ramCard,
+          .out = &m_ui.ramCard,
           .flexGrow = 1.0F,
           .configure = [sc, opacity = panelCardOpacity()](Flex& section) { applyGraphCardStyle(section, sc, opacity); },
       });
 
       makeHeaderRow(*card, i18n::tr("control-center.system.titles.memory"), sc);
-      m_ramGraph = addGraph(*card);
+      m_ui.ramGraph = addGraph(*card);
       auto* legend = makeLegendRow(*card, sc);
-      m_ramLegend = legend;
-      auto* ramGroup = makeIconLabel(*legend, "memory", sc, &m_ramIcon);
-      m_ramLabel = makeValueLabel(*ramGroup, sc);
+      m_ui.ramLegend = legend;
+      auto* ramGroup = makeIconLabel(*legend, "memory", sc, &m_ui.ramIcon);
+      m_ui.ramLabel = makeValueLabel(*ramGroup, sc);
 
       row->addChild(std::move(card));
     }
@@ -277,25 +277,25 @@ std::unique_ptr<Flex> SystemTab::create() {
     // GPU card
     {
       auto card = ui::column({
-          .out = &m_gpuCard,
+          .out = &m_ui.gpuCard,
           .flexGrow = 1.0F,
           .visible = false,
           .configure = [sc, opacity = panelCardOpacity()](Flex& section) { applyGraphCardStyle(section, sc, opacity); },
       });
 
       makeHeaderRow(*card, i18n::tr("control-center.system.titles.gpu"), sc);
-      m_gpuGraph = addGraph(*card);
+      m_ui.gpuGraph = addGraph(*card);
       auto* legend = makeLegendRow(*card, sc);
-      m_gpuLegend = legend;
-      m_gpuUsageGroup = makeIconLabel(*legend, "gpu-usage", sc, &m_gpuUsageIcon);
-      m_gpuUsageLabel = makeValueLabel(*m_gpuUsageGroup, sc);
-      m_gpuUsageGroup->setVisible(false);
-      m_gpuVramGroup = makeIconLabel(*legend, "memory", sc, &m_gpuVramIcon);
-      m_gpuVramLabel = makeValueLabel(*m_gpuVramGroup, sc);
-      m_gpuVramGroup->setVisible(false);
-      m_gpuTempGroup = makeIconLabel(*legend, "temperature", sc, &m_gpuTempIcon);
-      m_gpuTempLabel = makeValueLabel(*m_gpuTempGroup, sc);
-      m_gpuTempGroup->setVisible(false);
+      m_ui.gpuLegend = legend;
+      m_ui.gpuUsageGroup = makeIconLabel(*legend, "gpu-usage", sc, &m_ui.gpuUsageIcon);
+      m_ui.gpuUsageLabel = makeValueLabel(*m_ui.gpuUsageGroup, sc);
+      m_ui.gpuUsageGroup->setVisible(false);
+      m_ui.gpuVramGroup = makeIconLabel(*legend, "memory", sc, &m_ui.gpuVramIcon);
+      m_ui.gpuVramLabel = makeValueLabel(*m_ui.gpuVramGroup, sc);
+      m_ui.gpuVramGroup->setVisible(false);
+      m_ui.gpuTempGroup = makeIconLabel(*legend, "temperature", sc, &m_ui.gpuTempIcon);
+      m_ui.gpuTempLabel = makeValueLabel(*m_ui.gpuTempGroup, sc);
+      m_ui.gpuTempGroup->setVisible(false);
 
       row->addChild(std::move(card));
     }
@@ -303,19 +303,19 @@ std::unique_ptr<Flex> SystemTab::create() {
     // Network card
     {
       auto card = ui::column({
-          .out = &m_netCard,
+          .out = &m_ui.netCard,
           .flexGrow = 1.0F,
           .configure = [sc, opacity = panelCardOpacity()](Flex& section) { applyGraphCardStyle(section, sc, opacity); },
       });
 
       makeHeaderRow(*card, i18n::tr("control-center.system.titles.network"), sc);
-      m_netGraph = addGraph(*card);
+      m_ui.netGraph = addGraph(*card);
       auto* legend = makeLegendRow(*card, sc);
-      m_netLegend = legend;
-      auto* rxGroup = makeIconLabel(*legend, "download-speed", sc, &m_rxIcon);
-      m_rxLabel = makeValueLabel(*rxGroup, sc);
-      auto* txGroup = makeIconLabel(*legend, "upload-speed", sc, &m_txIcon);
-      m_txLabel = makeValueLabel(*txGroup, sc);
+      m_ui.netLegend = legend;
+      auto* rxGroup = makeIconLabel(*legend, "download-speed", sc, &m_ui.rxIcon);
+      m_ui.rxLabel = makeValueLabel(*rxGroup, sc);
+      auto* txGroup = makeIconLabel(*legend, "upload-speed", sc, &m_ui.txIcon);
+      m_ui.txLabel = makeValueLabel(*txGroup, sc);
 
       row->addChild(std::move(card));
     }
@@ -346,8 +346,8 @@ std::unique_ptr<Flex> SystemTab::create() {
         i18n::tr("control-center.system.tooltips.load")
     );
     m_resourcesLines[1] = addResourceRow(*resourcesCard, "memory", i18n::tr("control-center.system.labels.ram"), sc);
-    m_swapLabel = addResourceRow(
-        *resourcesCard, "arrows-exchange", i18n::tr("control-center.system.labels.swap"), sc, &m_swapRow
+    m_ui.swapLabel = addResourceRow(
+        *resourcesCard, "arrows-exchange", i18n::tr("control-center.system.labels.swap"), sc, &m_ui.swapRow
     );
 
     // Up to four physical disks, discovered automatically (root first). Usage refreshes in doUpdate.
@@ -428,44 +428,11 @@ void SystemTab::retainStats(bool retain) {
 }
 
 void SystemTab::onClose() {
-  m_root = nullptr;
-  m_cpuGraph = nullptr;
-  m_ramGraph = nullptr;
-  m_gpuGraph = nullptr;
-  m_netGraph = nullptr;
-  m_cpuCard = nullptr;
-  m_ramCard = nullptr;
-  m_gpuCard = nullptr;
-  m_netCard = nullptr;
-  m_cpuLegend = nullptr;
-  m_ramLegend = nullptr;
-  m_gpuLegend = nullptr;
-  m_netLegend = nullptr;
-  m_cpuPctIcon = nullptr;
-  m_cpuPctLabel = nullptr;
-  m_cpuTempIcon = nullptr;
-  m_cpuTempLabel = nullptr;
-  m_gpuTempGroup = nullptr;
-  m_gpuTempIcon = nullptr;
-  m_gpuTempLabel = nullptr;
-  m_gpuUsageGroup = nullptr;
-  m_gpuUsageIcon = nullptr;
-  m_gpuUsageLabel = nullptr;
-  m_gpuVramGroup = nullptr;
-  m_gpuVramIcon = nullptr;
-  m_gpuVramLabel = nullptr;
-  m_ramIcon = nullptr;
-  m_ramLabel = nullptr;
-  m_rxIcon = nullptr;
-  m_rxLabel = nullptr;
-  m_txIcon = nullptr;
-  m_txLabel = nullptr;
+  m_ui = {};
   for (auto& l : m_systemLines)
     l = nullptr;
   for (auto& l : m_resourcesLines)
     l = nullptr;
-  m_swapRow = nullptr;
-  m_swapLabel = nullptr;
   m_diskLabels.clear();
   m_diskMountPoints.clear();
   m_graphInitialized = false;
@@ -498,31 +465,31 @@ void SystemTab::onFrameTick(float deltaMs) {
 
   m_scrollProgress = scrollProgressForSample(m_lastSampleAt);
 
-  if (m_cpuGraph != nullptr) {
-    m_cpuGraph->setScroll(m_scrollProgress);
+  if (m_ui.cpuGraph != nullptr) {
+    m_ui.cpuGraph->setScroll(m_scrollProgress);
   }
-  if (m_ramGraph != nullptr) {
-    m_ramGraph->setScroll(m_scrollProgress);
+  if (m_ui.ramGraph != nullptr) {
+    m_ui.ramGraph->setScroll(m_scrollProgress);
   }
-  if (m_gpuGraph != nullptr) {
-    m_gpuGraph->setScroll(m_scrollProgress);
+  if (m_ui.gpuGraph != nullptr) {
+    m_ui.gpuGraph->setScroll(m_scrollProgress);
   }
-  if (m_netGraph != nullptr) {
-    m_netGraph->setScroll(m_scrollProgress);
+  if (m_ui.netGraph != nullptr) {
+    m_ui.netGraph->setScroll(m_scrollProgress);
   }
 
   PanelManager::instance().requestRedraw();
 }
 
 void SystemTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_root == nullptr) {
+  if (m_ui.root == nullptr) {
     return;
   }
 
   const float sc = contentScale();
 
-  m_root->setSize(contentWidth, bodyHeight);
-  m_root->layout(renderer);
+  m_ui.root->setSize(contentWidth, bodyHeight);
+  m_ui.root->layout(renderer);
 
   const float cardPadH = kGraphCardPadH * sc * 2.0F;
 
@@ -543,14 +510,14 @@ void SystemTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeigh
     g->setLineWidth(kGraphLineWidth * sc);
   };
 
-  sizeGraph(m_cpuGraph, m_cpuCard, m_cpuLegend);
-  sizeGraph(m_ramGraph, m_ramCard, m_ramLegend);
+  sizeGraph(m_ui.cpuGraph, m_ui.cpuCard, m_ui.cpuLegend);
+  sizeGraph(m_ui.ramGraph, m_ui.ramCard, m_ui.ramLegend);
   if (m_gpuVisible) {
-    sizeGraph(m_gpuGraph, m_gpuCard, m_gpuLegend);
+    sizeGraph(m_ui.gpuGraph, m_ui.gpuCard, m_ui.gpuLegend);
   }
-  sizeGraph(m_netGraph, m_netCard, m_netLegend);
+  sizeGraph(m_ui.netGraph, m_ui.netCard, m_ui.netLegend);
 
-  m_root->layout(renderer);
+  m_ui.root->layout(renderer);
 }
 
 void SystemTab::doUpdate(Renderer& renderer) {
@@ -560,72 +527,72 @@ void SystemTab::doUpdate(Renderer& renderer) {
 
   const bool monitorRunning = m_monitor->isRunning();
 
-  if (m_cpuGraph != nullptr) {
-    m_cpuGraph->setColor(colorSpecFromRole(ColorRole::Primary));
-    m_cpuGraph->setColor2(colorSpecFromRole(ColorRole::Error));
+  if (m_ui.cpuGraph != nullptr) {
+    m_ui.cpuGraph->setColor(colorSpecFromRole(ColorRole::Primary));
+    m_ui.cpuGraph->setColor2(colorSpecFromRole(ColorRole::Error));
   }
-  if (m_cpuPctIcon != nullptr) {
-    m_cpuPctIcon->setColor(colorSpecFromRole(ColorRole::Primary));
+  if (m_ui.cpuPctIcon != nullptr) {
+    m_ui.cpuPctIcon->setColor(colorSpecFromRole(ColorRole::Primary));
   }
-  if (m_cpuPctLabel != nullptr) {
-    m_cpuPctLabel->setColor(colorSpecFromRole(ColorRole::Primary));
+  if (m_ui.cpuPctLabel != nullptr) {
+    m_ui.cpuPctLabel->setColor(colorSpecFromRole(ColorRole::Primary));
   }
-  if (m_cpuTempIcon != nullptr) {
-    m_cpuTempIcon->setColor(colorSpecFromRole(ColorRole::Error));
+  if (m_ui.cpuTempIcon != nullptr) {
+    m_ui.cpuTempIcon->setColor(colorSpecFromRole(ColorRole::Error));
   }
-  if (m_cpuTempLabel != nullptr) {
-    m_cpuTempLabel->setColor(colorSpecFromRole(ColorRole::Error));
-  }
-
-  if (m_ramGraph != nullptr) {
-    m_ramGraph->setColor(colorSpecFromRole(ColorRole::Secondary));
-  }
-  if (m_ramIcon != nullptr) {
-    m_ramIcon->setColor(colorSpecFromRole(ColorRole::Secondary));
-  }
-  if (m_ramLabel != nullptr) {
-    m_ramLabel->setColor(colorSpecFromRole(ColorRole::Secondary));
+  if (m_ui.cpuTempLabel != nullptr) {
+    m_ui.cpuTempLabel->setColor(colorSpecFromRole(ColorRole::Error));
   }
 
-  if (m_gpuGraph != nullptr) {
-    m_gpuGraph->setColor(colorSpecFromRole(ColorRole::Primary));
-    m_gpuGraph->setColor2(colorSpecFromRole(ColorRole::Secondary));
-    m_gpuGraph->setColor3(colorSpecFromRole(ColorRole::Error));
+  if (m_ui.ramGraph != nullptr) {
+    m_ui.ramGraph->setColor(colorSpecFromRole(ColorRole::Secondary));
   }
-  if (m_gpuUsageIcon != nullptr) {
-    m_gpuUsageIcon->setColor(colorSpecFromRole(ColorRole::Primary));
+  if (m_ui.ramIcon != nullptr) {
+    m_ui.ramIcon->setColor(colorSpecFromRole(ColorRole::Secondary));
   }
-  if (m_gpuUsageLabel != nullptr) {
-    m_gpuUsageLabel->setColor(colorSpecFromRole(ColorRole::Primary));
-  }
-  if (m_gpuVramIcon != nullptr) {
-    m_gpuVramIcon->setColor(colorSpecFromRole(ColorRole::Secondary));
-  }
-  if (m_gpuVramLabel != nullptr) {
-    m_gpuVramLabel->setColor(colorSpecFromRole(ColorRole::Secondary));
-  }
-  if (m_gpuTempIcon != nullptr) {
-    m_gpuTempIcon->setColor(colorSpecFromRole(ColorRole::Error));
-  }
-  if (m_gpuTempLabel != nullptr) {
-    m_gpuTempLabel->setColor(colorSpecFromRole(ColorRole::Error));
+  if (m_ui.ramLabel != nullptr) {
+    m_ui.ramLabel->setColor(colorSpecFromRole(ColorRole::Secondary));
   }
 
-  if (m_netGraph != nullptr) {
-    m_netGraph->setColor(colorSpecFromRole(ColorRole::Tertiary));
-    m_netGraph->setColor2(colorSpecFromRole(ColorRole::Secondary));
+  if (m_ui.gpuGraph != nullptr) {
+    m_ui.gpuGraph->setColor(colorSpecFromRole(ColorRole::Primary));
+    m_ui.gpuGraph->setColor2(colorSpecFromRole(ColorRole::Secondary));
+    m_ui.gpuGraph->setColor3(colorSpecFromRole(ColorRole::Error));
   }
-  if (m_rxIcon != nullptr) {
-    m_rxIcon->setColor(colorSpecFromRole(ColorRole::Tertiary));
+  if (m_ui.gpuUsageIcon != nullptr) {
+    m_ui.gpuUsageIcon->setColor(colorSpecFromRole(ColorRole::Primary));
   }
-  if (m_rxLabel != nullptr) {
-    m_rxLabel->setColor(colorSpecFromRole(ColorRole::Tertiary));
+  if (m_ui.gpuUsageLabel != nullptr) {
+    m_ui.gpuUsageLabel->setColor(colorSpecFromRole(ColorRole::Primary));
   }
-  if (m_txIcon != nullptr) {
-    m_txIcon->setColor(colorSpecFromRole(ColorRole::Secondary));
+  if (m_ui.gpuVramIcon != nullptr) {
+    m_ui.gpuVramIcon->setColor(colorSpecFromRole(ColorRole::Secondary));
   }
-  if (m_txLabel != nullptr) {
-    m_txLabel->setColor(colorSpecFromRole(ColorRole::Secondary));
+  if (m_ui.gpuVramLabel != nullptr) {
+    m_ui.gpuVramLabel->setColor(colorSpecFromRole(ColorRole::Secondary));
+  }
+  if (m_ui.gpuTempIcon != nullptr) {
+    m_ui.gpuTempIcon->setColor(colorSpecFromRole(ColorRole::Error));
+  }
+  if (m_ui.gpuTempLabel != nullptr) {
+    m_ui.gpuTempLabel->setColor(colorSpecFromRole(ColorRole::Error));
+  }
+
+  if (m_ui.netGraph != nullptr) {
+    m_ui.netGraph->setColor(colorSpecFromRole(ColorRole::Tertiary));
+    m_ui.netGraph->setColor2(colorSpecFromRole(ColorRole::Secondary));
+  }
+  if (m_ui.rxIcon != nullptr) {
+    m_ui.rxIcon->setColor(colorSpecFromRole(ColorRole::Tertiary));
+  }
+  if (m_ui.rxLabel != nullptr) {
+    m_ui.rxLabel->setColor(colorSpecFromRole(ColorRole::Tertiary));
+  }
+  if (m_ui.txIcon != nullptr) {
+    m_ui.txIcon->setColor(colorSpecFromRole(ColorRole::Secondary));
+  }
+  if (m_ui.txLabel != nullptr) {
+    m_ui.txLabel->setColor(colorSpecFromRole(ColorRole::Secondary));
   }
 
   if (monitorRunning) {
@@ -639,10 +606,10 @@ void SystemTab::doUpdate(Renderer& renderer) {
         g->sync(renderer);
       }
     };
-    clearGraph(m_cpuGraph);
-    clearGraph(m_ramGraph);
-    clearGraph(m_gpuGraph);
-    clearGraph(m_netGraph);
+    clearGraph(m_ui.cpuGraph);
+    clearGraph(m_ui.ramGraph);
+    clearGraph(m_ui.gpuGraph);
+    clearGraph(m_ui.netGraph);
     m_graphInitialized = false;
     m_lastSampleAt = {};
     m_scrollProgress = 1.0F;
@@ -669,7 +636,7 @@ void SystemTab::updateGraphs(Renderer& renderer) {
   const auto n = hist.size();
 
   // CPU: usage (primary) + CPU temp (secondary)
-  if (m_cpuGraph != nullptr) {
+  if (m_ui.cpuGraph != nullptr) {
     std::vector<float> usage(n);
     std::vector<float> cpuTemp(n);
     for (std::size_t i = 0; i < n; ++i) {
@@ -684,23 +651,23 @@ void SystemTab::updateGraphs(Renderer& renderer) {
         cpuTemp[i] = range > 0.0 ? static_cast<float>(std::clamp((t - m_cpuTempMin) / range, 0.0, 1.0)) : 0.5F;
       }
     }
-    m_cpuGraph->setValues(std::move(usage));
-    m_cpuGraph->setValues2(std::move(cpuTemp));
-    m_cpuGraph->sync(renderer);
+    m_ui.cpuGraph->setValues(std::move(usage));
+    m_ui.cpuGraph->setValues2(std::move(cpuTemp));
+    m_ui.cpuGraph->sync(renderer);
   }
 
   // Memory
-  if (m_ramGraph != nullptr) {
+  if (m_ui.ramGraph != nullptr) {
     std::vector<float> ram(n);
     for (std::size_t i = 0; i < n; ++i) {
       ram[i] = static_cast<float>(std::clamp(hist[i].ramUsagePercent / 100.0, 0.0, 1.0));
     }
-    m_ramGraph->setValues(std::move(ram));
-    m_ramGraph->sync(renderer);
+    m_ui.ramGraph->setValues(std::move(ram));
+    m_ui.ramGraph->sync(renderer);
   }
 
   // GPU: usage (primary) + VRAM (secondary) + temperature (tertiary)
-  if (m_gpuGraph != nullptr) {
+  if (m_ui.gpuGraph != nullptr) {
     bool hasGpuUsage = false;
     bool hasGpuTemp = false;
     bool hasGpuVram = false;
@@ -728,10 +695,10 @@ void SystemTab::updateGraphs(Renderer& renderer) {
         gpuTemp[i] = range > 0.0 ? static_cast<float>(std::clamp((t - m_gpuTempMin) / range, 0.0, 1.0)) : 0.5F;
       }
     }
-    m_gpuGraph->setValues(hasGpuUsage ? std::move(gpuUsage) : std::vector<float>{});
-    m_gpuGraph->setValues2(hasGpuVram ? std::move(gpuVram) : std::vector<float>{});
-    m_gpuGraph->setValues3(hasGpuTemp ? std::move(gpuTemp) : std::vector<float>{});
-    m_gpuGraph->sync(renderer);
+    m_ui.gpuGraph->setValues(hasGpuUsage ? std::move(gpuUsage) : std::vector<float>{});
+    m_ui.gpuGraph->setValues2(hasGpuVram ? std::move(gpuVram) : std::vector<float>{});
+    m_ui.gpuGraph->setValues3(hasGpuTemp ? std::move(gpuTemp) : std::vector<float>{});
+    m_ui.gpuGraph->sync(renderer);
     const bool hasGpuData = hasGpuUsage || hasGpuVram || hasGpuTemp;
     if (hasGpuData != m_gpuVisible) {
       m_gpuVisible = hasGpuData;
@@ -740,7 +707,7 @@ void SystemTab::updateGraphs(Renderer& renderer) {
   }
 
   // Network
-  if (m_netGraph != nullptr) {
+  if (m_ui.netGraph != nullptr) {
     double maxVal = kNetMinScaleBps;
     for (std::size_t i = 0; i < n; ++i) {
       const auto& s = hist[i];
@@ -755,26 +722,26 @@ void SystemTab::updateGraphs(Renderer& renderer) {
       rx[i] = static_cast<float>(std::clamp(s.netRxBytesPerSec / m_netPeak, 0.0, 1.0));
       tx[i] = static_cast<float>(std::clamp(s.netTxBytesPerSec / m_netPeak, 0.0, 1.0));
     }
-    m_netGraph->setValues(std::move(rx));
-    m_netGraph->setValues2(std::move(tx));
-    m_netGraph->sync(renderer);
+    m_ui.netGraph->setValues(std::move(rx));
+    m_ui.netGraph->setValues2(std::move(tx));
+    m_ui.netGraph->sync(renderer);
   }
 
   m_graphInitialized = true;
   m_lastSampleAt = latestSampleAt;
   m_scrollProgress = scrollProgressForSample(m_lastSampleAt);
 
-  if (m_cpuGraph != nullptr) {
-    m_cpuGraph->setScroll(m_scrollProgress);
+  if (m_ui.cpuGraph != nullptr) {
+    m_ui.cpuGraph->setScroll(m_scrollProgress);
   }
-  if (m_ramGraph != nullptr) {
-    m_ramGraph->setScroll(m_scrollProgress);
+  if (m_ui.ramGraph != nullptr) {
+    m_ui.ramGraph->setScroll(m_scrollProgress);
   }
-  if (m_gpuGraph != nullptr) {
-    m_gpuGraph->setScroll(m_scrollProgress);
+  if (m_ui.gpuGraph != nullptr) {
+    m_ui.gpuGraph->setScroll(m_scrollProgress);
   }
-  if (m_netGraph != nullptr) {
-    m_netGraph->setScroll(m_scrollProgress);
+  if (m_ui.netGraph != nullptr) {
+    m_ui.netGraph->setScroll(m_scrollProgress);
   }
 
   PanelManager::instance().requestLayout();
@@ -784,84 +751,84 @@ void SystemTab::updateGraphs(Renderer& renderer) {
 }
 
 void SystemTab::updateGpuVisibility() {
-  if (m_gpuCard != nullptr) {
-    m_gpuCard->setVisible(m_gpuVisible);
+  if (m_ui.gpuCard != nullptr) {
+    m_ui.gpuCard->setVisible(m_gpuVisible);
   }
   PanelManager::instance().requestLayout();
 }
 
 void SystemTab::syncLabels() {
   if (m_monitor == nullptr || !m_monitor->isRunning()) {
-    if (m_cpuPctLabel != nullptr) {
-      m_cpuPctLabel->setText("--");
+    if (m_ui.cpuPctLabel != nullptr) {
+      m_ui.cpuPctLabel->setText("--");
     }
-    if (m_cpuTempLabel != nullptr) {
-      m_cpuTempLabel->setText("--");
+    if (m_ui.cpuTempLabel != nullptr) {
+      m_ui.cpuTempLabel->setText("--");
     }
-    if (m_gpuTempLabel != nullptr) {
-      m_gpuTempLabel->setText("--");
+    if (m_ui.gpuTempLabel != nullptr) {
+      m_ui.gpuTempLabel->setText("--");
     }
-    if (m_gpuUsageLabel != nullptr) {
-      m_gpuUsageLabel->setText("--");
+    if (m_ui.gpuUsageLabel != nullptr) {
+      m_ui.gpuUsageLabel->setText("--");
     }
-    if (m_gpuVramLabel != nullptr) {
-      m_gpuVramLabel->setText("--");
+    if (m_ui.gpuVramLabel != nullptr) {
+      m_ui.gpuVramLabel->setText("--");
     }
-    if (m_ramLabel != nullptr) {
-      m_ramLabel->setText("--");
+    if (m_ui.ramLabel != nullptr) {
+      m_ui.ramLabel->setText("--");
     }
-    if (m_rxLabel != nullptr) {
-      m_rxLabel->setText("--");
+    if (m_ui.rxLabel != nullptr) {
+      m_ui.rxLabel->setText("--");
     }
-    if (m_txLabel != nullptr) {
-      m_txLabel->setText("--");
+    if (m_ui.txLabel != nullptr) {
+      m_ui.txLabel->setText("--");
     }
     return;
   }
 
   const auto stats = m_monitor->latest();
 
-  if (m_cpuPctLabel != nullptr) {
-    m_cpuPctLabel->setText(std::format("{:.0F}%", stats.cpuUsagePercent));
+  if (m_ui.cpuPctLabel != nullptr) {
+    m_ui.cpuPctLabel->setText(std::format("{:.0F}%", stats.cpuUsagePercent));
   }
-  if (m_cpuTempLabel != nullptr) {
+  if (m_ui.cpuTempLabel != nullptr) {
     if (stats.cpuTempC.has_value()) {
-      m_cpuTempLabel->setText(std::format("{:.0F}°C", *stats.cpuTempC));
+      m_ui.cpuTempLabel->setText(std::format("{:.0F}°C", *stats.cpuTempC));
     } else {
-      m_cpuTempLabel->setText("--");
+      m_ui.cpuTempLabel->setText("--");
     }
   }
-  if (m_gpuTempGroup != nullptr) {
+  if (m_ui.gpuTempGroup != nullptr) {
     const bool hasTempData = stats.gpuTempC.has_value();
-    m_gpuTempGroup->setVisible(hasTempData);
-    if (hasTempData && m_gpuTempLabel != nullptr) {
-      m_gpuTempLabel->setText(std::format("{:.0F}°C", *stats.gpuTempC));
+    m_ui.gpuTempGroup->setVisible(hasTempData);
+    if (hasTempData && m_ui.gpuTempLabel != nullptr) {
+      m_ui.gpuTempLabel->setText(std::format("{:.0F}°C", *stats.gpuTempC));
     }
   }
-  if (m_gpuUsageGroup != nullptr) {
+  if (m_ui.gpuUsageGroup != nullptr) {
     const bool hasUsageData = stats.gpuUsagePercent.has_value();
-    m_gpuUsageGroup->setVisible(hasUsageData);
-    if (hasUsageData && m_gpuUsageLabel != nullptr) {
-      m_gpuUsageLabel->setText(std::format("{:.0F}%", *stats.gpuUsagePercent));
+    m_ui.gpuUsageGroup->setVisible(hasUsageData);
+    if (hasUsageData && m_ui.gpuUsageLabel != nullptr) {
+      m_ui.gpuUsageLabel->setText(std::format("{:.0F}%", *stats.gpuUsagePercent));
     }
   }
-  if (m_gpuVramGroup != nullptr) {
+  if (m_ui.gpuVramGroup != nullptr) {
     const bool hasVramData = stats.gpuVramUsedBytes.has_value();
-    m_gpuVramGroup->setVisible(hasVramData);
-    if (hasVramData && m_gpuVramLabel != nullptr) {
-      m_gpuVramLabel->setText(formatGpuVramUsed(stats));
+    m_ui.gpuVramGroup->setVisible(hasVramData);
+    if (hasVramData && m_ui.gpuVramLabel != nullptr) {
+      m_ui.gpuVramLabel->setText(formatGpuVramUsed(stats));
     }
   }
-  if (m_ramLabel != nullptr) {
-    m_ramLabel->setText(
+  if (m_ui.ramLabel != nullptr) {
+    m_ui.ramLabel->setText(
         FormatUnits::formatBinaryMibAsGib(stats.ramUsedMb) + std::format(" · {:.0F}%", stats.ramUsagePercent)
     );
   }
-  if (m_rxLabel != nullptr) {
-    m_rxLabel->setText(FormatUnits::formatDecimalBytesPerSecond(stats.netRxBytesPerSec));
+  if (m_ui.rxLabel != nullptr) {
+    m_ui.rxLabel->setText(FormatUnits::formatDecimalBytesPerSecond(stats.netRxBytesPerSec));
   }
-  if (m_txLabel != nullptr) {
-    m_txLabel->setText(FormatUnits::formatDecimalBytesPerSecond(stats.netTxBytesPerSec));
+  if (m_ui.txLabel != nullptr) {
+    m_ui.txLabel->setText(FormatUnits::formatDecimalBytesPerSecond(stats.netTxBytesPerSec));
   }
 
   // System info
@@ -899,11 +866,11 @@ void SystemTab::syncLabels() {
   if (m_resourcesLines[1] != nullptr) {
     m_resourcesLines[1]->setText(formatMemoryUsedTotal(stats));
   }
-  if (m_swapRow != nullptr) {
+  if (m_ui.swapRow != nullptr) {
     const bool hasSwap = stats.swapTotalMb > 0;
-    m_swapRow->setVisible(hasSwap);
-    if (hasSwap && m_swapLabel != nullptr) {
-      m_swapLabel->setText(FormatUnits::formatBinaryMibUsageAsGib(stats.swapUsedMb, stats.swapTotalMb));
+    m_ui.swapRow->setVisible(hasSwap);
+    if (hasSwap && m_ui.swapLabel != nullptr) {
+      m_ui.swapLabel->setText(FormatUnits::formatBinaryMibUsageAsGib(stats.swapUsedMb, stats.swapTotalMb));
     }
   }
   for (std::size_t i = 0; i < m_diskLabels.size(); ++i) {

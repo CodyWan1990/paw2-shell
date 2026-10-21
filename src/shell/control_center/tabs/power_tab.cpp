@@ -119,7 +119,7 @@ std::unique_ptr<Flex> PowerTab::create() {
   const float scale = contentScale();
 
   auto tab = ui::column({
-      .out = &m_root,
+      .out = &m_ui.root,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
   });
@@ -142,7 +142,7 @@ std::unique_ptr<Flex> PowerTab::create() {
   buildHealthCard(*content, scale);
   buildPeripheralsCard(*content, scale);
 
-  m_root->addChild(std::move(scroll));
+  m_ui.root->addChild(std::move(scroll));
 
   return tab;
 }
@@ -157,11 +157,11 @@ void PowerTab::buildChargingCard(Flex& root, float scale) {
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
   });
-  m_chargingCard = card.get();
+  m_ui.chargingCard = card.get();
   card->addChild(makeCardHeaderRow(i18n::tr("control-center.power.charging.title"), scale));
   card->addChild(
       ui::column({
-          .out = &m_chargingList,
+          .out = &m_ui.chargingList,
           .align = FlexAlign::Stretch,
           .gap = Style::spaceMd * scale,
       })
@@ -178,27 +178,27 @@ void PowerTab::buildStatusCard(Flex& root, float scale) {
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
   });
-  m_statusCard = card.get();
+  m_ui.statusCard = card.get();
 
   card->addChild(makeCardHeaderRow(i18n::tr("control-center.power.battery"), scale));
 
   auto topRow = ui::row(
       {.align = FlexAlign::Center, .gap = Style::spaceSm * scale},
       ui::glyph({
-          .out = &m_statusGlyph,
+          .out = &m_ui.statusGlyph,
           .glyph = batteryGlyphName(0.0, BatteryState::Unknown),
           .glyphSize = Style::fontSizeTitle * scale,
           .color = colorSpecFromRole(ColorRole::OnSurface),
       }),
       ui::label({
-          .out = &m_percentLabel,
+          .out = &m_ui.percentLabel,
           .text = "--",
           .fontSize = Style::fontSizeTitle * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::OnSurface),
       }),
       ui::label({
-          .out = &m_stateLabel,
+          .out = &m_ui.stateLabel,
           .text = "",
           .fontSize = Style::fontSizeBody * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
@@ -209,7 +209,7 @@ void PowerTab::buildStatusCard(Flex& root, float scale) {
 
   card->addChild(
       ui::progressBar({
-          .out = &m_levelBar,
+          .out = &m_ui.levelBar,
           .fill = colorSpecFromRole(ColorRole::Primary),
           .track = colorSpecFromRole(ColorRole::Surface),
           .radius = Style::sliderTrackHeight * scale * 0.5F,
@@ -219,14 +219,14 @@ void PowerTab::buildStatusCard(Flex& root, float scale) {
   );
 
   auto timeRow = ui::row(
-      {.out = &m_timeRow, .align = FlexAlign::Center, .gap = Style::spaceXs * scale, .visible = false},
+      {.out = &m_ui.timeRow, .align = FlexAlign::Center, .gap = Style::spaceXs * scale, .visible = false},
       ui::glyph({
           .glyph = "clock",
           .glyphSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
       }),
       ui::label({
-          .out = &m_timeLabel,
+          .out = &m_ui.timeLabel,
           .text = "",
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
@@ -235,14 +235,14 @@ void PowerTab::buildStatusCard(Flex& root, float scale) {
   card->addChild(std::move(timeRow));
 
   auto rateRow = ui::row(
-      {.out = &m_rateRow, .align = FlexAlign::Center, .gap = Style::spaceXs * scale, .visible = false},
+      {.out = &m_ui.rateRow, .align = FlexAlign::Center, .gap = Style::spaceXs * scale, .visible = false},
       ui::glyph({
           .glyph = "bolt",
           .glyphSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
       }),
       ui::label({
-          .out = &m_rateLabel,
+          .out = &m_ui.rateLabel,
           .text = "",
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
@@ -273,7 +273,7 @@ void PowerTab::buildProfilesCard(Flex& root, float scale) {
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
   });
-  m_profilesCard = card.get();
+  m_ui.profilesCard = card.get();
 
   card->addChild(makeCardHeaderRow(i18n::tr("control-center.power.power-profile"), scale));
 
@@ -285,7 +285,7 @@ void PowerTab::buildProfilesCard(Flex& root, float scale) {
 
   card->addChild(
       ui::segmented({
-          .out = &m_profiles,
+          .out = &m_ui.profiles,
           .options = std::move(options),
           .fontSize = Style::fontSizeCaption,
           .scale = scale,
@@ -302,14 +302,13 @@ void PowerTab::buildProfilesCard(Flex& root, float scale) {
   );
 
   auto inhibitedRow = ui::row(
-      {.out = &m_inhibitedRow, .align = FlexAlign::Center, .gap = Style::spaceXs * scale, .visible = false},
+      {.out = &m_ui.inhibitedRow, .align = FlexAlign::Center, .gap = Style::spaceXs * scale, .visible = false},
       ui::glyph({
           .glyph = "alert-triangle",
           .glyphSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::Error),
       }),
       ui::label({
-          .out = &m_inhibitedLabel,
           .text = i18n::tr("control-center.power.performance-inhibited"),
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
@@ -331,12 +330,12 @@ void PowerTab::buildHealthCard(Flex& root, float scale) {
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
   });
-  m_healthCard = card.get();
+  m_ui.healthCard = card.get();
 
   auto header = makeCardHeaderRow(i18n::tr("control-center.power.health"), scale);
   header->addChild(
       ui::label({
-          .out = &m_healthLabel,
+          .out = &m_ui.healthLabel,
           .text = "--",
           .fontSize = Style::fontSizeBody * scale,
           .fontWeight = FontWeight::Bold,
@@ -355,7 +354,7 @@ void PowerTab::buildHealthCard(Flex& root, float scale) {
 
   card->addChild(
       ui::progressBar({
-          .out = &m_healthBar,
+          .out = &m_ui.healthBar,
           .fill = colorSpecFromRole(ColorRole::Primary),
           .track = colorSpecFromRole(ColorRole::Surface),
           .radius = Style::sliderTrackHeight * scale * 0.5F,
@@ -377,52 +376,32 @@ void PowerTab::buildPeripheralsCard(Flex& root, float scale) {
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
   });
-  m_peripheralsCard = card.get();
+  m_ui.peripheralsCard = card.get();
 
   card->addChild(makeCardHeaderRow(i18n::tr("control-center.power.peripherals"), scale));
 
-  auto list = ui::column({.out = &m_peripheralsList, .align = FlexAlign::Stretch, .gap = Style::spaceSm * scale});
+  auto list = ui::column({.out = &m_ui.peripheralsList, .align = FlexAlign::Stretch, .gap = Style::spaceSm * scale});
   card->addChild(std::move(list));
 
   root.addChild(std::move(card));
 }
 
 void PowerTab::onClose() {
-  m_root = nullptr;
-  m_statusCard = nullptr;
-  m_statusGlyph = nullptr;
-  m_percentLabel = nullptr;
-  m_stateLabel = nullptr;
-  m_levelBar = nullptr;
-  m_timeRow = nullptr;
-  m_timeLabel = nullptr;
-  m_rateRow = nullptr;
-  m_rateLabel = nullptr;
-  m_chargingCard = nullptr;
-  m_chargingList = nullptr;
+  m_ui = {};
   m_chargeLimitRows.clear();
   m_lastChargeLimitKey.clear();
-  m_profilesCard = nullptr;
-  m_profiles = nullptr;
-  m_inhibitedRow = nullptr;
-  m_inhibitedLabel = nullptr;
-  m_healthCard = nullptr;
-  m_healthLabel = nullptr;
-  m_healthBar = nullptr;
-  m_peripheralsCard = nullptr;
-  m_peripheralsList = nullptr;
   m_peripheralRows.clear();
   m_lastPeripheralKey.clear();
 }
 
 void PowerTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_root == nullptr) {
+  if (m_ui.root == nullptr) {
     return;
   }
   rebuildPeripherals();
   rebuildChargeLimits();
-  m_root->setSize(contentWidth, bodyHeight);
-  m_root->layout(renderer);
+  m_ui.root->setSize(contentWidth, bodyHeight);
+  m_ui.root->layout(renderer);
 }
 
 void PowerTab::doUpdate(Renderer& /*renderer*/) {
@@ -434,7 +413,7 @@ void PowerTab::doUpdate(Renderer& /*renderer*/) {
 }
 
 void PowerTab::rebuildChargeLimits() {
-  if (m_chargingCard == nullptr || m_chargingList == nullptr || m_upower == nullptr) {
+  if (m_ui.chargingCard == nullptr || m_ui.chargingList == nullptr || m_upower == nullptr) {
     return;
   }
 
@@ -455,7 +434,7 @@ void PowerTab::rebuildChargeLimits() {
     m_lastChargeLimitKey = key;
     for (auto& entry : m_chargeLimitRows) {
       if (entry.row != nullptr) {
-        m_chargingList->removeChild(entry.row);
+        m_ui.chargingList->removeChild(entry.row);
       }
     }
     m_chargeLimitRows.clear();
@@ -539,12 +518,12 @@ void PowerTab::rebuildChargeLimits() {
               .visible = false,
           })
       );
-      m_chargingList->addChild(std::move(row));
+      m_ui.chargingList->addChild(std::move(row));
       m_chargeLimitRows.push_back(entry);
     }
   }
 
-  m_chargingCard->setVisible(!batteries.empty());
+  m_ui.chargingCard->setVisible(!batteries.empty());
   for (std::size_t i = 0; i < batteries.size() && i < m_chargeLimitRows.size(); ++i) {
     const auto& state = batteries[i].chargeLimit;
     auto& row = m_chargeLimitRows[i];
@@ -623,39 +602,39 @@ void PowerTab::rebuildChargeLimits() {
 }
 
 void PowerTab::syncBatteryStatus() {
-  if (m_statusCard == nullptr || m_upower == nullptr) {
+  if (m_ui.statusCard == nullptr || m_upower == nullptr) {
     return;
   }
 
   const UPowerState& state = m_upower->state();
-  m_statusCard->setVisible(state.isPresent);
+  m_ui.statusCard->setVisible(state.isPresent);
   if (!state.isPresent) {
     return;
   }
 
-  if (m_statusGlyph != nullptr) {
-    m_statusGlyph->setGlyph(batteryGlyphName(state.percentage, state.state));
+  if (m_ui.statusGlyph != nullptr) {
+    m_ui.statusGlyph->setGlyph(batteryGlyphName(state.percentage, state.state));
   }
-  if (m_percentLabel != nullptr) {
-    m_percentLabel->setText(std::format("{:.0F}%", state.percentage));
+  if (m_ui.percentLabel != nullptr) {
+    m_ui.percentLabel->setText(std::format("{:.0F}%", state.percentage));
   }
-  if (m_stateLabel != nullptr) {
-    m_stateLabel->setText(batteryStateLabel(state.state));
+  if (m_ui.stateLabel != nullptr) {
+    m_ui.stateLabel->setText(batteryStateLabel(state.state));
   }
-  if (m_levelBar != nullptr) {
-    m_levelBar->setProgress(static_cast<float>(std::clamp(state.percentage / 100.0, 0.0, 1.0)));
+  if (m_ui.levelBar != nullptr) {
+    m_ui.levelBar->setProgress(static_cast<float>(std::clamp(state.percentage / 100.0, 0.0, 1.0)));
     const bool low = state.state == BatteryState::Discharging && state.percentage <= 20.0;
-    m_levelBar->setFill(colorSpecFromRole(low ? ColorRole::Error : ColorRole::Primary));
+    m_ui.levelBar->setFill(colorSpecFromRole(low ? ColorRole::Error : ColorRole::Primary));
   }
 
   const bool charging = state.state == BatteryState::Charging || state.state == BatteryState::PendingCharge;
   const std::int64_t seconds = charging ? state.timeToFull : state.timeToEmpty;
-  if (m_timeRow != nullptr) {
+  if (m_ui.timeRow != nullptr) {
     const bool show = seconds > 0;
-    m_timeRow->setVisible(show);
-    if (show && m_timeLabel != nullptr) {
+    m_ui.timeRow->setVisible(show);
+    if (show && m_ui.timeLabel != nullptr) {
       const std::string duration = formatDuration(std::chrono::seconds{seconds});
-      m_timeLabel->setText(
+      m_ui.timeLabel->setText(
           i18n::tr(
               charging ? "control-center.power.time-to-full" : "control-center.power.time-to-empty", "time", duration
           )
@@ -663,17 +642,17 @@ void PowerTab::syncBatteryStatus() {
     }
   }
 
-  if (m_rateRow != nullptr) {
+  if (m_ui.rateRow != nullptr) {
     const bool show = state.energyRate > 0.0;
-    m_rateRow->setVisible(show);
-    if (show && m_rateLabel != nullptr) {
-      m_rateLabel->setText(std::format("{:.1F} W", state.energyRate));
+    m_ui.rateRow->setVisible(show);
+    if (show && m_ui.rateLabel != nullptr) {
+      m_ui.rateLabel->setText(std::format("{:.1F} W", state.energyRate));
     }
   }
 }
 
 void PowerTab::syncPowerProfiles() {
-  if (m_profiles == nullptr || m_powerProfiles == nullptr || m_profileOrder.empty()) {
+  if (m_ui.profiles == nullptr || m_powerProfiles == nullptr || m_profileOrder.empty()) {
     return;
   }
 
@@ -681,41 +660,41 @@ void PowerTab::syncPowerProfiles() {
   const auto it = std::ranges::find(m_profileOrder, active);
   if (it != m_profileOrder.end()) {
     const auto index = static_cast<std::size_t>(std::distance(m_profileOrder.begin(), it));
-    if (index != m_profiles->selectedIndex()) {
+    if (index != m_ui.profiles->selectedIndex()) {
       m_syncingProfiles = true;
-      m_profiles->setSelectedIndex(index);
+      m_ui.profiles->setSelectedIndex(index);
       m_syncingProfiles = false;
     }
   }
 
-  if (m_inhibitedRow != nullptr) {
-    m_inhibitedRow->setVisible(!m_powerProfiles->state().performanceInhibited.empty());
+  if (m_ui.inhibitedRow != nullptr) {
+    m_ui.inhibitedRow->setVisible(!m_powerProfiles->state().performanceInhibited.empty());
   }
 }
 
 void PowerTab::syncBatteryHealth() {
-  if (m_healthCard == nullptr || m_upower == nullptr) {
+  if (m_ui.healthCard == nullptr || m_upower == nullptr) {
     return;
   }
 
   const UPowerDeviceInfo* battery = m_upower->defaultSystemBattery();
   const std::optional<double> health = battery != nullptr ? battery->healthPercent() : std::nullopt;
-  m_healthCard->setVisible(health.has_value());
+  m_ui.healthCard->setVisible(health.has_value());
   if (!health) {
     return;
   }
 
-  if (m_healthLabel != nullptr) {
-    m_healthLabel->setText(std::format("{:.0F}%", *health));
+  if (m_ui.healthLabel != nullptr) {
+    m_ui.healthLabel->setText(std::format("{:.0F}%", *health));
   }
-  if (m_healthBar != nullptr) {
-    m_healthBar->setProgress(static_cast<float>(*health / 100.0));
-    m_healthBar->setFill(colorSpecFromRole(healthRole(*health)));
+  if (m_ui.healthBar != nullptr) {
+    m_ui.healthBar->setProgress(static_cast<float>(*health / 100.0));
+    m_ui.healthBar->setFill(colorSpecFromRole(healthRole(*health)));
   }
 }
 
 void PowerTab::rebuildPeripherals() {
-  if (m_peripheralsCard == nullptr || m_peripheralsList == nullptr || m_upower == nullptr) {
+  if (m_ui.peripheralsCard == nullptr || m_ui.peripheralsList == nullptr || m_upower == nullptr) {
     return;
   }
 
@@ -738,7 +717,7 @@ void PowerTab::rebuildPeripherals() {
 
     for (auto& entry : m_peripheralRows) {
       if (entry.row != nullptr) {
-        m_peripheralsList->removeChild(entry.row);
+        m_ui.peripheralsList->removeChild(entry.row);
       }
     }
     m_peripheralRows.clear();
@@ -771,12 +750,12 @@ void PowerTab::rebuildPeripherals() {
               .minWidth = Style::controlHeightSm * scale,
           })
       );
-      m_peripheralsList->addChild(std::move(row));
+      m_ui.peripheralsList->addChild(std::move(row));
       m_peripheralRows.push_back(std::move(entry));
     }
   }
 
-  m_peripheralsCard->setVisible(!peripherals.empty());
+  m_ui.peripheralsCard->setVisible(!peripherals.empty());
 
   for (std::size_t i = 0; i < m_peripheralRows.size() && i < peripherals.size(); ++i) {
     if (m_peripheralRows[i].pctLabel != nullptr) {

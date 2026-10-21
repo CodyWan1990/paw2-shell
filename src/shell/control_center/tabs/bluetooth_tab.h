@@ -59,26 +59,25 @@ private:
   BluetoothService* m_service = nullptr;
   BluetoothAgent* m_agent = nullptr;
 
-  Flex* m_rootLayout = nullptr;
-
-  Flex* m_pairingCard = nullptr;
-  Label* m_pairingTitle = nullptr;
-  Label* m_pairingDetail = nullptr;
-  Label* m_pairingCode = nullptr;
-  Flex* m_pairingInputRow = nullptr;
-  Input* m_pairingInput = nullptr;
-  Flex* m_pairingButtonRow = nullptr;
-  Button* m_pairingAccept = nullptr;
-  Button* m_pairingTrustAndAllow = nullptr;
-  Button* m_pairingReject = nullptr;
-
-  ScrollView* m_listScroll = nullptr;
-  Flex* m_list = nullptr;
-
-  Toggle* m_powerToggle = nullptr;
-  Toggle* m_discoverableToggle = nullptr;
-  Button* m_rescanButton = nullptr;
-  Spinner* m_scanSpinner = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    Flex* pairingCard = nullptr;
+    Label* pairingTitle = nullptr;
+    Label* pairingDetail = nullptr;
+    Label* pairingCode = nullptr;
+    Flex* pairingInputRow = nullptr;
+    Input* pairingInput = nullptr;
+    Button* pairingAccept = nullptr;
+    Button* pairingTrustAndAllow = nullptr;
+    ScrollView* listScroll = nullptr;
+    Flex* list = nullptr;
+    Toggle* powerToggle = nullptr;
+    Toggle* discoverableToggle = nullptr;
+    Button* rescanButton = nullptr;
+    Spinner* scanSpinner = nullptr;
+  };
+  Ui m_ui;
 
   Timer m_discoveryTimer;
   DiscoveryLease m_discoveryLease = DiscoveryLease::None;

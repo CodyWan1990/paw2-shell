@@ -62,26 +62,28 @@ private:
   std::uint64_t m_spectrumListenerId = 0;
   bool m_active = false;
 
-  Flex* m_rootLayout = nullptr;
-  Flex* m_mediaColumn = nullptr;
-  Flex* m_visualizerColumn = nullptr;
-  Flex* m_visualizerBody = nullptr;
-  AudioVisualizer* m_visualizerSpectrum = nullptr;
-  Image* m_artwork = nullptr;
-  Flex* m_artworkRow = nullptr;
-  Flex* m_nowCard = nullptr;
-  Flex* m_mediaStack = nullptr;
-  Button* m_playerMenuButton = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    Flex* visualizerBody = nullptr;
+    AudioVisualizer* visualizerSpectrum = nullptr;
+    Image* artwork = nullptr;
+    Flex* artworkRow = nullptr;
+    Flex* nowCard = nullptr;
+    Flex* mediaStack = nullptr;
+    Button* playerMenuButton = nullptr;
+    Label* trackTitle = nullptr;
+    Label* trackArtist = nullptr;
+    Label* trackAlbum = nullptr;
+    Slider* progressSlider = nullptr;
+    Button* prevButton = nullptr;
+    Button* playPauseButton = nullptr;
+    Button* nextButton = nullptr;
+    Button* repeatButton = nullptr;
+    Button* shuffleButton = nullptr;
+  };
+  Ui m_ui;
   std::unique_ptr<ContextMenuPopup> m_playerMenuPopup;
-  Label* m_trackTitle = nullptr;
-  Label* m_trackArtist = nullptr;
-  Label* m_trackAlbum = nullptr;
-  Slider* m_progressSlider = nullptr;
-  Button* m_prevButton = nullptr;
-  Button* m_playPauseButton = nullptr;
-  Button* m_nextButton = nullptr;
-  Button* m_repeatButton = nullptr;
-  Button* m_shuffleButton = nullptr;
 
   std::string m_lastArtPath;
   std::string m_lastBusName;

@@ -85,37 +85,40 @@ private:
   ExternalIpService* m_externalIpService = nullptr;
   ModemManagerService* m_modem = nullptr;
 
-  Flex* m_rootLayout = nullptr;
-  Flex* m_currentCard = nullptr;
-  Label* m_currentTitle = nullptr;
-  Label* m_currentDetail = nullptr;
-  Flex* m_passwordCard = nullptr;
-  Label* m_passwordTitle = nullptr;
-  Input* m_passwordInput = nullptr;
-  Button* m_passwordRevealButton = nullptr;
-  // 802.1X form. Hidden for pre-shared-key networks, which keep the single
-  // password field below it.
-  Flex* m_enterpriseFields = nullptr;
-  Select* m_eapSelect = nullptr;
-  Select* m_phase2Select = nullptr;
-  Input* m_identityInput = nullptr;
-  Input* m_anonymousIdentityInput = nullptr;
-  Input* m_caCertInput = nullptr;
-  Input* m_domainMatchInput = nullptr;
-  Label* m_credentialError = nullptr;
-  ScrollView* m_listScroll = nullptr;
-  Flex* m_list = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    Label* currentTitle = nullptr;
+    Label* currentDetail = nullptr;
+    Flex* passwordCard = nullptr;
+    Label* passwordTitle = nullptr;
+    Input* passwordInput = nullptr;
+    Button* passwordRevealButton = nullptr;
+    // 802.1X form. Hidden for pre-shared-key networks, which keep the single
+    // password field below it.
+    Flex* enterpriseFields = nullptr;
+    Select* eapSelect = nullptr;
+    Select* phase2Select = nullptr;
+    Input* identityInput = nullptr;
+    Input* anonymousIdentityInput = nullptr;
+    Input* caCertInput = nullptr;
+    Input* domainMatchInput = nullptr;
+    Label* credentialError = nullptr;
+    ScrollView* listScroll = nullptr;
+    Flex* list = nullptr;
+    Button* rescanButton = nullptr;
+    Toggle* wifiToggle = nullptr;
+    Flex* currentRow = nullptr;
+    Button* disconnectButton = nullptr;
+    Spinner* scanSpinner = nullptr;
+    Toggle* cellularToggle = nullptr;
+  };
+  Ui m_ui;
 
-  Button* m_rescanButton = nullptr;
-  Toggle* m_wifiToggle = nullptr;
-  Flex* m_currentRow = nullptr;
-  Button* m_disconnectButton = nullptr;
-  Spinner* m_scanSpinner = nullptr;
   bool m_vpnVisible = true;
 
   std::unordered_map<std::string, AccessPointRow*> m_apRows;
 
-  Toggle* m_cellularToggle = nullptr;
   std::vector<CellularRow*> m_cellularRows;
 
   std::string m_lastStructureKey;

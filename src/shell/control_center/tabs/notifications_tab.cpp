@@ -643,14 +643,14 @@ NotificationsTab::~NotificationsTab() = default;
 std::unique_ptr<Flex> NotificationsTab::create() {
   const float scale = contentScale();
   auto tab = ui::column({
-      .out = &m_root,
+      .out = &m_ui.root,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
   });
 
   tab->addChild(
       ui::segmented({
-          .out = &m_filter,
+          .out = &m_ui.filter,
           .options =
               std::vector<ui::SegmentedOption>{
                   {.label = i18n::tr("control-center.notifications.filter.all")},
@@ -669,12 +669,12 @@ std::unique_ptr<Flex> NotificationsTab::create() {
             }
 
             cancelFilterSlide();
-            AnimationManager* animations = m_list != nullptr ? m_list->animationManager() : nullptr;
-            if (animations == nullptr || m_list == nullptr) {
+            AnimationManager* animations = m_ui.list != nullptr ? m_ui.list->animationManager() : nullptr;
+            if (animations == nullptr || m_ui.list == nullptr) {
               m_filterIndex = idx;
               m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
-              if (m_list != nullptr) {
-                m_list->scrollView().setScrollOffset(0.0F);
+              if (m_ui.list != nullptr) {
+                m_ui.list->scrollView().setScrollOffset(0.0F);
               }
               PanelManager::instance().requestLayout();
               return;
@@ -689,7 +689,7 @@ std::unique_ptr<Flex> NotificationsTab::create() {
 
   tab->addChild(
       ui::virtualListView({
-          .out = &m_list,
+          .out = &m_ui.list,
           .contentScale = scale,
           .itemGap = Style::spaceMd * scale,
           .overscanItems = 3,
@@ -705,7 +705,7 @@ std::unique_ptr<Flex> NotificationsTab::create() {
   tab->addChild(
       ui::column(
           {
-              .out = &m_emptyCard,
+              .out = &m_ui.emptyCard,
               .align = FlexAlign::Center,
               .gap = Style::spaceSm * scale,
               .paddingV = Style::spaceLg * scale,
@@ -715,13 +715,13 @@ std::unique_ptr<Flex> NotificationsTab::create() {
               .cardStyleFillOpacity = panelCardOpacity(),
           },
           ui::label({
-              .out = &m_emptyTitle,
+              .out = &m_ui.emptyTitle,
               .fontSize = Style::fontSizeBody * scale,
               .fontWeight = FontWeight::Bold,
               .color = colorSpecFromRole(ColorRole::OnSurface),
           }),
           ui::label({
-              .out = &m_emptyBody,
+              .out = &m_ui.emptyBody,
               .fontSize = Style::fontSizeBody * scale,
               .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
           })
@@ -740,7 +740,7 @@ std::unique_ptr<Flex> NotificationsTab::createHeaderActions() {
           .gap = Style::spaceSm * scale,
       },
       ui::button({
-          .out = &m_clearAllButton,
+          .out = &m_ui.clearAllButton,
           .glyph = "trash",
           .tooltip = i18n::tr("control-center.notifications.clear-all"),
           .onClick = [this]() { clearAllNotifications(); },
@@ -751,7 +751,7 @@ std::unique_ptr<Flex> NotificationsTab::createHeaderActions() {
               },
       }),
       ui::button({
-          .out = &m_dndButton,
+          .out = &m_ui.dndButton,
           .glyph = dndEnabled ? "bell-off" : "bell",
           .selected = dndEnabled,
           .tooltip =
@@ -763,22 +763,22 @@ std::unique_ptr<Flex> NotificationsTab::createHeaderActions() {
 }
 
 void NotificationsTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_root == nullptr || m_filter == nullptr) {
+  if (m_ui.root == nullptr || m_ui.filter == nullptr) {
     return;
   }
 
   if (!filterSlideOutActive()) {
     refreshDataSnapshot();
   }
-  m_root->setSize(contentWidth, bodyHeight);
-  m_root->layout(renderer);
+  m_ui.root->setSize(contentWidth, bodyHeight);
+  m_ui.root->layout(renderer);
 
-  if (m_list != nullptr && m_filterSlideAnimId == 0 && !m_startFilterSlideIn) {
-    m_filterSlideBaseX = m_list->x();
-    m_filterSlideBaseY = m_list->y();
+  if (m_ui.list != nullptr && m_filterSlideAnimId == 0 && !m_startFilterSlideIn) {
+    m_filterSlideBaseX = m_ui.list->x();
+    m_filterSlideBaseY = m_ui.list->y();
   }
 
-  if (m_startFilterSlideIn && m_list != nullptr) {
+  if (m_startFilterSlideIn && m_ui.list != nullptr) {
     m_startFilterSlideIn = false;
     beginFilterSlideIn();
   }
@@ -788,24 +788,17 @@ void NotificationsTab::doUpdate(Renderer& renderer) {
   if (filterSlideOutActive()) {
     return;
   }
-  if (refreshDataSnapshot() && m_root != nullptr) {
-    m_root->layout(renderer);
+  if (refreshDataSnapshot() && m_ui.root != nullptr) {
+    m_ui.root->layout(renderer);
   }
 }
 
 void NotificationsTab::onClose() {
   cancelFilterSlide();
-  if (m_list != nullptr) {
-    m_list->setAdapter(nullptr);
+  if (m_ui.list != nullptr) {
+    m_ui.list->setAdapter(nullptr);
   }
-  m_root = nullptr;
-  m_list = nullptr;
-  m_emptyCard = nullptr;
-  m_emptyTitle = nullptr;
-  m_emptyBody = nullptr;
-  m_filter = nullptr;
-  m_clearAllButton = nullptr;
-  m_dndButton = nullptr;
+  m_ui = {};
   m_adapter.reset();
   m_filtered.clear();
   m_expandedIds.clear();
@@ -820,8 +813,8 @@ void NotificationsTab::onClose() {
 }
 
 void NotificationsTab::cancelFilterSlide() {
-  if (m_filterSlideAnimId != 0 && m_list != nullptr) {
-    if (AnimationManager* animations = m_list->animationManager(); animations != nullptr) {
+  if (m_filterSlideAnimId != 0 && m_ui.list != nullptr) {
+    if (AnimationManager* animations = m_ui.list->animationManager(); animations != nullptr) {
       animations->cancel(m_filterSlideAnimId);
     }
     m_filterSlideAnimId = 0;
@@ -829,41 +822,41 @@ void NotificationsTab::cancelFilterSlide() {
   m_pendingFilterIndex = std::numeric_limits<std::size_t>::max();
   m_startFilterSlideIn = false;
   m_filterSlideDirection = 0;
-  if (m_list != nullptr) {
-    m_list->setPosition(m_filterSlideBaseX, m_filterSlideBaseY);
-    m_list->setOpacity(1.0F);
+  if (m_ui.list != nullptr) {
+    m_ui.list->setPosition(m_filterSlideBaseX, m_filterSlideBaseY);
+    m_ui.list->setOpacity(1.0F);
   }
 }
 
 bool NotificationsTab::filterSlideOutActive() const { return m_filterSlideAnimId != 0 && !m_startFilterSlideIn; }
 
 void NotificationsTab::applyFilterSlide(float progress, bool slidingIn) {
-  if (m_list == nullptr || m_root == nullptr) {
+  if (m_ui.list == nullptr || m_ui.root == nullptr) {
     return;
   }
 
-  const float travel = m_root->width();
+  const float travel = m_ui.root->width();
   if (travel <= 0.0F) {
     return;
   }
 
   const auto direction = static_cast<float>(m_filterSlideDirection);
   if (slidingIn) {
-    m_list->setPosition(m_filterSlideBaseX + direction * travel * (1.0F - progress), m_filterSlideBaseY);
-    m_list->setOpacity(0.7F + 0.3F * progress);
+    m_ui.list->setPosition(m_filterSlideBaseX + direction * travel * (1.0F - progress), m_filterSlideBaseY);
+    m_ui.list->setOpacity(0.7F + 0.3F * progress);
   } else {
-    m_list->setPosition(m_filterSlideBaseX - direction * travel * progress, m_filterSlideBaseY);
-    m_list->setOpacity(1.0F - 0.3F * progress);
+    m_ui.list->setPosition(m_filterSlideBaseX - direction * travel * progress, m_filterSlideBaseY);
+    m_ui.list->setOpacity(1.0F - 0.3F * progress);
   }
 }
 
 void NotificationsTab::beginFilterSlideOut(std::size_t nextIndex) {
-  AnimationManager* animations = m_list != nullptr ? m_list->animationManager() : nullptr;
-  if (animations == nullptr || m_list == nullptr) {
+  AnimationManager* animations = m_ui.list != nullptr ? m_ui.list->animationManager() : nullptr;
+  if (animations == nullptr || m_ui.list == nullptr) {
     m_filterIndex = nextIndex;
     m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
-    if (m_list != nullptr) {
-      m_list->scrollView().setScrollOffset(0.0F);
+    if (m_ui.list != nullptr) {
+      m_ui.list->scrollView().setScrollOffset(0.0F);
     }
     PanelManager::instance().requestLayout();
     return;
@@ -871,8 +864,8 @@ void NotificationsTab::beginFilterSlideOut(std::size_t nextIndex) {
 
   m_pendingFilterIndex = nextIndex;
   m_filterSlideDirection = nextIndex > m_filterIndex ? 1 : -1;
-  m_filterSlideBaseX = m_list->x();
-  m_filterSlideBaseY = m_list->y();
+  m_filterSlideBaseX = m_ui.list->x();
+  m_filterSlideBaseY = m_ui.list->y();
 
   PanelManager::instance().requestFrameTick();
   m_filterSlideAnimId = animations->animate(
@@ -888,24 +881,24 @@ void NotificationsTab::beginFilterSlideOut(std::size_t nextIndex) {
         }
         m_pendingFilterIndex = std::numeric_limits<std::size_t>::max();
         m_lastRebuildFilterIndex = static_cast<std::size_t>(-1);
-        if (m_list != nullptr) {
-          m_list->scrollView().setScrollOffset(0.0F);
+        if (m_ui.list != nullptr) {
+          m_ui.list->scrollView().setScrollOffset(0.0F);
         }
         m_startFilterSlideIn = true;
         PanelManager::instance().requestLayout();
       },
-      m_list
+      m_ui.list
   );
 }
 
 void NotificationsTab::beginFilterSlideIn() {
-  AnimationManager* animations = m_list != nullptr ? m_list->animationManager() : nullptr;
-  if (animations == nullptr || m_list == nullptr) {
+  AnimationManager* animations = m_ui.list != nullptr ? m_ui.list->animationManager() : nullptr;
+  if (animations == nullptr || m_ui.list == nullptr) {
     return;
   }
 
-  m_filterSlideBaseX = m_list->x();
-  m_filterSlideBaseY = m_list->y();
+  m_filterSlideBaseX = m_ui.list->x();
+  m_filterSlideBaseY = m_ui.list->y();
 
   applyFilterSlide(0.0F, true);
   PanelManager::instance().requestFrameTick();
@@ -917,12 +910,12 @@ void NotificationsTab::beginFilterSlideIn() {
       },
       [this]() {
         m_filterSlideAnimId = 0;
-        if (m_list != nullptr) {
-          m_list->setPosition(m_filterSlideBaseX, m_filterSlideBaseY);
-          m_list->setOpacity(1.0F);
+        if (m_ui.list != nullptr) {
+          m_ui.list->setPosition(m_filterSlideBaseX, m_filterSlideBaseY);
+          m_ui.list->setOpacity(1.0F);
         }
       },
-      m_list
+      m_ui.list
   );
 }
 
@@ -942,8 +935,8 @@ void NotificationsTab::clearAllNotifications() {
   m_notifications->clearHistory();
   m_expandedIds.clear();
   m_lastSerial = 0;
-  if (m_list != nullptr) {
-    m_list->notifyDataChanged();
+  if (m_ui.list != nullptr) {
+    m_ui.list->notifyDataChanged();
   }
   auto* panel = dynamic_cast<ControlCenterPanel*>(PanelManager::instance().activePanel());
   if (panel != nullptr && !panel->showsSidebar()) {
@@ -974,8 +967,8 @@ void NotificationsTab::removeNotificationEntry(uint32_t id, bool wasActive) {
   m_notifications->removeHistoryEntry(id);
   m_expandedIds.erase(id);
   m_lastSerial = 0;
-  if (m_list != nullptr) {
-    m_list->notifyDataChanged();
+  if (m_ui.list != nullptr) {
+    m_ui.list->notifyDataChanged();
   }
   PanelManager::instance().refresh();
 }
@@ -987,11 +980,11 @@ void NotificationsTab::toggleNotificationExpanded(uint32_t id) {
     m_expandedIds.insert(id);
   }
 
-  if (m_list != nullptr) {
+  if (m_ui.list != nullptr) {
     if (const auto index = filteredIndexForId(id); index.has_value()) {
-      m_list->notifyItemChanged(*index);
+      m_ui.list->notifyItemChanged(*index);
     } else {
-      m_list->notifyDataChanged();
+      m_ui.list->notifyDataChanged();
     }
   }
   PanelManager::instance().refresh();
@@ -1009,11 +1002,11 @@ void NotificationsTab::invokeNotificationAction(uint32_t id, const std::string& 
   }
 
   m_lastSerial = 0;
-  if (m_list != nullptr) {
+  if (m_ui.list != nullptr) {
     if (const auto index = filteredIndexForId(id); index.has_value()) {
-      m_list->notifyItemChanged(*index);
+      m_ui.list->notifyItemChanged(*index);
     } else {
-      m_list->notifyDataChanged();
+      m_ui.list->notifyDataChanged();
     }
   }
   PanelManager::instance().refresh();
@@ -1021,8 +1014,8 @@ void NotificationsTab::invokeNotificationAction(uint32_t id, const std::string& 
 
 bool NotificationsTab::refreshDataSnapshot() {
   const bool hasHistory = m_notifications != nullptr && !m_notifications->history().empty();
-  if (m_clearAllButton != nullptr) {
-    m_clearAllButton->setVisible(hasHistory);
+  if (m_ui.clearAllButton != nullptr) {
+    m_ui.clearAllButton->setVisible(hasHistory);
   }
   syncDndButton();
 
@@ -1050,44 +1043,44 @@ bool NotificationsTab::refreshDataSnapshot() {
   m_lastRebuildFilterIndex = m_filterIndex;
 
   updateEmptyState(hasHistory, !m_filtered.empty());
-  if (m_list != nullptr) {
-    m_list->notifyDataChanged();
+  if (m_ui.list != nullptr) {
+    m_ui.list->notifyDataChanged();
   }
   return true;
 }
 
 void NotificationsTab::syncDndButton() {
-  if (m_dndButton == nullptr) {
+  if (m_ui.dndButton == nullptr) {
     return;
   }
 
   const bool enabled = m_notifications != nullptr && m_notifications->doNotDisturb();
-  m_dndButton->setEnabled(m_notifications != nullptr);
-  m_dndButton->setSelected(enabled);
-  m_dndButton->setGlyph(enabled ? "bell-off" : "bell");
-  m_dndButton->setTooltip(
+  m_ui.dndButton->setEnabled(m_notifications != nullptr);
+  m_ui.dndButton->setSelected(enabled);
+  m_ui.dndButton->setGlyph(enabled ? "bell-off" : "bell");
+  m_ui.dndButton->setTooltip(
       i18n::tr(enabled ? "control-center.notifications.dnd-off" : "control-center.notifications.dnd-on")
   );
 }
 
 void NotificationsTab::updateEmptyState(bool hasHistory, bool hasFiltered) {
-  if (m_list != nullptr) {
-    m_list->setVisible(hasFiltered);
+  if (m_ui.list != nullptr) {
+    m_ui.list->setVisible(hasFiltered);
   }
-  if (m_emptyCard != nullptr) {
-    m_emptyCard->setVisible(!hasFiltered);
+  if (m_ui.emptyCard != nullptr) {
+    m_ui.emptyCard->setVisible(!hasFiltered);
   }
 
-  if (m_emptyTitle == nullptr || m_emptyBody == nullptr) {
+  if (m_ui.emptyTitle == nullptr || m_ui.emptyBody == nullptr) {
     return;
   }
 
   if (hasHistory) {
-    m_emptyTitle->setText(i18n::tr("control-center.notifications.filter-empty-title"));
-    m_emptyBody->setText(i18n::tr("control-center.notifications.filter-empty-body"));
+    m_ui.emptyTitle->setText(i18n::tr("control-center.notifications.filter-empty-title"));
+    m_ui.emptyBody->setText(i18n::tr("control-center.notifications.filter-empty-body"));
   } else {
-    m_emptyTitle->setText(i18n::tr("control-center.notifications.empty-title"));
-    m_emptyBody->setText(i18n::tr("control-center.notifications.empty-body"));
+    m_ui.emptyTitle->setText(i18n::tr("control-center.notifications.empty-title"));
+    m_ui.emptyBody->setText(i18n::tr("control-center.notifications.empty-body"));
   }
 }
 
@@ -1101,7 +1094,7 @@ std::optional<std::size_t> NotificationsTab::filteredIndexForId(uint32_t id) con
 }
 
 void NotificationsTab::onPanelCardOpacityChanged(float opacity) {
-  if (m_filter != nullptr) {
-    m_filter->setSurfaceOpacity(opacity);
+  if (m_ui.filter != nullptr) {
+    m_ui.filter->setSurfaceOpacity(opacity);
   }
 }

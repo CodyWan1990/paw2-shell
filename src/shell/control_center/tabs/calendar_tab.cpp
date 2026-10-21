@@ -65,7 +65,7 @@ std::unique_ptr<Flex> CalendarTab::create() {
   }
 
   auto tab = ui::row({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
   });
@@ -82,10 +82,10 @@ std::unique_ptr<Flex> CalendarTab::create() {
     }
     changeMonthBy(steps > 0.0F ? 1 : -1);
   });
-  m_calendarArea = calendarArea.get();
+  m_ui.calendarArea = calendarArea.get();
 
   auto calendarCard = ui::column({
-      .out = &m_card,
+      .out = &m_ui.card,
       .gap = Style::spaceMd * scale,
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
@@ -93,7 +93,7 @@ std::unique_ptr<Flex> CalendarTab::create() {
 
   calendarCard->addChild(
       ui::label({
-          .out = &m_todayLabel,
+          .out = &m_ui.todayLabel,
           .text = formatShellDate(m_config),
           .fontSize = Style::fontSizeTitle * scale,
           .fontWeight = FontWeight::Medium,
@@ -118,7 +118,7 @@ std::unique_ptr<Flex> CalendarTab::create() {
   );
 
   auto header = ui::row({
-      .out = &m_header,
+      .out = &m_ui.header,
       .align = FlexAlign::Center,
       .justify = FlexJustify::SpaceBetween,
       .gap = Style::spaceSm * scale,
@@ -126,9 +126,9 @@ std::unique_ptr<Flex> CalendarTab::create() {
   });
 
   auto previousSlot = ui::row(
-      {.out = &m_previousSlot, .align = FlexAlign::Center, .justify = FlexJustify::Center},
+      {.out = &m_ui.previousSlot, .align = FlexAlign::Center, .justify = FlexJustify::Center},
       ui::button({
-          .out = &m_previousButton,
+          .out = &m_ui.previousButton,
           .glyph = Style::rtl() ? "chevron-right" : "chevron-left",
           .variant = ButtonVariant::Ghost,
           .minWidth = kCalendarNavButtonSize * scale,
@@ -139,9 +139,9 @@ std::unique_ptr<Flex> CalendarTab::create() {
   header->addChild(std::move(previousSlot));
 
   auto monthWrap = ui::column(
-      {.out = &m_monthWrap, .align = FlexAlign::Center, .justify = FlexJustify::Center, .flexGrow = 1.0F},
+      {.out = &m_ui.monthWrap, .align = FlexAlign::Center, .justify = FlexJustify::Center, .flexGrow = 1.0F},
       ui::label({
-          .out = &m_monthLabel,
+          .out = &m_ui.monthLabel,
           .fontSize = (Style::fontSizeTitle + Style::spaceXs) * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::OnSurface),
@@ -151,9 +151,9 @@ std::unique_ptr<Flex> CalendarTab::create() {
   header->addChild(std::move(monthWrap));
 
   auto nextSlot = ui::row(
-      {.out = &m_nextSlot, .align = FlexAlign::Center, .justify = FlexJustify::Center},
+      {.out = &m_ui.nextSlot, .align = FlexAlign::Center, .justify = FlexJustify::Center},
       ui::button({
-          .out = &m_nextButton,
+          .out = &m_ui.nextButton,
           .glyph = Style::rtl() ? "chevron-left" : "chevron-right",
           .variant = ButtonVariant::Ghost,
           .minWidth = kCalendarNavButtonSize * scale,
@@ -166,7 +166,7 @@ std::unique_ptr<Flex> CalendarTab::create() {
   calendarCard->addChild(std::move(header));
 
   auto gridViewport = ui::column({
-      .out = &m_gridViewport,
+      .out = &m_ui.gridViewport,
       .align = FlexAlign::Stretch,
       .gap = 0.0F,
       .flexGrow = 1.0F,
@@ -174,7 +174,7 @@ std::unique_ptr<Flex> CalendarTab::create() {
   });
 
   auto grid = ui::column({
-      .out = &m_grid,
+      .out = &m_ui.grid,
       .align = FlexAlign::Stretch,
       .gap = kCalendarGridGap * scale,
       .configure = [](Flex& layer) { layer.setParticipatesInLayout(false); },
@@ -185,13 +185,13 @@ std::unique_ptr<Flex> CalendarTab::create() {
   tab->addChild(std::move(calendarArea));
 
   auto eventsCard = ui::column(
-      {.out = &m_eventsCard,
+      {.out = &m_ui.eventsCard,
        .gap = Style::spaceSm * scale,
        .flexGrow = 2.0F,
        .cardStyleScale = scale,
        .cardStyleFillOpacity = panelCardOpacity()},
       ui::label({
-          .out = &m_eventsTitle,
+          .out = &m_ui.eventsTitle,
           .text = i18n::tr("control-center.calendar.events"),
           .fontSize = Style::fontSizeTitle * scale,
           .fontWeight = FontWeight::Bold,
@@ -199,7 +199,7 @@ std::unique_ptr<Flex> CalendarTab::create() {
           .maxLines = 1,
       }),
       ui::scrollView({
-          .out = &m_eventsScroll,
+          .out = &m_ui.eventsScroll,
           .contentScale = scale,
           .fillWidth = true,
           .fillHeight = true,
@@ -224,7 +224,7 @@ std::unique_ptr<Flex> CalendarTab::createHeaderActions() {
           .gap = Style::spaceSm * scale,
       },
       ui::button({
-          .out = &m_toggleEventsCardButton,
+          .out = &m_ui.toggleEventsCardButton,
           .glyph = m_showEventsCard ? "calendar-event" : "calendar-off",
           .selected = m_showEventsCard,
           .tooltip = i18n::tr("control-center.calendar.toggle-events-card"),
@@ -235,17 +235,18 @@ std::unique_ptr<Flex> CalendarTab::createHeaderActions() {
 }
 
 void CalendarTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_rootLayout == nullptr || m_card == nullptr || m_calendarArea == nullptr) {
+  if (m_ui.rootLayout == nullptr || m_ui.card == nullptr || m_ui.calendarArea == nullptr) {
     return;
   }
 
-  m_rootLayout->setSize(contentWidth, bodyHeight);
-  m_rootLayout->layout(renderer);
-  m_card->setSize(m_calendarArea->width(), m_calendarArea->height());
-  m_card->layout(renderer);
+  m_ui.rootLayout->setSize(contentWidth, bodyHeight);
+  m_ui.rootLayout->layout(renderer);
+  m_ui.card->setSize(m_ui.calendarArea->width(), m_ui.calendarArea->height());
+  m_ui.card->layout(renderer);
 
-  const float innerWidth = std::max(0.0F, m_card->width() - (m_card->paddingLeft() + m_card->paddingRight()));
-  const float innerHeight = std::max(0.0F, m_card->height() - (m_card->paddingTop() + m_card->paddingBottom()));
+  const float innerWidth = std::max(0.0F, m_ui.card->width() - (m_ui.card->paddingLeft() + m_ui.card->paddingRight()));
+  const float innerHeight =
+      std::max(0.0F, m_ui.card->height() - (m_ui.card->paddingTop() + m_ui.card->paddingBottom()));
   const calendar_view::State state = calendar_view::stateForOffset(m_monthOffset);
 
   // Default the selection to today until the user picks a day.
@@ -263,7 +264,7 @@ void CalendarTab::doLayout(Renderer& renderer, float contentWidth, float bodyHei
       || state.current.day != m_lastToday;
 
   if (m_monthSlideAnimId != 0 && !m_startMonthSlideIn) {
-    m_rootLayout->layout(renderer);
+    m_ui.rootLayout->layout(renderer);
     calendar_view::layoutEventLinkOverlays(m_eventListState);
     return;
   }
@@ -282,25 +283,25 @@ void CalendarTab::doLayout(Renderer& renderer, float contentWidth, float bodyHei
   m_lastToday = state.current.day;
 
   rebuild();
-  if (m_grid != nullptr) {
+  if (m_ui.grid != nullptr) {
     if (m_monthSlideAnimId == 0 && !m_startMonthSlideIn) {
-      m_grid->setPosition(0.0F, 0.0F);
-      m_grid->setOpacity(1.0F);
+      m_ui.grid->setPosition(0.0F, 0.0F);
+      m_ui.grid->setOpacity(1.0F);
     }
-    m_grid->layout(renderer);
+    m_ui.grid->layout(renderer);
   }
-  if (m_startMonthSlideIn && m_gridViewport != nullptr) {
+  if (m_startMonthSlideIn && m_ui.gridViewport != nullptr) {
     m_startMonthSlideIn = false;
     beginSlideIn();
   }
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->layout(renderer);
   calendar_view::layoutEventLinkOverlays(m_eventListState);
 }
 
 void CalendarTab::doUpdate(Renderer& renderer) {
   (void)renderer;
-  if (m_todayLabel != nullptr) {
-    m_todayLabel->setText(formatShellDate(m_config));
+  if (m_ui.todayLabel != nullptr) {
+    m_ui.todayLabel->setText(formatShellDate(m_config));
   }
 }
 
@@ -333,23 +334,7 @@ void CalendarTab::focusToday() {
 void CalendarTab::onClose() {
   m_eventFadeTimer.stop();
   cancelMonthSlide();
-  m_rootLayout = nullptr;
-  m_calendarArea = nullptr;
-  m_card = nullptr;
-  m_header = nullptr;
-  m_previousSlot = nullptr;
-  m_nextSlot = nullptr;
-  m_monthWrap = nullptr;
-  m_todayLabel = nullptr;
-  m_monthLabel = nullptr;
-  m_previousButton = nullptr;
-  m_nextButton = nullptr;
-  m_toggleEventsCardButton = nullptr;
-  m_gridViewport = nullptr;
-  m_grid = nullptr;
-  m_eventsCard = nullptr;
-  m_eventsTitle = nullptr;
-  m_eventsScroll = nullptr;
+  m_ui = {};
   m_eventListState.linkOverlays.clear();
   m_selectedYear = std::numeric_limits<int>::min();
   m_selectedMonth = -1;
@@ -370,8 +355,8 @@ void CalendarTab::changeMonthBy(int delta) {
 
   cancelMonthSlide();
 
-  AnimationManager* animations = m_gridViewport != nullptr ? m_gridViewport->animationManager() : nullptr;
-  if (animations == nullptr || m_grid == nullptr) {
+  AnimationManager* animations = m_ui.gridViewport != nullptr ? m_ui.gridViewport->animationManager() : nullptr;
+  if (animations == nullptr || m_ui.grid == nullptr) {
     m_monthOffset += delta;
     m_lastDisplayYear = std::numeric_limits<int>::min();
     m_lastDisplayMonth = -1;
@@ -383,43 +368,43 @@ void CalendarTab::changeMonthBy(int delta) {
 }
 
 void CalendarTab::cancelMonthSlide() {
-  if (m_monthSlideAnimId != 0 && m_gridViewport != nullptr) {
-    if (AnimationManager* animations = m_gridViewport->animationManager(); animations != nullptr) {
+  if (m_monthSlideAnimId != 0 && m_ui.gridViewport != nullptr) {
+    if (AnimationManager* animations = m_ui.gridViewport->animationManager(); animations != nullptr) {
       animations->cancel(m_monthSlideAnimId);
     }
     m_monthSlideAnimId = 0;
   }
   m_pendingMonthDelta = 0;
   m_startMonthSlideIn = false;
-  if (m_grid != nullptr) {
-    m_grid->setPosition(0.0F, 0.0F);
-    m_grid->setOpacity(1.0F);
+  if (m_ui.grid != nullptr) {
+    m_ui.grid->setPosition(0.0F, 0.0F);
+    m_ui.grid->setOpacity(1.0F);
   }
 }
 
 void CalendarTab::applyMonthSlide(float progress, bool slidingIn) {
-  if (m_grid == nullptr || m_gridViewport == nullptr) {
+  if (m_ui.grid == nullptr || m_ui.gridViewport == nullptr) {
     return;
   }
 
-  const float travel = m_gridViewport->width();
+  const float travel = m_ui.gridViewport->width();
   if (travel <= 0.0F) {
     return;
   }
 
   const auto direction = static_cast<float>(m_monthSlideDirection);
   if (slidingIn) {
-    m_grid->setPosition(direction * travel * (1.0F - progress), 0.0F);
-    m_grid->setOpacity(0.7F + 0.3F * progress);
+    m_ui.grid->setPosition(direction * travel * (1.0F - progress), 0.0F);
+    m_ui.grid->setOpacity(0.7F + 0.3F * progress);
   } else {
-    m_grid->setPosition(-direction * travel * progress, 0.0F);
-    m_grid->setOpacity(1.0F - 0.3F * progress);
+    m_ui.grid->setPosition(-direction * travel * progress, 0.0F);
+    m_ui.grid->setOpacity(1.0F - 0.3F * progress);
   }
 }
 
 void CalendarTab::beginSlideOut(int delta) {
-  AnimationManager* animations = m_gridViewport != nullptr ? m_gridViewport->animationManager() : nullptr;
-  if (animations == nullptr || m_grid == nullptr) {
+  AnimationManager* animations = m_ui.gridViewport != nullptr ? m_ui.gridViewport->animationManager() : nullptr;
+  if (animations == nullptr || m_ui.grid == nullptr) {
     m_monthOffset += delta;
     m_lastDisplayYear = std::numeric_limits<int>::min();
     m_lastDisplayMonth = -1;
@@ -446,13 +431,13 @@ void CalendarTab::beginSlideOut(int delta) {
         m_startMonthSlideIn = true;
         PanelManager::instance().refresh();
       },
-      m_gridViewport
+      m_ui.gridViewport
   );
 }
 
 void CalendarTab::beginSlideIn() {
-  AnimationManager* animations = m_gridViewport != nullptr ? m_gridViewport->animationManager() : nullptr;
-  if (animations == nullptr || m_grid == nullptr) {
+  AnimationManager* animations = m_ui.gridViewport != nullptr ? m_ui.gridViewport->animationManager() : nullptr;
+  if (animations == nullptr || m_ui.grid == nullptr) {
     return;
   }
 
@@ -466,24 +451,25 @@ void CalendarTab::beginSlideIn() {
       },
       [this]() {
         m_monthSlideAnimId = 0;
-        if (m_grid != nullptr) {
-          m_grid->setPosition(0.0F, 0.0F);
-          m_grid->setOpacity(1.0F);
+        if (m_ui.grid != nullptr) {
+          m_ui.grid->setPosition(0.0F, 0.0F);
+          m_ui.grid->setOpacity(1.0F);
         }
       },
-      m_gridViewport
+      m_ui.gridViewport
   );
 }
 
 void CalendarTab::rebuild() {
   uiAssertNotRendering("CalendarTab::rebuild");
-  if (m_grid == nullptr || m_monthLabel == nullptr || m_card == nullptr) {
+  if (m_ui.grid == nullptr || m_ui.monthLabel == nullptr || m_ui.card == nullptr) {
     return;
   }
 
   const float scale = contentScale();
-  const float innerWidth = std::max(0.0F, m_card->width() - (m_card->paddingLeft() + m_card->paddingRight()));
-  const float innerHeight = std::max(0.0F, m_card->height() - (m_card->paddingTop() + m_card->paddingBottom()));
+  const float innerWidth = std::max(0.0F, m_ui.card->width() - (m_ui.card->paddingLeft() + m_ui.card->paddingRight()));
+  const float innerHeight =
+      std::max(0.0F, m_ui.card->height() - (m_ui.card->paddingTop() + m_ui.card->paddingBottom()));
   const float navWidth = kCalendarNavButtonSize * scale * 2.0F + Style::spaceSm * scale * 2.0F;
   const float monthWidth = std::max(0.0F, innerWidth - navWidth);
   const float gridHeightAvailable =
@@ -522,33 +508,33 @@ void CalendarTab::rebuild() {
   const float buttonBudget = std::max(0.0F, dayCellHeight - dotStripHeight - dotGap);
   const float dayButtonSize = std::floor(std::min({buttonBudget, dayColumnWidth, kCalendarDayButtonSizeMax * scale}));
 
-  if (m_header != nullptr) {
-    m_header->setSize(innerWidth, kCalendarHeaderHeight * scale);
+  if (m_ui.header != nullptr) {
+    m_ui.header->setSize(innerWidth, kCalendarHeaderHeight * scale);
   }
-  if (m_previousSlot != nullptr) {
-    m_previousSlot->setSize(kCalendarNavButtonSize * scale, kCalendarHeaderHeight * scale);
+  if (m_ui.previousSlot != nullptr) {
+    m_ui.previousSlot->setSize(kCalendarNavButtonSize * scale, kCalendarHeaderHeight * scale);
   }
-  if (m_nextSlot != nullptr) {
-    m_nextSlot->setSize(kCalendarNavButtonSize * scale, kCalendarHeaderHeight * scale);
+  if (m_ui.nextSlot != nullptr) {
+    m_ui.nextSlot->setSize(kCalendarNavButtonSize * scale, kCalendarHeaderHeight * scale);
   }
-  if (m_previousButton != nullptr) {
-    m_previousButton->setSize(kCalendarNavButtonSize * scale, kCalendarNavButtonSize * scale);
+  if (m_ui.previousButton != nullptr) {
+    m_ui.previousButton->setSize(kCalendarNavButtonSize * scale, kCalendarNavButtonSize * scale);
   }
-  if (m_nextButton != nullptr) {
-    m_nextButton->setSize(kCalendarNavButtonSize * scale, kCalendarNavButtonSize * scale);
+  if (m_ui.nextButton != nullptr) {
+    m_ui.nextButton->setSize(kCalendarNavButtonSize * scale, kCalendarNavButtonSize * scale);
   }
-  if (m_monthWrap != nullptr) {
-    m_monthWrap->setSize(monthWidth, kCalendarHeaderHeight * scale);
+  if (m_ui.monthWrap != nullptr) {
+    m_ui.monthWrap->setSize(monthWidth, kCalendarHeaderHeight * scale);
   }
-  m_monthLabel->setMaxWidth(monthWidth);
-  if (m_todayLabel != nullptr) {
-    m_todayLabel->setText(formatShellDate(m_config));
-    m_todayLabel->setMaxWidth(innerWidth);
+  m_ui.monthLabel->setMaxWidth(monthWidth);
+  if (m_ui.todayLabel != nullptr) {
+    m_ui.todayLabel->setText(formatShellDate(m_config));
+    m_ui.todayLabel->setMaxWidth(innerWidth);
   }
 
   calendar_view::rebuildMonth({
-      .grid = *m_grid,
-      .monthLabel = *m_monthLabel,
+      .grid = *m_ui.grid,
+      .monthLabel = *m_ui.monthLabel,
       .snapshot = m_calendar != nullptr ? &m_calendar->snapshot() : nullptr,
       .selected = {.year = m_selectedYear, .month = m_selectedMonth, .day = m_selectedDay},
       .monthOffset = m_monthOffset,
@@ -588,20 +574,20 @@ void CalendarTab::rebuild() {
           },
   });
 
-  if (m_gridViewport != nullptr) {
-    m_gridViewport->setSize(innerWidth, m_grid->height());
+  if (m_ui.gridViewport != nullptr) {
+    m_ui.gridViewport->setSize(innerWidth, m_ui.grid->height());
   }
   rebuildEventList(scale);
 }
 
 void CalendarTab::rebuildEventList(float scale) {
-  if (m_eventsScroll == nullptr || m_config == nullptr) {
+  if (m_ui.eventsScroll == nullptr || m_config == nullptr) {
     return;
   }
   const auto& calendarConfig = m_config->config().calendar;
   calendar_view::rebuildEventList({
-      .scroll = *m_eventsScroll,
-      .title = m_eventsTitle,
+      .scroll = *m_ui.eventsScroll,
+      .title = m_ui.eventsTitle,
       .snapshot = m_calendar != nullptr ? &m_calendar->snapshot() : nullptr,
       .selected = {.year = m_selectedYear, .month = m_selectedMonth, .day = m_selectedDay},
       .scale = scale,
@@ -617,11 +603,11 @@ void CalendarTab::toggleEventsCard() {
   if (m_config != nullptr) {
     m_config->setOverride({"control_center", "calendar", "show_events_card"}, m_showEventsCard);
   }
-  if (m_toggleEventsCardButton != nullptr) {
-    m_toggleEventsCardButton->setGlyph(m_showEventsCard ? "calendar-event" : "calendar-off");
-    m_toggleEventsCardButton->setSelected(m_showEventsCard);
+  if (m_ui.toggleEventsCardButton != nullptr) {
+    m_ui.toggleEventsCardButton->setGlyph(m_showEventsCard ? "calendar-event" : "calendar-off");
+    m_ui.toggleEventsCardButton->setSelected(m_showEventsCard);
   }
-  if (m_eventsCard != nullptr) {
-    m_eventsCard->setVisible(m_showEventsCard);
+  if (m_ui.eventsCard != nullptr) {
+    m_ui.eventsCard->setVisible(m_showEventsCard);
   }
 }

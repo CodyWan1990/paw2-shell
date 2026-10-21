@@ -51,11 +51,15 @@ private:
     std::string lastDisplayInfo;
   };
 
-  Flex* m_rootLayout = nullptr;
-  Flex* m_emptyState = nullptr;
-  ScrollView* m_cardsScroll = nullptr;
-  Flex* m_cardsLayout = nullptr;
-  Button* m_rescanButton = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    Flex* emptyState = nullptr;
+    ScrollView* cardsScroll = nullptr;
+    Flex* cardsLayout = nullptr;
+    Button* rescanButton = nullptr;
+  };
+  Ui m_ui;
   std::vector<DisplayCard> m_cards;
   std::string m_lastDisplayListKey;
 

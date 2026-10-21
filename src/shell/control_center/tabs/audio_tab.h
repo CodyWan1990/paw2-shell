@@ -96,17 +96,17 @@ private:
   WaylandConnection* m_wayland = nullptr;
   RenderContext* m_renderContext = nullptr;
 
-  Flex* m_rootLayout = nullptr;
-  Flex* m_deviceColumn = nullptr;
-  Flex* m_outputCard = nullptr;
-  Flex* m_inputCard = nullptr;
-  ScrollView* m_outputScroll = nullptr;
-  ScrollView* m_inputScroll = nullptr;
-  Flex* m_outputList = nullptr;
-  Flex* m_inputList = nullptr;
-  Flex* m_programCard = nullptr;
-  ScrollView* m_programScroll = nullptr;
-  Flex* m_programList = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    ScrollView* outputScroll = nullptr;
+    ScrollView* inputScroll = nullptr;
+    Flex* outputList = nullptr;
+    Flex* inputList = nullptr;
+    Flex* programList = nullptr;
+    DeviceVolumeCardState* openDeviceMenuCard = nullptr;
+  };
+  Ui m_ui;
   std::vector<Flex*> m_programRows;
   std::string m_lastProgramListKey;
   float m_lastProgramSliderMax = -1.0F;
@@ -116,7 +116,6 @@ private:
   DeviceVolumeCardState m_outputDeviceVolume;
   DeviceVolumeCardState m_inputDeviceVolume;
   std::unique_ptr<ContextMenuPopup> m_deviceMenuPopup;
-  DeviceVolumeCardState* m_openDeviceMenuCard = nullptr;
   std::uint32_t m_openProgramRoutingMenuStreamId = 0;
 
   float m_lastOutputWidth = -1.0F;

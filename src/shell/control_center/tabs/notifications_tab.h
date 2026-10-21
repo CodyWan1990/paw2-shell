@@ -56,14 +56,18 @@ private:
   IconResolver m_iconResolver;
   std::unique_ptr<NotificationHistoryAdapter> m_adapter;
   std::vector<const NotificationHistoryEntry*> m_filtered;
-  Flex* m_root = nullptr;
-  VirtualListView* m_list = nullptr;
-  Flex* m_emptyCard = nullptr;
-  Label* m_emptyTitle = nullptr;
-  Label* m_emptyBody = nullptr;
-  Button* m_clearAllButton = nullptr;
-  Button* m_dndButton = nullptr;
-  Segmented* m_filter = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* root = nullptr;
+    VirtualListView* list = nullptr;
+    Flex* emptyCard = nullptr;
+    Label* emptyTitle = nullptr;
+    Label* emptyBody = nullptr;
+    Button* clearAllButton = nullptr;
+    Button* dndButton = nullptr;
+    Segmented* filter = nullptr;
+  };
+  Ui m_ui;
   std::size_t m_filterIndex = 0;
   std::unordered_set<uint32_t> m_expandedIds;
   std::uint64_t m_lastSerial = 0;

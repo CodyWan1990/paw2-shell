@@ -63,55 +63,59 @@ ThemeEditorPanel::ThemeEditorPanel(
 void ThemeEditorPanel::create() {
   const float scale = contentScale();
   auto root = ui::column({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
       .padding = Style::spaceLg * scale,
   });
 
-  root->addChild(ui::label({
-      .out = &m_heading,
-      .fontSize = Style::fontSizeTitle * scale,
-      .fontWeight = FontWeight::Bold,
-      .color = colorSpecFromRole(ColorRole::OnSurface),
-  }));
+  root->addChild(
+      ui::label({
+          .out = &m_ui.heading,
+          .fontSize = Style::fontSizeTitle * scale,
+          .fontWeight = FontWeight::Bold,
+          .color = colorSpecFromRole(ColorRole::OnSurface),
+      })
+  );
 
   root->addChild(sectionLabel("themes.editor.name", scale));
-  root->addChild(ui::input({
-      .out = &m_titleInput,
-      .placeholder = i18n::tr("themes.editor.name-placeholder"),
-      .surfaceOpacity = panelCardOpacity(),
-      .onChange =
-          [this](const std::string& value) {
+  root->addChild(
+      ui::input({
+          .out = &m_ui.titleInput,
+          .placeholder = i18n::tr("themes.editor.name-placeholder"),
+          .surfaceOpacity = panelCardOpacity(),
+          .onChange = [this](const std::string& value) {
             m_draft.title = value;
             syncButtons();
           },
-  }));
+      })
+  );
 
   root->addChild(sectionLabel("themes.editor.palette", scale));
-  root->addChild(ui::segmented({
-      .out = &m_sourceSwitch,
-      .options =
-          std::vector<ui::SegmentedOption>{
-              {.label = i18n::tr("settings.options.theme.source.built-in"), .glyph = {}, .tooltip = {}},
-              {.label = i18n::tr("settings.options.theme.source.wallpaper"), .glyph = {}, .tooltip = {}},
-              {.label = i18n::tr("settings.options.theme.source.community"), .glyph = {}, .tooltip = {}},
-              {.label = i18n::tr("settings.options.theme.source.custom"), .glyph = {}, .tooltip = {}},
-          },
-      .equalSegmentWidths = true,
-      .onChange =
-          [this](std::size_t index) {
+  root->addChild(
+      ui::segmented({
+          .out = &m_ui.sourceSwitch,
+          .options =
+              std::vector<ui::SegmentedOption>{
+                  {.label = i18n::tr("settings.options.theme.source.built-in"), .glyph = {}, .tooltip = {}},
+                  {.label = i18n::tr("settings.options.theme.source.wallpaper"), .glyph = {}, .tooltip = {}},
+                  {.label = i18n::tr("settings.options.theme.source.community"), .glyph = {}, .tooltip = {}},
+                  {.label = i18n::tr("settings.options.theme.source.custom"), .glyph = {}, .tooltip = {}},
+              },
+          .equalSegmentWidths = true,
+          .onChange = [this](std::size_t index) {
             m_draft.source = kSources[std::min(index, kSources.size() - 1)];
             syncPaletteSelect();
             syncButtons();
           },
-  }));
-  root->addChild(ui::select({
-      .out = &m_paletteSelect,
-      .placeholder = i18n::tr("themes.editor.palette-placeholder"),
-      .surfaceOpacity = panelCardOpacity(),
-      .onSelectionChanged =
-          [this](std::size_t index, std::string_view /*text*/) {
+      })
+  );
+  root->addChild(
+      ui::select({
+          .out = &m_ui.paletteSelect,
+          .placeholder = i18n::tr("themes.editor.palette-placeholder"),
+          .surfaceOpacity = panelCardOpacity(),
+          .onSelectionChanged = [this](std::size_t index, std::string_view /*text*/) {
             if (index >= m_choices.size()) {
               return;
             }
@@ -122,7 +126,8 @@ void ThemeEditorPanel::create() {
             }
             syncButtons();
           },
-  }));
+      })
+  );
 
   root->addChild(ui::row(
       {.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
@@ -146,7 +151,7 @@ void ThemeEditorPanel::create() {
       .fillWidth = true,
       .flexGrow = 1.0F,
   });
-  m_wallpaperList = wallpapers->content();
+  m_ui.wallpaperList = wallpapers->content();
   root->addChild(std::move(wallpapers));
 
   root->addChild(ui::row(
@@ -169,42 +174,48 @@ void ThemeEditorPanel::create() {
           .onClick = [this]() { captureDesktop(); },
       })
   ));
-  root->addChild(ui::image({
-      .out = &m_preview,
-      .fit = ImageFit::Cover,
-      .radius = Style::radiusMd * scale,
-      .height = kPreviewHeight * scale,
-  }));
-  m_preview->setAsyncReadyCallback([]() { PanelManager::instance().refresh(); });
-  root->addChild(ui::label({
-      .out = &m_previewNote,
-      .fontSize = Style::fontSizeCaption * scale,
-      .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
-  }));
-
-  root->addChild(ui::row(
-      {.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
-      ui::button({
-          .out = &m_deleteButton,
-          .text = i18n::tr("themes.editor.delete"),
-          .glyph = "trash",
-          .variant = ButtonVariant::Destructive,
-          .onClick = [this]() { requestDelete(); },
-      }),
-      ui::spacer(),
-      ui::button({
-          .text = i18n::tr("common.actions.cancel"),
-          .variant = ButtonVariant::Outline,
-          .onClick = []() { backToThemes(); },
-      }),
-      ui::button({
-          .out = &m_saveButton,
-          .text = i18n::tr("themes.editor.save"),
-          .glyph = "check",
-          .variant = ButtonVariant::Primary,
-          .onClick = [this]() { save(); },
+  root->addChild(
+      ui::image({
+          .out = &m_ui.preview,
+          .fit = ImageFit::Cover,
+          .radius = Style::radiusMd * scale,
+          .height = kPreviewHeight * scale,
       })
-  ));
+  );
+  m_ui.preview->setAsyncReadyCallback([]() { PanelManager::instance().refresh(); });
+  root->addChild(
+      ui::label({
+          .out = &m_ui.previewNote,
+          .fontSize = Style::fontSizeCaption * scale,
+          .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
+      })
+  );
+
+  root->addChild(
+      ui::row(
+          {.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
+          ui::button({
+              .out = &m_ui.deleteButton,
+              .text = i18n::tr("themes.editor.delete"),
+              .glyph = "trash",
+              .variant = ButtonVariant::Destructive,
+              .onClick = [this]() { requestDelete(); },
+          }),
+          ui::spacer(),
+          ui::button({
+              .text = i18n::tr("common.actions.cancel"),
+              .variant = ButtonVariant::Outline,
+              .onClick = []() { backToThemes(); },
+          }),
+          ui::button({
+              .out = &m_ui.saveButton,
+              .text = i18n::tr("themes.editor.save"),
+              .glyph = "check",
+              .variant = ButtonVariant::Primary,
+              .onClick = [this]() { save(); },
+          })
+      )
+  );
 
   setRoot(std::move(root));
 }
@@ -230,33 +241,24 @@ void ThemeEditorPanel::onOpen(std::string_view context) {
 
 void ThemeEditorPanel::onClose() {
   clearReleasedRoot();
-  m_rootLayout = nullptr;
-  m_heading = nullptr;
-  m_titleInput = nullptr;
-  m_sourceSwitch = nullptr;
-  m_paletteSelect = nullptr;
-  m_wallpaperList = nullptr;
-  m_preview = nullptr;
-  m_previewNote = nullptr;
-  m_saveButton = nullptr;
-  m_deleteButton = nullptr;
+  m_ui = {};
   m_thumbs.clear();
   m_previewPath.clear();
 }
 
 InputArea* ThemeEditorPanel::initialFocusArea() const {
-  return m_titleInput != nullptr ? m_titleInput->inputArea() : nullptr;
+  return m_ui.titleInput != nullptr ? m_ui.titleInput->inputArea() : nullptr;
 }
 
 void ThemeEditorPanel::syncFromDraft() {
-  if (m_heading != nullptr) {
-    m_heading->setText(i18n::tr(m_editingExisting ? "themes.editor.edit-title" : "themes.editor.new-title"));
+  if (m_ui.heading != nullptr) {
+    m_ui.heading->setText(i18n::tr(m_editingExisting ? "themes.editor.edit-title" : "themes.editor.new-title"));
   }
-  if (m_titleInput != nullptr) {
-    m_titleInput->setValue(m_draft.title);
+  if (m_ui.titleInput != nullptr) {
+    m_ui.titleInput->setValue(m_draft.title);
   }
-  if (m_sourceSwitch != nullptr) {
-    m_sourceSwitch->setSelectedIndex(static_cast<std::size_t>(m_draft.source));
+  if (m_ui.sourceSwitch != nullptr) {
+    m_ui.sourceSwitch->setSelectedIndex(static_cast<std::size_t>(m_draft.source));
   }
   syncPaletteSelect();
   rebuildWallpaperList();
@@ -265,7 +267,7 @@ void ThemeEditorPanel::syncFromDraft() {
 }
 
 void ThemeEditorPanel::syncPaletteSelect() {
-  if (m_paletteSelect == nullptr) {
+  if (m_ui.paletteSelect == nullptr) {
     return;
   }
   const ThemeMode mode = m_config != nullptr ? m_config->config().theme.mode : ThemeMode::Dark;
@@ -276,61 +278,63 @@ void ThemeEditorPanel::syncPaletteSelect() {
     labels.push_back(choice.label);
     previews.push_back(choice.preview);
   }
-  m_paletteSelect->setOptions(std::move(labels));
-  m_paletteSelect->setColorSwatchPreviews(std::move(previews));
+  m_ui.paletteSelect->setOptions(std::move(labels));
+  m_ui.paletteSelect->setColorSwatchPreviews(std::move(previews));
   const auto it = std::ranges::find(m_choices, m_draft.paletteValue(), &themes::PaletteChoice::value);
   if (it != m_choices.end()) {
-    m_paletteSelect->setSelectedIndexSilently(static_cast<std::size_t>(it - m_choices.begin()));
+    m_ui.paletteSelect->setSelectedIndexSilently(static_cast<std::size_t>(it - m_choices.begin()));
   } else if (m_draft.source == PaletteSource::Wallpaper && !m_choices.empty()) {
     // The wallpaper source always has a scheme; start from the first.
     m_draft.wallpaperScheme = m_choices.front().value;
-    m_paletteSelect->setSelectedIndexSilently(0);
+    m_ui.paletteSelect->setSelectedIndexSilently(0);
   }
 }
 
 void ThemeEditorPanel::rebuildWallpaperList() {
-  if (m_wallpaperList == nullptr) {
+  if (m_ui.wallpaperList == nullptr) {
     return;
   }
   const float scale = contentScale();
-  m_wallpaperList->clearChildren();
+  m_ui.wallpaperList->clearChildren();
   m_thumbs.clear();
-  m_wallpaperList->setGap(Style::spaceXs * scale);
+  m_ui.wallpaperList->setGap(Style::spaceXs * scale);
 
   if (m_draft.wallpapers.empty()) {
-    m_wallpaperList->addChild(ui::label({
-        .text = i18n::tr("themes.editor.no-wallpapers"),
-        .fontSize = Style::fontSizeCaption * scale,
-        .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
-    }));
+    m_ui.wallpaperList->addChild(
+        ui::label({
+            .text = i18n::tr("themes.editor.no-wallpapers"),
+            .fontSize = Style::fontSizeCaption * scale,
+            .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
+        })
+    );
     return;
   }
   for (std::size_t i = 0; i < m_draft.wallpapers.size(); ++i) {
     const std::string& path = m_draft.wallpapers[i];
     Image* thumb = nullptr;
-    m_wallpaperList->addChild(ui::row(
-        {.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
-        ui::image({
-            .out = &thumb,
-            .fit = ImageFit::Cover,
-            .radius = Style::radiusSm * scale,
-            .width = kThumbWidth * scale,
-            .height = kThumbHeight * scale,
-        }),
-        ui::label({
-            .text = std::filesystem::path(path).filename().string(),
-            .fontSize = Style::fontSizeBody * scale,
-            .color = colorSpecFromRole(ColorRole::OnSurface),
-            .maxLines = 1,
-            .ellipsize = TextEllipsize::Middle,
-            .flexGrow = 1.0F,
-        }),
-        ui::button({
-            .glyph = "x",
-            .variant = ButtonVariant::Ghost,
-            .tooltip = i18n::tr("themes.editor.remove-wallpaper"),
-            .onClick =
-                [this, i]() {
+    m_ui.wallpaperList->addChild(
+        ui::row(
+            {.align = FlexAlign::Center, .gap = Style::spaceSm * scale, .fillWidth = true},
+            ui::image({
+                .out = &thumb,
+                .fit = ImageFit::Cover,
+                .radius = Style::radiusSm * scale,
+                .width = kThumbWidth * scale,
+                .height = kThumbHeight * scale,
+            }),
+            ui::label({
+                .text = std::filesystem::path(path).filename().string(),
+                .fontSize = Style::fontSizeBody * scale,
+                .color = colorSpecFromRole(ColorRole::OnSurface),
+                .maxLines = 1,
+                .ellipsize = TextEllipsize::Middle,
+                .flexGrow = 1.0F,
+            }),
+            ui::button({
+                .glyph = "x",
+                .variant = ButtonVariant::Ghost,
+                .tooltip = i18n::tr("themes.editor.remove-wallpaper"),
+                .onClick = [this, i]() {
                   if (i < m_draft.wallpapers.size()) {
                     m_draft.wallpapers.erase(m_draft.wallpapers.begin() + static_cast<long>(i));
                     m_draft.wallpaperIndex = 0;
@@ -339,8 +343,9 @@ void ThemeEditorPanel::rebuildWallpaperList() {
                     PanelManager::instance().refresh();
                   }
                 },
-        })
-    ));
+            })
+        )
+    );
     thumb->setAsyncReadyCallback([]() { PanelManager::instance().refresh(); });
     m_thumbs.push_back({.image = thumb, .path = path});
   }
@@ -349,22 +354,24 @@ void ThemeEditorPanel::rebuildWallpaperList() {
 void ThemeEditorPanel::syncPreview() {
   // A captured screenshot when there is one, else the theme's wallpaper.
   m_previewPath = !m_draft.screenshotPath.empty() ? m_draft.screenshotPath : m_draft.currentWallpaper();
-  if (m_previewNote != nullptr) {
-    m_previewNote->setText(i18n::tr(
-        !m_draft.screenshotPath.empty() ? "themes.editor.preview-captured"
-        : m_previewPath.empty()         ? "themes.editor.preview-none"
-                                        : "themes.editor.preview-wallpaper"
-    ));
+  if (m_ui.previewNote != nullptr) {
+    m_ui.previewNote->setText(
+        i18n::tr(
+            !m_draft.screenshotPath.empty() ? "themes.editor.preview-captured"
+                : m_previewPath.empty()     ? "themes.editor.preview-none"
+                                            : "themes.editor.preview-wallpaper"
+        )
+    );
   }
 }
 
 void ThemeEditorPanel::syncButtons() {
-  if (m_saveButton != nullptr) {
-    m_saveButton->setEnabled(!StringUtils::trim(m_draft.title).empty() && !m_draft.paletteValue().empty());
+  if (m_ui.saveButton != nullptr) {
+    m_ui.saveButton->setEnabled(!StringUtils::trim(m_draft.title).empty() && !m_draft.paletteValue().empty());
   }
-  if (m_deleteButton != nullptr) {
-    m_deleteButton->setVisible(m_editingExisting);
-    m_deleteButton->setText(i18n::tr(m_confirmingDelete ? "themes.editor.delete-confirm" : "themes.editor.delete"));
+  if (m_ui.deleteButton != nullptr) {
+    m_ui.deleteButton->setVisible(m_editingExisting);
+    m_ui.deleteButton->setText(i18n::tr(m_confirmingDelete ? "themes.editor.delete-confirm" : "themes.editor.delete"));
   }
 }
 
@@ -465,20 +472,22 @@ void ThemeEditorPanel::doUpdate(Renderer& renderer) {
         renderer, *m_textures, thumb.path, static_cast<int>(std::ceil(kThumbWidth * scale)), true
     );
   }
-  if (m_preview != nullptr) {
+  if (m_ui.preview != nullptr) {
     if (m_previewPath.empty()) {
-      m_preview->clear(renderer);
+      m_ui.preview->clear(renderer);
     } else {
-      (void)m_preview->setSourceFileAsync(renderer, *m_textures, m_previewPath, static_cast<int>(std::ceil(preferredWidth())), true);
+      (void)m_ui.preview->setSourceFileAsync(
+          renderer, *m_textures, m_previewPath, static_cast<int>(std::ceil(preferredWidth())), true
+      );
     }
   }
 }
 
 void ThemeEditorPanel::doLayout(Renderer& renderer, float width, float height) {
-  if (m_rootLayout == nullptr) {
+  if (m_ui.rootLayout == nullptr) {
     return;
   }
   doUpdate(renderer);
-  m_rootLayout->setSize(width, height);
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->setSize(width, height);
+  m_ui.rootLayout->layout(renderer);
 }

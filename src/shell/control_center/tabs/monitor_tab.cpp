@@ -73,13 +73,13 @@ std::unique_ptr<Flex> MonitorTab::create() {
   const float scale = contentScale();
 
   auto tab = ui::column({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
   });
 
   auto cardsScroll = ui::scrollView({
-      .out = &m_cardsScroll,
+      .out = &m_ui.cardsScroll,
       .contentScale = scale,
       .scrollbarVisible = true,
       .viewportPaddingH = 0.0F,
@@ -89,13 +89,13 @@ std::unique_ptr<Flex> MonitorTab::create() {
       .contentDirection = FlexDirection::Vertical,
       .contentAlign = FlexAlign::Stretch,
       .contentGap = Style::spaceMd * scale,
-      .contentOut = &m_cardsLayout,
+      .contentOut = &m_ui.cardsLayout,
   });
   tab->addChild(std::move(cardsScroll));
 
   // Empty state (shown when no displays are known)
   auto emptyState = ui::column(
-      {.out = &m_emptyState,
+      {.out = &m_ui.emptyState,
        .align = FlexAlign::Center,
        .justify = FlexJustify::Center,
        .flexGrow = 1.0F,
@@ -116,7 +116,7 @@ std::unique_ptr<Flex> MonitorTab::createHeaderActions() {
   auto row = ui::row(
       {.align = FlexAlign::Center, .gap = Style::spaceSm * scale},
       ui::button({
-          .out = &m_rescanButton,
+          .out = &m_ui.rescanButton,
           .glyph = "refresh",
           .tooltip = i18n::tr("control-center.display.rescan"),
           .onClick =
@@ -134,8 +134,8 @@ std::unique_ptr<Flex> MonitorTab::createHeaderActions() {
 
 // The rescan only re-runs ddcutil detect, so it is meaningless without DDC/CI.
 void MonitorTab::syncHeaderActions() {
-  if (m_rescanButton != nullptr) {
-    m_rescanButton->setVisible(m_configService != nullptr && m_configService->config().brightness.enableDdcutil);
+  if (m_ui.rescanButton != nullptr) {
+    m_ui.rescanButton->setVisible(m_configService != nullptr && m_configService->config().brightness.enableDdcutil);
   }
 }
 
@@ -150,11 +150,7 @@ void MonitorTab::setActive(bool active) {
 void MonitorTab::onClose() {
   flushPendingBrightness(true);
   m_debounceTimer.stop();
-  m_rootLayout = nullptr;
-  m_emptyState = nullptr;
-  m_cardsScroll = nullptr;
-  m_cardsLayout = nullptr;
-  m_rescanButton = nullptr;
+  m_ui = {};
   m_cards.clear();
   m_lastDisplayListKey.clear();
 }
@@ -169,18 +165,18 @@ bool MonitorTab::dragging() const noexcept {
 }
 
 void MonitorTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_rootLayout == nullptr) {
+  if (m_ui.rootLayout == nullptr) {
     return;
   }
 
   rebuildCards(renderer);
 
-  m_rootLayout->setSize(contentWidth, bodyHeight);
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->setSize(contentWidth, bodyHeight);
+  m_ui.rootLayout->layout(renderer);
 
   const float scale = contentScale();
   const float cardWidth =
-      std::max(1.0F, m_cardsScroll != nullptr ? m_cardsScroll->contentViewportWidth() : contentWidth);
+      std::max(1.0F, m_ui.cardsScroll != nullptr ? m_ui.cardsScroll->contentViewportWidth() : contentWidth);
   const float cardInnerWidth = std::max(1.0F, cardWidth - Style::spaceMd * scale * 2.0F);
   const float headerTextMaxWidth =
       std::max(1.0F, cardInnerWidth - Style::fontSizeTitle * scale - Style::spaceSm * scale);
@@ -198,7 +194,7 @@ void MonitorTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeig
     }
   }
 
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->layout(renderer);
 }
 
 void MonitorTab::doUpdate(Renderer& renderer) {
@@ -267,7 +263,7 @@ void MonitorTab::doUpdate(Renderer& renderer) {
 }
 
 void MonitorTab::rebuildCards(Renderer& /*renderer*/) {
-  if (m_brightness == nullptr || m_cardsLayout == nullptr) {
+  if (m_brightness == nullptr || m_ui.cardsLayout == nullptr) {
     return;
   }
 
@@ -281,18 +277,18 @@ void MonitorTab::rebuildCards(Renderer& /*renderer*/) {
   // Remove old cards
   for (auto& card : m_cards) {
     if (card.card != nullptr) {
-      m_cardsLayout->removeChild(card.card);
+      m_ui.cardsLayout->removeChild(card.card);
     }
   }
   m_cards.clear();
 
   // Show/hide empty state
   const bool empty = displays.empty();
-  if (m_emptyState != nullptr) {
-    m_emptyState->setVisible(empty);
+  if (m_ui.emptyState != nullptr) {
+    m_ui.emptyState->setVisible(empty);
   }
-  if (m_cardsScroll != nullptr) {
-    m_cardsScroll->setVisible(!empty);
+  if (m_ui.cardsScroll != nullptr) {
+    m_ui.cardsScroll->setVisible(!empty);
   }
 
   if (empty) {
@@ -410,7 +406,7 @@ void MonitorTab::rebuildCards(Renderer& /*renderer*/) {
     card->addChild(std::move(sliderRow));
 
     auto* cardPtr = card.get();
-    m_cardsLayout->addChild(std::move(card));
+    m_ui.cardsLayout->addChild(std::move(card));
 
     m_cards.push_back(
         DisplayCard{

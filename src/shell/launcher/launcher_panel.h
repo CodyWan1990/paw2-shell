@@ -139,25 +139,28 @@ private:
   UsageTracker m_usageTracker;
   IconResolver m_iconResolver;
 
-  Flex* m_container = nullptr;
-  Input* m_input = nullptr;
-  Segmented* m_categoryFilter = nullptr;
-  Flex* m_body = nullptr;
-  Flex* m_resultsViewport = nullptr;
-  Flex* m_launcherToolbar = nullptr;
-  Segmented* m_launcherNavigation = nullptr;
-  Image* m_launcherAvatar = nullptr;
-  Glyph* m_launcherAvatarFallback = nullptr;
-  Button* m_launcherSettingsButton = nullptr;
-  Button* m_launcherUsageButton = nullptr;
-  Button* m_launcherGridButton = nullptr;
-  Button* m_launcherPowerButton = nullptr;
-  VirtualGridView* m_grid = nullptr;
-  VirtualListView* m_launcherSections = nullptr;
-  ScrollView* m_detailScroll = nullptr;
-  Label* m_detailSubtitle = nullptr;
-  Label* m_detailBody = nullptr;
-  Label* m_emptyLabel = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* container = nullptr;
+    Input* input = nullptr;
+    Segmented* categoryFilter = nullptr;
+    Flex* resultsViewport = nullptr;
+    Flex* launcherToolbar = nullptr;
+    Segmented* launcherNavigation = nullptr;
+    Image* launcherAvatar = nullptr;
+    Glyph* launcherAvatarFallback = nullptr;
+    Button* launcherSettingsButton = nullptr;
+    Button* launcherUsageButton = nullptr;
+    Button* launcherGridButton = nullptr;
+    Button* launcherPowerButton = nullptr;
+    VirtualGridView* grid = nullptr;
+    VirtualListView* launcherSections = nullptr;
+    ScrollView* detailScroll = nullptr;
+    Label* detailSubtitle = nullptr;
+    Label* detailBody = nullptr;
+    Label* emptyLabel = nullptr;
+  };
+  Ui m_ui;
   bool m_anyProviderLoading = false;
   std::unique_ptr<LauncherResultAdapter> m_listAdapter;
   std::unique_ptr<LauncherAppGridAdapter> m_gridAdapter;

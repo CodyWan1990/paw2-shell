@@ -76,35 +76,35 @@ private:
   ConfigService* m_config = nullptr;
   AsyncTextureCache* m_asyncTextures = nullptr;
 
-  InputArea* m_focusArea = nullptr;
-  Flex* m_rootLayout = nullptr;
-  Flex* m_sidebar = nullptr;
-  Flex* m_sidebarHeaderRow = nullptr;
-  Label* m_sidebarTitle = nullptr;
-  Button* m_clearHistoryButton = nullptr;
-  Button* m_clearKeepPinnedButton = nullptr;
-  Flex* m_clearConfirmPanel = nullptr;
-  Label* m_clearConfirmDesc = nullptr;
-  Button* m_closeButton = nullptr;
-  Input* m_filterInput = nullptr;
-  VirtualGridView* m_listGrid = nullptr;
-  Label* m_listEmptyLabel = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    InputArea* focusArea = nullptr;
+    Flex* rootLayout = nullptr;
+    Flex* sidebar = nullptr;
+    Button* clearHistoryButton = nullptr;
+    Button* clearKeepPinnedButton = nullptr;
+    Flex* clearConfirmPanel = nullptr;
+    Label* clearConfirmDesc = nullptr;
+    Button* closeButton = nullptr;
+    Input* filterInput = nullptr;
+    VirtualGridView* listGrid = nullptr;
+    Label* listEmptyLabel = nullptr;
+    Flex* previewCard = nullptr;
+    Label* previewTitle = nullptr;
+    Label* previewMeta = nullptr;
+    Button* imageActionButton = nullptr;
+    Button* pinButton = nullptr;
+    Button* copyButton = nullptr;
+    Button* deleteEntryButton = nullptr;
+    Flex* deleteConfirmPanel = nullptr;
+    ScrollView* previewScrollView = nullptr;
+    Flex* previewContent = nullptr;
+    Image* previewImage = nullptr;
+  };
+  Ui m_ui;
   std::unique_ptr<ClipboardListAdapter> m_listAdapter;
   std::vector<std::size_t> m_filteredIndices;
   std::string m_filterQuery;
-
-  Flex* m_previewCard = nullptr;
-  Flex* m_previewHeaderRow = nullptr;
-  Label* m_previewTitle = nullptr;
-  Label* m_previewMeta = nullptr;
-  Button* m_imageActionButton = nullptr;
-  Button* m_pinButton = nullptr;
-  Button* m_copyButton = nullptr;
-  Button* m_deleteEntryButton = nullptr;
-  Flex* m_deleteConfirmPanel = nullptr;
-  ScrollView* m_previewScrollView = nullptr;
-  Flex* m_previewContent = nullptr;
-  Image* m_previewImage = nullptr;
 
   std::size_t m_selectedIndex = 0;
   std::size_t m_previewPayloadIndex = static_cast<std::size_t>(-1);

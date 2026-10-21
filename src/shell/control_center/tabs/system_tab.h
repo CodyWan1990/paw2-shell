@@ -48,42 +48,44 @@ private:
   double m_gpuTempMax = 80.0;
   double m_netPeak = 0.0;
 
-  Flex* m_root = nullptr;
-
-  Graph* m_cpuGraph = nullptr;
-  Graph* m_ramGraph = nullptr;
-  Graph* m_gpuGraph = nullptr;
-  Graph* m_netGraph = nullptr;
-
-  Flex* m_cpuCard = nullptr;
-  Flex* m_ramCard = nullptr;
-  Flex* m_gpuCard = nullptr;
-  Flex* m_netCard = nullptr;
-
-  Flex* m_cpuLegend = nullptr;
-  Flex* m_ramLegend = nullptr;
-  Flex* m_gpuLegend = nullptr;
-  Flex* m_netLegend = nullptr;
-
-  Glyph* m_cpuPctIcon = nullptr;
-  Label* m_cpuPctLabel = nullptr;
-  Glyph* m_cpuTempIcon = nullptr;
-  Label* m_cpuTempLabel = nullptr;
-  Flex* m_gpuTempGroup = nullptr;
-  Glyph* m_gpuTempIcon = nullptr;
-  Label* m_gpuTempLabel = nullptr;
-  Flex* m_gpuUsageGroup = nullptr;
-  Glyph* m_gpuUsageIcon = nullptr;
-  Label* m_gpuUsageLabel = nullptr;
-  Flex* m_gpuVramGroup = nullptr;
-  Glyph* m_gpuVramIcon = nullptr;
-  Label* m_gpuVramLabel = nullptr;
-  Glyph* m_ramIcon = nullptr;
-  Label* m_ramLabel = nullptr;
-  Glyph* m_rxIcon = nullptr;
-  Label* m_rxLabel = nullptr;
-  Glyph* m_txIcon = nullptr;
-  Label* m_txLabel = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* root = nullptr;
+    Graph* cpuGraph = nullptr;
+    Graph* ramGraph = nullptr;
+    Graph* gpuGraph = nullptr;
+    Graph* netGraph = nullptr;
+    Flex* cpuCard = nullptr;
+    Flex* ramCard = nullptr;
+    Flex* gpuCard = nullptr;
+    Flex* netCard = nullptr;
+    Flex* cpuLegend = nullptr;
+    Flex* ramLegend = nullptr;
+    Flex* gpuLegend = nullptr;
+    Flex* netLegend = nullptr;
+    Glyph* cpuPctIcon = nullptr;
+    Label* cpuPctLabel = nullptr;
+    Glyph* cpuTempIcon = nullptr;
+    Label* cpuTempLabel = nullptr;
+    Flex* gpuTempGroup = nullptr;
+    Glyph* gpuTempIcon = nullptr;
+    Label* gpuTempLabel = nullptr;
+    Flex* gpuUsageGroup = nullptr;
+    Glyph* gpuUsageIcon = nullptr;
+    Label* gpuUsageLabel = nullptr;
+    Flex* gpuVramGroup = nullptr;
+    Glyph* gpuVramIcon = nullptr;
+    Label* gpuVramLabel = nullptr;
+    Glyph* ramIcon = nullptr;
+    Label* ramLabel = nullptr;
+    Glyph* rxIcon = nullptr;
+    Label* rxLabel = nullptr;
+    Glyph* txIcon = nullptr;
+    Label* txLabel = nullptr;
+    Flex* swapRow = nullptr;
+    Label* swapLabel = nullptr;
+  };
+  Ui m_ui;
 
   // System card: cpu, gpu, distro, kernel, wm, uptime + os age
   static constexpr int kSystemLines = 6;
@@ -92,8 +94,6 @@ private:
   // Resources card: load, memory, swap (hidden when no swap), then up to four discovered physical disks.
   static constexpr int kResourcesLines = 2;
   Label* m_resourcesLines[kResourcesLines] = {};
-  Flex* m_swapRow = nullptr;
-  Label* m_swapLabel = nullptr;
   std::vector<std::string> m_diskMountPoints;
   std::vector<Label*> m_diskLabels;
 };

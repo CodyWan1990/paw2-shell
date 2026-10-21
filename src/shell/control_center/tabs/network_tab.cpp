@@ -622,34 +622,33 @@ std::unique_ptr<Flex> NetworkTab::create() {
   const float scale = contentScale();
 
   auto tab = ui::column({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
   });
 
   auto currentCard = ui::column({
-      .out = &m_currentCard,
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
   });
   addTitle(*currentCard, i18n::tr("control-center.network.current-connection"), scale);
 
   auto connRow = ui::row(
-      {.out = &m_currentRow, .align = FlexAlign::Center, .gap = Style::spaceSm * scale},
+      {.out = &m_ui.currentRow, .align = FlexAlign::Center, .gap = Style::spaceSm * scale},
       ui::label({
-          .out = &m_currentTitle,
+          .out = &m_ui.currentTitle,
           .fontSize = Style::fontSizeBody * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::OnSurface),
       }),
       ui::label({
-          .out = &m_currentDetail,
+          .out = &m_ui.currentDetail,
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
           .flexGrow = 1.0F,
       }),
       ui::button({
-          .out = &m_disconnectButton,
+          .out = &m_ui.disconnectButton,
           .glyph = "plug-off",
           .glyphSize = Style::baseGlyphSize * scale,
           .variant = ButtonVariant::Destructive,
@@ -675,7 +674,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
   tab->addChild(std::move(currentCard));
 
   auto passwordCard = ui::column({
-      .out = &m_passwordCard,
+      .out = &m_ui.passwordCard,
       .visible = false,
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
@@ -684,7 +683,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   passwordCard->addChild(
       ui::label({
-          .out = &m_passwordTitle,
+          .out = &m_ui.passwordTitle,
           .fontSize = Style::fontSizeBody * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::OnSurface),
@@ -693,7 +692,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   passwordCard->addChild(
       ui::label({
-          .out = &m_credentialError,
+          .out = &m_ui.credentialError,
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::Error),
           .maxLines = 4,
@@ -702,11 +701,11 @@ std::unique_ptr<Flex> NetworkTab::create() {
   );
 
   const auto submitFromForm = [this](const std::string& /*value*/) {
-    submitPasswordPrompt(m_passwordInput != nullptr ? m_passwordInput->value() : std::string{});
+    submitPasswordPrompt(m_ui.passwordInput != nullptr ? m_ui.passwordInput->value() : std::string{});
   };
 
   auto enterpriseFields = ui::column({
-      .out = &m_enterpriseFields,
+      .out = &m_ui.enterpriseFields,
       // Flex defaults to Center on the cross axis, which collapses each field to
       // its natural width. The card itself stretches via applySectionCardStyle();
       // this nested column has to say so for itself.
@@ -719,7 +718,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
       ui::row(
           {.align = FlexAlign::Center, .gap = Style::spaceSm * scale},
           ui::select({
-              .out = &m_eapSelect,
+              .out = &m_ui.eapSelect,
               .options = optionLabels(kEapOptions),
               .selectedIndex = std::size_t{0},
               .placeholder = i18n::tr("control-center.network.eap-method"),
@@ -730,19 +729,19 @@ std::unique_ptr<Flex> NetworkTab::create() {
                     // PEAP tunnels MSCHAPv2 only. Pinning and locking the inner method
                     // beats letting the user assemble a pair that cannot authenticate
                     // and only fails later, at association time.
-                    if (m_phase2Select == nullptr) {
+                    if (m_ui.phase2Select == nullptr) {
                       return;
                     }
                     const bool pinsInnerMethod =
                         optionAt(kEapOptions, index).method == network_enterprise::EapMethod::Peap;
                     if (pinsInnerMethod) {
-                      m_phase2Select->setSelectedIndexSilently(kPeapPhase2Index);
+                      m_ui.phase2Select->setSelectedIndexSilently(kPeapPhase2Index);
                     }
-                    m_phase2Select->setEnabled(!pinsInnerMethod);
+                    m_ui.phase2Select->setEnabled(!pinsInnerMethod);
                   },
           }),
           ui::select({
-              .out = &m_phase2Select,
+              .out = &m_ui.phase2Select,
               .options = optionLabels(kPhase2Options),
               .selectedIndex = kPeapPhase2Index,
               .placeholder = i18n::tr("control-center.network.phase2-auth"),
@@ -755,7 +754,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   enterpriseFields->addChild(
       ui::input({
-          .out = &m_identityInput,
+          .out = &m_ui.identityInput,
           .placeholder = i18n::tr("control-center.network.identity"),
           .surfaceOpacity = panelCardOpacity(),
           .surfaceRole = ColorRole::Surface,
@@ -765,7 +764,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   enterpriseFields->addChild(
       ui::input({
-          .out = &m_anonymousIdentityInput,
+          .out = &m_ui.anonymousIdentityInput,
           .placeholder = i18n::tr("control-center.network.anonymous-identity"),
           .surfaceOpacity = panelCardOpacity(),
           .surfaceRole = ColorRole::Surface,
@@ -775,7 +774,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   enterpriseFields->addChild(
       ui::input({
-          .out = &m_domainMatchInput,
+          .out = &m_ui.domainMatchInput,
           .placeholder = i18n::tr("control-center.network.domain-suffix-match"),
           .surfaceOpacity = panelCardOpacity(),
           .surfaceRole = ColorRole::Surface,
@@ -785,7 +784,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   enterpriseFields->addChild(
       ui::input({
-          .out = &m_caCertInput,
+          .out = &m_ui.caCertInput,
           .placeholder = i18n::tr("control-center.network.ca-certificate"),
           .surfaceOpacity = panelCardOpacity(),
           .surfaceRole = ColorRole::Surface,
@@ -798,7 +797,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
   auto inputRow = ui::row(
       {.align = FlexAlign::Center, .gap = Style::spaceSm * scale},
       ui::input({
-          .out = &m_passwordInput,
+          .out = &m_ui.passwordInput,
           .placeholder = i18n::tr("control-center.network.password"),
           .passwordMode = true,
           .surfaceOpacity = panelCardOpacity(),
@@ -807,7 +806,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
           .onSubmit = [this](const std::string& value) { submitPasswordPrompt(value); },
       }),
       ui::button({
-          .out = &m_passwordRevealButton,
+          .out = &m_ui.passwordRevealButton,
           .glyph = "eye",
           .glyphSize = Style::baseGlyphSize * scale,
           .variant = ButtonVariant::Ghost,
@@ -817,13 +816,13 @@ std::unique_ptr<Flex> NetworkTab::create() {
           .radius = Style::scaledRadiusMd(scale),
           .onClick =
               [this]() {
-                if (m_passwordInput == nullptr) {
+                if (m_ui.passwordInput == nullptr) {
                   return;
                 }
-                const bool revealed = !m_passwordInput->passwordRevealed();
-                m_passwordInput->setPasswordRevealed(revealed);
-                if (m_passwordRevealButton != nullptr) {
-                  m_passwordRevealButton->setGlyph(revealed ? "eye-off" : "eye");
+                const bool revealed = !m_ui.passwordInput->passwordRevealed();
+                m_ui.passwordInput->setPasswordRevealed(revealed);
+                if (m_ui.passwordRevealButton != nullptr) {
+                  m_ui.passwordRevealButton->setGlyph(revealed ? "eye-off" : "eye");
                 }
               },
       }),
@@ -831,7 +830,9 @@ std::unique_ptr<Flex> NetworkTab::create() {
           .text = i18n::tr("control-center.network.connect"),
           .variant = ButtonVariant::Default,
           .onClick =
-              [this]() { submitPasswordPrompt(m_passwordInput != nullptr ? m_passwordInput->value() : std::string{}); },
+              [this]() {
+                submitPasswordPrompt(m_ui.passwordInput != nullptr ? m_ui.passwordInput->value() : std::string{});
+              },
       }),
       ui::button({
           .text = i18n::tr("common.actions.cancel"),
@@ -844,7 +845,7 @@ std::unique_ptr<Flex> NetworkTab::create() {
 
   Flex* scrollContent = nullptr;
   auto listScroll = ui::scrollView({
-      .out = &m_listScroll,
+      .out = &m_ui.listScroll,
       .contentScale = contentScale(),
       .scrollbarVisible = true,
       .viewportPaddingH = 0.0F,
@@ -857,11 +858,11 @@ std::unique_ptr<Flex> NetworkTab::create() {
       .contentOut = &scrollContent,
   });
   // The password card scrolls with the list so a tall 802.1X form stays reachable.
-  // m_list is a separate column because rebuildApList() clears all of its children.
+  // m_ui.list is a separate column because rebuildApList() clears all of its children.
   scrollContent->addChild(std::move(passwordCard));
   scrollContent->addChild(
       ui::column({
-          .out = &m_list,
+          .out = &m_ui.list,
           .align = FlexAlign::Stretch,
           .gap = Style::spaceMd * scale,
       })
@@ -884,17 +885,17 @@ void NetworkTab::setActive(bool active) {
 }
 
 void NetworkTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_rootLayout == nullptr) {
+  if (m_ui.rootLayout == nullptr) {
     return;
   }
-  m_rootLayout->setSize(contentWidth, bodyHeight);
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->setSize(contentWidth, bodyHeight);
+  m_ui.rootLayout->layout(renderer);
   syncPasswordCard();
   rebuildApList(renderer);
   syncApRows();
   syncCellularCard();
   syncCurrentCard();
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->layout(renderer);
 }
 
 void NetworkTab::doUpdate(Renderer& renderer) {
@@ -904,37 +905,14 @@ void NetworkTab::doUpdate(Renderer& renderer) {
   // A signal percent's text changes its width, so the list has to be laid out again.
   bool listChanged = syncApRows();
   listChanged = syncCellularCard() || listChanged;
-  if (listChanged && m_list != nullptr) {
-    m_list->layout(renderer);
+  if (listChanged && m_ui.list != nullptr) {
+    m_ui.list->layout(renderer);
   }
   syncCurrentCard();
 }
 
 void NetworkTab::onClose() {
-  m_rootLayout = nullptr;
-  m_currentCard = nullptr;
-  m_currentTitle = nullptr;
-  m_currentDetail = nullptr;
-  m_passwordCard = nullptr;
-  m_passwordTitle = nullptr;
-  m_passwordInput = nullptr;
-  m_passwordRevealButton = nullptr;
-  m_enterpriseFields = nullptr;
-  m_eapSelect = nullptr;
-  m_phase2Select = nullptr;
-  m_identityInput = nullptr;
-  m_anonymousIdentityInput = nullptr;
-  m_caCertInput = nullptr;
-  m_domainMatchInput = nullptr;
-  m_credentialError = nullptr;
-  m_listScroll = nullptr;
-  m_list = nullptr;
-  m_rescanButton = nullptr;
-  m_wifiToggle = nullptr;
-  m_scanSpinner = nullptr;
-  m_currentRow = nullptr;
-  m_disconnectButton = nullptr;
-  m_cellularToggle = nullptr;
+  m_ui = {};
   m_cellularRows.clear();
   m_cellularTogglePending = false;
   m_cellularTogglePendingTimer.stop();
@@ -958,20 +936,20 @@ void NetworkTab::syncPasswordCard() {
       && !m_secrets->hasPendingRequest()) {
     clearPasswordPrompt();
   }
-  if (m_passwordCard == nullptr) {
+  if (m_ui.passwordCard == nullptr) {
     return;
   }
-  m_passwordCard->setVisible(m_hasPendingSecret);
-  if (m_enterpriseFields != nullptr) {
-    m_enterpriseFields->setVisible(m_hasPendingSecret && m_pendingEnterprise);
+  m_ui.passwordCard->setVisible(m_hasPendingSecret);
+  if (m_ui.enterpriseFields != nullptr) {
+    m_ui.enterpriseFields->setVisible(m_hasPendingSecret && m_pendingEnterprise);
   }
-  if (m_hasPendingSecret && m_passwordTitle != nullptr) {
+  if (m_hasPendingSecret && m_ui.passwordTitle != nullptr) {
     if (m_pendingSsid.empty()) {
-      m_passwordTitle->setText(i18n::tr("control-center.network.password-prompt"));
+      m_ui.passwordTitle->setText(i18n::tr("control-center.network.password-prompt"));
     } else if (m_pendingEnterprise) {
-      m_passwordTitle->setText(i18n::tr("control-center.network.enterprise-prompt-for", "ssid", m_pendingSsid));
+      m_ui.passwordTitle->setText(i18n::tr("control-center.network.enterprise-prompt-for", "ssid", m_pendingSsid));
     } else {
-      m_passwordTitle->setText(i18n::tr("control-center.network.password-prompt-for", "ssid", m_pendingSsid));
+      m_ui.passwordTitle->setText(i18n::tr("control-center.network.password-prompt-for", "ssid", m_pendingSsid));
     }
   }
 }
@@ -981,18 +959,18 @@ void NetworkTab::focusPendingPasswordPrompt() {
     return;
   }
   // The enterprise form starts with the identity; a plain prompt only has the password.
-  Input* target = m_pendingEnterprise ? m_identityInput : m_passwordInput;
+  Input* target = m_pendingEnterprise ? m_ui.identityInput : m_ui.passwordInput;
   if (target != nullptr) {
     PanelManager::instance().focusArea(target->inputArea());
   }
 }
 
 void NetworkTab::setCredentialError(const std::string& message) {
-  if (m_credentialError == nullptr) {
+  if (m_ui.credentialError == nullptr) {
     return;
   }
-  m_credentialError->setText(message);
-  m_credentialError->setVisible(!message.empty());
+  m_ui.credentialError->setText(message);
+  m_ui.credentialError->setVisible(!message.empty());
   // Showing or hiding the message changes the card's height, and the card is
   // above the network list.
   PanelManager::instance().requestLayout();
@@ -1007,13 +985,13 @@ network_enterprise::EnterpriseCredentials NetworkTab::collectEnterpriseCredentia
   };
 
   network_enterprise::EnterpriseCredentials credentials;
-  credentials.eap = optionAt(kEapOptions, selectedIndexOf(m_eapSelect)).method;
-  credentials.phase2 = optionAt(kPhase2Options, selectedIndexOf(m_phase2Select)).auth;
-  credentials.identity = valueOf(m_identityInput);
-  credentials.anonymousIdentity = valueOf(m_anonymousIdentityInput);
+  credentials.eap = optionAt(kEapOptions, selectedIndexOf(m_ui.eapSelect)).method;
+  credentials.phase2 = optionAt(kPhase2Options, selectedIndexOf(m_ui.phase2Select)).auth;
+  credentials.identity = valueOf(m_ui.identityInput);
+  credentials.anonymousIdentity = valueOf(m_ui.anonymousIdentityInput);
   credentials.password = password;
-  credentials.caCertPath = valueOf(m_caCertInput);
-  credentials.domainSuffixMatch = valueOf(m_domainMatchInput);
+  credentials.caCertPath = valueOf(m_ui.caCertInput);
+  credentials.domainSuffixMatch = valueOf(m_ui.domainMatchInput);
   return credentials;
 }
 
@@ -1061,8 +1039,8 @@ void NetworkTab::showPasswordPrompt(const AccessPointInfo& ap) {
     // than after the user has filled in the whole form.
     setCredentialError(enterpriseBlockReason(ap));
   }
-  if (m_listScroll != nullptr) {
-    m_listScroll->setScrollOffset(0.0F);
+  if (m_ui.listScroll != nullptr) {
+    m_ui.listScroll->setScrollOffset(0.0F);
   }
   PanelManager::instance().requestLayout();
 }
@@ -1114,24 +1092,24 @@ void NetworkTab::clearPasswordPrompt() {
   m_pendingEnterprise = false;
   m_pendingSsid.clear();
   m_pendingAccessPoint.reset();
-  if (m_passwordInput != nullptr) {
-    m_passwordInput->setValue("");
-    m_passwordInput->setPasswordRevealed(false);
+  if (m_ui.passwordInput != nullptr) {
+    m_ui.passwordInput->setValue("");
+    m_ui.passwordInput->setPasswordRevealed(false);
   }
-  if (m_passwordRevealButton != nullptr) {
-    m_passwordRevealButton->setGlyph("eye");
+  if (m_ui.passwordRevealButton != nullptr) {
+    m_ui.passwordRevealButton->setGlyph("eye");
   }
-  for (Input* input : {m_identityInput, m_anonymousIdentityInput, m_caCertInput, m_domainMatchInput}) {
+  for (Input* input : {m_ui.identityInput, m_ui.anonymousIdentityInput, m_ui.caCertInput, m_ui.domainMatchInput}) {
     if (input != nullptr) {
       input->setValue("");
     }
   }
-  if (m_eapSelect != nullptr) {
-    m_eapSelect->setSelectedIndexSilently(kDefaultOptionIndex);
+  if (m_ui.eapSelect != nullptr) {
+    m_ui.eapSelect->setSelectedIndexSilently(kDefaultOptionIndex);
   }
-  if (m_phase2Select != nullptr) {
-    m_phase2Select->setSelectedIndexSilently(kPeapPhase2Index);
-    m_phase2Select->setEnabled(false); // PEAP is the default, and it pins MSCHAPv2.
+  if (m_ui.phase2Select != nullptr) {
+    m_ui.phase2Select->setSelectedIndexSilently(kPeapPhase2Index);
+    m_ui.phase2Select->setEnabled(false); // PEAP is the default, and it pins MSCHAPv2.
   }
   setCredentialError({});
 }
@@ -1139,19 +1117,19 @@ void NetworkTab::clearPasswordPrompt() {
 bool NetworkTab::networkAvailable() const noexcept { return m_network != nullptr && m_network->available(); }
 
 void NetworkTab::syncCurrentCard() {
-  if (m_currentTitle == nullptr || m_currentDetail == nullptr) {
+  if (m_ui.currentTitle == nullptr || m_ui.currentDetail == nullptr) {
     return;
   }
   if (!networkAvailable()) {
-    m_currentTitle->setText(i18n::tr("control-center.network.unavailable-title"));
-    m_currentDetail->setText(i18n::tr("control-center.network.unavailable-detail"));
-    if (m_currentRow != nullptr) {
-      m_currentRow->setVisible(false);
+    m_ui.currentTitle->setText(i18n::tr("control-center.network.unavailable-title"));
+    m_ui.currentDetail->setText(i18n::tr("control-center.network.unavailable-detail"));
+    if (m_ui.currentRow != nullptr) {
+      m_ui.currentRow->setVisible(false);
     }
     return;
   }
-  if (m_currentRow != nullptr) {
-    m_currentRow->setVisible(true);
+  if (m_ui.currentRow != nullptr) {
+    m_ui.currentRow->setVisible(true);
   }
   const NetworkState& s = m_network->state();
   if (m_actionPending) {
@@ -1175,25 +1153,25 @@ void NetworkTab::syncCurrentCard() {
   static const std::string kNoExternalIp;
   const std::string& externalIp = m_externalIpService != nullptr ? m_externalIpService->externalIp() : kNoExternalIp;
   const CellularModemInfo* modem = m_modem != nullptr ? m_modem->primaryModem() : nullptr;
-  m_currentTitle->setText(currentTitle(s, modem));
-  m_currentDetail->setText(currentDetail(s, externalIp, modem));
-  if (m_disconnectButton != nullptr) {
+  m_ui.currentTitle->setText(currentTitle(s, modem));
+  m_ui.currentDetail->setText(currentDetail(s, externalIp, modem));
+  if (m_ui.disconnectButton != nullptr) {
     const bool canReconnectWired = !s.connected && m_network->canActivateWiredConnection();
-    m_disconnectButton->setVisible(s.connected || canReconnectWired || m_actionPending);
-    m_disconnectButton->setGlyph(s.connected ? "plug-off" : "plug");
-    m_disconnectButton->setVariant(s.connected ? ButtonVariant::Destructive : ButtonVariant::Default);
-    m_disconnectButton->setEnabled(!m_actionPending);
+    m_ui.disconnectButton->setVisible(s.connected || canReconnectWired || m_actionPending);
+    m_ui.disconnectButton->setGlyph(s.connected ? "plug-off" : "plug");
+    m_ui.disconnectButton->setVariant(s.connected ? ButtonVariant::Destructive : ButtonVariant::Default);
+    m_ui.disconnectButton->setEnabled(!m_actionPending);
   }
-  if (m_wifiToggle != nullptr) {
-    m_wifiToggle->setChecked(m_wifiTogglePending ? m_wifiToggleTarget : s.wirelessEnabled);
-    m_wifiToggle->setEnabled(!m_wifiTogglePending);
+  if (m_ui.wifiToggle != nullptr) {
+    m_ui.wifiToggle->setChecked(m_wifiTogglePending ? m_wifiToggleTarget : s.wirelessEnabled);
+    m_ui.wifiToggle->setEnabled(!m_wifiTogglePending);
   }
-  if (m_scanSpinner != nullptr) {
-    m_scanSpinner->setVisible(s.scanning);
-    if (s.scanning && !m_scanSpinner->spinning()) {
-      m_scanSpinner->start();
-    } else if (!s.scanning && m_scanSpinner->spinning()) {
-      m_scanSpinner->stop();
+  if (m_ui.scanSpinner != nullptr) {
+    m_ui.scanSpinner->setVisible(s.scanning);
+    if (s.scanning && !m_ui.scanSpinner->spinning()) {
+      m_ui.scanSpinner->start();
+    } else if (!s.scanning && m_ui.scanSpinner->spinning()) {
+      m_ui.scanSpinner->stop();
     }
   }
 }
@@ -1206,8 +1184,8 @@ void NetworkTab::beginPendingAction(bool wasConnected) {
     PanelManager::instance().requestUpdateOnly();
     PanelManager::instance().requestRedraw();
   });
-  if (m_disconnectButton != nullptr) {
-    m_disconnectButton->setEnabled(false);
+  if (m_ui.disconnectButton != nullptr) {
+    m_ui.disconnectButton->setEnabled(false);
   }
 }
 
@@ -1217,8 +1195,8 @@ void NetworkTab::requestWirelessEnabled(bool enabled) {
   m_wifiToggleWriteComplete = false;
   m_wifiToggleTargetObserved = false;
   const std::uint64_t generation = ++m_wifiToggleRequestGeneration;
-  if (m_wifiToggle != nullptr) {
-    m_wifiToggle->setEnabled(false);
+  if (m_ui.wifiToggle != nullptr) {
+    m_ui.wifiToggle->setEnabled(false);
   }
   if (m_network == nullptr) {
     handleWirelessEnabledCompletion(generation, false);
@@ -1296,10 +1274,10 @@ NetworkTab::structureKey(const std::vector<AccessPointInfo>& aps, const std::vec
 
 void NetworkTab::rebuildApList(Renderer& renderer) {
   uiAssertNotRendering("NetworkTab::rebuildApList");
-  if (m_list == nullptr || m_listScroll == nullptr) {
+  if (m_ui.list == nullptr || m_ui.listScroll == nullptr) {
     return;
   }
-  const float listWidth = m_listScroll->contentViewportWidth();
+  const float listWidth = m_ui.listScroll->contentViewportWidth();
   if (listWidth <= 0.0F) {
     return;
   }
@@ -1402,17 +1380,17 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
     return container;
   };
 
-  m_wifiToggle = nullptr;
-  m_scanSpinner = nullptr;
-  m_rescanButton = nullptr;
-  m_cellularToggle = nullptr;
+  m_ui.wifiToggle = nullptr;
+  m_ui.scanSpinner = nullptr;
+  m_ui.rescanButton = nullptr;
+  m_ui.cellularToggle = nullptr;
   m_cellularRows.clear();
   m_apRows.clear();
 
-  m_list->clearChildren();
+  m_ui.list->clearChildren();
 
   if (!networkAvailable()) {
-    m_list->addChild(
+    m_ui.list->addChild(
         ui::label({
             .text = i18n::tr("control-center.network.unavailable-title"),
             .fontSize = Style::fontSizeBody * scale,
@@ -1470,7 +1448,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
         }
       }
 
-      m_list->addChild(std::move(vpnCard));
+      m_ui.list->addChild(std::move(vpnCard));
     }
 
     if (m_modem != nullptr && !m_modem->modems().empty()) {
@@ -1482,7 +1460,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
       auto cellularHeader = makeCardHeaderRow(i18n::tr("control-center.network.cellular"), scale);
       cellularHeader->addChild(
           ui::toggle({
-              .out = &m_cellularToggle,
+              .out = &m_ui.cellularToggle,
               .checkedImmediate = cellularToggleDisplayChecked(),
               .toggleSize = ToggleSize::Medium,
               .scale = scale,
@@ -1497,7 +1475,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
         cellularCard->addChild(std::move(row));
       }
 
-      m_list->addChild(std::move(cellularCard));
+      m_ui.list->addChild(std::move(cellularCard));
     }
 
     {
@@ -1509,7 +1487,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
       auto wifiHeader = makeCardHeaderRow(i18n::tr("control-center.network.wifi"), scale);
       wifiHeader->addChild(
           ui::spinner({
-              .out = &m_scanSpinner,
+              .out = &m_ui.scanSpinner,
               .color = colorSpecFromRole(ColorRole::Primary),
               .spinnerSize = Style::baseGlyphSize * scale,
               .visible = false,
@@ -1518,7 +1496,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
 
       wifiHeader->addChild(
           ui::button({
-              .out = &m_rescanButton,
+              .out = &m_ui.rescanButton,
               .glyph = "refresh",
               .glyphSize = Style::baseGlyphSize * scale,
               .variant = ButtonVariant::Ghost,
@@ -1534,7 +1512,7 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
 
       wifiHeader->addChild(
           ui::toggle({
-              .out = &m_wifiToggle,
+              .out = &m_ui.wifiToggle,
               .checkedImmediate = m_network->state().wirelessEnabled,
               .toggleSize = ToggleSize::Medium,
               .scale = scale,
@@ -1545,14 +1523,14 @@ void NetworkTab::rebuildApList(Renderer& renderer) {
 
       wifiCard->addChild(buildApRows());
 
-      m_list->addChild(std::move(wifiCard));
+      m_ui.list->addChild(std::move(wifiCard));
 
       // Live state (spinner visibility/animation, toggle checked) is owned by
       // syncCurrentCard(), which runs every frame after the card is attached.
       // rebuildApList() builds structure only and must not drive animations.
     }
   }
-  m_list->layout(renderer);
+  m_ui.list->layout(renderer);
 }
 
 bool NetworkTab::syncApRows() {
@@ -1592,8 +1570,8 @@ bool NetworkTab::syncCellularCard() {
       changed = true;
     }
   }
-  if (m_cellularToggle != nullptr) {
-    m_cellularToggle->setChecked(cellularToggleDisplayChecked());
+  if (m_ui.cellularToggle != nullptr) {
+    m_ui.cellularToggle->setChecked(cellularToggleDisplayChecked());
   }
   return changed;
 }
@@ -1645,7 +1623,7 @@ void NetworkTab::requestCellularEnabled(bool enabled) {
 }
 
 void NetworkTab::onPanelCardOpacityChanged(float opacity) {
-  if (m_passwordInput != nullptr) {
-    m_passwordInput->setSurfaceOpacity(opacity);
+  if (m_ui.passwordInput != nullptr) {
+    m_ui.passwordInput->setSurfaceOpacity(opacity);
   }
 }

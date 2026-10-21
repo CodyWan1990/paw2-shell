@@ -352,13 +352,13 @@ std::unique_ptr<Flex> BluetoothTab::create() {
   const float scale = contentScale();
 
   auto tab = ui::column({
-      .out = &m_rootLayout,
+      .out = &m_ui.rootLayout,
       .align = FlexAlign::Stretch,
       .gap = Style::spaceMd * scale,
   });
 
   auto pairingCard = ui::column({
-      .out = &m_pairingCard,
+      .out = &m_ui.pairingCard,
       .visible = false,
       .cardStyleScale = scale,
       .cardStyleFillOpacity = panelCardOpacity(),
@@ -366,7 +366,7 @@ std::unique_ptr<Flex> BluetoothTab::create() {
 
   pairingCard->addChild(
       ui::label({
-          .out = &m_pairingTitle,
+          .out = &m_ui.pairingTitle,
           .fontSize = Style::fontSizeBody * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::OnSurface),
@@ -375,7 +375,7 @@ std::unique_ptr<Flex> BluetoothTab::create() {
 
   pairingCard->addChild(
       ui::label({
-          .out = &m_pairingDetail,
+          .out = &m_ui.pairingDetail,
           .fontSize = Style::fontSizeCaption * scale,
           .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
       })
@@ -383,7 +383,7 @@ std::unique_ptr<Flex> BluetoothTab::create() {
 
   pairingCard->addChild(
       ui::label({
-          .out = &m_pairingCode,
+          .out = &m_ui.pairingCode,
           .fontSize = Style::fontSizeTitle * scale,
           .fontWeight = FontWeight::Bold,
           .color = colorSpecFromRole(ColorRole::Primary),
@@ -391,9 +391,9 @@ std::unique_ptr<Flex> BluetoothTab::create() {
   );
 
   auto pairingInputRow = ui::row(
-      {.out = &m_pairingInputRow, .align = FlexAlign::Center, .gap = Style::spaceSm * scale, .visible = false},
+      {.out = &m_ui.pairingInputRow, .align = FlexAlign::Center, .gap = Style::spaceSm * scale, .visible = false},
       ui::input({
-          .out = &m_pairingInput,
+          .out = &m_ui.pairingInput,
           .placeholder = i18n::tr("control-center.bluetooth.enter-code"),
           .surfaceOpacity = panelCardOpacity(),
           .flexGrow = 1.0F,
@@ -418,9 +418,9 @@ std::unique_ptr<Flex> BluetoothTab::create() {
   pairingCard->addChild(std::move(pairingInputRow));
 
   auto pairingButtonRow = ui::row(
-      {.out = &m_pairingButtonRow, .align = FlexAlign::Center, .gap = Style::spaceSm * scale},
+      {.align = FlexAlign::Center, .gap = Style::spaceSm * scale},
       ui::button({
-          .out = &m_pairingAccept,
+          .out = &m_ui.pairingAccept,
           .text = i18n::tr("control-center.bluetooth.accept"),
           .variant = ButtonVariant::Default,
           .onClick =
@@ -437,14 +437,14 @@ std::unique_ptr<Flex> BluetoothTab::create() {
                   m_agent->acceptConfirm();
                   break;
                 case BluetoothPairingKind::PinCode:
-                  if (m_pairingInput != nullptr) {
-                    m_agent->submitPin(m_pairingInput->value());
+                  if (m_ui.pairingInput != nullptr) {
+                    m_agent->submitPin(m_ui.pairingInput->value());
                   }
                   break;
                 case BluetoothPairingKind::Passkey:
-                  if (m_pairingInput != nullptr) {
+                  if (m_ui.pairingInput != nullptr) {
                     try {
-                      m_agent->submitPasskey(static_cast<std::uint32_t>(std::stoul(m_pairingInput->value())));
+                      m_agent->submitPasskey(static_cast<std::uint32_t>(std::stoul(m_ui.pairingInput->value())));
                     } catch (...) {
                       m_agent->cancelPending();
                     }
@@ -462,7 +462,7 @@ std::unique_ptr<Flex> BluetoothTab::create() {
               },
       }),
       ui::button({
-          .out = &m_pairingTrustAndAllow,
+          .out = &m_ui.pairingTrustAndAllow,
           .text = i18n::tr("control-center.bluetooth.trust-and-allow"),
           .variant = ButtonVariant::Default,
           .onClick =
@@ -481,7 +481,6 @@ std::unique_ptr<Flex> BluetoothTab::create() {
               },
       }),
       ui::button({
-          .out = &m_pairingReject,
           .text = i18n::tr("control-center.bluetooth.reject"),
           .variant = ButtonVariant::Ghost,
           .onClick = [this]() {
@@ -497,7 +496,7 @@ std::unique_ptr<Flex> BluetoothTab::create() {
   tab->addChild(std::move(pairingCard));
 
   auto listScroll = ui::scrollView({
-      .out = &m_listScroll,
+      .out = &m_ui.listScroll,
       .contentScale = contentScale(),
       .scrollbarVisible = true,
       .viewportPaddingH = 0.0F,
@@ -507,7 +506,7 @@ std::unique_ptr<Flex> BluetoothTab::create() {
       .contentDirection = FlexDirection::Vertical,
       .contentAlign = FlexAlign::Stretch,
       .contentGap = Style::spaceMd * scale,
-      .contentOut = &m_list,
+      .contentOut = &m_ui.list,
   });
 
   tab->addChild(std::move(listScroll));
@@ -517,16 +516,16 @@ std::unique_ptr<Flex> BluetoothTab::create() {
 std::unique_ptr<Flex> BluetoothTab::createHeaderActions() { return nullptr; }
 
 void BluetoothTab::doLayout(Renderer& renderer, float contentWidth, float bodyHeight) {
-  if (m_rootLayout == nullptr) {
+  if (m_ui.rootLayout == nullptr) {
     return;
   }
-  m_rootLayout->setSize(contentWidth, bodyHeight);
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->setSize(contentWidth, bodyHeight);
+  m_ui.rootLayout->layout(renderer);
   syncPairingCard();
   rebuildDeviceList(renderer);
   syncDeviceRows();
   syncHeader();
-  m_rootLayout->layout(renderer);
+  m_ui.rootLayout->layout(renderer);
 }
 
 void BluetoothTab::doUpdate(Renderer& renderer) {
@@ -534,8 +533,8 @@ void BluetoothTab::doUpdate(Renderer& renderer) {
   syncPairingCard();
   rebuildDeviceList(renderer);
   // A metric pill's text changes its width, so the list has to be laid out again.
-  if (syncDeviceRows() && m_list != nullptr) {
-    m_list->layout(renderer);
+  if (syncDeviceRows() && m_ui.list != nullptr) {
+    m_ui.list->layout(renderer);
   }
   syncHeader();
 }
@@ -548,23 +547,7 @@ void BluetoothTab::setActive(bool active) {
 
 void BluetoothTab::onClose() {
   stopRequestedDiscovery();
-  m_rootLayout = nullptr;
-  m_pairingCard = nullptr;
-  m_pairingTitle = nullptr;
-  m_pairingDetail = nullptr;
-  m_pairingCode = nullptr;
-  m_pairingInputRow = nullptr;
-  m_pairingInput = nullptr;
-  m_pairingButtonRow = nullptr;
-  m_pairingAccept = nullptr;
-  m_pairingTrustAndAllow = nullptr;
-  m_pairingReject = nullptr;
-  m_listScroll = nullptr;
-  m_list = nullptr;
-  m_powerToggle = nullptr;
-  m_discoverableToggle = nullptr;
-  m_rescanButton = nullptr;
-  m_scanSpinner = nullptr;
+  m_ui = {};
   m_deviceRows.clear();
   m_lastStructureKey.clear();
   m_lastListWidth = -1.0F;
@@ -615,34 +598,34 @@ void BluetoothTab::syncHeader() {
     return;
   }
   const BluetoothState& s = m_service->state();
-  if (m_powerToggle != nullptr) {
-    m_powerToggle->setChecked(s.powered);
-    m_powerToggle->setEnabled(s.adapterPresent);
+  if (m_ui.powerToggle != nullptr) {
+    m_ui.powerToggle->setChecked(s.powered);
+    m_ui.powerToggle->setEnabled(s.adapterPresent);
   }
-  if (m_discoverableToggle != nullptr) {
-    m_discoverableToggle->setChecked(s.discoverable);
-    m_discoverableToggle->setEnabled(s.adapterPresent && s.powered);
+  if (m_ui.discoverableToggle != nullptr) {
+    m_ui.discoverableToggle->setChecked(s.discoverable);
+    m_ui.discoverableToggle->setEnabled(s.adapterPresent && s.powered);
   }
-  if (m_scanSpinner != nullptr) {
+  if (m_ui.scanSpinner != nullptr) {
     const bool spinnerVisible = s.discovering && s.powered && s.adapterPresent;
-    m_scanSpinner->setVisible(spinnerVisible);
-    if (spinnerVisible && !m_scanSpinner->spinning()) {
-      m_scanSpinner->start();
-    } else if (!spinnerVisible && m_scanSpinner->spinning()) {
-      m_scanSpinner->stop();
+    m_ui.scanSpinner->setVisible(spinnerVisible);
+    if (spinnerVisible && !m_ui.scanSpinner->spinning()) {
+      m_ui.scanSpinner->start();
+    } else if (!spinnerVisible && m_ui.scanSpinner->spinning()) {
+      m_ui.scanSpinner->stop();
     }
   }
-  if (m_rescanButton != nullptr) {
-    m_rescanButton->setEnabled(s.adapterPresent && s.powered);
+  if (m_ui.rescanButton != nullptr) {
+    m_ui.rescanButton->setEnabled(s.adapterPresent && s.powered);
   }
 }
 
 void BluetoothTab::syncPairingCard() {
-  if (m_pairingCard == nullptr) {
+  if (m_ui.pairingCard == nullptr) {
     return;
   }
   const bool hasPending = m_agent != nullptr && m_agent->hasPendingRequest();
-  m_pairingCard->setVisible(hasPending);
+  m_ui.pairingCard->setVisible(hasPending);
   if (!hasPending) {
     return;
   }
@@ -657,69 +640,69 @@ void BluetoothTab::syncPairingCard() {
     }
   }
 
-  if (m_pairingTitle != nullptr) {
-    m_pairingTitle->setText(i18n::tr("control-center.bluetooth.pair-title", "device", alias));
+  if (m_ui.pairingTitle != nullptr) {
+    m_ui.pairingTitle->setText(i18n::tr("control-center.bluetooth.pair-title", "device", alias));
   }
   const bool needsInput = req.kind == BluetoothPairingKind::PinCode || req.kind == BluetoothPairingKind::Passkey;
   const bool showsCode = req.kind == BluetoothPairingKind::Confirm
       || req.kind == BluetoothPairingKind::DisplayPasskey
       || req.kind == BluetoothPairingKind::DisplayPinCode;
 
-  if (m_pairingDetail != nullptr) {
+  if (m_ui.pairingDetail != nullptr) {
     switch (req.kind) {
     case BluetoothPairingKind::Confirm:
-      m_pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.confirm"));
+      m_ui.pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.confirm"));
       break;
     case BluetoothPairingKind::Authorize:
-      m_pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.authorize"));
+      m_ui.pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.authorize"));
       break;
     case BluetoothPairingKind::AuthorizeService:
       // The {uuid} placeholder predates the lookup and is kept for the existing locale
       // catalogs; it now carries the SIG service name, falling back to the raw UUID.
-      m_pairingDetail->setText(
+      m_ui.pairingDetail->setText(
           i18n::tr("control-center.bluetooth.pairing-detail.authorize-service", "uuid", bluetoothServiceLabel(req.uuid))
       );
       break;
     case BluetoothPairingKind::DisplayPinCode:
-      m_pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.display-pin"));
+      m_ui.pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.display-pin"));
       break;
     case BluetoothPairingKind::DisplayPasskey:
-      m_pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.display-passkey"));
+      m_ui.pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.display-passkey"));
       break;
     case BluetoothPairingKind::PinCode:
-      m_pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.pin-code"));
+      m_ui.pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.pin-code"));
       break;
     case BluetoothPairingKind::Passkey:
-      m_pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.passkey"));
+      m_ui.pairingDetail->setText(i18n::tr("control-center.bluetooth.pairing-detail.passkey"));
       break;
     case BluetoothPairingKind::None:
       break;
     }
   }
-  if (m_pairingCode != nullptr) {
-    m_pairingCode->setVisible(showsCode);
+  if (m_ui.pairingCode != nullptr) {
+    m_ui.pairingCode->setVisible(showsCode);
     if (showsCode) {
       if (req.kind == BluetoothPairingKind::DisplayPinCode) {
-        m_pairingCode->setText(req.pin);
+        m_ui.pairingCode->setText(req.pin);
       } else {
         char buf[16];
         std::snprintf(buf, sizeof(buf), "%06u", req.passkey);
-        m_pairingCode->setText(buf);
+        m_ui.pairingCode->setText(buf);
       }
     }
   }
-  if (m_pairingInputRow != nullptr) {
-    m_pairingInputRow->setVisible(needsInput);
+  if (m_ui.pairingInputRow != nullptr) {
+    m_ui.pairingInputRow->setVisible(needsInput);
   }
-  if (m_pairingAccept != nullptr) {
+  if (m_ui.pairingAccept != nullptr) {
     // DisplayPasskey has nothing to accept: the code is entered on the device and there
     // is no Agent1 reply. Show only the Reject action so Accept cannot clear the card.
-    m_pairingAccept->setVisible(req.kind != BluetoothPairingKind::DisplayPasskey);
+    m_ui.pairingAccept->setVisible(req.kind != BluetoothPairingKind::DisplayPasskey);
   }
-  if (m_pairingTrustAndAllow != nullptr) {
+  if (m_ui.pairingTrustAndAllow != nullptr) {
     // Only service authorization is suppressed by the Trusted flag, so trusting the device
     // would not stop the other request kinds from prompting again.
-    m_pairingTrustAndAllow->setVisible(req.kind == BluetoothPairingKind::AuthorizeService);
+    m_ui.pairingTrustAndAllow->setVisible(req.kind == BluetoothPairingKind::AuthorizeService);
   }
 }
 
@@ -772,10 +755,10 @@ bool BluetoothTab::syncDeviceRows() {
 
 void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
   uiAssertNotRendering("BluetoothTab::rebuildDeviceList");
-  if (m_list == nullptr || m_listScroll == nullptr) {
+  if (m_ui.list == nullptr || m_ui.listScroll == nullptr) {
     return;
   }
-  const float listWidth = m_listScroll->contentViewportWidth();
+  const float listWidth = m_ui.listScroll->contentViewportWidth();
   if (listWidth <= 0.0F) {
     return;
   }
@@ -792,7 +775,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
   m_lastStructureKey = nextKey;
 
   if (!structureChanged) {
-    m_list->layout(renderer);
+    m_ui.list->layout(renderer);
     return;
   }
 
@@ -805,23 +788,23 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
     }
   }
 
-  m_powerToggle = nullptr;
-  m_discoverableToggle = nullptr;
-  m_scanSpinner = nullptr;
-  m_rescanButton = nullptr;
+  m_ui.powerToggle = nullptr;
+  m_ui.discoverableToggle = nullptr;
+  m_ui.scanSpinner = nullptr;
+  m_ui.rescanButton = nullptr;
   m_deviceRows.clear();
 
-  m_list->clearChildren();
+  m_ui.list->clearChildren();
 
   if (m_service == nullptr) {
-    m_list->addChild(
+    m_ui.list->addChild(
         ui::label({
             .text = i18n::tr("control-center.bluetooth.unavailable"),
             .fontSize = Style::fontSizeCaption * scale,
             .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
         })
     );
-    m_list->layout(renderer);
+    m_ui.list->layout(renderer);
     return;
   }
 
@@ -849,7 +832,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
 
     powerRow->addChild(
         ui::spinner({
-            .out = &m_scanSpinner,
+            .out = &m_ui.scanSpinner,
             .color = colorSpecFromRole(ColorRole::Primary),
             .spinnerSize = Style::baseGlyphSize * scale,
             .visible = false,
@@ -858,7 +841,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
 
     powerRow->addChild(
         ui::button({
-            .out = &m_rescanButton,
+            .out = &m_ui.rescanButton,
             .glyph = "refresh",
             .glyphSize = Style::baseGlyphSize * scale,
             .enabled = s.adapterPresent && s.powered,
@@ -882,7 +865,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
 
     powerRow->addChild(
         ui::toggle({
-            .out = &m_powerToggle,
+            .out = &m_ui.powerToggle,
             .checkedImmediate = s.powered,
             .enabled = s.adapterPresent,
             .toggleSize = ToggleSize::Medium,
@@ -909,7 +892,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
             .flexGrow = 1.0F,
         }),
         ui::toggle({
-            .out = &m_discoverableToggle,
+            .out = &m_ui.discoverableToggle,
             .checkedImmediate = s.discoverable,
             .enabled = s.adapterPresent && s.powered,
             .toggleSize = ToggleSize::Medium,
@@ -924,11 +907,11 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
 
     adapterCard->addChild(std::move(visibleRow));
 
-    m_list->addChild(std::move(adapterCard));
+    m_ui.list->addChild(std::move(adapterCard));
   }
 
   if (!s.powered) {
-    m_list->addChild(
+    m_ui.list->addChild(
         ui::label({
             .text = s.rfkillSoftBlocked ? i18n::tr("control-center.bluetooth.rfkill-blocked")
                                         : i18n::tr("control-center.bluetooth.off"),
@@ -936,19 +919,19 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
             .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
         })
     );
-    m_list->layout(renderer);
+    m_ui.list->layout(renderer);
     return;
   }
 
   if (devices.empty()) {
-    m_list->addChild(
+    m_ui.list->addChild(
         ui::label({
             .text = i18n::tr("control-center.bluetooth.no-devices"),
             .fontSize = Style::fontSizeBody * scale,
             .color = colorSpecFromRole(ColorRole::OnSurfaceVariant),
         })
     );
-    m_list->layout(renderer);
+    m_ui.list->layout(renderer);
     return;
   }
 
@@ -976,7 +959,7 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
       });
       card->addChild(makeCardHeaderRow(sectionText, scale));
       bucketCard = card.get();
-      m_list->addChild(std::move(card));
+      m_ui.list->addChild(std::move(card));
       currentBucket = bucket;
       first = false;
     }
@@ -987,11 +970,11 @@ void BluetoothTab::rebuildDeviceList(Renderer& renderer) {
     rowPtr->startConnectingSpinner();
     m_deviceRows.emplace(rowPtr->devicePath(), rowPtr);
   }
-  m_list->layout(renderer);
+  m_ui.list->layout(renderer);
 }
 
 void BluetoothTab::onPanelCardOpacityChanged(float opacity) {
-  if (m_pairingInput != nullptr) {
-    m_pairingInput->setSurfaceOpacity(opacity);
+  if (m_ui.pairingInput != nullptr) {
+    m_ui.pairingInput->setSurfaceOpacity(opacity);
   }
 }

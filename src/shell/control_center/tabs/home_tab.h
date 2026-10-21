@@ -96,38 +96,49 @@ private:
   ShortcutServices m_services;
   bool m_active = false;
 
-  Flex* m_rootLayout = nullptr;
-  Flex* m_bottomRow = nullptr;
-  Flex* m_dateTimeCard = nullptr;
-  Flex* m_mediaCard = nullptr;
-  Flex* m_mediaText = nullptr;
-  Flex* m_userCard = nullptr;
-  Flex* m_userMain = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    Flex* bottomRow = nullptr;
+    Flex* dateTimeCard = nullptr;
+    Flex* mediaCard = nullptr;
+    Flex* mediaText = nullptr;
+    Flex* userCard = nullptr;
+    Flex* userMain = nullptr;
+    Image* userAvatar = nullptr;
+    Label* timeLabel = nullptr;
+    Label* dateLabel = nullptr;
+    Flex* weatherRow = nullptr;
+    Glyph* weatherGlyph = nullptr;
+    Label* weatherLine = nullptr;
+    Label* userHost = nullptr;
+    Label* userUptime = nullptr;
+    Label* userVersion = nullptr;
+    Button* sessionButton = nullptr;
+    InputArea* userCardKeyboardArea = nullptr;
+    InputArea* userCardArea = nullptr;
+    InputArea* mediaCardArea = nullptr;
+    InputArea* dateTimeCardArea = nullptr;
+    // Two stacked layers: m_ui.wallpaperPlaceholder shows the resident full-screen
+    // wallpaper texture immediately (slightly soft), m_ui.wallpaperBg holds the crisp
+    // card-sized thumbnail and crossfades in over it once decoded.
+    Image* wallpaperPlaceholder = nullptr;
+    Image* wallpaperBg = nullptr;
+    Label* mediaTrack = nullptr;
+    Label* mediaArtist = nullptr;
+    Label* mediaStatus = nullptr;
+    Label* mediaProgress = nullptr;
+    Flex* mediaArtSlot = nullptr;
+    Glyph* mediaArtFallback = nullptr;
+    Image* mediaArt = nullptr;
+    GridView* shortcutsGrid = nullptr;
+  };
+  Ui m_ui;
   InputArea* m_userAvatarArea = nullptr;
-  Image* m_userAvatar = nullptr;
 
-  Label* m_timeLabel = nullptr;
-  Label* m_dateLabel = nullptr;
-  Flex* m_weatherRow = nullptr;
-  Glyph* m_weatherGlyph = nullptr;
-  Label* m_weatherLine = nullptr;
-  Label* m_userHost = nullptr;
-  Label* m_userUptime = nullptr;
-  Label* m_userVersion = nullptr;
-  Button* m_settingsButton = nullptr;
-  Button* m_sessionButton = nullptr;
-  InputArea* m_userCardKeyboardArea = nullptr;
-  InputArea* m_userCardArea = nullptr;
-  InputArea* m_mediaCardArea = nullptr;
-  InputArea* m_dateTimeCardArea = nullptr;
   // Survives onClose() so the oversized-source warning fires once per session.
   std::string m_sizeCheckedAvatarPath;
 
-  // Two stacked layers: m_wallpaperPlaceholder shows the resident full-screen
-  // wallpaper texture immediately (slightly soft), m_wallpaperBg holds the crisp
-  // card-sized thumbnail and crossfades in over it once decoded.
-  Image* m_wallpaperPlaceholder = nullptr;
-  Image* m_wallpaperBg = nullptr;
   std::string m_loadedWallpaperPath;
   int m_loadedWallpaperSize = 0;
   std::string m_crispWorkingPath;
@@ -140,13 +151,6 @@ private:
   ThumbnailService::Subscription m_thumbnailPendingSub;
   Signal<>::ScopedConnection m_wallpaperChangedConn;
 
-  Label* m_mediaTrack = nullptr;
-  Label* m_mediaArtist = nullptr;
-  Label* m_mediaStatus = nullptr;
-  Label* m_mediaProgress = nullptr;
-  Flex* m_mediaArtSlot = nullptr;
-  Glyph* m_mediaArtFallback = nullptr;
-  Image* m_mediaArt = nullptr;
   std::string m_loadedMediaArtUrl;
   std::unordered_set<std::string> m_pendingArtDownloads;
   std::shared_ptr<void> m_aliveGuard = std::make_shared<int>(0);
@@ -163,7 +167,6 @@ private:
   // otherwise only refreshes when an unrelated service forces a redraw.
   Timer m_clockTimer;
 
-  GridView* m_shortcutsGrid = nullptr;
   std::vector<ShortcutPad> m_shortcutPads;
   // Plugin config as of the last shortcut grid build. A plugin shortcut seeds its Luau
   // runtime at construction, so a change here must block instance reuse.

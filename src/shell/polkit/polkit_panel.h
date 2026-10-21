@@ -47,18 +47,20 @@ private:
 
   ConfigService* m_config = nullptr;
   std::function<PolkitAgent*()> m_agentProvider;
-  Flex* m_rootLayout = nullptr;
-  InputArea* m_focusArea = nullptr;
-  Label* m_titleLabel = nullptr;
-  Label* m_messageLabel = nullptr;
-  Label* m_promptLabel = nullptr;
-  Label* m_supplementaryLabel = nullptr;
-  Input* m_input = nullptr;
-  Button* m_submitButton = nullptr;
-  Button* m_cancelButton = nullptr;
-  Node* m_iconContainer = nullptr;
-  Image* m_icon = nullptr;
-  Glyph* m_fallbackIcon = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* rootLayout = nullptr;
+    InputArea* focusArea = nullptr;
+    Label* messageLabel = nullptr;
+    Label* promptLabel = nullptr;
+    Label* supplementaryLabel = nullptr;
+    Input* input = nullptr;
+    Button* submitButton = nullptr;
+    Node* iconContainer = nullptr;
+    Image* icon = nullptr;
+    Glyph* fallbackIcon = nullptr;
+  };
+  Ui m_ui;
   IconResolver m_iconResolver;
   std::string m_lastIconName;
   bool m_iconResolved = false;

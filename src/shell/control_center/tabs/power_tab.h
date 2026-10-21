@@ -67,22 +67,36 @@ private:
   UPowerService* m_upower = nullptr;
   PowerProfilesService* m_powerProfiles = nullptr;
 
-  Flex* m_root = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* root = nullptr;
+    // Battery status
+    Flex* statusCard = nullptr;
+    Glyph* statusGlyph = nullptr;
+    Label* percentLabel = nullptr;
+    Label* stateLabel = nullptr;
+    ProgressBar* levelBar = nullptr;
+    Flex* timeRow = nullptr;
+    Label* timeLabel = nullptr;
+    Flex* rateRow = nullptr;
+    Label* rateLabel = nullptr;
+    // Battery charging limits
+    Flex* chargingCard = nullptr;
+    Flex* chargingList = nullptr;
+    // Power profiles
+    Flex* profilesCard = nullptr;
+    Segmented* profiles = nullptr;
+    Flex* inhibitedRow = nullptr;
+    // Battery health
+    Flex* healthCard = nullptr;
+    Label* healthLabel = nullptr;
+    ProgressBar* healthBar = nullptr;
+    // Peripheral batteries
+    Flex* peripheralsCard = nullptr;
+    Flex* peripheralsList = nullptr;
+  };
+  Ui m_ui;
 
-  // Battery status
-  Flex* m_statusCard = nullptr;
-  Glyph* m_statusGlyph = nullptr;
-  Label* m_percentLabel = nullptr;
-  Label* m_stateLabel = nullptr;
-  ProgressBar* m_levelBar = nullptr;
-  Flex* m_timeRow = nullptr;
-  Label* m_timeLabel = nullptr;
-  Flex* m_rateRow = nullptr;
-  Label* m_rateLabel = nullptr;
-
-  // Battery charging limits
-  Flex* m_chargingCard = nullptr;
-  Flex* m_chargingList = nullptr;
   struct ChargeLimitRow {
     Flex* row = nullptr;
     Label* nameLabel = nullptr;
@@ -97,22 +111,8 @@ private:
   std::vector<ChargeLimitRow> m_chargeLimitRows;
   std::string m_lastChargeLimitKey;
 
-  // Power profiles
-  Flex* m_profilesCard = nullptr;
-  Segmented* m_profiles = nullptr;
-  Flex* m_inhibitedRow = nullptr;
-  Label* m_inhibitedLabel = nullptr;
   std::vector<std::string> m_profileOrder;
   bool m_syncingProfiles = false;
-
-  // Battery health
-  Flex* m_healthCard = nullptr;
-  Label* m_healthLabel = nullptr;
-  ProgressBar* m_healthBar = nullptr;
-
-  // Peripheral batteries
-  Flex* m_peripheralsCard = nullptr;
-  Flex* m_peripheralsList = nullptr;
 
   struct PeripheralRow {
     std::string path;

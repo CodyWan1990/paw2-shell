@@ -174,20 +174,23 @@ private:
   // Tab instances (long-lived, survive panel open/close cycles)
   std::array<std::unique_ptr<Tab>, kTabCount> m_tabs;
 
-  // Panel UI structure (rebuilt each create(), nulled in onClose())
-  Flex* m_rootLayout = nullptr;
-  Flex* m_sidebar = nullptr;
-  ScrollView* m_sidebarScrollView = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    // Panel UI structure (rebuilt each create(), nulled in onClose())
+    Flex* rootLayout = nullptr;
+    Flex* sidebar = nullptr;
+    ScrollView* sidebarScrollView = nullptr;
+    RovingListNavHost* sidebarNav = nullptr;
+    InputArea* sidebarScrollArea = nullptr;
+    Flex* content = nullptr;
+    InputArea* contentDismissArea = nullptr;
+    Flex* contentHeader = nullptr;
+    Flex* contentHeaderActions = nullptr;
+    Label* contentTitle = nullptr;
+    Flex* tabBodies = nullptr;
+  };
+  Ui m_ui;
   ScrollViewState m_sidebarScrollState{};
-  RovingListNavHost* m_sidebarNav = nullptr;
-  InputArea* m_sidebarScrollArea = nullptr;
-  Flex* m_content = nullptr;
-  InputArea* m_contentDismissArea = nullptr;
-  Flex* m_contentHeader = nullptr;
-  Flex* m_contentHeaderActions = nullptr;
-  Label* m_contentTitle = nullptr;
-  Button* m_closeButton = nullptr;
-  Flex* m_tabBodies = nullptr;
   std::array<Button*, kTabCount> m_tabButtons{};
   std::array<Flex*, kTabCount> m_tabContainers{};
   std::array<Flex*, kTabCount> m_tabHeaderActions{};

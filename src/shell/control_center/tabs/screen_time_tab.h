@@ -59,20 +59,22 @@ private:
   float m_scrollBaseX = 0.0F;
   float m_scrollBaseY = 0.0F;
 
-  Flex* m_root = nullptr;
-  Flex* m_usageCard = nullptr;
-  Flex* m_detailBar = nullptr;
-  Label* m_disabledLabel = nullptr;
-  Label* m_detailTitle = nullptr;
-  Button* m_detailBackButton = nullptr;
-  Segmented* m_rangePicker = nullptr;
-  ScrollView* m_scroll = nullptr;
-  Flex* m_chartPlotRow = nullptr;
-  Flex* m_chartLabelRow = nullptr;
-  Flex* m_mostUsedSection = nullptr;
-  Flex* m_appsGrid = nullptr;
-  Label* m_totalLabel = nullptr;
-  Label* m_emptyLabel = nullptr;
+  // Scene nodes owned by root(); onClose() drops them all at once.
+  struct Ui {
+    Flex* root = nullptr;
+    Flex* usageCard = nullptr;
+    Flex* detailBar = nullptr;
+    Label* disabledLabel = nullptr;
+    Label* detailTitle = nullptr;
+    Segmented* rangePicker = nullptr;
+    ScrollView* scroll = nullptr;
+    Flex* chartPlotRow = nullptr;
+    Flex* chartLabelRow = nullptr;
+    Flex* mostUsedSection = nullptr;
+    Label* totalLabel = nullptr;
+    Label* emptyLabel = nullptr;
+  };
+  Ui m_ui;
 
   static constexpr int kMaxBuckets = 24;
   static constexpr int kMaxAppRows = 12;

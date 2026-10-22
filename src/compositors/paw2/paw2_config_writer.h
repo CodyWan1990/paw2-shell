@@ -59,6 +59,9 @@ namespace compositors::paw2 {
     void set(std::string path, nlohmann::json value);
     // Drop `path` from shell.toml; paw2 then uses its compiled default for it.
     void unset(std::string_view path);
+    // Take `path` - one key, or a whole table such as "scratchpads.terminal" - out of paw2's config,
+    // config.toml's copy too: its top table is claimed, and the path left out of it.
+    void remove(std::string_view path);
     // One key of one monitor's [[monitors]] entry, created if paw2 has none for it yet.
     void setMonitor(std::string_view connector, std::string key, nlohmann::json value);
     // A key under [bindings] in keybinds.toml, e.g. "close_window" or "commands.Super+Return".
@@ -92,6 +95,9 @@ namespace compositors::paw2 {
     void notify() const;
     [[nodiscard]] const nlohmann::json& effectiveConfig() const;
     [[nodiscard]] bool claimed(std::string_view table) const;
+    [[nodiscard]] bool removalPending(std::string_view path) const;
+    [[nodiscard]] std::optional<nlohmann::json>
+    withPendingEdits(const std::string& table, std::optional<nlohmann::json> value) const;
     void claim(std::string_view table);
     [[nodiscard]] nlohmann::json shellDocument() const;
     [[nodiscard]] nlohmann::json monitorsWithEdits() const;
@@ -108,6 +114,7 @@ namespace compositors::paw2 {
     // Edits not yet written, or written but not yet confirmed by paw2.
     std::map<std::string, nlohmann::json> m_pending;
     std::vector<std::string> m_unsetPending;
+    std::vector<std::string> m_removePending;
     bool m_ownsMonitors = false;
     bool m_lastGoodOwnsMonitors = false;
     // connector -> key -> value

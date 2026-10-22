@@ -90,7 +90,7 @@ namespace settings {
       return defaultKeybindSet(action);
     }
 
-    constexpr std::array<SettingsSectionDescriptor, 23> kSettingsSections{{
+    constexpr auto kSettingsSections = std::to_array<SettingsSectionDescriptor>({
         {SettingsSection::Appearance, "appearance", "adjustments-horizontal"},
         {SettingsSection::Wallpaper, "wallpaper", "paint"},
         {SettingsSection::Templates, "templates", "color-swatch"},
@@ -113,7 +113,7 @@ namespace settings {
         {SettingsSection::Paw2Displays, "paw2-displays", "device-desktop"},
         {SettingsSection::Paw2Shortcuts, "paw2-shortcuts", "keyboard"},
         {SettingsSection::Bar, "bar", "crop-3-2", false},
-    }};
+    });
 
     const SettingsSectionDescriptor& descriptorFor(SettingsSection section) {
       const auto it = std::ranges::find(kSettingsSections, section, &SettingsSectionDescriptor::section);
@@ -360,9 +360,21 @@ namespace settings {
     // path (`bar.<name>.<key>`, or `bar.<name>.monitor.<match>.<key>` for an override).
     void moveBarFineTuningToAdvanced(std::vector<SettingEntry>& entries) {
       static constexpr std::array<std::string_view, 15> kBasicBarKeys{
-          "enabled",   "position",           "auto_hide", "auto_hide_delay_ms", "show_on_workspace_switch",
-          "thickness", "background_opacity", "margin_edge", "radius",           "shadow",
-          "capsule",   "start",              "center",      "end",              "smart_auto_hide",
+          "enabled",
+          "position",
+          "auto_hide",
+          "auto_hide_delay_ms",
+          "show_on_workspace_switch",
+          "thickness",
+          "background_opacity",
+          "margin_edge",
+          "radius",
+          "shadow",
+          "capsule",
+          "start",
+          "center",
+          "end",
+          "smart_auto_hide",
       };
       for (auto& entry : entries) {
         if (entry.section != SettingsSection::Bar || entry.path.size() < 3 || entry.path.front() != "bar") {
@@ -376,7 +388,6 @@ namespace settings {
         }
       }
     }
-
 
     // paw2's settings as its pages show them. paw2's config message carries only what its config
     // files set, so anything missing reads as the default paw2 compiles in (its src/config.rs).
@@ -756,6 +767,17 @@ namespace settings {
           "theme.qt_style", TextSetting{.value = paw2.text("theme.qt_style"), .placeholder = "Breeze"},
           "qt style kvantum"
       );
+      // Automatic leaves the key unset: paw2 then uses gtk3 whenever an icon theme or font is set.
+      rows.add(
+          "theme.qt_platform_theme",
+          plainSelect(
+              {{"", "settings.schema.paw2.theme.qt-platform-theme.options.automatic"},
+               {"qt5ct", "settings.schema.paw2.theme.qt-platform-theme.options.qt5ct"},
+               {"qt6ct", "settings.schema.paw2.theme.qt-platform-theme.options.qt6ct"}},
+              paw2.text("theme.qt_platform_theme")
+          ),
+          "qt platform theme qt5ct qt6ct colors QT_QPA_PLATFORMTHEME"
+      );
     }
 
     // What stays on the paw2 page: how windows behave rather than how they look.
@@ -791,6 +813,92 @@ namespace settings {
       rows.setGroup("paw2-input");
       rows.toggle("input.focus_follows_mouse", false, "focus follows mouse pointer hover");
       rows.toggle("input.middle_click_paste", true, "middle click paste primary selection");
+    }
+
+    // paw2's scratchpads: a list of them by name and command, then a group per scratchpad for the
+    // rest of its [scratchpads.<name>] table and the keys that toggle it.
+    void appendPaw2ScratchpadEntries(std::vector<SettingEntry>& entries, const RegistryEnvironment& env) {
+      constexpr auto section = SettingsSection::Paw2;
+      const std::string text = "settings.schema.paw2.scratchpads";
+      const nlohmann::json scratchpads = env.paw2Value("scratchpads").value_or(nlohmann::json::object());
+      const nlohmann::json bindings = env.paw2Value("bindings.scratchpads").value_or(nlohmann::json::object());
+
+      StringMapSetting list{
+          .entries = {},
+          .suggestedKeys = {},
+          .keyPlaceholder = i18n::tr(text + ".list.name-placeholder"),
+          .valuePlaceholder = "kitty --class paw2-terminal",
+      };
+      for (const auto& [name, scratchpad] : scratchpads.items()) {
+        if (const auto command = scratchpad.find("command"); command != scratchpad.end() && command->is_array()) {
+          list.entries.emplace(name, joinCommandLine(command->get<std::vector<std::string>>()));
+        }
+      }
+      entries.push_back(makeEntry(
+          section, "paw2-scratchpads", i18n::tr(text + ".list.label"), i18n::tr(text + ".list.description"),
+          {"paw2", "scratchpads"}, std::move(list), "paw2 compositor scratchpad dropdown quake terminal"
+      ));
+
+      constexpr std::array<std::string_view, 4> kEdges{"top", "bottom", "left", "right"};
+      for (const auto& [name, scratchpad] : scratchpads.items()) {
+        if (!scratchpad.is_object()) {
+          continue;
+        }
+        // The page labels each group with its name (see groupLabel in settings_content.cpp).
+        const std::string group = "paw2-scratchpad:" + name;
+        const auto add = [&](std::string_view key, SettingControl control, std::string tags) {
+          const std::string row = text + "." + i18n::keySegment(key);
+          entries.push_back(makeEntry(
+              section, group, i18n::tr(row + ".label"), i18n::tr(row + ".description"),
+              {"paw2", "scratchpads", name, std::string(key)}, std::move(control),
+              "paw2 compositor scratchpad " + name + " " + tags
+          ));
+        };
+        const auto pair = [&scratchpad](std::string_view key) -> std::optional<std::array<double, 2>> {
+          const auto it = scratchpad.find(key);
+          if (it == scratchpad.end() || !it->is_array() || it->size() != 2) {
+            return std::nullopt;
+          }
+          return std::array<double, 2>{(*it)[0].get<double>(), (*it)[1].get<double>()};
+        };
+        const auto size = pair("size").value_or(std::array<double, 2>{75.0, 60.0});
+        const auto position = pair("position");
+
+        std::vector<std::string> keys;
+        for (const auto& [trigger, target] : bindings.items()) {
+          if (target.is_string() && target.get<std::string>() == name) {
+            keys.push_back(trigger);
+          }
+        }
+        add("keys", ListSetting{.items = std::move(keys), .recordKeys = true}, "shortcut keybind toggle");
+        add("app_id",
+            TextSetting{
+                .value = scratchpad.value("app_id", std::string{}),
+                .placeholder = i18n::tr(text + ".app-id.placeholder"),
+            },
+            "app id class window match");
+        add("edge", paw2Select(text + ".edge.options", kEdges, scratchpad.value("edge", std::string("top"))),
+            "edge side slide");
+        add("width", SliderSetting{size[0], 1, 100, 1, false}, "size width percent");
+        add("height", SliderSetting{size[1], 1, 100, 1, false}, "size height percent");
+        add("position",
+            TextSetting{
+                .value = position.has_value() ? std::format("{}, {}", (*position)[0], (*position)[1]) : std::string{},
+                .placeholder = i18n::tr(text + ".position.placeholder"),
+            },
+            "position place offset");
+        add("margin", SliderSetting{scratchpad.value("margin", 24), 0, 256, 1, true}, "margin gap edge");
+        // paw2 keeps the place a scratchpad was dragged or resized to over the one configured here.
+        entries.push_back(makeEntry(
+            section, group, i18n::tr(text + ".reset.label"), i18n::tr(text + ".reset.description"), {},
+            ButtonSetting{
+                .label = i18n::tr(text + ".reset.button"),
+                .action = [reset = env.paw2ResetScratchpad, name]() { reset(name); },
+                .glyph = "arrow-back-up",
+            },
+            "paw2 compositor scratchpad " + name + " reset place size moved resized"
+        ));
+      }
     }
 
   } // namespace
@@ -867,7 +975,6 @@ namespace settings {
     }
     return entry.searchText.contains(normalizedQuery);
   }
-
 
   bool isBarMonitorOverrideSettingPath(const std::vector<std::string>& path) {
     return path.size() >= 5 && path[0] == "bar" && path[2] == "monitor";
@@ -2228,13 +2335,13 @@ namespace settings {
     }
     entries.push_back(keyedEntry(
         SettingsSection::Security, "lock-screen", "lockscreen.blur-intensity", {"lockscreen", "blur_intensity"},
-        sliderFor(cfg.lockscreen.blurIntensity, paw2shell::config::schema::kUnitRange, false), "lock screen blur", false,
-        lockscreenOn
+        sliderFor(cfg.lockscreen.blurIntensity, paw2shell::config::schema::kUnitRange, false), "lock screen blur",
+        false, lockscreenOn
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Security, "lock-screen", "lockscreen.tint-intensity", {"lockscreen", "tint_intensity"},
-        sliderFor(cfg.lockscreen.tintIntensity, paw2shell::config::schema::kUnitRange, false), "lock screen tint", false,
-        lockscreenOn
+        sliderFor(cfg.lockscreen.tintIntensity, paw2shell::config::schema::kUnitRange, false), "lock screen tint",
+        false, lockscreenOn
     ));
     entries.push_back(keyedEntry(
         SettingsSection::Security, "lock-screen", "lockscreen.monitors", {"lockscreen", "monitors"},
@@ -2820,7 +2927,9 @@ namespace settings {
     entries.push_back(keyedEntry(
         SettingsSection::Calendar, "calendar-reminders", "services.calendar-reminder-lead",
         {"calendar", "reminders", "default_lead_minutes"},
-        sliderFor(cfg.calendar.reminders.defaultLeadMinutes, paw2shell::config::schema::kReminderLeadMinutesRange, true),
+        sliderFor(
+            cfg.calendar.reminders.defaultLeadMinutes, paw2shell::config::schema::kReminderLeadMinutesRange, true
+        ),
         "calendar reminder lead minutes before default", false, remindersOn
     ));
     entries.push_back(keyedEntry(
@@ -3485,6 +3594,10 @@ namespace settings {
         ToggleSetting{cfg.shell.windowSwitcher.currentWorkspaceOnly},
         "window switcher alt tab workspace current only filter"
     ));
+    // Scratchpads last on the page: one group each, so the list can grow without pushing the rest down.
+    if (env.paw2Value) {
+      appendPaw2ScratchpadEntries(entries, env);
+    }
 
     // Keys inside the shell's panels and menus, on the Shortcuts page beside paw2's global ones.
     entries.push_back(keyedEntry(

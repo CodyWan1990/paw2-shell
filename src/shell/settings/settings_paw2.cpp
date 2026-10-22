@@ -203,6 +203,158 @@ namespace settings {
       return true;
     }
 
+    // {"paw2", "scratchpads", "terminal"} is one scratchpad's command, and {"paw2", "scratchpads",
+    // "terminal", "edge"} one of its other rows.
+    [[nodiscard]] bool isScratchpadPath(const std::vector<std::string>& path) {
+      return (path.size() == 3 || path.size() == 4) && path[1] == "scratchpads";
+    }
+
+    constexpr std::array<double, 2> kScratchpadDefaultSize{75.0, 60.0};
+
+    [[nodiscard]] std::array<double, 2> pairAt(const nlohmann::json& table, std::string_view key) {
+      const auto it = table.find(key);
+      if (it == table.end() || !it->is_array() || it->size() != 2 || !(*it)[0].is_number() || !(*it)[1].is_number()) {
+        return kScratchpadDefaultSize;
+      }
+      return {(*it)[0].get<double>(), (*it)[1].get<double>()};
+    }
+
+    // "12.5, 5", "12.5,5" or "12.5 5": percentages of the output.
+    [[nodiscard]] std::optional<std::array<double, 2>> parsePercentPair(const std::string& text) {
+      std::string spaced = text;
+      std::ranges::replace(spaced, ',', ' ');
+      std::istringstream in(spaced);
+      std::array<double, 2> pair{};
+      std::string rest;
+      if (!(in >> pair[0] >> pair[1]) || (in >> rest)) {
+        return std::nullopt;
+      }
+      return pair;
+    }
+
+    // The keys in [bindings.scratchpads] that toggle `name`.
+    [[nodiscard]] std::vector<std::string>
+    keysOfScratchpad(const compositors::paw2::Paw2ConfigWriter& writer, std::string_view name) {
+      std::vector<std::string> keys;
+      const auto table = writer.get("bindings.scratchpads").value_or(nlohmann::json::object());
+      for (const auto& [trigger, target] : table.items()) {
+        if (target.is_string() && target.get<std::string>() == name) {
+          keys.push_back(trigger);
+        }
+      }
+      return keys;
+    }
+
+    void unbindScratchpad(compositors::paw2::Paw2ConfigWriter& writer, std::string_view name) {
+      for (const auto& key : keysOfScratchpad(writer, name)) {
+        writer.setBinding("scratchpads." + key, nullptr);
+      }
+    }
+
+    // paw2 matches a scratchpad's window by app_id, which must be unique. A new one guesses it from
+    // the program's name, which is right for most apps; terminals need a --class to match.
+    [[nodiscard]] std::string newScratchpadAppId(
+        const compositors::paw2::Paw2ConfigWriter& writer, const std::string& name, const std::string& program
+    ) {
+      std::string appId = std::filesystem::path(program).filename().string();
+      const auto scratchpads = writer.get("scratchpads").value_or(nlohmann::json::object());
+      const auto taken = [&scratchpads](const std::string& id) {
+        return std::ranges::any_of(scratchpads.items(), [&id](const auto& item) {
+          return item.value().is_object() && item.value().value("app_id", std::string{}) == id;
+        });
+      };
+      if (appId.empty() || taken(appId)) {
+        appId = "paw2-" + name;
+      }
+      return appId;
+    }
+
+    // One scratchpad's row. The list row is its command, and adding a name there creates it; size
+    // is two rows, width and height, and a blank position means paw2 places it against its edge.
+    [[nodiscard]] bool setScratchpadRow(
+        compositors::paw2::Paw2ConfigWriter& writer, const std::string& name, const std::string& key,
+        nlohmann::json value
+    ) {
+      // Dots would split the name across tables; the prefix is paw2's for its numbered scratchpads.
+      if (StringUtils::trim(name).empty() || name.find('.') != std::string::npos || name.starts_with("__paw2_")) {
+        return false;
+      }
+      const std::string table = "scratchpads." + name;
+      const nlohmann::json current = writer.get(table).value_or(nlohmann::json::object());
+
+      if (key.empty() && value.is_string()) {
+        const auto argv = splitCommandLine(value.get<std::string>());
+        if (argv.empty()) {
+          return false;
+        }
+        if (!current.contains("app_id")) {
+          writer.set(table + ".app_id", newScratchpadAppId(writer, name, argv.front()));
+        }
+        writer.set(table + ".command", argv);
+        return true;
+      }
+      if (key == "keys" && value.is_array()) {
+        unbindScratchpad(writer, name);
+        for (const auto& trigger : value) {
+          if (trigger.is_string() && !trigger.get<std::string>().empty()) {
+            writer.setBinding("scratchpads." + trigger.get<std::string>(), name);
+          }
+        }
+        return true;
+      }
+      if (key == "app_id" && value.is_string()) {
+        if (StringUtils::trim(value.get<std::string>()).empty()) {
+          return false;
+        }
+        writer.set(table + ".app_id", std::move(value));
+        return true;
+      }
+      if (key == "edge" && value.is_string()) {
+        writer.set(table + ".edge", std::move(value));
+        return true;
+      }
+      if (key == "margin" && value.is_number()) {
+        writer.set(table + ".margin", static_cast<std::int64_t>(std::llround(value.get<double>())));
+        return true;
+      }
+      const auto it = current.find("position");
+      const bool positioned = it != current.end() && it->is_array();
+      if ((key == "width" || key == "height") && value.is_number()) {
+        const std::size_t axis = key == "width" ? 0 : 1;
+        auto size = pairAt(current, "size");
+        size[axis] = std::clamp(value.get<double>(), 1.0, 100.0);
+        writer.set(table + ".size", nlohmann::json::array({size[0], size[1]}));
+        // paw2 rejects a scratchpad that runs off the output; move it back on rather than refuse.
+        if (positioned) {
+          auto position = pairAt(current, "position");
+          if (position[axis] + size[axis] > 100.0) {
+            position[axis] = 100.0 - size[axis];
+            writer.set(table + ".position", nlohmann::json::array({position[0], position[1]}));
+          }
+        }
+        return true;
+      }
+      if (key == "position" && value.is_string()) {
+        const std::string text = value.get<std::string>();
+        if (StringUtils::trim(text).empty()) {
+          writer.remove(table + ".position");
+          return true;
+        }
+        const auto position = parsePercentPair(text);
+        const auto size = pairAt(current, "size");
+        if (!position.has_value()
+            || (*position)[0] < 0.0
+            || (*position)[1] < 0.0
+            || (*position)[0] + size[0] > 100.0
+            || (*position)[1] + size[1] > 100.0) {
+          return false;
+        }
+        writer.set(table + ".position", nlohmann::json::array({(*position)[0], (*position)[1]}));
+        return true;
+      }
+      return false;
+    }
+
     [[nodiscard]] std::optional<std::int64_t>
     integerAt(const compositors::paw2::Paw2ConfigWriter& writer, std::string_view path) {
       const auto value = writer.get(path);
@@ -283,6 +435,9 @@ namespace settings {
     if (isMonitorPath(path)) {
       return setMonitorRow(writer, path[2], path[3], std::move(json));
     }
+    if (isScratchpadPath(path)) {
+      return setScratchpadRow(writer, path[2], path.size() == 4 ? path[3] : std::string{}, std::move(json));
+    }
     if (isCommandBindingPath(path) && json.is_string()) {
       const auto argv = splitCommandLine(json.get<std::string>());
       if (argv.empty()) {
@@ -322,6 +477,16 @@ namespace settings {
       unbindShellShortcut(writer, *shortcut);
     } else if (isMonitorPath(path)) {
       writer.setMonitor(path[2], path[3], nullptr);
+    } else if (isScratchpadPath(path) && path.size() == 3) {
+      // Removing a scratchpad from the list removes it, and the keys that toggled it.
+      unbindScratchpad(writer, path[2]);
+      writer.remove("scratchpads." + path[2]);
+    } else if (isScratchpadPath(path)) {
+      if (path[3] == "keys") {
+        unbindScratchpad(writer, path[2]);
+      } else if (path[3] == "position") {
+        writer.remove("scratchpads." + path[2] + ".position");
+      }
     } else if (isBindingPath(path)) {
       writer.setBinding(dottedPaw2Path(path, 2), nullptr);
     } else {
@@ -330,8 +495,9 @@ namespace settings {
   }
 
   bool paw2SettingOverridden(const compositors::paw2::Paw2ConfigWriter& writer, const std::vector<std::string>& path) {
-    // A monitor entry is written whole, so no single key of it has a default to go back to.
-    if (isMonitorPath(path)) {
+    // A monitor entry is written whole, so no single key of it has a default to go back to; nor
+    // has a scratchpad, which the page removes from its list instead.
+    if (isMonitorPath(path) || isScratchpadPath(path)) {
       return false;
     }
     if (const auto* shortcut = shellShortcutAt(path)) {
@@ -503,10 +669,14 @@ namespace settings {
         chord.modifiers |= KeyMod::Shift;
       } else if (chord.sym != 0) {
         return std::nullopt; // two keys, or a modifier after the key
+      } else if (lower == "wheelscrollup") {
+        chord.sym = KeyChordWheelUp;
+      } else if (lower == "wheelscrolldown") {
+        chord.sym = KeyChordWheelDown;
       } else {
         chord.sym = static_cast<std::uint32_t>(xkb_keysym_from_name(part.c_str(), XKB_KEYSYM_CASE_INSENSITIVE));
         if (chord.sym == XKB_KEY_NoSymbol) {
-          return std::nullopt; // MouseLeft, WheelScrollUp, ...
+          return std::nullopt; // MouseLeft, ...
         }
       }
     }
@@ -529,6 +699,12 @@ namespace settings {
     }
     if ((chord.modifiers & KeyMod::Shift) != 0) {
       out += "Shift+";
+    }
+    if (chord.sym == KeyChordWheelUp) {
+      return out + "WheelScrollUp";
+    }
+    if (chord.sym == KeyChordWheelDown) {
+      return out + "WheelScrollDown";
     }
     std::array<char, 64> name{};
     if (xkb_keysym_get_name(static_cast<xkb_keysym_t>(chord.sym), name.data(), name.size()) <= 0) {

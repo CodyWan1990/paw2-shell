@@ -1,6 +1,7 @@
 #include "compositors/paw2/paw2_config_writer.h"
 #include "compositors/paw2/paw2_runtime.h"
 #include "config/config_types.h"
+#include "core/input/key_chord.h"
 #include "i18n/i18n_service.h"
 #include "shell/settings/settings_paw2.h"
 #include "shell/settings/settings_registry.h"
@@ -51,7 +52,13 @@ int main() {
       {"appearance", {{"gaps", 15}, {"focus_ring_width", 1}}},
       {"layout", {{"enabled_layouts", {"scrolling", "dwindle"}}}},
       {"monitors", {{{"connector", "DP-1"}, {"resolution", {2560, 1440}}, {"scale", 1.25}}}},
-      {"bindings", {{"close_window", {"Super+w"}}, {"commands", {{"Super+Return", {"kitty", "--single-instance"}}}}}},
+      {"bindings",
+       {{"close_window", {"Super+w"}},
+        {"commands", {{"Super+Return", {"kitty", "--single-instance"}}}},
+        {"scratchpads", {{"Super+grave", "terminal"}}}}},
+      {"scratchpads",
+       {{"terminal",
+         {{"command", {"kitty", "--class", "paw2-terminal"}}, {"app_id", "paw2-terminal"}, {"size", {50, 40}}}}}},
   };
   settings::RegistryEnvironment env;
   env.paw2Value = [&paw2Config](std::string_view path) -> std::optional<nlohmann::json> {
@@ -98,7 +105,9 @@ int main() {
           entry.group == "paw2-tiling"
               || entry.group == "paw2-overview"
               || entry.group == "paw2-input"
-              || entry.group == "window-switcher",
+              || entry.group == "window-switcher"
+              || entry.group == "paw2-scratchpads"
+              || entry.group.starts_with("paw2-scratchpad:"),
           "behaviour only on the paw2 page: " + entry.group
       );
     }
@@ -176,7 +185,9 @@ int main() {
   ok &= check(findEntry(entries, {"paw2", "bindings", "workspace", "next"}) != nullptr, "workspace shortcuts");
 
   // Recorded keys and paw2's binding strings convert both ways.
-  for (const std::string binding : {"Super+Return", "Super+Shift+h", "Print", "Ctrl+Alt+Delete", "Super+Shift+1"}) {
+  for (const std::string binding :
+       {"Super+Return", "Super+Shift+h", "Print", "Ctrl+Alt+Delete", "Super+Shift+1", "Super+WheelScrollUp",
+        "Super+Ctrl+WheelScrollDown"}) {
     const auto chord = settings::paw2KeyChord(binding);
     ok &= check(chord.has_value() && settings::paw2BindingString(*chord) == binding, "binding round-trip: " + binding);
   }
@@ -184,7 +195,11 @@ int main() {
       settings::paw2BindingString(*settings::paw2KeyChord("logo+control+H")) == "Super+Ctrl+h",
       "aliases and case normalise"
   );
-  ok &= check(!settings::paw2KeyChord("Super+WheelScrollUp").has_value(), "wheel bindings have no chord");
+  ok &= check(
+      keyChordDisplayLabel(*settings::paw2KeyChord("Super+WheelScrollDown")) == "Super + Scroll Down",
+      "wheel bindings read as scrolling"
+  );
+  ok &= check(!settings::paw2KeyChord("Super+MouseLeft").has_value(), "button bindings have no chord");
   ok &= check(!settings::paw2KeyChord("Super").has_value(), "a modifier alone is no binding");
   const auto* closeWindow = findEntry(entries, {"paw2", "bindings", "close_window"});
   ok &= check(
@@ -195,6 +210,26 @@ int main() {
   ok &= check(
       commandRow != nullptr && std::get<settings::StringMapSetting>(commandRow->control).recordKeys,
       "command keys are recorded too"
+  );
+
+  const auto* scratchpadList = findEntry(entries, {"paw2", "scratchpads"});
+  ok &= check(
+      scratchpadList != nullptr
+          && std::get<settings::StringMapSetting>(scratchpadList->control).entries.at("terminal")
+              == "kitty --class paw2-terminal",
+      "scratchpads listed with their commands"
+  );
+  const auto* scratchpadKeys = findEntry(entries, {"paw2", "scratchpads", "terminal", "keys"});
+  ok &= check(
+      scratchpadKeys != nullptr
+          && scratchpadKeys->group == "paw2-scratchpad:terminal"
+          && std::get<settings::ListSetting>(scratchpadKeys->control).items == std::vector<std::string>{"Super+grave"},
+      "a group per scratchpad, with its keys"
+  );
+  const auto* scratchpadWidth = findEntry(entries, {"paw2", "scratchpads", "terminal", "width"});
+  ok &= check(
+      scratchpadWidth != nullptr && std::get<settings::SliderSetting>(scratchpadWidth->control).value == 50.0,
+      "scratchpad size split into width and height"
   );
 
   const auto argv = settings::splitCommandLine(R"(sh -c "echo \"hi\"" 'a b' x\ y)");
@@ -226,6 +261,41 @@ int main() {
     ok &= check(writer.get("appearance.focus_ring_width") == nlohmann::json(2), "narrower gaps narrow the ring");
     (void)settings::applyPaw2Setting(writer, {"paw2", "theme", "font"}, std::string{});
     ok &= check(!writer.get("theme.font").has_value(), "blank text is not written");
+
+    // Scratchpads: adding one by name and command guesses its app_id; keys go to [bindings.scratchpads].
+    ok &= check(
+        settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "music"}, std::string("/usr/bin/spotify --x")),
+        "scratchpad added"
+    );
+    ok &= check(writer.get("scratchpads.music.app_id") == nlohmann::json("spotify"), "app_id from the program");
+    ok &=
+        check(writer.get("scratchpads.music.command") == nlohmann::json::array({"/usr/bin/spotify", "--x"}), "command");
+    ok &= check(
+        !settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "a.b"}, std::string("foot")), "dotted name refused"
+    );
+    (void)settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "music", "width"}, 90.0);
+    ok &= check(
+        !settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "music", "position"}, std::string("20, 5")),
+        "a position that runs off the screen is refused"
+    );
+    ok &= check(
+        settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "music", "position"}, std::string("5, 5")),
+        "position accepted"
+    );
+    (void)settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "music", "width"}, 100.0);
+    ok &= check(
+        writer.get("scratchpads.music.position") == nlohmann::json::array({0.0, 5.0}), "wider moves the position back"
+    );
+    (void)settings::applyPaw2Setting(writer, {"paw2", "scratchpads", "music", "margin"}, 12.0);
+    ok &= check(writer.get("scratchpads.music.margin")->is_number_integer(), "margin written as an integer");
+    (void)settings::applyPaw2Setting(
+        writer, {"paw2", "scratchpads", "music", "keys"}, std::vector<std::string>{"Super+m"}
+    );
+    ok &= check(writer.get("bindings.scratchpads.Super+m") == nlohmann::json("music"), "scratchpad keys bound");
+    settings::resetPaw2Setting(writer, {"paw2", "scratchpads", "music"});
+    ok &= check(!writer.get("scratchpads.music").has_value(), "scratchpad removed");
+    ok &= check(!writer.get("bindings.scratchpads.Super+m").has_value(), "with its keys");
+
     (void)settings::applyPaw2Setting(writer, {"paw2", "monitors", "DP-1", "scale"}, 1.5);
     ok &= check(writer.get("monitors")->at(0).at("scale") == 1.5, "monitor rows go to [[monitors]]");
     ok &= check(
@@ -287,7 +357,8 @@ int main() {
     );
     const nlohmann::json themeNextArgv = nlohmann::json::array({"paw2-shell", "msg", "theme-next"});
     ok &= check(
-        writer.get("bindings.commands.Super+t") == themeNextArgv && writer.get("bindings.commands.Super+F5") == themeNextArgv,
+        writer.get("bindings.commands.Super+t") == themeNextArgv
+            && writer.get("bindings.commands.Super+F5") == themeNextArgv,
         "each key runs the shell command"
     );
     (void)settings::applyPaw2Setting(writer, nextTheme, std::vector<std::string>{"Super+n"});
@@ -296,7 +367,8 @@ int main() {
         writer.get("bindings.commands.Super+e") == nlohmann::json::array({"dolphin", "--new-window"}),
         "other commands are left alone"
     );
-    const auto shortcut = std::ranges::find(settings::shellShortcuts(), std::string_view("theme-next"), &settings::ShellShortcut::name);
+    const auto shortcut =
+        std::ranges::find(settings::shellShortcuts(), std::string_view("theme-next"), &settings::ShellShortcut::name);
     ok &= check(
         settings::shellShortcutKeys(*writer.get("bindings.commands"), *shortcut) == std::vector<std::string>{"Super+n"},
         "keys read back from the commands table"

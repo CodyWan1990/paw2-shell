@@ -139,9 +139,14 @@ std::string keyChordDisplayLabel(const KeyChord& chord) {
   }
 
   std::string keyName;
+  if (chord.sym == KeyChordWheelUp) {
+    keyName = "Scroll Up";
+  } else if (chord.sym == KeyChordWheelDown) {
+    keyName = "Scroll Down";
+  }
 
   // Prefer the printable glyph over the raw XKB name (e.g. "udiaeresis" -> "Ü").
-  const std::uint32_t cp = xkb_keysym_to_utf32(static_cast<xkb_keysym_t>(chord.sym));
+  const std::uint32_t cp = keyName.empty() ? xkb_keysym_to_utf32(static_cast<xkb_keysym_t>(chord.sym)) : 0;
   if (cp > 0x20 && cp != 0x7F) {
     std::array<char, 8> utf8Buf{};
     const int n = xkb_keysym_to_utf8(static_cast<xkb_keysym_t>(chord.sym), utf8Buf.data(), utf8Buf.size());
@@ -152,7 +157,6 @@ std::string keyChordDisplayLabel(const KeyChord& chord) {
       }
     }
   }
-
   if (keyName.empty()) {
     keyName = keysymName(chord.sym);
     if (keyName.empty()) {

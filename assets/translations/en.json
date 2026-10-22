@@ -904,6 +904,7 @@
       "keybind-invalid-printable": "Printable keys (letters, numbers, symbols) require a modifier such as Ctrl or Alt.",
       "keybind-invalid-super": "The Super/Windows key cannot be used in shell keybinds.",
       "keybind-invalid-title": "Keybind not allowed",
+      "keybind-invalid-wheel": "Hold a modifier, such as Super, while you scroll.",
       "launcher-usage-reset": "Launcher",
       "launcher-usage-reset-success": "Usage data cleared.",
       "lockscreen-widgets-editor": "Lockscreen widget editor",
@@ -1317,6 +1318,8 @@
         "paw2-keys-workspaces": "Workspaces",
         "paw2-input": "Input",
         "paw2-overview": "Overview",
+        "paw2-scratchpad": "Scratchpad: {name}",
+        "paw2-scratchpads": "Scratchpads",
         "paw2-status": "paw2",
         "paw2-tiling": "Tiling",
       "panel-keys": "Panels & Menus",
@@ -1929,6 +1932,54 @@
             }
           }
         },
+        "scratchpads": {
+          "list": {
+            "label": "Scratchpads",
+            "description": "Apps that slide in from an edge of the screen and hide again, each started by its command. Add one by name, then set its keys below.",
+            "name-placeholder": "terminal"
+          },
+          "keys": {
+            "label": "Keys",
+            "description": "Show or hide this scratchpad."
+          },
+          "app-id": {
+            "label": "App ID",
+            "description": "The window paw2 treats as this scratchpad. It must match the app's ID, and no two scratchpads can share one. Terminals usually need one set in the command, such as kitty --class.",
+            "placeholder": "paw2-terminal"
+          },
+          "edge": {
+            "label": "Edge",
+            "description": "The side of the screen it slides in from.",
+            "options": {
+              "top": "Top",
+              "bottom": "Bottom",
+              "left": "Left",
+              "right": "Right"
+            }
+          },
+          "width": {
+            "label": "Width",
+            "description": "Percent of the screen's width."
+          },
+          "height": {
+            "label": "Height",
+            "description": "Percent of the screen's height."
+          },
+          "position": {
+            "label": "Position",
+            "description": "Where its top-left corner sits, as percents of the screen. Leave blank to center it against its edge.",
+            "placeholder": "12.5, 5"
+          },
+          "margin": {
+            "label": "Margin",
+            "description": "Space between the scratchpad and its edge, in pixels."
+          },
+          "reset": {
+            "label": "Placement",
+            "description": "Once you move or resize a scratchpad, paw2 keeps it there instead of using the size and position above.",
+            "button": "Reset"
+          }
+        },
         "input": {
           "focus-follows-mouse": {
             "label": "Focus follows mouse",
@@ -1956,6 +2007,15 @@
           "gtk-theme": {
             "label": "GTK theme",
             "description": "Applies right away."
+          },
+          "qt-platform-theme": {
+            "label": "Qt platform theme",
+            "description": "Pick qt5ct or qt6ct to use their settings and the Qt template's colors. Automatic uses GTK's settings when an icon theme or font is set. Applies after the next login.",
+            "options": {
+              "automatic": "Automatic",
+              "qt5ct": "qt5ct",
+              "qt6ct": "qt6ct"
+            }
           },
           "qt-style": {
             "label": "Qt style",

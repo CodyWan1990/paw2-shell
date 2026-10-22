@@ -125,6 +125,8 @@ namespace compositors::paw2 {
     bool setLayout(std::string_view layout, std::string_view output = {});
     bool toggleScratchpad(std::string_view name);
     bool toggleScratchpadOverview();
+    // Forget where a scratchpad was moved or resized, so it takes its configured place again.
+    bool resetScratchpad(std::string_view name);
     bool toggleOverview();
     // Refused by paw2 for untrusted peers; callers fall back to logind.
     bool quit();

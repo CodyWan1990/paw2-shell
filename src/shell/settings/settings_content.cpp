@@ -153,6 +153,12 @@ namespace settings {
       if (constexpr std::string_view kOutputGroup = "paw2-output:"; group.starts_with(kOutputGroup)) {
         return std::string(group.substr(kOutputGroup.size()));
       }
+      // The paw2 page has a group per scratchpad, named after it.
+      if (constexpr std::string_view kScratchpadGroup = "paw2-scratchpad:"; group.starts_with(kScratchpadGroup)) {
+        return i18n::tr(
+            "settings.navigation.groups.paw2-scratchpad", "name", std::string(group.substr(kScratchpadGroup.size()))
+        );
+      }
       return i18n::tr("settings.navigation.groups." + std::string(group));
     };
 
@@ -204,7 +210,6 @@ namespace settings {
     };
 
     SettingsControlFactory factory(ctx);
-
 
     const auto makeMultiSelectBlock = [&](Flex& section, const SettingEntry& entry, const MultiSelectSetting& setting) {
       const bool overridden = (ctx.configService != nullptr && ctx.configService->hasEffectiveOverride(entry.path));

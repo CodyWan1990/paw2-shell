@@ -6,11 +6,20 @@
 #include <string_view>
 
 struct KeyChord {
-  std::uint32_t sym = 0;       // XKB keysym
+  std::uint32_t sym = 0;       // XKB keysym, or one of the wheel values below
   std::uint32_t modifiers = 0; // KeyMod bitmask
 
   bool operator==(const KeyChord&) const = default;
 };
+
+// Scroll-wheel triggers, for paw2 shortcuts, which bind the wheel as well as keys. XKB keysyms
+// stop at 0x1FFFFFFF, so no key can collide with these.
+inline constexpr std::uint32_t KeyChordWheelUp = 0xF0000001;
+inline constexpr std::uint32_t KeyChordWheelDown = 0xF0000002;
+
+[[nodiscard]] constexpr bool isWheelChord(const KeyChord& chord) noexcept {
+  return chord.sym == KeyChordWheelUp || chord.sym == KeyChordWheelDown;
+}
 
 // Throws std::runtime_error if spec contains a Super-family modifier.
 // Bare printable keys (e.g. "1", "a") are accepted — UI-level policy is

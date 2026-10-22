@@ -41,7 +41,8 @@ namespace compositors::paw2 {
     }
 
     void flatten(const std::string& prefix, const nlohmann::json& value, std::map<std::string, nlohmann::json>& out) {
-      if (value.is_object()) {
+      // An empty table is kept as one: [scratchpads] with every scratchpad removed still owns the table.
+      if (value.is_object() && (!value.empty() || prefix.empty())) {
         for (const auto& [key, child] : value.items()) {
           flatten(prefix.empty() ? key : prefix + "." + key, child, out);
         }
@@ -141,7 +142,6 @@ namespace compositors::paw2 {
       }
     }
 
-
   } // namespace
 
   std::vector<std::string> splitPath(std::string_view path) {
@@ -203,7 +203,7 @@ namespace compositors::paw2 {
     if (const auto it = m_pending.find(key); it != m_pending.end()) {
       return it->second;
     }
-    if (std::ranges::contains(m_unsetPending, key)) {
+    if (std::ranges::contains(m_unsetPending, key) || removalPending(key)) {
       return std::nullopt;
     }
     if (key == "monitors") {
@@ -219,10 +219,43 @@ namespace compositors::paw2 {
       }
       return std::nullopt;
     }
-    if (const auto* value = findPath(effectiveConfig(), splitPath(path))) {
-      return *value;
+    std::optional<nlohmann::json> value;
+    if (const auto* found = findPath(effectiveConfig(), splitPath(path))) {
+      value = *found;
     }
-    return std::nullopt;
+    return withPendingEdits(key, std::move(value));
+  }
+
+  bool Paw2ConfigWriter::removalPending(std::string_view path) const {
+    return std::ranges::any_of(m_removePending, [path](const std::string& removed) {
+      return path == removed || (path.starts_with(removed) && path[removed.size()] == '.');
+    });
+  }
+
+  // A table read with the edits under it that paw2 has not confirmed yet, so a page lists what it
+  // has just added or removed.
+  std::optional<nlohmann::json>
+  Paw2ConfigWriter::withPendingEdits(const std::string& table, std::optional<nlohmann::json> value) const {
+    const std::string prefix = table + ".";
+    for (const auto& [path, edit] : m_pending) {
+      if (!path.starts_with(prefix)) {
+        continue;
+      }
+      if (!value.has_value() || !value->is_object()) {
+        value = nlohmann::json::object();
+      }
+      assignPath(*value, splitPath(std::string_view(path).substr(prefix.size())), edit);
+    }
+    for (const auto& path : m_removePending) {
+      if (!path.starts_with(prefix) || !value.has_value()) {
+        continue;
+      }
+      const auto parts = splitPath(std::string_view(path).substr(prefix.size()));
+      if (findPath(*value, parts) != nullptr) {
+        assignPath(*value, parts, nullptr);
+      }
+    }
+    return value;
   }
 
   bool Paw2ConfigWriter::owns(std::string_view path) const { return m_owned.contains(std::string(path)); }
@@ -237,6 +270,9 @@ namespace compositors::paw2 {
       return;
     }
     std::erase(m_unsetPending, path);
+    std::erase_if(m_removePending, [&path](const std::string& removed) {
+      return path == removed || path.starts_with(removed + ".");
+    });
     m_pending.insert_or_assign(std::move(path), std::move(value));
     markDirty(m_shellDirty);
   }
@@ -250,6 +286,18 @@ namespace compositors::paw2 {
     if (!std::ranges::contains(m_unsetPending, key)) {
       m_unsetPending.push_back(key);
     }
+    markDirty(m_shellDirty);
+  }
+
+  void Paw2ConfigWriter::remove(std::string_view path) {
+    const std::string key(path);
+    if (key.empty() || topTable(key) == "bindings" || topTable(key) == "monitors" || !get(key).has_value()) {
+      return;
+    }
+    std::erase_if(m_pending, [&key](const auto& edit) {
+      return edit.first == key || edit.first.starts_with(key + ".");
+    });
+    m_removePending.push_back(key);
     markDirty(m_shellDirty);
   }
 
@@ -291,7 +339,9 @@ namespace compositors::paw2 {
 
   bool Paw2ConfigWriter::claimed(std::string_view table) const {
     const std::string prefix = std::string(table) + ".";
-    return std::ranges::any_of(m_owned, [&prefix](const auto& entry) { return entry.first.starts_with(prefix); });
+    return std::ranges::any_of(m_owned, [&prefix, table](const auto& entry) {
+      return entry.first == table || entry.first.starts_with(prefix);
+    });
   }
 
   void Paw2ConfigWriter::claim(std::string_view table) {
@@ -375,8 +425,10 @@ namespace compositors::paw2 {
     }
     std::stringstream out;
     // Relaxed precision: 0.95, not 0.94999999999999996 - this file is meant to be readable.
-    out << kHeader
-        << toml::toml_formatter{table, toml::toml_formatter::default_flags | toml::format_flags::relaxed_float_precision}
+    out
+        << kHeader
+        << toml::
+               toml_formatter{table, toml::toml_formatter::default_flags | toml::format_flags::relaxed_float_precision}
         << "\n";
     return out.str();
   }
@@ -408,9 +460,32 @@ namespace compositors::paw2 {
       m_waitingForConfig = true;
       return;
     }
+    // keybinds.toml first: paw2 may read the two between writes, and a scratchpad removed with its
+    // keys must lose the keys first, or paw2 sees keys naming a scratchpad that is gone.
+    if (m_keybindsDirty) {
+      if (!m_keybindsLastGood.has_value()) {
+        m_keybindsLastGood = FileUtils::readTextFile(keybindsDropIn()).value_or(std::string{});
+      }
+      (void)writeFile(keybindsDropIn(), nlohmann::json{{"bindings", bindingsWithEdits()}});
+    }
     if (m_shellDirty) {
+      for (const auto& path : m_removePending) {
+        const std::string table = topTable(path);
+        claim(table);
+        std::erase_if(m_owned, [&path](const auto& entry) {
+          return entry.first == path || entry.first.starts_with(path + ".");
+        });
+        if (!claimed(table)) {
+          m_owned.insert_or_assign(table, nlohmann::json::object());
+        }
+      }
       for (const auto& [path, value] : m_pending) {
-        claim(topTable(path));
+        const std::string table = topTable(path);
+        claim(table);
+        // A key going into a table kept as an empty one replaces the placeholder.
+        if (path != table) {
+          m_owned.erase(table);
+        }
         m_owned.insert_or_assign(path, value);
       }
       for (const auto& path : m_unsetPending) {
@@ -421,12 +496,6 @@ namespace compositors::paw2 {
       }
       // Monitors are rendered with the edits still applied; they stay pending until paw2 answers.
       (void)writeFile(shellDropIn(), shellDocument());
-    }
-    if (m_keybindsDirty) {
-      if (!m_keybindsLastGood.has_value()) {
-        m_keybindsLastGood = FileUtils::readTextFile(keybindsDropIn()).value_or(std::string{});
-      }
-      (void)writeFile(keybindsDropIn(), nlohmann::json{{"bindings", bindingsWithEdits()}});
     }
     m_shellDirty = false;
     m_keybindsDirty = false;
@@ -472,6 +541,7 @@ namespace compositors::paw2 {
     if (!newerEdits) {
       m_pending.clear();
       m_unsetPending.clear();
+      m_removePending.clear();
       m_pendingMonitors.clear();
       m_pendingBindings.clear();
       m_shellDirty = false;

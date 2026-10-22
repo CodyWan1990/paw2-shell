@@ -93,6 +93,14 @@ KeybindRecorder::KeybindRecorder() {
     }
     handleKeyUp(data.sym, data.modifiers);
   });
+  // paw2 shortcuts can be on the wheel: hold the modifiers, then scroll over the recorder.
+  area->setOnAxisHandler([this](const InputArea::PointerData& data) {
+    if (!m_recording || !m_allowSuper || data.axis != WL_POINTER_AXIS_VERTICAL_SCROLL || data.axisValue == 0.0) {
+      return false;
+    }
+    handleWheel(data.axisValue < 0.0 ? KeyChordWheelUp : KeyChordWheelDown);
+    return true;
+  });
   m_inputArea = static_cast<InputArea*>(addChild(std::move(area)));
   m_inputArea->setCursorShape(WP_CURSOR_SHAPE_DEVICE_V1_SHAPE_POINTER);
   m_inputArea->setRetainsFocusOnPointerRelease(true);
@@ -250,6 +258,24 @@ void KeybindRecorder::handleKeyDown(std::uint32_t sym, std::uint32_t shortcutSym
   // paw2 matches the unshifted key, so a shortcut recorded as "!" would never fire.
   const std::uint32_t chordSym = (m_allowSuper && shortcutSym != 0) ? shortcutSym : sym;
   KeyChord chord{.sym = chordSym, .modifiers = cleanModifiers};
+  m_chord = chord;
+  if (m_onCommit) {
+    m_onCommit(chord);
+  }
+  exitRecording(true);
+}
+
+void KeybindRecorder::handleWheel(std::uint32_t wheelSym) {
+  // A bare wheel binding would take scrolling away from every window.
+  if (m_pendingModifiers == 0) {
+    notify::error(
+        i18n::tr("notifications.internal.keybind-app"), i18n::tr("notifications.internal.keybind-invalid-title"),
+        i18n::tr("notifications.internal.keybind-invalid-wheel")
+    );
+    exitRecording(false);
+    return;
+  }
+  KeyChord chord{.sym = wheelSym, .modifiers = m_pendingModifiers};
   m_chord = chord;
   if (m_onCommit) {
     m_onCommit(chord);

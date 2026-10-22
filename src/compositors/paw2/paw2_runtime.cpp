@@ -205,6 +205,10 @@ namespace compositors::paw2 {
     return send({{"cmd", "toggle-scratchpad"}, {"name", name}});
   }
 
+  bool Paw2Runtime::resetScratchpad(std::string_view name) {
+    return send({{"cmd", "reset-scratchpad"}, {"name", name}});
+  }
+
   bool Paw2Runtime::toggleScratchpadOverview() { return send({{"cmd", "toggle-scratchpad-overview"}}); }
 
   bool Paw2Runtime::toggleOverview() { return send({{"cmd", "toggle-overview"}}); }

@@ -56,6 +56,7 @@ private:
   void doArrange(Renderer& renderer, const LayoutRect& rect) override;
   void handleKeyDown(std::uint32_t sym, std::uint32_t shortcutSym, std::uint32_t modifiers);
   void handleKeyUp(std::uint32_t sym, std::uint32_t modifiers);
+  void handleWheel(std::uint32_t wheelSym);
   void enterRecording();
   void exitRecording(bool commit);
   void setRecording(bool recording);

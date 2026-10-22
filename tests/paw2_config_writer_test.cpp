@@ -96,6 +96,7 @@ int main() {
       {"appearance", {{"gaps", 15}, {"blur", true}, {"opacity", 0.95}, {"focus_ring_color", "#0b3d91"}}},
       {"animations", {{"enabled", true}, {"duration_ms", 150}}},
       {"monitors", nlohmann::json::array({{{"connector", "DP-1"}, {"scale", 1.0}, {"stray", 7}}})},
+      {"scratchpads", {{"term", {{"command", {"foot"}}, {"app_id", "term"}}}}},
       {"bindings",
        {{"close_window", {"Super+q"}},
         {"commands", {{"Super+Return", {"kitty"}}}},
@@ -149,21 +150,24 @@ int main() {
   ok &= check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 999, "bad value written");
   paw2.sendConfig(config, false, {"appearance.gaps must be at most 256"});
   pump(runtime);
-  ok &= check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 20, "rejected write rolled back");
+  ok &=
+      check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 20, "rejected write rolled back");
   ok &= check(writer.rejectedErrors().size() == 1, "paw2's error kept for Settings");
   ok &= check(writer.get("appearance.gaps") == nlohmann::json(20), "pending edit dropped after rejection");
 
   // A config message we did not cause (a hand edit) is not ours to roll back.
   paw2.sendConfig(config, false, {"config.toml: broken"});
   pump(runtime);
-  ok &= check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 20, "no rollback without a write");
+  ok &=
+      check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 20, "no rollback without a write");
 
   // Monitors: the drop-in carries every monitor, only paw2's keys, edits applied.
   writer.setMonitor("DP-2", "scale", 1.5);
   writer.flush();
   shell = readToml(configDir / "config.d" / "shell.toml");
   ok &= check(shell["monitors"].size() == 2, "all monitors carried");
-  ok &= check(shell["monitors"][0]["connector"] == "DP-1" && !shell["monitors"][0].contains("stray"), "known keys only");
+  ok &=
+      check(shell["monitors"][0]["connector"] == "DP-1" && !shell["monitors"][0].contains("stray"), "known keys only");
   ok &= check(shell["monitors"][1]["connector"] == "DP-2" && shell["monitors"][1]["scale"] == 1.5, "new monitor");
   paw2.sendConfig(config);
   pump(runtime);
@@ -184,6 +188,25 @@ int main() {
   writer.unset("appearance.blur");
   writer.flush();
   ok &= check(!readToml(configDir / "config.d" / "shell.toml")["appearance"].contains("blur"), "unset removes key");
+
+  // Removing config.toml's only scratchpad leaves an empty [scratchpads], which still owns the table.
+  paw2.sendConfig(config);
+  pump(runtime);
+  writer.remove("scratchpads.term");
+  ok &= check(!writer.get("scratchpads.term").has_value(), "removal visible before paw2 answers");
+  writer.flush();
+  shell = readToml(configDir / "config.d" / "shell.toml");
+  ok &= check(shell.contains("scratchpads") && shell["scratchpads"].empty(), "empty table written");
+  paw2.sendConfig(config);
+  pump(runtime);
+  writer.set("scratchpads.music.command", nlohmann::json::array({"spotify"}));
+  writer.set("scratchpads.music.app_id", "spotify");
+  ok &= check(writer.get("scratchpads")->contains("music"), "a new table is listed before paw2 answers");
+  writer.flush();
+  shell = readToml(configDir / "config.d" / "shell.toml");
+  ok &= check(shell["scratchpads"].size() == 1 && shell["scratchpads"]["music"]["app_id"] == "spotify", "re-added");
+  paw2.sendConfig(config);
+  pump(runtime);
 
   // A fresh writer picks up what earlier sessions wrote.
   {

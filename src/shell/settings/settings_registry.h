@@ -322,10 +322,11 @@ namespace settings {
     // with edits paw2 has not answered yet on top. Empty while paw2 is not sharing its config
     // with this shell (not running, or this binary is not installed where paw2 trusts it).
     std::function<std::optional<nlohmann::json>(std::string_view)> paw2Value;
-    std::string paw2ConfigDir; // holds config.toml and config.d/
-    std::vector<compositors::paw2::Paw2Output> paw2Outputs; // connected monitors, for the Displays page
-    bool paw2OwnsShortcuts = false;                         // config.d/keybinds.toml exists
-    std::function<void()> paw2ReleaseShortcuts;             // deletes it
+    std::string paw2ConfigDir;                                   // holds config.toml and config.d/
+    std::vector<compositors::paw2::Paw2Output> paw2Outputs;      // connected monitors, for the Displays page
+    bool paw2OwnsShortcuts = false;                              // config.d/keybinds.toml exists
+    std::function<void()> paw2ReleaseShortcuts;                  // deletes it
+    std::function<void(const std::string&)> paw2ResetScratchpad; // forgets where it was moved
   };
 
   [[nodiscard]] const BarConfig* findBar(const Config& cfg, std::string_view name);

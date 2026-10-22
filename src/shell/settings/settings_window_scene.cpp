@@ -771,6 +771,9 @@ settings::RegistryEnvironment SettingsWindow::buildRegistryEnvironment() const {
       env.paw2Outputs = runtime.snapshot().outputs;
       env.paw2OwnsShortcuts = writer.ownsBindings();
       env.paw2ReleaseShortcuts = [platform = m_platform]() { platform->paw2ConfigWriter().releaseBindings(); };
+      env.paw2ResetScratchpad = [platform = m_platform](const std::string& name) {
+        (void)platform->paw2Runtime().resetScratchpad(name);
+      };
     }
   }
   if (m_config != nullptr) {
@@ -1367,9 +1370,7 @@ std::unique_ptr<Flex> SettingsWindow::buildBody(
   };
   const auto openDockMonitorOverrideCreate = [this]() { openMonitorOverrideCreateDialog(std::nullopt); };
   const auto clearTransientSettingsState = [this]() { this->clearTransientSettingsState(); };
-  const auto clearSearchQuery = [this]() {
-    m_searchQuery.clear();
-  };
+  const auto clearSearchQuery = [this]() { m_searchQuery.clear(); };
 
   auto body = ui::row({
       .align = FlexAlign::Stretch,

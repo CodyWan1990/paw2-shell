@@ -65,7 +65,7 @@ The presets in `assets/palettes/` are built from each project's published colour
 
 - **[Tokyo Night](https://github.com/folke/tokyonight.nvim)** by folke — Storm, Moon and Day (Apache-2.0)
 - **[Catppuccin](https://github.com/catppuccin/catppuccin)** — Macchiato, Frappé and Latte (MIT)
-- **[Rosé Pine](https://github.com/rose-pine/rose-pine-theme)** — main, Moon and Dawn (MIT)
+- **[Rosé Pine](https://github.com/rose-pine/rose-pine-theme)** — Moon and Dawn (MIT)
 - **[Gruvbox Material](https://github.com/sainnhe/gruvbox-material)** by sainnhe (MIT)
 - **[Everforest](https://github.com/sainnhe/everforest)** by sainnhe (MIT)
 - **[Kanagawa](https://github.com/rebelot/kanagawa.nvim)** by rebelot — Dragon and Lotus (MIT)

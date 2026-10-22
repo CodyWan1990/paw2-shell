@@ -80,10 +80,10 @@ For theme mode and palette commands, see
 
 Names the preset to load when `source = "builtin"`. Unknown names fall back to `Tokyo-Night`.
 
-Compiled presets: `Ayu`, `Catppuccin`, `Dracula`, `Eldritch`, `Gruvbox`, `Kanagawa`, `Nord`, `Tokyo-Night`.
+Compiled presets: `Ayu`, `Catppuccin`, `Dracula`, `Eldritch`, `Gruvbox`, `Kanagawa`, `Nord`, `Rosé Pine`, `Tokyo-Night`.
 
 Shipped presets (`assets/palettes/*.json`): `Catppuccin Frappe`, `Catppuccin Macchiato`, `Everforest`, `Flexoki`, `GitHub`,
-`Gruvbox Material`, `Kanagawa Dragon`, `One`, `Oxocarbon`, `Rose Pine`, `Rose Pine Moon`, `Solarized`, `Tokyo Night Moon`,
+`Gruvbox Material`, `Kanagawa Dragon`, `One`, `Oxocarbon`, `Rose Pine Moon`, `Solarized`, `Tokyo Night Moon`,
 `Tokyo Night Storm`, `Tomorrow`. A new preset is a palette JSON file in that folder, in the same format as
 [custom palettes](palette.md).
 

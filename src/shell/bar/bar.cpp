@@ -22,6 +22,7 @@
 #include "shell/panel/panel_manager.h"
 #include "shell/surface/shadow.h"
 #include "shell/tooltip/tooltip_manager.h"
+#include "time/time_format.h"
 #include "ui/builders.h"
 #include "ui/palette.h"
 #include "ui/style.h"
@@ -35,6 +36,7 @@
 #include <optional>
 #include <ranges>
 #include <unordered_set>
+#include <utility>
 #include <wayland-client-core.h>
 #include <wayland-client-protocol.h>
 
@@ -1532,10 +1534,29 @@ BarServices Bar::services() const {
 }
 
 void Bar::onSecondTick() {
+  // Once a minute every widget updates, as a catch-all for state nothing announces; in between,
+  // only the widgets that change every second do.
+  const bool minuteBoundary = formatLocalTime("{:%S}") == "00";
   for (auto& inst : m_instances) {
-    if (inst->surface != nullptr) {
-      inst->surface->requestUpdate();
+    if (inst->surface == nullptr) {
+      continue;
     }
+    if (minuteBoundary) {
+      inst->secondTickOnly = false;
+      inst->surface->requestUpdate();
+      continue;
+    }
+    const auto wantsTicks = [](const auto& widgets) {
+      return std::ranges::any_of(widgets, [](const auto& widget) { return widget->wantsSecondTicks(); });
+    };
+    if (!wantsTicks(inst->startWidgets) && !wantsTicks(inst->centerWidgets) && !wantsTicks(inst->endWidgets)) {
+      continue;
+    }
+    // An update already pending for another reason stays a full one.
+    if (!inst->surface->updateRequested()) {
+      inst->secondTickOnly = true;
+    }
+    inst->surface->requestUpdate();
   }
 }
 
@@ -1808,6 +1829,7 @@ void Bar::applyPendingWorkspaceReveal() {
 void Bar::refresh() {
   for (auto& inst : m_instances) {
     if (inst->surface != nullptr) {
+      inst->secondTickOnly = false;
       inst->surface->requestUpdate();
       if (inst->animations.hasActive() || instanceNeedsFrameTick(*inst)) {
         inst->surface->requestRedraw();
@@ -2656,8 +2678,9 @@ void Bar::attachWidgetsToSections(BarInstance& instance) {
 
     for (auto& widget : widgets) {
       widget->setAnimationManager(&instance.animations);
-      widget->setUpdateCallback([surface = instance.surface.get()]() {
+      widget->setUpdateCallback([&instance, surface = instance.surface.get()]() {
         if (surface != nullptr) {
+          instance.secondTickOnly = false;
           surface->requestUpdate();
         }
       });
@@ -3511,20 +3534,33 @@ void Bar::updateWidgets(BarInstance& instance) {
   const float barAreaW = barVisual.width;
   const float barAreaH = barVisual.height;
 
+  const bool secondTickOnly = std::exchange(instance.secondTickOnly, false);
+  bool sizeChanged = false;
   auto updateSection = [&](std::vector<std::unique_ptr<Widget>>& widgets) {
     for (auto& widget : widgets) {
-      if (widget->root() == nullptr) {
+      if (widget->root() == nullptr || (secondTickOnly && !widget->wantsSecondTicks())) {
         continue;
       }
+      const float width = widget->width();
+      const float height = widget->height();
       widget->update(renderer);
       widget->layout(renderer, barAreaW, barAreaH);
+      sizeChanged = sizeChanged || widget->width() != width || widget->height() != height;
     }
   };
 
   updateSection(instance.startWidgets);
   updateSection(instance.centerWidgets);
   updateSection(instance.endWidgets);
-  layoutBarSections(instance, renderer, barAreaW, barAreaH, padding, isVertical);
+  // A tick that changed no widget's size leaves the sections where they are.
+  if (!secondTickOnly
+      || sizeChanged
+      || instance.sectionsLaidOutW != barAreaW
+      || instance.sectionsLaidOutH != barAreaH) {
+    layoutBarSections(instance, renderer, barAreaW, barAreaH, padding, isVertical);
+    instance.sectionsLaidOutW = barAreaW;
+    instance.sectionsLaidOutH = barAreaH;
+  }
 }
 
 void Bar::prepareFrame(BarInstance& instance, bool needsUpdate, bool needsLayout) {

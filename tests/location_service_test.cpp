@@ -8,6 +8,7 @@
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <print>
 #include <string>
 #include <string_view>
@@ -101,6 +102,20 @@ int main() {
         "manual coordinates were not restored after disabling automatic location"
     );
   }
+
+  // Geocoding: the name is searched alone, and the rest of the address picks the place.
+  expect(location_geocode::queryName(" Paris , US") == "Paris", "the query is the name before the comma");
+  expect(location_geocode::queryName("Berlin") == "Berlin", "an address with no comma is all name");
+  const auto parises = nlohmann::json::parse(R"([
+    {"name":"Paris","admin1":"Île-de-France","country":"France","country_code":"FR"},
+    {"name":"Paris","admin1":"Texas","country":"United States","country_code":"US"},
+    {"name":"Paris","admin1":"Ontario","country":"Canada","country_code":"CA"}
+  ])");
+  expect(location_geocode::bestMatch(parises, "Paris, US") == 1, "a country code picks the place");
+  expect(location_geocode::bestMatch(parises, "Paris, ontario") == 2, "a region picks the place");
+  expect(location_geocode::bestMatch(parises, "Paris, Texas, United States") == 1, "region and country agree");
+  expect(location_geocode::bestMatch(parises, "Paris") == 0, "no qualifier keeps the first result");
+  expect(location_geocode::bestMatch(parises, "Paris, Mars") == 0, "an unknown qualifier keeps the first");
 
   std::filesystem::remove_all(root);
   return g_failures == 0 ? 0 : 1;

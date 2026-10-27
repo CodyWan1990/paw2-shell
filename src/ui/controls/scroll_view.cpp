@@ -109,7 +109,10 @@ ScrollView::ScrollView() {
     applyScrollOffsetValue(clampOffset(m_dragStartOffset - delta));
   });
   viewportArea->setOnAxisHandler([this](const InputArea::PointerData& data) {
-    if (!scrollable() || data.axis != scrollAxis(m_orientation)) {
+    const bool wheelAcross = m_verticalWheelScrollsAcross
+        && m_orientation == ScrollOrientation::Horizontal
+        && data.axis == WL_POINTER_AXIS_VERTICAL_SCROLL;
+    if (!scrollable() || (data.axis != scrollAxis(m_orientation) && !wheelAcross)) {
       return false;
     }
 

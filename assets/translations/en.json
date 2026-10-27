@@ -76,7 +76,8 @@
       "action-save": "Save",
       "annotate-export-failed": "Failed to build the annotated image",
       "choose-display": "Choose display",
-      "confirm-region": "{copy} to copy · {save} to save · Enter or Space for defaults · {cancel} to cancel · Drag to reselect",
+      "confirm-region":
+          "{copy} to copy · {save} to save · Enter or Space for defaults · {cancel} to cancel · Drag to reselect",
       "fullscreen": "Full screen",
       "overlay-alloc-failed": "Could not display the screenshot overlay (GPU out of video memory?)",
       "prompt-hint": "Esc: discard   Tab: cycle buttons   Enter: confirm",
@@ -346,7 +347,8 @@
       "eap-method": "EAP method",
       "enterprise-prompt-for": "Sign in to {ssid}",
       "error-ca-not-absolute": "The certificate path must be absolute, starting with /.",
-      "error-certificate-required": "This network requires certificate-based authentication (EAP-TLS), which is not supported yet.",
+      "error-certificate-required":
+          "This network requires certificate-based authentication (EAP-TLS), which is not supported yet.",
       "error-enterprise-unsupported": "The active network backend cannot configure 802.1X networks.",
       "error-missing-identity": "Enter the identity your organization issued you.",
       "error-missing-password": "Enter your password.",
@@ -894,11 +896,13 @@
       "calendar-reminder-open": "Open",
       "calendar-reminder-untitled": "Untitled event",
       "calendar-reminder-with-location": "{when}\n{location}",
-      "config-migration-body": "Update {path} in the source file. paw2-shell is applying this replacement only temporarily. Run paw2-shell config validate to list every required change.",
+      "config-migration-body":
+          "Update {path} in the source file. paw2-shell is applying this replacement only temporarily. Run paw2-shell config validate to list every required change.",
       "config-migration-title": "Configuration update needed",
       "dbus-disabled": "DBus notifications disabled",
       "desktop-widgets-editor": "Widget editor",
-      "desktop-widgets-editor-enabled": "Desktop widget editor is on. Switch to an empty workspace so open windows do not cover the editor.",
+      "desktop-widgets-editor-enabled":
+          "Desktop widget editor is on. Switch to an empty workspace so open windows do not cover the editor.",
       "keybind-app": "paw2-shell",
       "keybind-invalid-modifier": "This shortcut accepts a single key without modifiers.",
       "keybind-invalid-printable": "Printable keys (letters, numbers, symbols) require a modifier such as Ctrl or Alt.",
@@ -909,19 +913,23 @@
       "launcher-usage-reset-success": "Usage data cleared.",
       "lockscreen-widgets-editor": "Lockscreen widget editor",
       "lockscreen-widgets-editor-blocked-locked": "Unlock the session before editing lockscreen widgets.",
-      "lockscreen-widgets-editor-enabled": "Lockscreen widget editor is on. Switch to an empty workspace so open windows do not cover the editor.",
+      "lockscreen-widgets-editor-enabled":
+          "Lockscreen widget editor is on. Switch to an empty workspace so open windows do not cover the editor.",
       "mpris-disabled": "MPRIS disabled",
       "network": "Network",
       "network-connect-failed-auth": "The password was rejected or not provided.",
       "network-connect-failed-generic": "NetworkManager could not complete the connection.",
       "network-connect-failed-ip": "Connected to the network but could not get an IP address.",
-      "network-connect-failed-no-reply": "NetworkManager did not answer. An authorization request may be waiting with no polkit agent to answer it.",
+      "network-connect-failed-no-reply":
+          "NetworkManager did not answer. An authorization request may be waiting with no polkit agent to answer it.",
       "network-connect-failed-not-found": "The network is no longer in range.",
-      "network-connect-failed-permission": "Not authorized to change network connections. Enable the polkit agent in Security settings, or allow NetworkManager actions in a polkit rule.",
+      "network-connect-failed-permission":
+          "Not authorized to change network connections. Enable the polkit agent in Security settings, or allow NetworkManager actions in a polkit rule.",
       "network-connect-failed-timeout": "The network did not respond in time.",
       "network-connect-failed-title": "Could not connect to {ssid}",
       "polkit-agent": "Polkit Agent",
-      "polkit-no-session": "Polkit agent needs logind, elogind, or XDG_SESSION_ID. On seatd-only setups it cannot register for graphical prompts. Install elogind for in-session authentication.",
+      "polkit-no-session":
+          "Polkit agent needs logind, elogind, or XDG_SESSION_ID. On seatd-only setups it cannot register for graphical prompts. Install elogind for in-session authentication.",
       "screen-time-reset": "Screen Time",
       "screen-time-reset-success": "Usage history cleared.",
       "session-bus-unavailable": "Session bus unavailable",
@@ -1041,7 +1049,8 @@
       "invalid": "Check the highlighted calendar account fields.",
       "name-label": "Display Name",
       "name-placeholder": "Personal Calendar",
-      "password-file-error": "Could not read the configured password file. Check that it exists, is a readable regular file, and contains a password.",
+      "password-file-error":
+          "Could not read the configured password file. Check that it exists, is a readable regular file, and contains a password.",
       "password-file-label": "Password File",
       "password-keep-placeholder": "Leave blank to keep current password",
       "password-label": "App Password",
@@ -1056,7 +1065,8 @@
       "provider-label": "Provider",
       "save": "Save",
       "save-error": "Could not save calendar account.",
-      "secret-cleanup-error": "The account could not be saved, and its keyring credential could not be restored or cleaned up. Retry after unlocking Secret Service.",
+      "secret-cleanup-error":
+          "The account could not be saved, and its keyring credential could not be restored or cleaned up. Retry after unlocking Secret Service.",
       "secret-service-cancelled": "The Secret Service prompt was cancelled. Retry when you are ready to unlock it.",
       "secret-service-error": "Could not access calendar credentials in Secret Service. Retry the operation.",
       "secret-service-locked": "Calendar credentials are locked or access was denied. Unlock Secret Service and retry.",
@@ -1136,14 +1146,16 @@
           "border": "Border",
           "border-description": "Capsule outline color role; leave on Default for no outline",
           "border-width": "Border Width",
-          "border-width-description": "Thickness of the capsule outline in pixels; only drawn when a border color is set",
+          "border-width-description":
+              "Thickness of the capsule outline in pixels; only drawn when a border color is set",
           "clear": "Clear",
           "deselect": "Deselect",
           "drag": "Reorder",
           "drawer-columns": "Drawer Columns",
           "drawer-columns-description": "Number of widgets per row in the drawer panel",
           "drawer-detached": "Detached Panel",
-          "drawer-detached-description": "Open the drawer as a floating panel with its own background instead of merging with the bar",
+          "drawer-detached-description":
+              "Open the drawer as a floating panel with its own background instead of merging with the bar",
           "drawer-enabled": "Drawer",
           "drawer-enabled-description": "Move group widgets into a drawer panel toggled by a button",
           "drawer-glyph-closed": "Closed Icon",
@@ -1178,7 +1190,8 @@
           "title": "Capsule group",
           "ungroup": "Ungroup",
           "widget-spacing": "Spacing",
-          "widget-spacing-description": "Gap between widgets in this group, in pixels; Auto inherits the bar's widget spacing"
+          "widget-spacing-description":
+              "Gap between widgets in this group, in pixels; Auto inherits the bar's widget spacing"
         },
         "inspector": {
           "add-instance-title": "Add new named {widget} widget to {lane}",
@@ -1268,10 +1281,12 @@
     },
     "export-config": {
       "export": "Export",
-      "full-effective-description": "Exports every active setting, including built-in defaults. Useful for inspection or sharing a snapshot, but pins current defaults explicitly.",
+      "full-effective-description":
+          "Exports every active setting, including built-in defaults. Useful for inspection or sharing a snapshot, but pins current defaults explicitly.",
       "full-effective-save-title": "Save Full Effective Config",
       "full-effective-title": "Full Effective Config",
-      "merged-user-description": "Combines config files and GUI overrides into one TOML file. Built-in defaults stay implicit.",
+      "merged-user-description":
+          "Combines config files and GUI overrides into one TOML file. Built-in defaults stay implicit.",
       "merged-user-save-title": "Save Merged User Config",
       "merged-user-title": "Merged User Config (Recommended)",
       "title": "Export Config"
@@ -1322,7 +1337,11 @@
         "paw2-scratchpads": "Scratchpads",
         "paw2-status": "paw2",
         "paw2-tiling": "Tiling",
-      "panel-keys": "Panels & Menus",
+        "paw2-tiling-scrolling": "Scrolling",
+        "paw2-tiling-master-stack": "Master and stack",
+        "paw2-tiling-dwindle": "Dwindle",
+        "paw2-tiling-monocle": "Monocle",
+        "panel-keys": "Panels & Menus",
         "accessibility": "Accessibility",
         "audio": "Audio",
         "authentication": "Authentication",
@@ -1682,24 +1701,28 @@
       "paw2": {
         "unavailable": {
           "label": "paw2 isn't sharing its settings",
-          "description": "paw2 only shows its settings to a shell it trusts: one installed as root in a system directory, like /usr/bin/paw2-shell. A build run from its source tree, or a session that isn't paw2, gets nothing here.",
+          "description":
+              "paw2 only shows its settings to a shell it trusts: one installed as root in a system directory, like /usr/bin/paw2-shell. A build run from its source tree, or a session that isn't paw2, gets nothing here.",
           "open-folder": "Open config folder"
         },
         "bindings": {
           "file": {
             "config": {
               "label": "Shortcuts come from config.toml",
-              "description": "Changing one here moves all of [bindings] into config.d/keybinds.toml, and paw2 reads them from there instead."
+              "description":
+                  "Changing one here moves all of [bindings] into config.d/keybinds.toml, and paw2 reads them from there instead."
             },
             "owned": {
               "label": "Shortcuts come from config.d/keybinds.toml",
-              "description": "[bindings] in config.toml no longer applies. Using it again deletes keybinds.toml and the changes made here.",
+              "description":
+                  "[bindings] in config.toml no longer applies. Using it again deletes keybinds.toml and the changes made here.",
               "release": "Use config.toml"
             }
           },
           "commands": {
             "label": "Commands",
-            "description": "Keys that start a program. The command line splits on spaces; quote an argument to keep spaces in it."
+            "description":
+                "Keys that start a program. The command line splits on spaces; quote an argument to keep spaces in it."
           },
           "default": "Default: {keys}",
           "no-default": "Unbound by default",
@@ -1798,17 +1821,20 @@
           },
           "position": {
             "label": "Position",
-            "description": "Top-left corner in logical pixels, as \"x, y\"; a monitor left blank takes the first free space from the left.",
+            "description":
+                "Top-left corner in logical pixels, as \"x, y\"; a monitor left blank takes the first free space from the left.",
             "placeholder": "Automatic"
           },
           "focus-at-startup": {
             "label": "Focus at startup",
-            "description": "Start the session with the keyboard focus on this monitor. Only one monitor can. paw2 applies it the next time it starts."
+            "description":
+                "Start the session with the keyboard focus on this monitor. Only one monitor can. paw2 applies it the next time it starts."
           }
         },
         "theme-colors": {
           "label": "Follow shell colors",
-          "description": "Window focus ring, titlebars, shadows and the overview backdrop take their colors from the palette, and follow it when it changes."
+          "description":
+              "Window focus ring, titlebars, shadows and the overview backdrop take their colors from the palette, and follow it when it changes."
         },
         "config-error": "paw2 couldn't load its config, and is running on the last one that loaded: {errors}",
         "layout": {
@@ -1816,13 +1842,60 @@
             "label": "Layouts",
             "description": "Layouts available when cycling, in cycle order."
           },
-          "column-width": {
-            "label": "Column width",
-            "description": "Share of the screen width a new column takes in the scrolling layout."
+          "default": {
+            "label": "Starting layout",
+            "description": "The layout a workspace starts in, until you switch it."
           },
-          "center-focused-column": {
-            "label": "Center focused column",
-            "description": "Keep the focused column in the middle, instead of scrolling only far enough to show it."
+          "scrolling": {
+            "column-width": {
+              "label": "Column width",
+              "description": "Share of the screen width a new column takes."
+            },
+            "center-focused-column": {
+              "label": "Center focused column",
+              "description": "Keep the focused column in the middle, instead of scrolling only far enough to show it."
+            }
+          },
+          "master-stack": {
+            "master-ratio": {
+              "label": "Master size",
+              "description": "Share of the screen the master area takes, until you resize it on a workspace."
+            },
+            "master-count": {
+              "label": "Master windows",
+              "description": "How many windows start in the master area."
+            },
+            "position": {
+              "label": "Master side",
+              "description": "Which side of the screen the master area takes.",
+              "options": {
+                "left": "Left",
+                "right": "Right",
+                "top": "Top",
+                "bottom": "Bottom"
+              }
+            }
+          },
+          "dwindle": {
+            "split-ratio": {
+              "label": "Split size",
+              "description": "Share each split gives the window it makes room for."
+            },
+            "split": {
+              "label": "Split direction",
+              "description":
+                  "Alternate cuts side by side, then above and below. Longest side cuts across the longer side, which suits ultrawide and portrait screens.",
+              "options": {
+                "alternate": "Alternate",
+                "longest": "Longest side"
+              }
+            }
+          },
+          "monocle": {
+            "gaps": {
+              "label": "Gaps",
+              "description": "Keep the window gaps around the window; off fills the screen."
+            }
           },
           "tab-grouping": {
             "label": "Tab groups",
@@ -1850,7 +1923,8 @@
           },
           "titlebars": {
             "label": "Titlebars",
-            "description": "paw2 draws a titlebar with float and close buttons on each window that lets it. Drag it to move the window, double-click it to float or tile. Apps with their own header bar, like GTK ones, keep theirs."
+            "description":
+                "paw2 draws a titlebar with float and close buttons on each window that lets it. Drag it to move the window, double-click it to float or tile. Apps with their own header bar, like GTK ones, keep theirs."
           },
           "titlebar-height": {
             "label": "Titlebar height",
@@ -1894,7 +1968,8 @@
           },
           "blur": {
             "label": "Blur",
-            "description": "Blur what shows through translucent windows. It also lets the bar, dock and panels blur what is behind them; each has its own switch on its page."
+            "description":
+                "Blur what shows through translucent windows. It also lets the bar, dock and panels blur what is behind them; each has its own switch on its page."
           },
           "blur-radius": {
             "label": "Blur strength",
@@ -1935,7 +2010,8 @@
         "scratchpads": {
           "list": {
             "label": "Scratchpads",
-            "description": "Apps that slide in from an edge of the screen and hide again, each started by its command. Add one by name, then set its keys below.",
+            "description":
+                "Apps that slide in from an edge of the screen and hide again, each started by its command. Add one by name, then set its keys below.",
             "name-placeholder": "terminal"
           },
           "keys": {
@@ -1944,7 +2020,8 @@
           },
           "app-id": {
             "label": "App ID",
-            "description": "The window paw2 treats as this scratchpad. It must match the app's ID, and no two scratchpads can share one. Terminals usually need one set in the command, such as kitty --class.",
+            "description":
+                "The window paw2 treats as this scratchpad. It must match the app's ID, and no two scratchpads can share one. Terminals usually need one set in the command, such as kitty --class.",
             "placeholder": "paw2-terminal"
           },
           "edge": {
@@ -1967,7 +2044,8 @@
           },
           "position": {
             "label": "Position",
-            "description": "Where its top-left corner sits, as percents of the screen. Leave blank to center it against its edge.",
+            "description":
+                "Where its top-left corner sits, as percents of the screen. Leave blank to center it against its edge.",
             "placeholder": "12.5, 5"
           },
           "margin": {
@@ -1976,7 +2054,8 @@
           },
           "reset": {
             "label": "Placement",
-            "description": "Once you move or resize a scratchpad, paw2 keeps it there instead of using the size and position above.",
+            "description":
+                "Once you move or resize a scratchpad, paw2 keeps it there instead of using the size and position above.",
             "button": "Reset"
           }
         },
@@ -2010,7 +2089,8 @@
           },
           "qt-platform-theme": {
             "label": "Qt platform theme",
-            "description": "Pick qt5ct or qt6ct to use their settings and the Qt template's colors. Automatic uses GTK's settings when an icon theme or font is set. Applies after the next login.",
+            "description":
+                "Pick qt5ct or qt6ct to use their settings and the Qt template's colors. Automatic uses GTK's settings when an icon theme or font is set. Applies after the next login.",
             "options": {
               "automatic": "Automatic",
               "qt5ct": "qt5ct",
@@ -2023,7 +2103,8 @@
           },
           "font": {
             "label": "App font",
-            "description": "Family and size, like \"Inter 11\". The interface font sets the family. Applies after the next login."
+            "description":
+                "Family and size, like \"Inter 11\". The interface font sets the family. Applies after the next login."
           }
         }
       },
@@ -2080,7 +2161,8 @@
           "description": "Shadow opacity for surfaces and windows"
         },
         "global-shadow-size": {
-          "description": "How far shadows reach past bars, panels, the dock and popups, and past windows while paw2 shares its settings. Zero turns them off.",
+          "description":
+              "How far shadows reach past bars, panels, the dock and popups, and past windows while paw2 shares its settings. Zero turns them off.",
           "label": "Shadow Size"
         },
         "global-shadow-direction": {
@@ -2100,7 +2182,8 @@
           "label": "Palette Inspector"
         },
         "saved-themes": {
-          "description": "Named looks, each a palette with its wallpapers. Apply one from the themes panel, the bar or a shortcut.",
+          "description":
+              "Named looks, each a palette with its wallpapers. Apply one from the themes panel, the bar or a shortcut.",
           "label": "Saved themes",
           "open": "Open themes"
         },
@@ -2165,10 +2248,12 @@
       },
       "bar": {
         "auto-hide": {
-          "description": "Off keeps the bar visible; On hides it until you move the pointer to the screen edge; Smart shows the bar on an empty workspace and hides it when windows are open"
+          "description":
+              "Off keeps the bar visible; On hides it until you move the pointer to the screen edge; Smart shows the bar on an empty workspace and hides it when windows are open"
         },
         "auto-hide-delay": {
-          "description": "Wait this many milliseconds after the pointer leaves before hiding the bar; 0 hides immediately (On mode only)",
+          "description":
+              "Wait this many milliseconds after the pointer leaves before hiding the bar; 0 hides immediately (On mode only)",
           "label": "Auto-Hide Delay"
         },
         "background-opacity": {
@@ -2207,7 +2292,8 @@
           "label": "Capsule Padding"
         },
         "capsule-radius": {
-          "description": "Default corner radius for widget capsules, workspace pills, and taskbar workspace groups; leave blank for automatic pill shape, or set 0 for square corners",
+          "description":
+              "Default corner radius for widget capsules, workspace pills, and taskbar workspace groups; leave blank for automatic pill shape, or set 0 for square corners",
           "label": "Capsule Radius"
         },
         "capsule-thickness": {
@@ -2219,11 +2305,13 @@
           "label": "Center Widgets"
         },
         "compositor-blur": {
-          "description": "Allow the compositor to blur behind this bar when the background effect protocol is available",
+          "description":
+              "Allow the compositor to blur behind this bar when the background effect protocol is available",
           "label": "Compositor Blur"
         },
         "concave-edge-corners": {
-          "description": "Carve concave notches into two of the bar's corners (requires Edge Margin to be 0); with Ends Margin at 0, the corners on the bar's inner edge are carved, otherwise the corners touching the screen edge are carved",
+          "description":
+              "Carve concave notches into two of the bar's corners (requires Edge Margin to be 0); with Ends Margin at 0, the corners on the bar's inner edge are carved, otherwise the corners touching the screen edge are carved",
           "label": "Concave Edge Corners"
         },
         "contact-shadow": {
@@ -2266,10 +2354,12 @@
           "label": "End Widgets"
         },
         "ends-margin": {
-          "description": "Shortens the bar from both ends along its length; set to 0 px for a full-width or full-height bar"
+          "description":
+              "Shortens the bar from both ends along its length; set to 0 px for a full-width or full-height bar"
         },
         "font-family": {
-          "description": "Typeface for this bar's widgets; leave empty to inherit the global font (per-widget Font Family overrides this)",
+          "description":
+              "Typeface for this bar's widgets; leave empty to inherit the global font (per-widget Font Family overrides this)",
           "label": "Font Family"
         },
         "font-scale": {
@@ -2289,10 +2379,12 @@
           "label": "Wayland Layer"
         },
         "opposite-edge-margin": {
-          "description": "Extra reserved space on the inward side of the bar, away from the screen edge; use when maximized windows ignore struts"
+          "description":
+              "Extra reserved space on the inward side of the bar, away from the screen edge; use when maximized windows ignore struts"
         },
         "panel-overlap": {
-          "description": "Pixels an attached panel overlaps the bar edge to hide the seam (adjust if you see a line or gap)",
+          "description":
+              "Pixels an attached panel overlaps the bar edge to hide the seam (adjust if you see a line or gap)",
           "label": "Panel Overlap"
         },
         "position": {
@@ -2309,7 +2401,8 @@
           "label": "Show on Workspace Switch"
         },
         "show-tooltip": {
-          "description": "Show hover tooltips for widgets on this bar; a widget's own Show Tooltip setting overrides this",
+          "description":
+              "Show hover tooltips for widgets on this bar; a widget's own Show Tooltip setting overrides this",
           "label": "Show Tooltips"
         },
         "start-widgets": {
@@ -2325,7 +2418,8 @@
           "label": "Widget Capsules"
         },
         "widget-color": {
-          "description": "Default icon and label color role for widgets on this bar; fixed hex colors are also supported",
+          "description":
+              "Default icon and label color role for widgets on this bar; fixed hex colors are also supported",
           "label": "Widget Color"
         },
         "widget-icon-color": {
@@ -2410,7 +2504,8 @@
           "label": "Active Monitor Only"
         },
         "auto-hide": {
-          "description": "Off keeps the dock visible; On hides it until you move the pointer to the screen edge; Smart shows the dock on an empty workspace and hides it when windows are open"
+          "description":
+              "Off keeps the dock visible; On hides it until you move the pointer to the screen edge; Smart shows the dock on an empty workspace and hides it when windows are open"
         },
         "background-opacity": {
           "description": "Background opacity of the dock"
@@ -2424,7 +2519,8 @@
           "label": "Border Width"
         },
         "concave-edge-corners": {
-          "description": "Carve inward corners on the side that touches the screen edge; requires the margin to the screen edge to be 0",
+          "description":
+              "Carve inward corners on the side that touches the screen edge; requires the margin to the screen edge to be 0",
           "label": "Concave Edge Corners"
         },
         "corner-bottom-left": {
@@ -2600,7 +2696,8 @@
             "label": "On Theme Mode Changed"
           },
           "wallpaper-changed": {
-            "description": "Command to run when the wallpaper changes; provides PAW2_SHELL_WALLPAPER_PATH and PAW2_SHELL_WALLPAPER_CONNECTOR",
+            "description":
+                "Command to run when the wallpaper changes; provides PAW2_SHELL_WALLPAPER_PATH and PAW2_SHELL_WALLPAPER_CONNECTOR",
             "label": "On Wallpaper Changed"
           },
           "wifi-disabled": {
@@ -2615,7 +2712,8 @@
       },
       "idle": {
         "behaviors": {
-          "description": "Named idle actions with presets (lock, screen off, suspend) or custom commands, timeouts, resume pairing, and order",
+          "description":
+              "Named idle actions with presets (lock, screen off, suspend) or custom commands, timeouts, resume pairing, and order",
           "label": "Behaviors"
         },
         "pre-action-fade": {
@@ -2671,7 +2769,8 @@
       },
       "lockscreen": {
         "allow-empty-password": {
-          "description": "Let Enter submit an empty password (enable for security-key or other passwordless PAM stacks; keep off to avoid accidental wake-key lockouts)",
+          "description":
+              "Let Enter submit an empty password (enable for security-key or other passwordless PAM stacks; keep off to avoid accidental wake-key lockouts)",
           "label": "Empty Password Submit"
         },
         "blur-intensity": {
@@ -2695,11 +2794,13 @@
           "label": "Fingerprint Unlock"
         },
         "grace-period": {
-          "description": "Allow passwordless unlock for this many seconds after locking; any keypress or mouse movement unlocks. Set to 0 to always require the password",
+          "description":
+              "Allow passwordless unlock for this many seconds after locking; any keypress or mouse movement unlocks. Set to 0 to always require the password",
           "label": "Grace Period"
         },
         "lock-before-suspend": {
-          "description": "Lock the session before sleep (lid close, systemctl suspend, hibernate); Lock & Suspend actions still lock first",
+          "description":
+              "Lock the session before sleep (lid close, systemctl suspend, hibernate); Lock & Suspend actions still lock first",
           "label": "Lock Before Suspend"
         },
         "monitors": {
@@ -2774,7 +2875,8 @@
           "label": "Follow Focused Output"
         },
         "history-retention-hours": {
-          "description": "Automatically remove notification history entries older than the specified number of hours (0 to keep forever)",
+          "description":
+              "Automatically remove notification history entries older than the specified number of hours (0 to keep forever)",
           "label": "Retention Period"
         },
         "keep-dismissed-in-history": {
@@ -2786,7 +2888,8 @@
           "label": "Wayland Layer"
         },
         "max-visible": {
-          "description": "Maximum number of notification toasts visible on screen at once (0 to fill all available space)",
+          "description":
+              "Maximum number of notification toasts visible on screen at once (0 to fill all available space)",
           "label": "Max Visible Toasts"
         },
         "monitors": {
@@ -2810,7 +2913,8 @@
           "label": "Size"
         },
         "show-actions": {
-          "description": "Show action buttons in notification toasts; when disabled, clicking the toast triggers its default action",
+          "description":
+              "Show action buttons in notification toasts; when disabled, clicking the toast triggers its default action",
           "label": "Show Action Buttons"
         },
         "show-app-name": {
@@ -2828,7 +2932,8 @@
       },
       "panels": {
         "border-color": {
-          "description": "Outline color for floating panels; a theme role name follows the active theme, or pick a custom color",
+          "description":
+              "Outline color for floating panels; a theme role name follows the active theme, or pick a custom color",
           "label": "Border Color"
         },
         "border-width": {
@@ -2852,11 +2957,13 @@
           "label": "Control Center Tabs"
         },
         "control-center-width": {
-          "description": "Width of the Control Center panel in pixels (compact and no-sidebar modes scale down from this)",
+          "description":
+              "Width of the Control Center panel in pixels (compact and no-sidebar modes scale down from this)",
           "label": "Control Center Width"
         },
         "floating-layer": {
-          "description": "Use Top if input method candidate windows are hidden behind floating panels; Overlay keeps panels above fullscreen content",
+          "description":
+              "Use Top if input method candidate windows are hidden behind floating panels; Overlay keeps panels above fullscreen content",
           "label": "Floating Panel Layer"
         },
         "floating-offset": {
@@ -2884,7 +2991,8 @@
           "label": "Show App Origin Indicators"
         },
         "launcher-auto-paste": {
-          "description": "After calculator, emoji, and other copy activations, paste into the focused window (same shortcuts as clipboard auto-paste)",
+          "description":
+              "After calculator, emoji, and other copy activations, paste into the focused window (same shortcuts as clipboard auto-paste)",
           "label": "Auto-Paste"
         },
         "launcher-categories": {
@@ -2940,7 +3048,8 @@
           "label": "Panels Ignored"
         },
         "launcher-layout": {
-          "description": "Full adds view tabs and a toolbar with your profile and shortcuts; Simple shows a search field, optional category chips, and results",
+          "description":
+              "Full adds view tabs and a toolbar with your profile and shortcuts; Simple shows a search field, optional category chips, and results",
           "label": "Layout"
         },
         "launcher-pinned-apps": {
@@ -2985,7 +3094,8 @@
           "label": "Toolbar Position"
         },
         "launcher-session-search": {
-          "description": "Include session actions (lock, suspend, reboot, shutdown, logout) in general launcher searches, not only behind the /session prefix",
+          "description":
+              "Include session actions (lock, suspend, reboot, shutdown, logout) in general launcher searches, not only behind the /session prefix",
           "label": "Enable Session Search"
         },
         "launcher-show-icons": {
@@ -3037,7 +3147,8 @@
           "label": "Along Bar"
         },
         "panel-anchor-bar": {
-          "description": "Bar panels attach to when opened; leave empty to follow the widget, shortcut, or dock that opened them",
+          "description":
+              "Bar panels attach to when opened; leave empty to follow the widget, shortcut, or dock that opened them",
           "label": "Anchor Bar"
         },
         "placement-clipboard": {
@@ -3061,7 +3172,8 @@
           "label": "Placement"
         },
         "placement-wallpaper": {
-          "description": "Choose whether the wallpaper picker attaches to the bar or floats at a chosen screen position",
+          "description":
+              "Choose whether the wallpaper picker attaches to the bar or floats at a chosen screen position",
           "label": "Placement"
         },
         "position-clipboard": {
@@ -3137,7 +3249,8 @@
           "description-cancelled": "The Secret Service prompt was cancelled; retry when you are ready",
           "description-error": "Calendar credentials could not be accessed through Secret Service",
           "description-locked": "Calendar credentials are locked or access was denied; unlock Secret Service and retry",
-          "description-migration": "Plaintext calendar credentials are waiting to be moved into Secret Service; they are not used for calendar sync",
+          "description-migration":
+              "Plaintext calendar credentials are waiting to be moved into Secret Service; they are not used for calendar sync",
           "description-opening": "Calendar credentials are being opened through Secret Service",
           "description-unavailable": "No Secret Service provider is available in this session",
           "label": "Calendar Credential Storage"
@@ -3147,7 +3260,8 @@
           "label": "Merge Duplicate Events"
         },
         "calendar-dedupe-ignore-patterns": {
-          "description": "Regular expressions removed from an event title before it is compared, so titles that differ only by a matched part still merge",
+          "description":
+              "Regular expressions removed from an event title before it is compared, so titles that differ only by a matched part still merge",
           "label": "Ignore in Title When Merging"
         },
         "calendar-digest-time": {
@@ -3184,14 +3298,19 @@
         },
         "calendar-storage": {
           "button": "Retry",
-          "description-cancelled": "The encrypted storage prompt was cancelled; calendar events remain available for this session only",
+          "description-cancelled":
+              "The encrypted storage prompt was cancelled; calendar events remain available for this session only",
           "description-error": "The encrypted calendar event cache could not be opened or saved",
           "description-locked": "Encrypted storage is locked or access was denied; fix access and retry",
-          "description-migration": "The plaintext calendar event cache is waiting to be encrypted; it is preserved until migration succeeds",
-          "description-missing-key": "The calendar event cache key is missing; account credentials use separate storage (existing cache files have been preserved)",
+          "description-migration":
+              "The plaintext calendar event cache is waiting to be encrypted; it is preserved until migration succeeds",
+          "description-missing-key":
+              "The calendar event cache key is missing; account credentials use separate storage (existing cache files have been preserved)",
           "description-opening": "The encrypted calendar event cache is being opened",
-          "description-recovery": "The calendar event cache could not be authenticated or is damaged; retry after restoring the correct key, or reset private storage",
-          "description-unavailable": "No Secret Service provider is available; calendar events remain available for this session only",
+          "description-recovery":
+              "The calendar event cache could not be authenticated or is damaged; retry after restoring the correct key, or reset private storage",
+          "description-unavailable":
+              "No Secret Service provider is available; calendar events remain available for this session only",
           "label": "Calendar Event Storage"
         },
         "calendar-week-numbers": {
@@ -3302,7 +3421,8 @@
             "label": "Disk Poll Interval"
           },
           "gpu-poll": {
-            "description": "Seconds between GPU temperature, usage, and VRAM samples; the GPU is only sampled while something displays a GPU stat, so an idle machine is never woken (0 disables entirely)",
+            "description":
+                "Seconds between GPU temperature, usage, and VRAM samples; the GPU is only sampled while something displays a GPU stat, so an idle machine is never woken (0 disables entirely)",
             "label": "GPU Poll Interval"
           },
           "label": "System Monitor",
@@ -3432,7 +3552,8 @@
           "label": "Clipboard Auto-Paste"
         },
         "clipboard-confirm-clear-history": {
-          "description": "Ask before clearing clipboard history or deleting an unpinned entry from the panel; when off, those actions apply immediately (pinned entries still ask before delete)",
+          "description":
+              "Ask before clearing clipboard history or deleting an unpinned entry from the panel; when off, those actions apply immediately (pinned entries still ask before delete)",
           "label": "Confirm Clear History"
         },
         "clipboard-enabled": {
@@ -3444,7 +3565,8 @@
           "label": "History Size"
         },
         "clipboard-image-action": {
-          "description": "Command to run from image clipboard entries; use {path} for the file path, {stdin} to mark the stdin position, or omit {path} to pipe automatically",
+          "description":
+              "Command to run from image clipboard entries; use {path} for the file path, {stdin} to mark the stdin position, or omit {path} to pipe automatically",
           "label": "Image Action Command",
           "placeholder": "gimp {path} or satty -f -"
         },
@@ -3454,14 +3576,19 @@
         },
         "clipboard-storage": {
           "button": "Retry",
-          "description-cancelled": "The Secret Service prompt was cancelled; clipboard history remains available for this session only",
+          "description-cancelled":
+              "The Secret Service prompt was cancelled; clipboard history remains available for this session only",
           "description-error": "Encrypted clipboard history could not be opened or saved",
           "description-locked": "Clipboard key storage is locked or access was denied; fix access and retry",
-          "description-migration": "Plaintext clipboard history is waiting to be encrypted; existing files are preserved until migration succeeds",
-          "description-missing-key": "The configured encrypted storage key is missing; existing clipboard history files have been preserved",
+          "description-migration":
+              "Plaintext clipboard history is waiting to be encrypted; existing files are preserved until migration succeeds",
+          "description-missing-key":
+              "The configured encrypted storage key is missing; existing clipboard history files have been preserved",
           "description-opening": "Encrypted clipboard history is being opened",
-          "description-recovery": "Clipboard history could not be authenticated or is damaged; retry after restoring the correct key, or reset private storage",
-          "description-unavailable": "No Secret Service provider is available; clipboard history remains available for this session only",
+          "description-recovery":
+              "Clipboard history could not be authenticated or is damaged; retry after restoring the correct key, or reset private storage",
+          "description-unavailable":
+              "No Secret Service provider is available; clipboard history remains available for this session only",
           "label": "Clipboard History Storage"
         },
         "date-format": {
@@ -3469,7 +3596,8 @@
           "label": "Date Format"
         },
         "external-ip": {
-          "description": "Resolve the connection's public WAN IP (via api.ipify.org) and show it in the Control Center network tab",
+          "description":
+              "Resolve the connection's public WAN IP (via api.ipify.org) and show it in the Control Center network tab",
           "label": "Show WAN IP"
         },
         "keyboard-layout-custom-labels": {
@@ -3479,15 +3607,18 @@
         "launch-apps-as-systemd-services": {
           "description": "Launches applications in separate systemd services so they don't share paw2-shell's cgroup",
           "label": "Launch Apps as systemd Services",
-          "requires-systemd-session": "Requires paw2-shell to run as a systemd user service (uwsm or a systemd user unit)"
+          "requires-systemd-session":
+              "Requires paw2-shell to run as a systemd user service (uwsm or a systemd user unit)"
         },
         "launch-apps-custom-command": {
-          "description": "Wraps apps launched from the launcher, dock, and taskbar; substitutes $CMD with the original command",
+          "description":
+              "Wraps apps launched from the launcher, dock, and taskbar; substitutes $CMD with the original command",
           "label": "Custom App Launch Command",
           "placeholder": "$CMD"
         },
         "niri-overview-type-to-launch": {
-          "description": "Open the launcher when typing in niri overview; uses a tiny keyboard-focus surface while overview is open",
+          "description":
+              "Open the launcher when typing in niri overview; uses a tiny keyboard-focus surface while overview is open",
           "label": "Type to Launch"
         },
         "offline-mode": {
@@ -3567,7 +3698,8 @@
           "label": "Privacy"
         },
         "osd-kinds-volume": {
-          "description": "Show OSD popups when volume changes; use advanced settings to control output and input separately",
+          "description":
+              "Show OSD popups when volume changes; use advanced settings to control output and input separately",
           "label": "Volume"
         },
         "osd-kinds-volume-input": {
@@ -3631,7 +3763,8 @@
           "label": "Screen Sharing Filter Regex"
         },
         "readline-shortcuts": {
-          "description": "Use readline-style shortcuts in every text field (Ctrl+A moves to the start of the line instead of selecting all)",
+          "description":
+              "Use readline-style shortcuts in every text field (Ctrl+A moves to the start of the line instead of selecting all)",
           "label": "Readline Shortcuts"
         },
         "screen-time-enabled": {
@@ -3644,7 +3777,8 @@
           "label": "Reset Screen Time Data"
         },
         "screenshot-annotate": {
-          "description": "Open the annotation editor on every screenshot; Done applies the save, clipboard, and pipe settings",
+          "description":
+              "Open the annotation editor on every screenshot; Done applies the save, clipboard, and pipe settings",
           "label": "Annotate Before Delivering"
         },
         "screenshot-close-on-copy": {
@@ -3684,7 +3818,8 @@
           "description": "Actions applied after capture, or when you choose Done in the annotation editor."
         },
         "screenshot-pipe-command": {
-          "description": "Command run as /bin/sh -lc with the PNG on stdin; for annotators or uploaders (for example: swappy -f - or satty -f -)",
+          "description":
+              "Command run as /bin/sh -lc with the PNG on stdin; for annotators or uploaders (for example: swappy -f - or satty -f -)",
           "label": "Pipe Command",
           "placeholder": "swappy -f -"
         },
@@ -3693,7 +3828,8 @@
           "label": "Pipe to Command"
         },
         "screenshot-region-modifier": {
-          "description": "Modifier to move or resize a selected region: left-drag to move, right-drag to resize from the outer thirds (corners resize both axes). None (default) keeps the plain drag-to-adjust behavior",
+          "description":
+              "Modifier to move or resize a selected region: left-drag to move, right-drag to resize from the outer thirds (corners resize both axes). None (default) keeps the plain drag-to-adjust behavior",
           "label": "Move/Resize Modifier"
         },
         "screenshot-remember-last-region": {
@@ -3709,7 +3845,8 @@
           "label": "Show Cursor"
         },
         "screenshot-skip-annotate-on-copy-save": {
-          "description": "Copy and Save in the region overlay deliver immediately; Enter and Space still open the editor",
+          "description":
+              "Copy and Save in the region overlay deliver immediately; Enter and Space still open the editor",
           "label": "Skip Editor on Copy or Save"
         },
         "settings-expand-all-groups": {
@@ -3725,7 +3862,8 @@
           "label": "Show Location"
         },
         "telemetry": {
-          "description": "Sends a small anonymous startup ping with version, OS, compositor, monitor resolutions, RAM, and UI scale",
+          "description":
+              "Sends a small anonymous startup ping with version, OS, compositor, monitor resolutions, RAM, and UI scale",
           "label": "Anonymous Startup Ping"
         },
         "time-format": {
@@ -3733,7 +3871,8 @@
           "label": "Time Format"
         },
         "umbriel-overview-type-to-launch": {
-          "description": "Open the launcher when typing in umbriel overview; uses a tiny keyboard-focus surface while overview is open",
+          "description":
+              "Open the launcher when typing in umbriel overview; uses a tiny keyboard-focus surface while overview is open",
           "label": "Type to Launch"
         },
         "window-switcher-current-workspace-only": {
@@ -3745,7 +3884,8 @@
           "label": "Most Recently Used Order"
         },
         "window-switcher-show-all-outputs": {
-          "description": "List windows from every monitor; turn off to list only windows on the monitor showing the switcher",
+          "description":
+              "List windows from every monitor; turn off to list only windows on the monitor showing the switcher",
           "label": "Show All Monitors"
         },
         "window-switcher-show-app-icon": {
@@ -3771,7 +3911,8 @@
           "label": "{device} Warning Threshold"
         },
         "battery-warning-threshold": {
-          "description": "System battery percentage at or below which the shell sends a low-battery notification and battery widgets use their warning color (0 disables)",
+          "description":
+              "System battery percentage at or below which the shell sends a low-battery notification and battery widgets use their warning color (0 disables)",
           "label": "Battery Warning Threshold"
         }
       },
@@ -3873,7 +4014,8 @@
       "command-label": "Shell command",
       "command-placeholder": "Optional bash command, leave empty for built-in behavior",
       "command-required-placeholder": "Shell command to run",
-      "countdown-seconds-description": "Wait this many seconds before running. Activate again to confirm immediately. 0 runs at once.",
+      "countdown-seconds-description":
+          "Wait this many seconds before running. Activate again to confirm immediately. 0 runs at once.",
       "countdown-seconds-label": "Countdown (seconds)",
       "glyph-label": "Glyph",
       "glyph-picker-title": "Action glyph",
@@ -3894,9 +4036,11 @@
     "storage-recovery": {
       "button": "Reset Private Storage",
       "button-confirm": "Confirm Storage Reset",
-      "description": "Permanently delete saved clipboard history and the calendar event cache, then reopen private storage (a configured key file is never modified)",
+      "description":
+          "Permanently delete saved clipboard history and the calendar event cache, then reopen private storage (a configured key file is never modified)",
       "error-delete": "Some private storage files could not be deleted. The storage key was preserved.",
-      "error-key": "Private storage files were deleted, but secure storage could not be reopened. Fix access and retry.",
+      "error-key":
+          "Private storage files were deleted, but secure storage could not be reopened. Fix access and retry.",
       "label": "Recover Private Storage",
       "success": "Private storage was reset successfully."
     },
@@ -3910,7 +4054,8 @@
         "command-placeholder": "Shell command",
         "commands": {
           "annotate": {
-            "description": "Draw on the screen over running apps; press F or the Freeze button to capture the background",
+            "description":
+                "Draw on the screen over running apps; press F or the Freeze button to capture the background",
             "label": "Annotate screen"
           },
           "bar-auto-hide-set": {
@@ -4002,7 +4147,8 @@
             "label": "Get color scheme"
           },
           "color-scheme-set": {
-            "description": "Set palette source and selection in settings.toml (preset name, wallpaper generator scheme, or custom palette name)",
+            "description":
+                "Set palette source and selection in settings.toml (preset name, wallpaper generator scheme, or custom palette name)",
             "label": "Set color scheme"
           },
           "config-reload": {
@@ -4214,7 +4360,8 @@
             "label": "Annotate screenshot"
           },
           "screenshot-fullscreen": {
-            "description": "Capture the focused monitor by default, pick interactively with pick, or all outputs with all",
+            "description":
+                "Capture the focused monitor by default, pick interactively with pick, or all outputs with all",
             "label": "Fullscreen screenshot"
           },
           "screenshot-region": {
@@ -4455,10 +4602,12 @@
       "settings": {
         "label-overrides": {
           "label": "Workspace Names",
-          "workspaces-description": "Show your own text or icon for a workspace: the key is its number or name, the value is what the bar shows instead"
+          "workspaces-description":
+              "Show your own text or icon for a workspace: the key is its number or name, the value is what the bar shows instead"
         },
         "actions": {
-          "description": "What each mouse gesture does on this widget; pick a command, run a shell command, or disable it",
+          "description":
+              "What each mouse gesture does on this widget; pick a command, run a shell command, or disable it",
           "label": "Gesture Actions"
         },
         "active-color": {
@@ -4476,7 +4625,8 @@
         "active-pill-size": {
           "description": "Minimum active workspace pill length along the bar, as a multiple of pill thickness",
           "label": "Active Pill Size",
-          "workspaces-description": "Minimum active workspace pill length along the bar, as a multiple of pill thickness; labels may expand beyond this"
+          "workspaces-description":
+              "Minimum active workspace pill length along the bar, as a multiple of pill thickness; labels may expand beyond this"
         },
         "album-art-only": {
           "description": "Show only the circular album artwork without the track title",
@@ -4507,11 +4657,13 @@
           "label": "Capsule"
         },
         "style": {
-          "description": "Decoration preset: none, capsule, box outline, translucent pill or accent underline. Explicit capsule settings still override it",
+          "description":
+              "Decoration preset: none, capsule, box outline, translucent pill or accent underline. Explicit capsule settings still override it",
           "label": "Style"
         },
         "underline": {
-          "description": "Accent line along the widget's inner edge; color role or hex. The underline style uses the widget color",
+          "description":
+              "Accent line along the widget's inner edge; color role or hex. The underline style uses the widget color",
           "label": "Underline"
         },
         "underline-width": {
@@ -4543,10 +4695,13 @@
           "label": "Capsule Padding"
         },
         "capsule-radius": {
-          "description": "Corner radius for this widget capsule; leave blank for automatic pill shape, or set 0 for square corners",
+          "description":
+              "Corner radius for this widget capsule; leave blank for automatic pill shape, or set 0 for square corners",
           "label": "Capsule Radius",
-          "taskbar-description": "Corner radius for the widget capsule, workspace disc indicators, and workspace group capsules; leave blank for automatic pill shape, or set 0 for square corners",
-          "workspaces-description": "Corner radius for this widget capsule and workspace pills; leave blank for automatic pill shape, or set 0 for square corners"
+          "taskbar-description":
+              "Corner radius for the widget capsule, workspace disc indicators, and workspace group capsules; leave blank for automatic pill shape, or set 0 for square corners",
+          "workspaces-description":
+              "Corner radius for this widget capsule and workspace pills; leave blank for automatic pill shape, or set 0 for square corners"
         },
         "centered": {
           "description": "Center visualizer bars instead of aligning them to the edge",
@@ -4578,7 +4733,8 @@
           "label": "Colorize Custom Image"
         },
         "custom-label": {
-          "description": "Custom text shown beside the glyph or custom image; remains visible when Show Glyph is disabled",
+          "description":
+              "Custom text shown beside the glyph or custom image; remains visible when Show Glyph is disabled",
           "label": "Custom Label"
         },
         "detached-panel": {
@@ -4629,8 +4785,10 @@
         "focused-output-only": {
           "description": "Only highlight the active workspace on the focused monitor",
           "label": "Highlight Focused Monitor Only",
-          "taskbar-description": "Only highlight the active workspace on the monitor that has keyboard or pointer focus; active workspaces on other monitors use the occupied color and the inactive capsule style",
-          "workspaces-description": "Only highlight the active workspace on the monitor that has keyboard or pointer focus; other monitors show their active workspace as occupied instead"
+          "taskbar-description":
+              "Only highlight the active workspace on the monitor that has keyboard or pointer focus; active workspaces on other monitors use the occupied color and the inactive capsule style",
+          "workspaces-description":
+              "Only highlight the active workspace on the monitor that has keyboard or pointer focus; other monitors show their active workspace as occupied instead"
         },
         "font-family": {
           "description": "Typeface for this widget; leave empty to inherit the bar font",
@@ -4663,7 +4821,8 @@
           "label": "Group by Workspace"
         },
         "group-single-icon-per-app": {
-          "description": "When grouping by workspace with icons, collapse multiple windows from the same app into one icon with a count badge",
+          "description":
+              "When grouping by workspace with icons, collapse multiple windows from the same app into one icon with a count badge",
           "label": "Single Icon per App"
         },
         "height": {
@@ -4778,7 +4937,8 @@
         "inactive-pill-size": {
           "description": "Minimum inactive workspace pill length along the bar, as a multiple of pill thickness",
           "label": "Inactive Pill Size",
-          "workspaces-description": "Minimum inactive workspace pill length along the bar, as a multiple of pill thickness; labels may expand beyond this"
+          "workspaces-description":
+              "Minimum inactive workspace pill length along the bar, as a multiple of pill thickness; labels may expand beyond this"
         },
         "interactive": {
           "description": "Allow pointer hover, clicks, scrolls, and tooltips for this widget",
@@ -4815,14 +4975,16 @@
         "labels-only-when-occupied": {
           "description": "Hide workspace labels on empty, inactive workspaces",
           "label": "Labels Only When Occupied",
-          "workspaces-description": "Show workspace ID or name labels on workspaces with open windows and on the active workspace even when it is empty; other empty tags stay unlabeled"
+          "workspaces-description":
+              "Show workspace ID or name labels on workspaces with open windows and on the active workspace even when it is empty; other empty tags stay unlabeled"
         },
         "length": {
           "description": "Spacer length in pixels",
           "label": "Length"
         },
         "match-adjacent-spacing": {
-          "description": "Widen gaps between inline tray icons to match the visual spacing of neighboring bar widgets (includes capsule padding)",
+          "description":
+              "Widen gaps between inline tray icons to match the visual spacing of neighboring bar widgets (includes capsule padding)",
           "label": "Match Adjacent Widget Spacing"
         },
         "max-label-chars": {
@@ -4864,7 +5026,8 @@
           "label": "Compact Network Speed"
         },
         "network-speed-unit": {
-          "description": "Unit used for network receive and transmit speeds; Auto switches between B/s, kB/s, MB/s, and GB/s",
+          "description":
+              "Unit used for network receive and transmit speeds; Auto switches between B/s, kB/s, MB/s, and GB/s",
           "label": "Network Speed Unit"
         },
         "occupied-color": {
@@ -4887,7 +5050,8 @@
         "pinned": {
           "description": "Tray item IDs that stay visible in the bar when drawer mode is enabled",
           "label": "Pinned Items",
-          "taskbar-description": "Desktop apps that stay on the taskbar when not running; ignored while Group by Workspace is on",
+          "taskbar-description":
+              "Desktop apps that stay on the taskbar when not running; ignored while Group by Workspace is on",
           "taskbar-label": "Pinned Apps"
         },
         "pinned-opacity": {
@@ -4907,7 +5071,8 @@
           "label": "Scale"
         },
         "scope": {
-          "description": "Run one script runtime per live widget placement, or share one runtime across bars with the same widget ID",
+          "description":
+              "Run one script runtime per live widget placement, or share one runtime across bars with the same widget ID",
           "label": "Runtime Scope"
         },
         "script": {
@@ -4915,7 +5080,8 @@
           "label": "Script"
         },
         "scroll-repeat": {
-          "description": "Choose whether scroll actions follow command semantics, run once per gesture, or repeat for every scroll step",
+          "description":
+              "Choose whether scroll actions follow command semantics, run once per gesture, or repeat for every scroll step",
           "label": "Scroll Repeat"
         },
         "show-active-indicator": {
@@ -4983,7 +5149,8 @@
           "label": "Show Tooltip"
         },
         "show-unlock-hint": {
-          "description": "Show the status card above the login box for unlock hints and auth prompts; errors and Caps Lock warnings still appear when this is off",
+          "description":
+              "Show the status card above the login box for unlock hints and auth prompts; errors and Caps Lock warnings still appear when this is off",
           "label": "Unlock Hint"
         },
         "show-value": {
@@ -4991,7 +5158,8 @@
           "label": "Show Value"
         },
         "show-vpn-label": {
-          "description": "Replaces network label with VPN label in Replace mode; adds VPN label next to VPN icon in Both mode",
+          "description":
+              "Replaces network label with VPN label in Replace mode; adds VPN label next to VPN icon in Both mode",
           "label": "Show VPN Label"
         },
         "show-when-idle": {
@@ -5017,7 +5185,8 @@
         "style": {
           "description": "Workspace switcher appearance",
           "label": "Style",
-          "workspaces-description": "Regular shows animated pills; Minimal is text-only labels; Focus Hint uses dots for inactive workspaces and an expanded active pill with the focused app icon"
+          "workspaces-description":
+              "Regular shows animated pills; Minimal is text-only labels; Focus Hint uses dots for inactive workspaces and an expanded active pill with the focused app icon"
         },
         "taskbar-max-width": {
           "description": "Total width budget in pixels; window titles shrink to fit and hide when too narrow",
@@ -5028,7 +5197,8 @@
           "label": "Text"
         },
         "timezone": {
-          "description": "Timezone identifier (e.g. Europe/Berlin) to use for this clock; leave empty to use system local time",
+          "description":
+              "Timezone identifier (e.g. Europe/Berlin) to use for this clock; leave empty to use system local time",
           "label": "Timezone"
         },
         "title-scroll": {
@@ -5060,7 +5230,8 @@
           "label": "Visualization"
         },
         "vpn-status": {
-          "description": "How to display VPN status: Replace swaps the network icon for a VPN shield, Both shows them side by side, Hidden disables the VPN indicator",
+          "description":
+              "How to display VPN status: Replace swaps the network icon for a VPN shield, Both shows them side by side, Hidden disables the VPN indicator",
           "label": "VPN Status"
         },
         "warning-color": {
@@ -5076,11 +5247,13 @@
           "label": "Window Title Max Width"
         },
         "workspace-group-capsule": {
-          "description": "Draw the background and border around each grouped workspace. Turn off to keep icon grouping and workspace disc labels only.",
+          "description":
+              "Draw the background and border around each grouped workspace. Turn off to keep icon grouping and workspace disc labels only.",
           "label": "Workspace Group Capsule"
         },
         "workspace-group-content": {
-          "description": "What each workspace group shows: app icons, a window count, or dots (up to five, then +N for the rest)",
+          "description":
+              "What each workspace group shows: app icons, a window count, or dots (up to five, then +N for the rest)",
           "label": "Group Content"
         },
         "workspace-label-placement": {
@@ -5130,7 +5303,8 @@
       "export-config": "Export Config…",
       "export-config-saved": "Config export saved.",
       "filter-overridden": "Overridden",
-      "legacy-config-warning": "Legacy setting: {issue}. Edit this source entry; paw2-shell is applying the replacement only temporarily. Run paw2-shell config validate to list every required change.",
+      "legacy-config-warning":
+          "Legacy setting: {issue}. Edit this source entry; paw2-shell is applying the replacement only temporarily. Run paw2-shell config validate to list every required change.",
       "native-title": "paw2-shell Settings",
       "no-results": "No settings found",
       "no-results-hint": "Try a different setting name or config key.",

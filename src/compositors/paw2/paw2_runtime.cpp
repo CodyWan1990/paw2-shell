@@ -137,6 +137,16 @@ namespace compositors::paw2 {
 
     snapshot.layouts = jsonStrings(message, "layouts");
 
+    if (const auto keyboard = message.find("keyboard"); keyboard != message.end() && keyboard->is_object()) {
+      snapshot.keyboard = Paw2Keyboard{
+          .layout = jsonString(*keyboard, "layout"),
+          .layouts = jsonStrings(*keyboard, "layouts"),
+          .capsLock = jsonBool(*keyboard, "caps_lock"),
+          .numLock = jsonBool(*keyboard, "num_lock"),
+          .scrollLock = jsonBool(*keyboard, "scroll_lock"),
+      };
+    }
+
     return snapshot;
   }
 

@@ -62,6 +62,8 @@ public:
   ~WorkspacesWidget() override;
 
   void create() override;
+  // Its state comes from workspace changes, which refresh the bar.
+  [[nodiscard]] bool wantsSecondTicks() const override { return false; }
   [[nodiscard]] bool wantsBarHoverHighlight() const noexcept override { return false; }
 
 private:

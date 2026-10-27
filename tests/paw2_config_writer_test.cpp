@@ -1,6 +1,7 @@
 #include "compositors/paw2/paw2_config_writer.h"
 #include "compositors/paw2/paw2_runtime.h"
 #include "core/toml.h"
+#include "util/file_utils.h"
 
 #include <cstdlib>
 #include <cstring>
@@ -148,7 +149,12 @@ int main() {
   writer.set("appearance.gaps", 999);
   writer.flush();
   ok &= check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 999, "bad value written");
-  paw2.sendConfig(config, false, {"appearance.gaps must be at most 256"});
+  // A rejection paw2 blames on config.toml is someone else's: the write stays and still awaits a verdict.
+  paw2.sendConfig(config, false, {(configDir / "config.toml").string() + ": broken"});
+  pump(runtime);
+  ok &= check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 999, "not ours, kept");
+  ok &= check(writer.rejectedErrors().empty(), "no rejection of ours shown");
+  paw2.sendConfig(config, false, {writer.shellDropIn().string() + ": appearance.gaps must be at most 256"});
   pump(runtime);
   ok &=
       check(readToml(configDir / "config.d" / "shell.toml")["appearance"]["gaps"] == 20, "rejected write rolled back");
@@ -207,6 +213,23 @@ int main() {
   ok &= check(shell["scratchpads"].size() == 1 && shell["scratchpads"]["music"]["app_id"] == "spotify", "re-added");
   paw2.sendConfig(config);
   pump(runtime);
+
+  // Palette colours go to theme.toml's [colors], and only once paw2 says it knows that table.
+  const std::map<std::string, std::string> palette{{"focus_ring", "#112233"}, {"backdrop", "#445566"}};
+  const auto shellBefore = readToml(writer.shellDropIn());
+  writer.writeThemeColors(palette);
+  ok &= check(!std::filesystem::exists(writer.themeDropIn()), "no [colors] for a paw2 without it");
+  config["colors"] = nlohmann::json::object();
+  paw2.sendConfig(config);
+  pump(runtime);
+  writer.writeThemeColors(palette);
+  const auto theme = readToml(writer.themeDropIn());
+  ok &= check(theme.size() == 1 && theme["colors"]["focus_ring"] == "#112233", "palette in its own drop-in");
+  ok &= check(readToml(writer.shellDropIn()) == shellBefore, "shell.toml untouched");
+  ok &= check(
+      FileUtils::readTextFile(writer.themeDropIn())->find("Settings window") == std::string::npos,
+      "theme.toml has its own header, not shell.toml's"
+  );
 
   // A fresh writer picks up what earlier sessions wrote.
   {

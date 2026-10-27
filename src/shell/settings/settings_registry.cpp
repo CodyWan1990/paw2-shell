@@ -785,18 +785,64 @@ namespace settings {
       Paw2Rows rows(entries, paw2, SettingsSection::Paw2, "paw2-tiling");
       constexpr std::array<std::string_view, 4> kLayouts{"scrolling", "dwindle", "master_stack", "monocle"};
       ListSetting layouts{.items = paw2.list("layout.enabled_layouts", {kLayouts.begin(), kLayouts.end()})};
+      SelectSetting startingLayout;
       for (const auto layout : kLayouts) {
-        layouts.suggestedOptions.push_back(
-            SelectOption{
-                .value = std::string(layout),
-                .label = i18n::tr("settings.schema.paw2.layout.names." + i18n::keySegment(layout))
-            }
-        );
+        SelectOption option{
+            .value = std::string(layout),
+            .label = i18n::tr("settings.schema.paw2.layout.names." + i18n::keySegment(layout))
+        };
+        layouts.suggestedOptions.push_back(option);
+        // Only an enabled layout can be the one a workspace starts in.
+        if (std::ranges::contains(layouts.items, option.value)) {
+          startingLayout.options.push_back(std::move(option));
+        }
       }
+      // Unset, paw2 starts workspaces in the first layout of the cycle.
+      startingLayout.selectedValue =
+          paw2.text("layout.default", layouts.items.empty() ? std::string(kLayouts[0]) : layouts.items.front());
       rows.add("layout.enabled_layouts", std::move(layouts), "cycle layouts");
-      rows.slider("layout.column_width", 0.6, 0.1, 1.0, 0.05, "column width scrolling");
-      rows.toggle("layout.center_focused_column", false, "center viewport scrolling");
+      rows.add("layout.default", std::move(startingLayout), "default starting layout new workspace");
       rows.toggle("layout.tab_grouping", false, "tabs tab bar group");
+
+      // Each layout's own section. The scrolling keys used to sit directly in [layout], and paw2
+      // still reads them there, so an old config.toml's values show until Settings moves them.
+      rows.setGroup("paw2-tiling-scrolling");
+      rows.slider(
+          "layout.scrolling.column_width", paw2.number("layout.column_width", 0.6), 0.1, 1.0, 0.05,
+          "column width scrolling"
+      );
+      rows.toggle(
+          "layout.scrolling.center_focused_column", paw2.boolean("layout.center_focused_column", false),
+          "center viewport scrolling"
+      );
+
+      rows.setGroup("paw2-tiling-master-stack");
+      rows.slider("layout.master_stack.master_ratio", 0.6, 0.1, 0.9, 0.05, "master stack size ratio width");
+      rows.slider("layout.master_stack.master_count", 1, 1, 16, 1, "master stack windows count");
+      constexpr std::array<std::string_view, 4> kMasterPositions{"left", "right", "top", "bottom"};
+      rows.add(
+          "layout.master_stack.position",
+          paw2Select(
+              "settings.schema.paw2.layout.master-stack.position.options", kMasterPositions,
+              paw2.text("layout.master_stack.position", "left")
+          ),
+          "master stack side position orientation"
+      );
+
+      rows.setGroup("paw2-tiling-dwindle");
+      rows.slider("layout.dwindle.split_ratio", 0.5, 0.1, 0.9, 0.05, "dwindle split size ratio");
+      constexpr std::array<std::string_view, 2> kDwindleSplits{"alternate", "longest"};
+      rows.add(
+          "layout.dwindle.split",
+          paw2Select(
+              "settings.schema.paw2.layout.dwindle.split.options", kDwindleSplits,
+              paw2.text("layout.dwindle.split", "alternate")
+          ),
+          "dwindle split direction longest ultrawide"
+      );
+
+      rows.setGroup("paw2-tiling-monocle");
+      rows.toggle("layout.monocle.gaps", true, "monocle gaps fullscreen");
 
       rows.setGroup("paw2-overview");
       rows.slider("overview.zoom", 0.5, 0.2, 0.75, 0.05, "overview zoom size");

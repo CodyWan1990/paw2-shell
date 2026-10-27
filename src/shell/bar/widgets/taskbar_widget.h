@@ -84,6 +84,8 @@ public:
   ~TaskbarWidget() override;
 
   void create() override;
+  // Its windows come from toplevel and workspace changes, which refresh the bar.
+  [[nodiscard]] bool wantsSecondTicks() const override { return false; }
   [[nodiscard]] bool onPointerEvent(const PointerEvent& event) override;
   [[nodiscard]] bool wantsBarHoverHighlight() const noexcept override { return false; }
   // Steps through whatever this taskbar shows: workspace groups when grouping, else tasks.

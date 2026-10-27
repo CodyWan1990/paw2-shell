@@ -7,28 +7,27 @@
 #include <optional>
 
 class CompositorPlatform;
-class ConfigService;
 
 namespace paw2shell::theme {
 
   // paw2's focus ring, titlebars, window shadows and overview backdrop follow the shell's palette.
-  // They are paw2's settings, so they go through Paw2ConfigWriter like any Settings edit: when the
-  // palette resolves, and when paw2 connects, which may be after the shell has started.
+  // They go to paw2's [colors] table in a drop-in of their own (Paw2ConfigWriter::writeThemeColors),
+  // so the user's [appearance] and [overview] stay theirs: when the palette resolves, and when paw2
+  // connects, which may be after the shell has started.
   class Paw2ThemeSync {
   public:
-    Paw2ThemeSync(CompositorPlatform& platform, ConfigService& config);
+    explicit Paw2ThemeSync(CompositorPlatform& platform);
     ~Paw2ThemeSync();
 
     Paw2ThemeSync(const Paw2ThemeSync&) = delete;
     Paw2ThemeSync& operator=(const Paw2ThemeSync&) = delete;
 
     void setColors(const Color& focusRing, const Color& titlebar, const Color& shadow, const Color& backdrop);
-    // Call on config reload: the font may have changed.
-    void refresh();
 
   private:
+    void refresh();
+
     CompositorPlatform& m_platform;
-    ConfigService& m_config;
     Signal<>::ScopedConnection m_runtimeListener;
     bool m_paw2Connected = false;
     std::optional<Color> m_focusRing;

@@ -54,6 +54,10 @@ public:
   }
   virtual void onFrameTick(float deltaMs) { (void)deltaMs; }
   [[nodiscard]] virtual bool needsFrameTick() const { return false; }
+  // Whether the bar's once-a-second update should reach this widget. Every widget still gets the
+  // full update on each minute boundary and on every refresh; a widget whose text only changes
+  // through those (or through its own requestUpdate) says false and skips the other 59.
+  [[nodiscard]] virtual bool wantsSecondTicks() const { return true; }
   [[nodiscard]] virtual bool onPointerEvent(const PointerEvent& event) {
     (void)event;
     return false;

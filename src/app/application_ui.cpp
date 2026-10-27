@@ -950,7 +950,9 @@ void Application::initWidgetControllersAndCallbacks() {
       m_desktopWidgetsController.onSecondTick();
       m_lockscreenWidgetsController.onSecondTick();
       m_settingsWindow.onSecondTick();
-      if (m_configService.config().osd.kinds.keyboardLayout) {
+      // paw2 reports layout changes itself (see CompositorPlatform::onPaw2Changed); elsewhere
+      // only a focused client hears of them, so the shell has to look.
+      if (m_configService.config().osd.kinds.keyboardLayout && !m_compositorPlatform.compositorReportsKeyboard()) {
         m_keyboardLayoutOsd.onLayoutChanged(m_compositorPlatform, m_configService.config());
       }
     }

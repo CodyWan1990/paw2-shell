@@ -39,7 +39,12 @@ LockKeysService::LockKeysState LockKeysService::state() const noexcept { return 
 
 void LockKeysService::setChangeCallback(ChangeCallback callback) { m_changeCallback = std::move(callback); }
 
+void LockKeysService::setCompositorSource(CompositorSource source) { m_compositorSource = std::move(source); }
+
 int LockKeysService::pollTimeoutMs() const {
+  if (m_compositorSource && m_compositorSource().has_value()) {
+    return -1;
+  }
   if (m_nextRefreshAt == std::chrono::steady_clock::time_point{}) {
     return 0;
   }
@@ -75,6 +80,11 @@ void LockKeysService::refreshNow() {
 }
 
 LockKeysService::LockKeysState LockKeysService::readCurrentState() {
+  if (m_compositorSource) {
+    if (const auto state = m_compositorSource(); state.has_value()) {
+      return *state;
+    }
+  }
   if (!m_sysfsDiscovered) {
     discoverSysfsLeds();
   }

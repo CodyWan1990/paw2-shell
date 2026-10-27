@@ -154,6 +154,13 @@ public:
   [[nodiscard]] std::vector<std::string> keyboardLayoutNames() const;
 
   void setKeyboardLayoutChangeCallback(ChangeCallback callback);
+  // Lock keys as the compositor reports them, when it does (paw2 over its socket); nullopt means
+  // the shell has to find out itself.
+  [[nodiscard]] std::optional<WaylandSeat::LockKeysState> compositorLockKeysState() const;
+  // Whether the compositor reports layout and lock-key changes itself, so nothing has to poll.
+  [[nodiscard]] bool compositorReportsKeyboard() const noexcept { return m_lastPaw2KeyboardLayout.has_value(); }
+  // Called when compositorLockKeysState() changes.
+  void setLockKeysChangeCallback(ChangeCallback callback);
   void addKeyboardLayoutPollFds(std::vector<pollfd>& fds) const;
   void dispatchKeyboardLayoutPoll(const std::vector<pollfd>& fds, std::size_t startIdx);
 
@@ -184,6 +191,7 @@ private:
 
   void bindExtWorkspace(ext_workspace_manager_v1* manager);
   void notifyToplevelsChanged();
+  void onPaw2Changed();
   void onOutputAdded(wl_output* output);
   [[nodiscard]] wl_output* resolveOutputName(const std::string& outputName) const;
   [[nodiscard]] std::string connectorNameForOutput(wl_output* output) const;
@@ -206,7 +214,11 @@ private:
   ChangeCallback m_workspaceChangeCallback;
   ChangeCallback m_overviewChangeCallback;
   ChangeCallback m_keyboardLayoutChangeCallback;
+  ChangeCallback m_lockKeysChangeCallback;
   ChangeCallback m_toplevelChangeCallback;
+  // paw2's last keyboard, to tell its layout and lock-key changes apart from other snapshots.
+  std::optional<std::string> m_lastPaw2KeyboardLayout;
+  std::optional<WaylandSeat::LockKeysState> m_lastPaw2LockKeys;
   std::unique_ptr<OutputProbe> m_outputProbe;
   std::vector<WorkspaceModelSnapshot> m_lastWorkspaceModelSnapshot;
   std::optional<std::string> m_lastFocusedCompositorWindowId;

@@ -24,6 +24,9 @@ namespace {
   constexpr float kCardWidth = 260.0F;
   constexpr float kCardImageHeight = 146.0F;
 
+  // A text line's height, as the other panels estimate it.
+  constexpr float lineHeight(float fontSize) { return fontSize * 1.35F; }
+
   std::string fileNameOf(std::string_view path) { return std::filesystem::path(path).filename().string(); }
 
 } // namespace
@@ -73,13 +76,16 @@ void ThemesPanel::create() {
       )
   );
 
-  root->addChild(ui::scrollView({
-      .out = &m_scroll,
-      .contentScale = scale,
-      .orientation = ScrollOrientation::Horizontal,
-      .fillWidth = true,
-      .flexGrow = 1.0F,
-  }));
+  root->addChild(
+      ui::scrollView({
+          .out = &m_scroll,
+          .contentScale = scale,
+          .orientation = ScrollOrientation::Horizontal,
+          .fillWidth = true,
+          .flexGrow = 1.0F,
+          .configure = [](ScrollView& view) { view.setVerticalWheelScrollsAcross(true); },
+      })
+  );
 
   root->addChild(panel_scaffold::hint(i18n::tr("themes.panel.hint"), scale));
 
@@ -110,6 +116,25 @@ void ThemesPanel::setView(View view) {
   m_selected = 0;
   rebuildCards();
   PanelManager::instance().refresh();
+}
+
+// Tall enough for the tallest card: a theme card with its swatches and the Edit button under it.
+// A fixed height once cut the Edit row off below the scrollbar.
+float ThemesPanel::preferredHeight() const {
+  const float card = Style::spaceSm * 2.0F // card padding
+      + kCardImageHeight
+      + Style::spaceSm
+      + lineHeight(Style::fontSizeBody) // title
+      + Style::spaceXs
+      + lineHeight(Style::fontSizeCaption);                              // swatches
+  const float cardColumn = card + Style::spaceXs + Style::controlHeight; // the Edit button
+  const float strip = cardColumn + Style::scrollbarGap + Style::scrollbarHoverWidth;
+  const float root = Style::spaceLg * 2.0F // rootColumn padding
+      + Style::controlHeight               // header
+      + strip
+      + lineHeight(Style::fontSizeCaption) // hint
+      + Style::spaceMd * 2.0F;             // gaps between the three
+  return std::ceil(scaled(root + Style::panelPadding * 2.0F));
 }
 
 void ThemesPanel::openEditor(std::string_view id) {

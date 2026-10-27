@@ -79,6 +79,9 @@ public:
 
   void retainCpuTemp();
   void releaseCpuTemp();
+  // CPU frequency walks every CPU's cpufreq files in sysfs, so it is only read while held.
+  void retainCpuFreq();
+  void releaseCpuFreq();
   void retainCpuCores();
   void releaseCpuCores();
   void retainGpuTemp();
@@ -167,6 +170,7 @@ private:
 
   std::atomic<bool> m_running{false};
   std::atomic<int> m_cpuTempRefs{0};
+  std::atomic<int> m_cpuFreqRefs{0};
   std::atomic<int> m_cpuCoreRefs{0};
   std::atomic<int> m_gpuTempRefs{0};
   std::atomic<int> m_gpuUsageRefs{0};

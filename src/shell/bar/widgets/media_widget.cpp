@@ -294,7 +294,8 @@ void MediaWidget::syncProgress(const std::optional<MprisPlayerInfo>& active) {
   const float fillWidth = std::max(1.0F, m_progressBar->width());
   const auto intervalMs =
       static_cast<std::int64_t>(std::clamp(static_cast<float>(active->lengthUs / 1000) / fillWidth, 250.0F, 1000.0F));
-  m_progressTimer.start(std::chrono::milliseconds(intervalMs), [this]() { requestUpdate(); });
+  // Only the fill moves, so the tick redraws it alone rather than updating the whole bar.
+  m_progressTimer.start(std::chrono::milliseconds(intervalMs), [this]() { syncProgress(activePlayer()); });
 }
 
 void MediaWidget::syncState(Renderer& renderer, const std::optional<MprisPlayerInfo>& active) {

@@ -118,6 +118,7 @@ public:
   // Rects are surface-local, so they may legitimately sit partly or fully outside.
   static bool regionIntersectsBounds(const std::vector<InputRect>& rects, std::uint32_t width, std::uint32_t height);
   void requestUpdate();
+  [[nodiscard]] bool updateRequested() const noexcept { return m_updateRequested; }
   void requestUpdateOnly();
   void requestLayout();
   void requestRedraw();

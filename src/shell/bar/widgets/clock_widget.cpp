@@ -30,6 +30,10 @@ ClockWidget::ClockWidget(wl_output* /*output*/, Options options)
     : m_format(std::move(options.format)), m_verticalFormat(std::move(options.verticalFormat)),
       m_tooltipFormat(std::move(options.tooltipFormat)), m_timezone(std::move(options.timezone)) {}
 
+bool ClockWidget::wantsSecondTicks() const {
+  return formatShowsSeconds(m_format) || formatShowsSeconds(m_verticalFormat) || formatShowsSeconds(m_tooltipFormat);
+}
+
 std::string ClockWidget::formatTimeText() const {
   if (!m_isVertical) {
     if (!m_timezone.empty()) {

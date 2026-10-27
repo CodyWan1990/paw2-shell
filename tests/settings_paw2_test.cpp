@@ -50,7 +50,8 @@ int main() {
   // paw2's config message carries only what its files set.
   const nlohmann::json paw2Config = {
       {"appearance", {{"gaps", 15}, {"focus_ring_width", 1}}},
-      {"layout", {{"enabled_layouts", {"scrolling", "dwindle"}}}},
+      // column_width in its old place, as an older config.toml still has it.
+      {"layout", {{"enabled_layouts", {"scrolling", "dwindle"}}, {"column_width", 0.4}}},
       {"monitors", {{{"connector", "DP-1"}, {"resolution", {2560, 1440}}, {"scale", 1.25}}}},
       {"bindings",
        {{"close_window", {"Super+w"}},
@@ -102,7 +103,7 @@ int main() {
     }
     if (entry.section == settings::SettingsSection::Paw2) {
       ok &= check(
-          entry.group == "paw2-tiling"
+          entry.group.starts_with("paw2-tiling")
               || entry.group == "paw2-overview"
               || entry.group == "paw2-input"
               || entry.group == "window-switcher"
@@ -231,6 +232,28 @@ int main() {
       scratchpadWidth != nullptr && std::get<settings::SliderSetting>(scratchpadWidth->control).value == 50.0,
       "scratchpad size split into width and height"
   );
+
+  // Each layout's options: the scrolling row shows the old key until the new one is written, and
+  // only an enabled layout can be the one a workspace starts in.
+  const auto* columnWidth = findEntry(entries, {"paw2", "layout", "scrolling", "column_width"});
+  ok &= check(
+      columnWidth != nullptr
+          && columnWidth->group == "paw2-tiling-scrolling"
+          && std::get<settings::SliderSetting>(columnWidth->control).value == 0.4,
+      "scrolling column width reads the old key"
+  );
+  const auto* startingLayout = findEntry(entries, {"paw2", "layout", "default"});
+  ok &= check(
+      startingLayout != nullptr
+          && std::get<settings::SelectSetting>(startingLayout->control).options.size() == 2
+          && std::get<settings::SelectSetting>(startingLayout->control).selectedValue == "scrolling",
+      "starting layout offers the enabled layouts, first by default"
+  );
+  for (const auto key : {"master_ratio", "master_count", "position"}) {
+    ok &= check(findEntry(entries, {"paw2", "layout", "master_stack", key}) != nullptr, "master_stack row");
+  }
+  ok &= check(findEntry(entries, {"paw2", "layout", "dwindle", "split"}) != nullptr, "dwindle split row");
+  ok &= check(findEntry(entries, {"paw2", "layout", "monocle", "gaps"}) != nullptr, "monocle gaps row");
 
   const auto argv = settings::splitCommandLine(R"(sh -c "echo \"hi\"" 'a b' x\ y)");
   ok &= check(argv == std::vector<std::string>{"sh", "-c", "echo \"hi\"", "a b", "x y"}, "command line split");

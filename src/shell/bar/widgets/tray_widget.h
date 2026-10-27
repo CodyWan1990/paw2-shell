@@ -46,6 +46,8 @@ public:
   void setHoverOverlayParent(Node* node) noexcept { m_hoverOverlayParent = node; }
   void setCapsuleCross(float cross) noexcept { m_capsuleCross = cross; }
   void create() override;
+  // Its items come from the tray service, which refreshes the bar on change.
+  [[nodiscard]] bool wantsSecondTicks() const override { return false; }
   [[nodiscard]] bool wantsBarHoverHighlight() const noexcept override { return false; }
 
 private:

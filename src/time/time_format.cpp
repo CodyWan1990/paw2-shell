@@ -223,6 +223,10 @@ namespace {
 
 } // namespace
 
+bool formatShowsSeconds(std::string_view format) {
+  return format.contains("%S") || format.contains("%T") || format.contains("%X");
+}
+
 std::string formatLocalTime(const char* fmt) {
   using namespace std::chrono;
   if (fmt == nullptr || isBlankClockFormat(fmt)) {

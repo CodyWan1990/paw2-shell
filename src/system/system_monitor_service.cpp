@@ -1054,6 +1054,10 @@ void SystemMonitorService::retainCpuTemp() { m_cpuTempRefs.fetch_add(1, std::mem
 
 void SystemMonitorService::releaseCpuTemp() { m_cpuTempRefs.fetch_sub(1, std::memory_order_relaxed); }
 
+void SystemMonitorService::retainCpuFreq() { m_cpuFreqRefs.fetch_add(1, std::memory_order_relaxed); }
+
+void SystemMonitorService::releaseCpuFreq() { m_cpuFreqRefs.fetch_sub(1, std::memory_order_relaxed); }
+
 void SystemMonitorService::retainCpuCores() {
   if (m_cpuCoreRefs.fetch_add(1, std::memory_order_relaxed) != 0) {
     return;
@@ -1344,8 +1348,8 @@ void SystemMonitorService::samplingLoop() {
       }
 
       nextCpu = now + cpuInterval;
-      const auto freq = paw2shell::system::cpu_freq::readFreqs();
-      {
+      if (m_cpuFreqRefs.load(std::memory_order_relaxed) > 0) {
+        const auto freq = paw2shell::system::cpu_freq::readFreqs();
         std::scoped_lock lock{m_statsMutex};
         m_latest.cpuFreqAvailable = freq.curMhz.has_value();
         m_latest.cpuFreqMhz = freq.curMhz.value_or(0.0);
@@ -1494,7 +1498,7 @@ void SystemMonitorService::samplingLoop() {
         }
       }
       nextGpu = now + gpuInterval;
-      statsTouched = true;
+      statsTouched = statsTouched || gpuRetained;
     }
 
     if (diskEnabled && now >= nextDisk) {
@@ -1562,7 +1566,9 @@ void SystemMonitorService::samplingLoop() {
     };
     considerWake(cpuEnabled, nextCpu);
     considerWake(cpuCoresEnabled, nextCpuCores);
-    considerWake(gpuEnabled, nextGpu);
+    // Nothing displays a GPU stat: no reason to wake for one. A first retain is picked up on the
+    // next wake for another metric.
+    considerWake(gpuEnabled && gpuRetained, nextGpu);
     considerWake(memoryEnabled, nextMemory);
     considerWake(networkEnabled, nextNetwork);
     considerWake(diskEnabled, nextDisk);

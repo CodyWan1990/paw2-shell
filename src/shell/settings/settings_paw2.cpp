@@ -404,6 +404,20 @@ namespace settings {
       return false;
     }
 
+    // paw2 once read the scrolling layout's keys directly from [layout] and still does, behind
+    // [layout.scrolling]. Writing a key's new home takes the old one out, config.toml's copy
+    // included, so it cannot linger and come back as the value after a reset.
+    void dropLegacyLayoutKey(compositors::paw2::Paw2ConfigWriter& writer, std::string_view dotted) {
+      constexpr std::string_view kScrolling = "layout.scrolling.";
+      if (!dotted.starts_with(kScrolling)) {
+        return;
+      }
+      const std::string legacy = "layout." + std::string(dotted.substr(kScrolling.size()));
+      if (writer.get(legacy).has_value()) {
+        writer.remove(legacy);
+      }
+    }
+
   } // namespace
 
   bool isPaw2SettingPath(const std::vector<std::string>& path) { return path.size() >= 2 && path.front() == "paw2"; }
@@ -451,6 +465,7 @@ namespace settings {
       return true;
     }
     const std::string dotted = dottedPaw2Path(path);
+    dropLegacyLayoutKey(writer, dotted);
     // paw2 rejects blank strings ("theme.font cannot be empty"); a cleared field means "not set".
     if (json.is_string() && json.get<std::string>().empty()) {
       writer.unset(dotted);
@@ -490,6 +505,7 @@ namespace settings {
     } else if (isBindingPath(path)) {
       writer.setBinding(dottedPaw2Path(path, 2), nullptr);
     } else {
+      dropLegacyLayoutKey(writer, dottedPaw2Path(path));
       writer.unset(dottedPaw2Path(path));
     }
   }

@@ -233,7 +233,7 @@ private:
   FileWatcher m_fileWatcher;
   paw2shell::theme::ThemeService m_themeService{m_configService};
   paw2shell::theme::TemplateApplyService m_templateApplyService{m_configService};
-  paw2shell::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform, m_configService};
+  paw2shell::theme::Paw2ThemeSync m_paw2ThemeSync{m_compositorPlatform};
   // Saved themes. Applying one goes through the same wallpaper and palette paths
   // as `wallpaper-set` and `color-scheme-set`.
   paw2shell::theme::ThemePresetService m_themePresets{

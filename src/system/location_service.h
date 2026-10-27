@@ -3,15 +3,28 @@
 #include "config/config_types.h"
 
 #include <chrono>
+#include <cstddef>
 #include <cstdint>
 #include <filesystem>
 #include <functional>
+#include <nlohmann/json_fwd.hpp>
 #include <optional>
 #include <string>
+#include <string_view>
 #include <vector>
 
 class ConfigService;
 class HttpClient;
+
+// Open-Meteo's geocoder matches a place's name and nothing else, so "Paris, US" finds nothing.
+// The address is split at its first comma: the name is searched, and the rest ("US", "Texas",
+// "United States") chooses among the places that share it.
+namespace location_geocode {
+  [[nodiscard]] std::string queryName(std::string_view address);
+  // Index into Open-Meteo's `results` of the place whose country code, country or region matches
+  // the most of the address's qualifiers; the first result when none match.
+  [[nodiscard]] std::size_t bestMatch(const nlohmann::json& results, std::string_view address);
+} // namespace location_geocode
 
 // Coordinates selected from IP geolocation, a geocoded address, or manual configuration.
 struct ResolvedLocation {

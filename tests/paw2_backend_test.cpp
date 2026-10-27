@@ -35,7 +35,9 @@ namespace {
       R"({"id":4,"identifier":"bbb","title":"web","app_id":"firefox","output":"DP-1","workspace":1,"focused":true},)"
       R"({"id":9,"identifier":"ccc","title":"chat","app_id":"vesktop","output":"HDMI-A-1","workspace":0,"focused":false,"minimized":true}],)"
       R"("scratchpads":[{"name":"term","app_id":"kitty","loaded":true,"visible":false,"output":null}],)"
-      R"("layouts":["scrolling","dwindle","master","monocle"]})";
+      R"("layouts":["scrolling","dwindle","master","monocle"],)"
+      R"json("keyboard":{"layout":"English (US)","layouts":["English (US)","German"],)json"
+      R"json("caps_lock":true,"num_lock":false,"scroll_lock":false}})json";
 
   void pump(compositors::paw2::Paw2Runtime& runtime) {
     for (int i = 0; i < 50 && runtime.pollFd() >= 0; ++i) {
@@ -67,6 +69,18 @@ int main() {
           && parsed.outputs[0].modes[0].refresh == 165.08
           && parsed.outputs[0].modes[1].width == 1920,
       "output modes"
+  );
+  ok &= check(
+      parsed.keyboard.has_value()
+          && parsed.keyboard->layout == "English (US)"
+          && parsed.keyboard->layouts.size() == 2
+          && parsed.keyboard->capsLock
+          && !parsed.keyboard->numLock,
+      "keyboard layout and lock keys"
+  );
+  ok &= check(
+      !compositors::paw2::parseSnapshot(nlohmann::json::parse(R"({"type":"snapshot"})")).keyboard.has_value(),
+      "no keyboard from an older paw2"
   );
   ok &= check(compositors::paw2::workspaceIdFor("DP-1", 0) == "DP-1:1", "ext-workspace id is 1-based");
 

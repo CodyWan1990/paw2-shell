@@ -24,6 +24,9 @@ std::string formatTimeAgo(std::chrono::system_clock::time_point tp);
 // First day of the week from the active LC_TIME locale (struct tm::tm_wday encoding: Sun=0 .. Sat=6).
 [[nodiscard]] int localeFirstDayOfWeek();
 
+// Whether a chrono format string shows seconds, so its text changes every second.
+[[nodiscard]] bool formatShowsSeconds(std::string_view format);
+
 // Formats current local time with a C++20 chrono format string (e.g. "{:%H:%M}").
 // Bare chrono specs such as "%H:%M" are accepted, as are strftime-style no-pad
 // numeric specifiers such as "%-I".

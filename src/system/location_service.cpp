@@ -50,7 +50,52 @@ namespace {
     return it->get<bool>();
   }
 
+  // The comma-separated parts of an address after the place name, trimmed.
+  std::vector<std::string> addressQualifiers(std::string_view address) {
+    std::vector<std::string> qualifiers;
+    std::size_t start = address.find(',');
+    while (start != std::string_view::npos) {
+      const std::size_t end = address.find(',', start + 1);
+      std::string part =
+          StringUtils::trim(address.substr(start + 1, end == std::string_view::npos ? end : end - start - 1));
+      if (!part.empty()) {
+        qualifiers.push_back(std::move(part));
+      }
+      start = end;
+    }
+    return qualifiers;
+  }
+
 } // namespace
+
+namespace location_geocode {
+
+  std::string queryName(std::string_view address) { return StringUtils::trim(address.substr(0, address.find(','))); }
+
+  std::size_t bestMatch(const nlohmann::json& results, std::string_view address) {
+    const auto qualifiers = addressQualifiers(address);
+    std::size_t best = 0;
+    int bestScore = 0;
+    for (std::size_t i = 0; i < results.size(); ++i) {
+      const nlohmann::json& place = results[i];
+      int score = 0;
+      for (const auto& qualifier : qualifiers) {
+        for (const char* key : {"country_code", "country", "admin1", "admin2"}) {
+          if (StringUtils::equalsInsensitive(readString(place, key), qualifier)) {
+            ++score;
+            break;
+          }
+        }
+      }
+      if (score > bestScore) {
+        best = i;
+        bestScore = score;
+      }
+    }
+    return best;
+  }
+
+} // namespace location_geocode
 
 LocationService::LocationService(ConfigService& configService, HttpClient& httpClient)
     : m_configService(configService), m_httpClient(httpClient) {}
@@ -192,8 +237,9 @@ void LocationService::startAddressGeocode() {
   std::error_code ec;
   std::filesystem::create_directories(transportCacheDir(), ec);
   const auto path = transportCacheDir() / "geocode.json";
-  const std::string url = "https://geocoding-api.open-meteo.com/v1/search?count=1&format=json&name="
-      + StringUtils::urlEncode(m_config.address);
+  // Several candidates, so the rest of the address can pick between same-named places.
+  const std::string url = "https://geocoding-api.open-meteo.com/v1/search?count=10&format=json&name="
+      + StringUtils::urlEncode(location_geocode::queryName(m_config.address));
   const std::uint64_t serial = ++m_requestSerial;
   m_requestKind = RequestKind::GeocodeAddress;
   m_httpClient.download(url, path, [this, path, serial](bool success) {
@@ -231,7 +277,8 @@ void LocationService::handleResponse(
     if (!autoLocated && (results == response.end() || !results->is_array() || results->empty())) {
       throw std::runtime_error("no place matches the address");
     }
-    const nlohmann::json& place = autoLocated ? response : results->front();
+    const nlohmann::json& place =
+        autoLocated ? response : (*results)[location_geocode::bestMatch(*results, m_config.address)];
     const double latitude = readNumber(place, "latitude");
     const double longitude = readNumber(place, "longitude");
     const std::string name = readString(place, autoLocated ? "city" : "name");

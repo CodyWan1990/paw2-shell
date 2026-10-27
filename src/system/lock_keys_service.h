@@ -14,11 +14,15 @@ class LockKeysService {
 public:
   using LockKeysState = WaylandSeat::LockKeysState;
   using ChangeCallback = std::function<void(const LockKeysState& previous, const LockKeysState& current)>;
+  // The compositor's own report of the lock keys, when it has one. While it answers, sysfs is
+  // not polled; the compositor's change notification should call refreshNow().
+  using CompositorSource = std::function<std::optional<LockKeysState>()>;
 
   explicit LockKeysService(WaylandConnection& wayland);
 
   [[nodiscard]] LockKeysState state() const noexcept;
   void setChangeCallback(ChangeCallback callback);
+  void setCompositorSource(CompositorSource source);
   [[nodiscard]] int pollTimeoutMs() const;
   void dispatchPoll();
   void refreshNow();
@@ -36,6 +40,7 @@ private:
   int m_sysfsReadFailures = 0;
   std::chrono::steady_clock::time_point m_nextRefreshAt;
   ChangeCallback m_changeCallback;
+  CompositorSource m_compositorSource;
   std::vector<std::filesystem::path> m_capsLockPaths;
   std::vector<std::filesystem::path> m_numLockPaths;
   std::vector<std::filesystem::path> m_scrollLockPaths;

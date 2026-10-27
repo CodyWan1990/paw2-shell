@@ -19,10 +19,11 @@ namespace compositors::paw2 {
   class Paw2Runtime;
 
   // Changes paw2's settings the way paw2 wants them changed: never in config.toml - that file and
-  // its comments are the user's - but in two drop-ins paw2 merges over it and reloads by itself:
+  // its comments are the user's - but in drop-ins paw2 merges over it and reloads by itself:
   //
   //   config.d/shell.toml     every Settings page except the shortcuts
   //   config.d/keybinds.toml  [bindings], and nothing else
+  //   config.d/theme.toml     [colors] from the palette (writeThemeColors), and nothing else
   //
   // A drop-in owns every top-level table it names *whole*, which shapes everything here:
   //   - The first write into a table "claims" it: paw2's current values for the rest of that table
@@ -34,7 +35,8 @@ namespace compositors::paw2 {
   //
   // paw2 validates; this class does not. After a write it waits for paw2's next `config` message:
   // a rejection rolls the file back to what paw2 last accepted and keeps paw2's errors for the UI.
-  // Only our own writes are rolled back - a broken hand edit elsewhere is not ours to undo.
+  // Only our own writes are rolled back - a broken hand edit elsewhere is not ours to undo, and a
+  // rejection paw2 blames on another layer leaves our write in place.
   //
   // Values are JSON (as paw2 sends its config); paths are dotted, e.g. "appearance.gaps".
   class Paw2ConfigWriter {
@@ -68,6 +70,12 @@ namespace compositors::paw2 {
     // A null value removes it.
     void setBinding(std::string path, nlohmann::json value);
 
+    // Write `colors` (key -> "#RRGGBB") as the [colors] table of config.d/theme.toml, a drop-in of
+    // its own, so following the palette never claims [appearance] or [overview] from config.toml.
+    // Does nothing until paw2 says it knows [colors] (an older paw2 would reject the file), or when
+    // the file already holds exactly this.
+    void writeThemeColors(const std::map<std::string, std::string>& colors);
+
     // Write now instead of after the debounce (e.g. when Settings closes).
     void flush();
 
@@ -82,8 +90,10 @@ namespace compositors::paw2 {
 
     // ── Exposed for tests ───────────────────────────────────────────────────
     [[nodiscard]] static std::string renderTomlDocument(const nlohmann::json& document);
+    [[nodiscard]] static std::string renderTomlDocument(const nlohmann::json& document, std::string_view header);
     [[nodiscard]] std::filesystem::path shellDropIn() const { return m_dropInDir / "shell.toml"; }
     [[nodiscard]] std::filesystem::path keybindsDropIn() const { return m_dropInDir / "keybinds.toml"; }
+    [[nodiscard]] std::filesystem::path themeDropIn() const { return m_dropInDir / "theme.toml"; }
 
   private:
     void load();
@@ -92,6 +102,8 @@ namespace compositors::paw2 {
     void markDirty(bool& dropInDirty);
     void save();
     void onRuntimeChanged();
+    // Whether paw2's last rejection blames shell.toml or keybinds.toml rather than another layer.
+    [[nodiscard]] bool rejectionIsOurs() const;
     void notify() const;
     [[nodiscard]] const nlohmann::json& effectiveConfig() const;
     [[nodiscard]] bool claimed(std::string_view table) const;

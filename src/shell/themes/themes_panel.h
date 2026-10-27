@@ -37,7 +37,7 @@ public:
   [[nodiscard]] bool handleGlobalKey(std::uint32_t sym, std::uint32_t modifiers, bool pressed, bool preedit) override;
 
   [[nodiscard]] float preferredWidth() const override { return scaled(920.0F); }
-  [[nodiscard]] float preferredHeight() const override { return scaled(380.0F); }
+  [[nodiscard]] float preferredHeight() const override;
   [[nodiscard]] PanelPlacement panelPlacement() const noexcept override { return PanelPlacement::Floating; }
   [[nodiscard]] std::string panelScreenPosition() const override { return "center"; }
   [[nodiscard]] LayerShellKeyboard keyboardMode() const override { return LayerShellKeyboard::Exclusive; }

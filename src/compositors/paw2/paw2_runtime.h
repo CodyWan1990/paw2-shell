@@ -7,6 +7,7 @@
 #include <cstdint>
 #include <functional>
 #include <nlohmann/json.hpp>
+#include <optional>
 #include <poll.h>
 #include <string>
 #include <string_view>
@@ -64,12 +65,26 @@ namespace compositors::paw2 {
     bool operator==(const Paw2Scratchpad&) const = default;
   };
 
+  // The keyboard's layout and lock keys. paw2 sends them because a bar rarely has the keyboard
+  // focus, and only the focused client hears about either over wl_keyboard.
+  struct Paw2Keyboard {
+    std::string layout;
+    std::vector<std::string> layouts;
+    bool capsLock = false;
+    bool numLock = false;
+    bool scrollLock = false;
+
+    bool operator==(const Paw2Keyboard&) const = default;
+  };
+
   struct Paw2Snapshot {
     std::vector<Paw2Output> outputs;
     std::vector<Paw2Window> windows;
     std::vector<Paw2Scratchpad> scratchpads;
     // Layout names in cycle order.
     std::vector<std::string> layouts;
+    // Absent from a paw2 older than the field.
+    std::optional<Paw2Keyboard> keyboard;
 
     bool operator==(const Paw2Snapshot&) const = default;
   };
@@ -98,8 +113,8 @@ namespace compositors::paw2 {
     [[nodiscard]] bool connected() const noexcept { return m_fd >= 0; }
     [[nodiscard]] const Paw2Snapshot& snapshot() const noexcept { return m_snapshot; }
     [[nodiscard]] bool hasSnapshot() const noexcept { return m_hasSnapshot; }
-    // paw2 sends `config` only to peers it trusts (installed by the package manager or listed
-    // in [security] privileged_clients); an untrusted peer also gets blank titles and app ids.
+    // paw2 sends `config` only to peers it trusts (installed by the package manager, see paw2's
+    // client_trust); an untrusted peer also gets blank titles and app ids.
     [[nodiscard]] bool trusted() const noexcept { return m_trusted; }
     // paw2's merged config (compiled defaults, config.toml, config.d/). Only sent to trusted peers.
     [[nodiscard]] const nlohmann::json& config() const noexcept { return m_config; }

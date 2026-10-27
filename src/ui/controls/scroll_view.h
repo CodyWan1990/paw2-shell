@@ -22,6 +22,10 @@ class ScrollView : public Flex {
 public:
   ScrollView();
   void setOrientation(ScrollOrientation orientation);
+  // For a horizontal view that is the only thing scrolling under the pointer, such as a strip of
+  // cards: an ordinary mouse wheel (the vertical axis) scrolls it sideways too. Off by default, so a
+  // wide table inside a scrolling document leaves the wheel to the document.
+  void setVerticalWheelScrollsAcross(bool enabled) noexcept { m_verticalWheelScrollsAcross = enabled; }
 
   [[nodiscard]] Flex* content() noexcept { return m_content; }
   [[nodiscard]] const Flex* content() const noexcept { return m_content; }
@@ -128,4 +132,5 @@ private:
   bool m_reserveScrollbarGutter = false;
   bool m_dragging = false;
   ScrollOrientation m_orientation = ScrollOrientation::Vertical;
+  bool m_verticalWheelScrollsAcross = false;
 };

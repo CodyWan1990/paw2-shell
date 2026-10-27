@@ -98,6 +98,13 @@ struct BarInstance {
   Flex* centerSection = nullptr;
   Flex* endSection = nullptr;
 
+  // The pending update came from the second tick alone, so only widgets that want second ticks
+  // need it (see Bar::onSecondTick). Anything else asking for an update clears it.
+  bool secondTickOnly = false;
+  // The bar area the sections were last laid out in; a tick-only update still lays them out when
+  // it changed underneath, e.g. a resize landing in the same frame.
+  float sectionsLaidOutW = 0.0F;
+  float sectionsLaidOutH = 0.0F;
   std::vector<std::unique_ptr<Widget>> startWidgets;
   std::vector<std::unique_ptr<Widget>> centerWidgets;
   std::vector<std::unique_ptr<Widget>> endWidgets;

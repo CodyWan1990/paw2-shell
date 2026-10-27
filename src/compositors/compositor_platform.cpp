@@ -142,9 +142,7 @@ CompositorPlatform::CompositorPlatform(WaylandConnection& wayland)
     auto& paw2 = m_runtimeRegistry->paw2();
     m_workspaceMetadataBackend = std::make_unique<Paw2WorkspaceBackend>(paw2);
     m_focusedOutputBackends.push_back(std::make_unique<Paw2FocusedOutputBackend>(paw2));
-    // The socket is also the only source of the focused window (paw2 has no
-    // wlr-foreign-toplevel-management), so a snapshot is a toplevel change too.
-    m_paw2ListenerToken = paw2.addListener([this]() { notifyToplevelsChanged(); });
+    m_paw2ListenerToken = paw2.addListener([this]() { onPaw2Changed(); });
   }
   m_outputPowerBackend = createOutputPowerBackend();
 
@@ -768,7 +766,45 @@ std::optional<KeyboardLayoutState> CompositorPlatform::keyboardLayoutState() con
   return m_keyboardLayoutBackend->layoutState();
 }
 
+void CompositorPlatform::onPaw2Changed() {
+  // The socket is also the only source of the focused window (paw2 has no
+  // wlr-foreign-toplevel-management), so a snapshot is a toplevel change too.
+  notifyToplevelsChanged();
+
+  const auto& keyboard = m_runtimeRegistry->paw2().snapshot().keyboard;
+  if (!keyboard.has_value()) {
+    return;
+  }
+  // The first report counts as a change too: it is what the layout OSD takes as its baseline.
+  if (m_lastPaw2KeyboardLayout != keyboard->layout) {
+    m_lastPaw2KeyboardLayout = keyboard->layout;
+    if (m_keyboardLayoutChangeCallback) {
+      m_keyboardLayoutChangeCallback();
+    }
+  }
+  const WaylandSeat::LockKeysState lockKeys{
+      .capsLock = keyboard->capsLock, .numLock = keyboard->numLock, .scrollLock = keyboard->scrollLock
+  };
+  if (m_lastPaw2LockKeys != lockKeys) {
+    m_lastPaw2LockKeys = lockKeys;
+    if (m_lockKeysChangeCallback) {
+      m_lockKeysChangeCallback();
+    }
+  }
+}
+
+std::optional<WaylandSeat::LockKeysState> CompositorPlatform::compositorLockKeysState() const {
+  return m_lastPaw2LockKeys;
+}
+
+void CompositorPlatform::setLockKeysChangeCallback(ChangeCallback callback) {
+  m_lockKeysChangeCallback = std::move(callback);
+}
+
 std::string CompositorPlatform::currentKeyboardLayoutName() const {
+  if (m_lastPaw2KeyboardLayout.has_value() && !m_lastPaw2KeyboardLayout->empty()) {
+    return *m_lastPaw2KeyboardLayout;
+  }
   if (m_keyboardLayoutBackend != nullptr) {
     if (auto backendName = m_keyboardLayoutBackend->currentLayoutName();
         backendName.has_value() && !backendName->empty()) {
@@ -779,6 +815,10 @@ std::string CompositorPlatform::currentKeyboardLayoutName() const {
 }
 
 std::vector<std::string> CompositorPlatform::keyboardLayoutNames() const {
+  if (const auto& keyboard = m_runtimeRegistry->paw2().snapshot().keyboard;
+      m_lastPaw2KeyboardLayout.has_value() && keyboard.has_value() && !keyboard->layouts.empty()) {
+    return keyboard->layouts;
+  }
   if (m_keyboardLayoutBackend != nullptr) {
     if (const auto state = m_keyboardLayoutBackend->layoutState(); state.has_value() && !state->names.empty()) {
       if (state->names.size() > 1) {

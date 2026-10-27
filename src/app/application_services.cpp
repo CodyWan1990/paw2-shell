@@ -561,7 +561,6 @@ void Application::initStyleThemeAndWayland() {
   m_configService.addReloadCallback(applyStyleConfig);
   m_configService.addReloadCallback(applyPasswordMaskStyle);
   m_configService.addReloadCallback(applyInputConfig);
-  m_configService.addReloadCallback([this]() { m_paw2ThemeSync.refresh(); });
   m_configService.addReloadCallback([this]() {
     m_httpClient.setOfflineMode(m_configService.config().shell.offlineMode);
   });
@@ -774,6 +773,12 @@ void Application::initWaylandCallbacks() {
     m_windowSwitcher.onToplevelChange();
   });
   if constexpr (kLockKeysEnabled) {
+    m_lockKeysService.setCompositorSource([this]() { return m_compositorPlatform.compositorLockKeysState(); });
+    m_compositorPlatform.setLockKeysChangeCallback([this]() {
+      if (lockKeysConsumersEnabled(m_configService.config())) {
+        m_lockKeysService.refreshNow();
+      }
+    });
     if (lockKeysConsumersEnabled(m_configService.config())) {
       m_lockKeysService.refreshNow();
     }

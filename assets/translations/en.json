@@ -1854,6 +1854,11 @@
             "center-focused-column": {
               "label": "Center focused column",
               "description": "Keep the focused column in the middle, instead of scrolling only far enough to show it."
+            },
+            "lone-window-full-width": {
+              "label": "Full width for a lone window",
+              "description":
+                  "A workspace's only window takes the whole width until a second one opens. Smart gaps does this too."
             }
           },
           "master-stack": {
@@ -1912,6 +1917,11 @@
           "gaps": {
             "label": "Gaps",
             "description": "Space between windows and around the screen edges, in logical pixels."
+          },
+          "smart-gaps": {
+            "label": "Smart gaps",
+            "description":
+                "A workspace's only window fills it, with no gaps or focus ring around it. In scrolling it also takes the full width."
           },
           "focus-ring-width": {
             "label": "Focus ring width",

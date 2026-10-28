@@ -737,6 +737,7 @@ namespace settings {
     void appendPaw2WindowEntries(std::vector<SettingEntry>& entries, const Paw2Values& paw2) {
       Paw2Rows rows(entries, paw2, SettingsSection::Appearance, "windows");
       rows.slider("appearance.gaps", 0, 0, 64, 1, "gaps spacing margin");
+      rows.toggle("appearance.smart_gaps", false, "smart gaps single lone window border focus ring");
       rows.slider("appearance.focus_ring_width", 0, 0, 16, 1, "focus ring border width");
       // paw2 draws these for apps that let it; GTK apps keep their own header bars.
       const bool titlebarsOn =
@@ -815,6 +816,7 @@ namespace settings {
           "layout.scrolling.center_focused_column", paw2.boolean("layout.center_focused_column", false),
           "center viewport scrolling"
       );
+      rows.toggle("layout.scrolling.lone_window_full_width", false, "full width single lone window scrolling column");
 
       rows.setGroup("paw2-tiling-master-stack");
       rows.slider("layout.master_stack.master_ratio", 0.6, 0.1, 0.9, 0.05, "master stack size ratio width");

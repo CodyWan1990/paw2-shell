@@ -97,6 +97,8 @@ namespace settings {
         {"increase_column_width", "paw2-keys-layout", ""},
         {"decrease_row_height", "paw2-keys-layout", ""},
         {"increase_row_height", "paw2-keys-layout", ""},
+        {"decrease_master_count", "paw2-keys-layout", ""},
+        {"increase_master_count", "paw2-keys-layout", ""},
         {"tab_group_left", "paw2-keys-tabs", ""},
         {"tab_group_right", "paw2-keys-tabs", ""},
         {"previous_tab", "paw2-keys-tabs", ""},

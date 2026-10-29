@@ -1761,6 +1761,8 @@
             "increase-column-width": "Wider column",
             "decrease-row-height": "Shorter row",
             "increase-row-height": "Taller row",
+            "decrease-master-count": "Fewer master windows",
+            "increase-master-count": "More master windows",
             "tab-group-left": "Into tab group on the left",
             "tab-group-right": "Into tab group on the right",
             "previous-tab": "Previous tab",

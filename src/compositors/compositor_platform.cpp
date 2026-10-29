@@ -328,7 +328,18 @@ wl_output* CompositorPlatform::activeToplevelOutput() const {
 }
 
 std::vector<std::string> CompositorPlatform::runningAppIds(wl_output* outputFilter) const {
-  return m_wayland.runningAppIds(outputFilter);
+  auto ids = m_wayland.runningAppIds(outputFilter);
+  // ext-foreign-toplevel-list does not say which output a window is on, so the Wayland side ignores the filter.
+  // When the compositor reports window identities with their outputs, keep only the apps with a window there.
+  if (outputFilter != nullptr
+      && m_workspaceMetadataBackend != nullptr
+      && m_workspaceMetadataBackend->hasExactWindowIdentity()
+      && m_wayland.hasExtForeignToplevelList()) {
+    std::erase_if(ids, [&](const std::string& id) {
+      return enrichedWindowsForApp(StringUtils::toLower(id), {}, outputFilter).empty();
+    });
+  }
+  return ids;
 }
 
 std::vector<ToplevelInfo> CompositorPlatform::windowsForApp(

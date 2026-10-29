@@ -707,6 +707,8 @@ void Dock::onWorkspaceChanged() {
     return;
   }
   scheduleSmartAutoHideReevaluation();
+  // A window moving to another monitor arrives as a workspace change, and a per-monitor dock lists it differently.
+  refresh();
 }
 
 void Dock::scheduleSmartAutoHideReevaluation() {

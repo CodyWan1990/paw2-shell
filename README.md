@@ -25,6 +25,10 @@ something breaks, an issue is very welcome.
 paw2-shell is a native Wayland shell written in C++ with no Qt or GTK: bars and widgets, dock, launcher, control
 center, notifications, wallpapers, lock screen, OSDs and desktop widgets.
 
+It is a hard fork of [Noctalia](https://github.com/noctalia-dev/noctalia) v5.3.0. Noctalia was the starting point;
+paw2-shell stripped it down, rebuilt it around paw2, and has since diverged heavily. The foundation is still their
+work, so see [Support Noctalia](#support-noctalia) below.
+
 It runs only on paw2 and is built to work hand in hand with it. The shell and the compositor share one look, and you
 can set up most of paw2 from the shell's settings instead of editing files by hand.
 
@@ -105,6 +109,17 @@ and how the pieces fit together is described in [ARCHITECTURE.md](ARCHITECTURE.m
 The old QML/Quickshell version of paw2-shell is kept on the
 [`legacy-qml`](https://github.com/CodyWan1990/paw2-shell/tree/legacy-qml) branch.
 
+## Support Noctalia
+
+paw2-shell wouldn't exist without Noctalia. The bars, panels, renderer and much of what sits under them began as their
+work. If you enjoy this shell, please consider supporting the people who built its foundation:
+
+- Star [noctalia-dev/noctalia](https://github.com/noctalia-dev/noctalia) on GitHub
+- Donate through [Buy Me a Coffee](https://www.buymeacoffee.com/noctalia) or [Ko-fi](https://ko-fi.com/noctaliadev)
+- Join their community on [Discord](https://discord.noctalia.dev)
+
+Please report paw2-shell bugs here, not to Noctalia. They don't maintain this fork.
+
 ## License
 
-MIT. See [LICENSE](LICENSE) and [CREDITS.md](CREDITS.md).
+MIT, like Noctalia. See [LICENSE](LICENSE) and [CREDITS.md](CREDITS.md).

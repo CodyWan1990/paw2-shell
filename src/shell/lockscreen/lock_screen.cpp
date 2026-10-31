@@ -619,17 +619,6 @@ void LockScreen::suppressEntryTransition() {
   kLog.debug("desktop lock transition suppressed for powered-off outputs");
 }
 
-void LockScreen::onOutputPowerChanged() {
-  if (m_compositorPlatform == nullptr || !m_compositorPlatform->shouldSuppressLockTransition()) {
-    return;
-  }
-  if (isActive() || m_lockStarting || m_lockDeferred) {
-    suppressEntryTransition();
-  } else if (m_configService == nullptr || !m_configService->config().lockscreen.blurredDesktop) {
-    invalidateDesktopCaptures();
-  }
-}
-
 void LockScreen::prepareForOutputPowerOff(std::function<void(bool)> done) {
   cancelOutputPowerOff();
   if (!done) {
@@ -1305,7 +1294,7 @@ void LockScreen::applyIndicatorsToSurface(LockSurface& surface) const {
   std::string layoutLabel;
   if (m_compositorPlatform != nullptr) {
     hasMultipleLayouts = m_compositorPlatform->keyboardLayoutNames().size() > 1;
-    switchable = m_compositorPlatform->hasKeyboardLayoutBackend();
+    switchable = m_compositorPlatform->canCycleKeyboardLayout();
     const std::string layoutName = m_compositorPlatform->currentKeyboardLayoutName();
     layoutLabel = m_configService != nullptr
         ? resolveKeyboardLayoutLabel(

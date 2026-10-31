@@ -83,7 +83,6 @@
 #include "wayland/clipboard_poll_source.h"
 #include "wayland/clipboard_service.h"
 #include "wayland/key_repeat_poll_source.h"
-#include "wayland/keyboard_layout_poll_source.h"
 #include "wayland/text_input_service.h"
 #include "wayland/virtual_keyboard_service.h"
 #include "wayland/wayland_connection.h"
@@ -368,7 +367,6 @@ private:
   TimerPollSource m_timerPollSource;
   KeyRepeatPollSource m_keyRepeatPollSource{m_wayland};
   WorkspacePollSource m_workspacePollSource{m_compositorPlatform};
-  KeyboardLayoutPollSource m_keyboardLayoutPollSource{m_compositorPlatform};
   LockKeysPollSource m_lockKeysPollSource{m_lockKeysService};
   std::unique_ptr<BrightnessPollSource> m_brightnessPollSource;
   std::unique_ptr<PipeWirePollSource> m_pipewirePollSource;

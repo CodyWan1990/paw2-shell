@@ -84,7 +84,6 @@ public:
   /// Calls `done(false)` if cancelled or no safe frame arrives before the deadline.
   void prepareForOutputPowerOff(std::function<void(bool)> done);
   void cancelOutputPowerOff();
-  void onOutputPowerChanged();
 
   template <typename Fn> void forEachSurface(Fn&& fn) {
     for (auto& instance : m_instances) {

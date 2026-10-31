@@ -223,6 +223,8 @@ namespace compositors::paw2 {
 
   bool Paw2Runtime::toggleOverview() { return send({{"cmd", "toggle-overview"}}); }
 
+  bool Paw2Runtime::cycleKeyboardLayout() { return send({{"cmd", "cycle-keyboard-layout"}}); }
+
   bool Paw2Runtime::quit() { return send({{"cmd", "quit"}}); }
 
   bool Paw2Runtime::send(const nlohmann::json& command) {

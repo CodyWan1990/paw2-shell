@@ -257,7 +257,7 @@ void KeyboardLayoutWidget::sync(Renderer& renderer) {
     const bool needsBackend = left != nullptr
         && left->kind == paw2shell::bar::WidgetAction::Kind::Ipc
         && left->verb == "keyboard-layout-cycle";
-    node->setOpacity(needsBackend && !m_platform.hasKeyboardLayoutBackend() ? 0.85F : 1.0F);
+    node->setOpacity(needsBackend && !m_platform.canCycleKeyboardLayout() ? 0.85F : 1.0F);
   }
 
   requestRedraw();

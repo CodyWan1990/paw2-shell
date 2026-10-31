@@ -143,6 +143,8 @@ namespace compositors::paw2 {
     // Forget where a scratchpad was moved or resized, so it takes its configured place again.
     bool resetScratchpad(std::string_view name);
     bool toggleOverview();
+    // Steps the keymap to its next layout.
+    bool cycleKeyboardLayout();
     // Refused by paw2 for untrusted peers; callers fall back to logind.
     bool quit();
 

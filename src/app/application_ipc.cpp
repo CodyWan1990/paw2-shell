@@ -505,7 +505,7 @@ void Application::initIpc() {
     if (!paw2shell::ipc::splitWords(args).empty()) {
       return "error: keyboard-layout-cycle takes no arguments\n";
     }
-    if (!m_compositorPlatform.hasKeyboardLayoutBackend()) {
+    if (!m_compositorPlatform.canCycleKeyboardLayout()) {
       return "error: this compositor has no keyboard layout backend\n";
     }
     if (!m_compositorPlatform.cycleKeyboardLayout()) {

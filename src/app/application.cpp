@@ -172,7 +172,6 @@ Application::Application()
 }
 
 Application::~Application() {
-  m_compositorPlatform.setOutputPowerChangeCallback({});
   ++m_outputPowerRequestGeneration;
   m_lockScreen.cancelOutputPowerOff();
   ColorPickerDialog::setPresenter(nullptr);

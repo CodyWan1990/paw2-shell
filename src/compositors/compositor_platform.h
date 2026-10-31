@@ -1,6 +1,5 @@
 #pragma once
 
-#include "compositors/keyboard_backend.h"
 #include "compositors/workspace_backend.h"
 #include "ui/signal.h"
 #include "wayland/wayland_connection.h"
@@ -23,19 +22,19 @@ struct zwlr_foreign_toplevel_handle_v1;
 class OutputProbe;
 class WaylandWorkspaces;
 
-namespace compositors {
-  class CompositorRuntimeRegistry;
-  class FocusedOutputBackend;
-  class OutputPowerBackend;
-  namespace paw2 {
-    class Paw2ConfigWriter;
-    class Paw2Runtime;
-  }
-} // namespace compositors
+namespace compositors::paw2 {
+  class Paw2ConfigWriter;
+  class Paw2Runtime;
+} // namespace compositors::paw2
 
 class Paw2WorkspaceBackend;
 
 class WorkspaceAlertService;
+
+struct KeyboardLayoutState {
+  std::vector<std::string> names;
+  int currentIndex = -1;
+};
 
 class CompositorPlatform {
 public:
@@ -116,7 +115,6 @@ public:
   [[nodiscard]] std::optional<std::string> focusedCompositorWindowId() const;
 
   void setWorkspaceChangeCallback(ChangeCallback callback);
-  void setOverviewChangeCallback(ChangeCallback callback);
   void activateWorkspace(const std::string& id);
   void activateWorkspace(wl_output* output, const std::string& id);
   void activateWorkspace(wl_output* output, const Workspace& workspace);
@@ -130,6 +128,9 @@ public:
   [[nodiscard]] std::vector<std::string> workspaceDisplayKeys(wl_output* outputFilter = nullptr) const;
   [[nodiscard]] std::vector<WorkspaceWindowAssignment>
   workspaceWindowAssignments(wl_output* outputFilter = nullptr) const;
+  // Whether the active workspace on `output` holds any window; smart auto-hide shows the bar and
+  // dock only over an empty one.
+  [[nodiscard]] bool activeWorkspaceHasWindows(wl_output* output) const;
   // Workspace keys of the overlay workspaces currently open on `outputFilter`
   // (nullptr = every output). Empty unless the active workspace backend tracks them.
   [[nodiscard]] std::vector<std::string> openOverlayWorkspaceKeys(wl_output* outputFilter = nullptr) const;
@@ -147,8 +148,9 @@ public:
   assignTaskbarWindows(const std::vector<TaskbarWindowCandidate>& windows, wl_output* outputFilter = nullptr) const;
   [[nodiscard]] const char* workspaceBackendName() const noexcept;
 
-  [[nodiscard]] bool cycleKeyboardLayout() const;
-  [[nodiscard]] bool hasKeyboardLayoutBackend() const noexcept;
+  // Switches through paw2, which owns the keymap; false outside paw2 or with one layout.
+  [[nodiscard]] bool cycleKeyboardLayout();
+  [[nodiscard]] bool canCycleKeyboardLayout() const noexcept;
   [[nodiscard]] std::optional<KeyboardLayoutState> keyboardLayoutState() const;
   [[nodiscard]] std::string currentKeyboardLayoutName() const;
   [[nodiscard]] std::vector<std::string> keyboardLayoutNames() const;
@@ -161,18 +163,11 @@ public:
   [[nodiscard]] bool compositorReportsKeyboard() const noexcept { return m_lastPaw2KeyboardLayout.has_value(); }
   // Called when compositorLockKeysState() changes.
   void setLockKeysChangeCallback(ChangeCallback callback);
-  void addKeyboardLayoutPollFds(std::vector<pollfd>& fds) const;
-  void dispatchKeyboardLayoutPoll(const std::vector<pollfd>& fds, std::size_t startIdx);
 
   [[nodiscard]] bool requestSessionExit() const;
   [[nodiscard]] bool setOutputPower(bool on) const;
   void setOutputPowerOffPending(bool pending) noexcept { m_outputPowerOffPending = pending; }
   [[nodiscard]] bool shouldSuppressLockTransition() const;
-  void setOutputPowerChangeCallback(ChangeCallback callback);
-
-  [[nodiscard]] bool tracksOverviewState() const noexcept;
-  [[nodiscard]] bool hasOverviewState() const noexcept;
-  [[nodiscard]] bool isOverviewOpen() const noexcept;
 
   // paw2's control socket: layouts, scratchpads, merged config. Always present; check
   // available()/connected() before relying on it.
@@ -192,7 +187,6 @@ private:
   void bindExtWorkspace(ext_workspace_manager_v1* manager);
   void notifyToplevelsChanged();
   void onPaw2Changed();
-  void onOutputAdded(wl_output* output);
   [[nodiscard]] wl_output* resolveOutputName(const std::string& outputName) const;
   [[nodiscard]] std::string connectorNameForOutput(wl_output* output) const;
   [[nodiscard]] std::vector<WorkspaceModelSnapshot> workspaceModelSnapshot() const;
@@ -202,17 +196,16 @@ private:
 
   WaylandConnection& m_wayland;
   WorkspaceAlertService* m_workspaceAlertService = nullptr;
-  std::unique_ptr<compositors::CompositorRuntimeRegistry> m_runtimeRegistry;
+  std::unique_ptr<compositors::paw2::Paw2Runtime> m_paw2;
+  // Listens to m_paw2, so it is declared after it and destroyed first.
+  std::unique_ptr<compositors::paw2::Paw2ConfigWriter> m_paw2Config;
   std::unique_ptr<WaylandWorkspaces> m_workspaces;
-  std::unique_ptr<compositors::WorkspaceMetadataBackend> m_workspaceMetadataBackend;
+  // Only inside a paw2 session; null when the shell runs under another compositor.
+  std::unique_ptr<Paw2WorkspaceBackend> m_paw2Workspaces;
   Signal<>::ScopedConnection m_paw2ListenerToken;
-  std::vector<std::unique_ptr<compositors::FocusedOutputBackend>> m_focusedOutputBackends;
-  std::unique_ptr<compositors::OutputPowerBackend> m_outputPowerBackend;
   mutable std::optional<bool> m_lastRequestedOutputPowerState;
   bool m_outputPowerOffPending = false;
-  std::unique_ptr<KeyboardLayoutBackend> m_keyboardLayoutBackend;
   ChangeCallback m_workspaceChangeCallback;
-  ChangeCallback m_overviewChangeCallback;
   ChangeCallback m_keyboardLayoutChangeCallback;
   ChangeCallback m_lockKeysChangeCallback;
   ChangeCallback m_toplevelChangeCallback;

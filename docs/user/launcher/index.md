@@ -102,7 +102,7 @@ Open or close any panel paw2-shell knows about, without memorizing its `paw2-she
 - **Source**: Every panel currently registered with paw2-shell , plus one row per visible Control Center tab (Audio, Network, Bluetooth, and so on).
 - **Functionality**: Fuzzy-matches against the panel's name. Activating a plain panel result toggles it; activating a tab result opens Control Center directly to that tab.
 - **Scoring**: Activation count boosts the score.
-- **Ignored panels**: `shell.launcher.panels.ignored` excludes specific panel ids from the list (defaulting to `polkit`, `setup-wizard`, `test`, and `launcher`) for panels that aren't meant to be opened on demand, or (for `launcher`) redundant to toggle from within the launcher itself. Editable under **Settings → Panels → Launcher → Providers**.
+- **Ignored panels**: `shell.launcher.panels.ignored` excludes specific panel ids from the list (defaulting to `polkit`, `setup-wizard`, and `launcher`) for panels that aren't meant to be opened on demand, or (for `launcher`) redundant to toggle from within the launcher itself. Editable under **Settings → Panels → Launcher → Providers**.
 
 ### Wallpaper
 

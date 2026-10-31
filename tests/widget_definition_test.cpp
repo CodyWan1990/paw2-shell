@@ -27,7 +27,6 @@
 #include "shell/bar/widgets/spacer_widget_definition.h"
 #include "shell/bar/widgets/sysmon_widget_definition.h"
 #include "shell/bar/widgets/taskbar_widget_definition.h"
-#include "shell/bar/widgets/test_widget_definition.h"
 #include "shell/bar/widgets/text_widget_definition.h"
 #include "shell/bar/widgets/theme_mode_widget_definition.h"
 #include "shell/bar/widgets/tray_widget_definition.h"
@@ -248,7 +247,6 @@ int main() {
   if (!taskbarConfig.widgets.at("taskbar-test").getBool("group_by_workspace", false)) {
     fail("taskbar", "capability visibility mutated persisted workspace grouping");
   }
-  checkDefinition<true>("test", testWidgetDefinition);
   checkDefinition("text", textWidgetDefinition);
   checkDefinition<true>("theme_mode", themeModeWidgetDefinition);
   checkDefinition("tray", trayWidgetDefinition, TrayWidgetDefinitionContext{});

@@ -1188,7 +1188,7 @@ struct ShellConfig {
     struct PanelsConfig {
       // Panel ids the panel provider never lists. Setting this in config.toml
       // replaces the default outright, same as every other list config here.
-      std::vector<std::string> ignored{"polkit", "setup-wizard", "test", "launcher"};
+      std::vector<std::string> ignored{"polkit", "setup-wizard", "launcher"};
 
       bool operator==(const PanelsConfig&) const = default;
     } panels;

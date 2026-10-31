@@ -824,7 +824,6 @@
           "polkit": "Authentication Prompt",
           "session": "Session",
           "setup-wizard": "Setup Wizard",
-          "test": "Test Panel",
           "tray-drawer": "Tray Drawer",
           "wallpaper": "Wallpaper"
         },
@@ -5300,7 +5299,6 @@
         "spacer": "Spacer",
         "sysmon": "System Monitor",
         "taskbar": "Taskbar",
-        "test": "Test",
         "text": "Text",
         "theme-mode": "Theme Mode",
         "themes": "Themes",

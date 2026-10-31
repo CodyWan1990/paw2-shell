@@ -813,7 +813,6 @@
           "polkit": "Caixa de Diálogo de Autenticação",
           "session": "Sessão",
           "setup-wizard": "Assistente de Configuração",
-          "test": "Painel de Teste",
           "tray-drawer": "Gaveta da Bandeja",
           "wallpaper": "Papel de Parede"
         },
@@ -4660,7 +4659,6 @@
         "spacer": "Spacer",
         "sysmon": "Monitor do Sistema",
         "taskbar": "Taskbar",
-        "test": "Teste",
         "text": "Texto",
         "theme-mode": "Modo do Tema",
         "tray": "Bandeja",

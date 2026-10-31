@@ -64,7 +64,6 @@
 #include "shell/session/session_ipc.h"
 #include "shell/session/session_panel.h"
 #include "shell/setup_wizard/setup_wizard_panel.h"
-#include "shell/test/test_panel.h"
 #include "shell/tooltip/tooltip_manager.h"
 #include "shell/tray/tray_drawer_panel.h"
 #include "shell/themes/theme_editor_panel.h"
@@ -452,7 +451,6 @@ void Application::initPanelManagerAndPanels() {
   m_panelManager.registerPanel("clipboard", std::move(clipboardPanel));
   syncClipboardService();
   m_panelManager.registerPanel("session", std::make_unique<SessionPanel>(&m_configService, m_sessionActionRunner));
-  m_panelManager.registerPanel("test", std::make_unique<TestPanel>());
   auto controlCenterPanel = std::make_unique<ControlCenterPanel>(ControlCenterServices{
       .notifications = &m_notificationManager,
       .audio = m_pipewireService.get(),

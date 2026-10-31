@@ -783,7 +783,6 @@
           "polkit": "身份验证提示",
           "session": "会话",
           "setup-wizard": "设置向导",
-          "test": "测试面板",
           "tray-drawer": "托盘抽屉",
           "wallpaper": "壁纸"
         },
@@ -4567,7 +4566,6 @@
         "spacer": "空白间隔",
         "sysmon": "系统监视器",
         "taskbar": "任务栏",
-        "test": "测试",
         "text": "文本",
         "theme-mode": "主题模式",
         "tray": "托盘",

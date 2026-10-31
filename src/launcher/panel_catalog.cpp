@@ -27,7 +27,6 @@ namespace panel_catalog {
         BuiltinPanelMeta{"polkit", "launcher.providers.panel.builtin.polkit", "shield-lock"},
         BuiltinPanelMeta{"session", "launcher.providers.panel.builtin.session", "power"},
         BuiltinPanelMeta{"setup-wizard", "launcher.providers.panel.builtin.setup-wizard", "wand"},
-        BuiltinPanelMeta{"test", "launcher.providers.panel.builtin.test", "bug"},
         BuiltinPanelMeta{"tray-drawer", "launcher.providers.panel.builtin.tray-drawer", "apps"},
         BuiltinPanelMeta{"wallpaper", "launcher.providers.panel.builtin.wallpaper", "wallpaper-selector"},
     };

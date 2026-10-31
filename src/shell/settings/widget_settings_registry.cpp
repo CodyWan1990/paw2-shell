@@ -29,7 +29,6 @@
 #include "shell/bar/widgets/spacer_widget_definition.h"
 #include "shell/bar/widgets/sysmon_widget_definition.h"
 #include "shell/bar/widgets/taskbar_widget_definition.h"
-#include "shell/bar/widgets/test_widget_definition.h"
 #include "shell/bar/widgets/text_widget_definition.h"
 #include "shell/bar/widgets/theme_mode_widget_definition.h"
 #include "shell/bar/widgets/themes_widget_definition.h"
@@ -160,7 +159,6 @@ namespace settings {
         projectWidgetDefinition<spacerWidgetDefinition>(),
         projectWidgetDefinition<sysmonWidgetDefinition>(),
         projectWidgetDefinition<taskbarWidgetDefinition>(),
-        projectWidgetDefinition<testWidgetDefinition>(),
         projectWidgetDefinition<textWidgetDefinition>(),
         projectWidgetDefinition<themeModeWidgetDefinition>(),
         projectWidgetDefinition<themesWidgetDefinition>(),
@@ -252,7 +250,6 @@ namespace settings {
         {.type = "spacer", .labelKey = "settings.widgets.types.spacer", .glyph = "arrows-horizontal"},
         {.type = "sysmon", .labelKey = "settings.widgets.types.sysmon", .glyph = "cpu-usage"},
         {.type = "taskbar", .labelKey = "settings.widgets.types.taskbar", .glyph = "apps"},
-        {.type = "test", .labelKey = "settings.widgets.types.test", .glyph = "flask", .visibleInPicker = false},
         {.type = "text", .labelKey = "settings.widgets.types.text", .glyph = "letter-t"},
         {.type = "theme_mode", .labelKey = "settings.widgets.types.theme-mode", .glyph = "theme-mode"},
         {.type = "themes", .labelKey = "settings.widgets.types.themes", .glyph = "palette"},

@@ -813,7 +813,6 @@
           "polkit": "Richiesta di autenticazione",
           "session": "Sessione",
           "setup-wizard": "Procedura setup guidata",
-          "test": "Pannello di prova",
           "tray-drawer": "Cassetto dei vassoi",
           "wallpaper": "Sfondo"
         },
@@ -4660,7 +4659,6 @@
         "spacer": "Spaziatore",
         "sysmon": "Monitor di sistema",
         "taskbar": "Taskbar",
-        "test": "Test",
         "text": "Testo",
         "theme-mode": "Modalità tema",
         "tray": "Vassoio",

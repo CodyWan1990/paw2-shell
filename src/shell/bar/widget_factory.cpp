@@ -56,7 +56,6 @@
 #include "shell/bar/widgets/sysmon_widget_definition.h"
 #include "shell/bar/widgets/taskbar_widget.h"
 #include "shell/bar/widgets/taskbar_widget_definition.h"
-#include "shell/bar/widgets/test_widget.h"
 #include "shell/bar/widgets/text_widget.h"
 #include "shell/bar/widgets/text_widget_definition.h"
 #include "shell/bar/widgets/theme_mode_widget.h"
@@ -323,9 +322,6 @@ std::unique_ptr<Widget> WidgetFactory::create(
                     .widgetName = context.name,
                 }
             );
-          }},
-      {"test", [](const WidgetFactory&, const BuiltinWidgetContext& context) {
-            return createWidget<TestWidget>(context.contentScale, context.output);
           }},
       {"text", [](const WidgetFactory&, const BuiltinWidgetContext& context) {
             return createWidget<TextWidget>(

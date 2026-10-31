@@ -4,7 +4,7 @@
 #   makepkg -si
 
 pkgname=paw2-shell-git
-pkgver=1.1.0
+pkgver=1.1.0.r82.gaf83a4e
 pkgrel=1
 epoch=1
 pkgdesc='Desktop shell for the paw2 Wayland compositor.'

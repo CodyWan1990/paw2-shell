@@ -52,13 +52,11 @@ namespace settings {
       const ConfigOverrideValue* value
   );
 
-  // A compositor action the Shortcuts page binds, as paw2's DEFAULT_BINDINGS (src/config.rs) lists
-  // it: its [bindings] key, the page group it sits in, and the keys paw2 uses when the key is
-  // absent. paw2 does not send its defaults, so they are mirrored here.
+  // Where the Shortcuts page puts a compositor action, in page order. paw2 sends the actions
+  // themselves and their default keys; one missing here lands in "paw2-keys-other".
   struct Paw2BindingAction {
-    std::string_view key;      // "close_window", or "workspace.previous" for [bindings.workspace]
-    std::string_view group;    // e.g. "paw2-keys-windows"
-    std::string_view defaults; // space-separated chords; empty means unbound
+    std::string_view key;   // "close_window", or "workspace.previous" for [bindings.workspace]
+    std::string_view group; // e.g. "paw2-keys-windows"
   };
   [[nodiscard]] std::span<const Paw2BindingAction> paw2BindingActions();
 

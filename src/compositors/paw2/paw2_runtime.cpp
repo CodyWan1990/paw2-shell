@@ -438,6 +438,16 @@ namespace compositors::paw2 {
       m_config = json.value("values", nlohmann::json::object());
       m_configOk = json.value("ok", true);
       m_configErrors = jsonStrings(json, "errors");
+      m_defaultBindings.clear();
+      if (const auto it = json.find("default_bindings"); it != json.end() && it->is_array()) {
+        for (const auto& action : *it) {
+          if (action.is_object() && action.value("name", std::string{}) != "") {
+            m_defaultBindings.push_back(
+                {.name = action.value("name", std::string{}), .keys = jsonStrings(action, "keys")}
+            );
+          }
+        }
+      }
       ++m_configGeneration;
       notify();
     }

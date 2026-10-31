@@ -89,6 +89,14 @@ namespace compositors::paw2 {
     bool operator==(const Paw2Snapshot&) const = default;
   };
 
+  // A bindable action and the keys paw2 gives it when the config leaves it out.
+  struct Paw2DefaultBinding {
+    std::string name; // "close_window", or "workspace.previous" for [bindings.workspace]
+    std::vector<std::string> keys;
+
+    bool operator==(const Paw2DefaultBinding&) const = default;
+  };
+
   // ext-workspace id paw2 assigns to a workspace: "<output>:<index + 1>".
   [[nodiscard]] std::string workspaceIdFor(std::string_view output, std::uint32_t zeroBasedIndex);
 
@@ -120,6 +128,8 @@ namespace compositors::paw2 {
     [[nodiscard]] const nlohmann::json& config() const noexcept { return m_config; }
     [[nodiscard]] bool configOk() const noexcept { return m_configOk; }
     [[nodiscard]] const std::vector<std::string>& configErrors() const noexcept { return m_configErrors; }
+    // Every action paw2 can bind, in its order; empty from a paw2 older than the field.
+    [[nodiscard]] const std::vector<Paw2DefaultBinding>& defaultBindings() const noexcept { return m_defaultBindings; }
     // Bumped on every `config` message - paw2 sends one after each reload, so a writer can tell
     // the verdict on its own write from the config it already had.
     [[nodiscard]] std::uint64_t configGeneration() const noexcept { return m_configGeneration; }
@@ -178,6 +188,7 @@ namespace compositors::paw2 {
     nlohmann::json m_config = nlohmann::json::object();
     bool m_configOk = true;
     std::vector<std::string> m_configErrors;
+    std::vector<Paw2DefaultBinding> m_defaultBindings;
     std::uint64_t m_configGeneration = 0;
 
     mutable Signal<> m_changed;

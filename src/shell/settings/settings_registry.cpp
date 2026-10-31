@@ -636,33 +636,46 @@ namespace settings {
           {"paw2", "bindings", "commands"}, std::move(commands), "paw2 shortcuts keybinds launch run command app"
       ));
 
-      for (const auto& action : paw2BindingActions()) {
+      // paw2's own list says which actions exist and their default keys; the shell's table only
+      // places them on the page, and anything it does not know yet goes under "Other".
+      const auto& actions = env.paw2DefaultBindings;
+      const auto addAction = [&](std::string_view name, std::string_view group, bool known) {
+        const auto paw2Action = std::ranges::find(actions, name, &compositors::paw2::Paw2DefaultBinding::name);
+        const std::vector<std::string> defaultKeys =
+            paw2Action != actions.end() ? paw2Action->keys : std::vector<std::string>{};
+
         std::vector<std::string> path{"paw2", "bindings"};
-        for (auto& part : compositors::paw2::splitPath(action.key)) {
+        for (auto& part : compositors::paw2::splitPath(name)) {
           path.push_back(std::move(part));
         }
-        std::string key(action.key);
-        std::ranges::replace(key, '.', '-');
-        key = text + ".actions." + i18n::keySegment(key);
+        std::string label(name);
+        if (known) {
+          std::ranges::replace(label, '.', '-');
+          label = i18n::tr(text + ".actions." + i18n::keySegment(label));
+        } else {
+          std::ranges::replace(label, '_', ' ');
+        }
 
         // Unset, paw2 uses its default keys for the action.
-        std::vector<std::string> keys;
-        if (const auto value = env.paw2Value("bindings." + std::string(action.key));
-            value.has_value() && value->is_array()) {
+        std::vector<std::string> keys = defaultKeys;
+        if (const auto value = env.paw2Value("bindings." + std::string(name)); value.has_value() && value->is_array()) {
           keys = value->get<std::vector<std::string>>();
-        } else {
-          keys = StringUtils::splitWhitespace(action.defaults);
         }
-        const std::string defaults = action.defaults.empty()
+        const std::string defaults = defaultKeys.empty()
             ? i18n::tr(text + ".no-default")
-            : i18n::tr(
-                  text + ".default", "keys", StringUtils::join(StringUtils::splitWhitespace(action.defaults), ", ")
-              );
+            : i18n::tr(text + ".default", "keys", StringUtils::join(defaultKeys, ", "));
         entries.push_back(makeEntry(
-            section, std::string(action.group), i18n::tr(key), defaults, std::move(path),
-            ListSetting{.items = std::move(keys), .recordKeys = true},
-            "paw2 shortcuts keybinds " + std::string(action.key)
+            section, std::string(group), std::move(label), defaults, std::move(path),
+            ListSetting{.items = std::move(keys), .recordKeys = true}, "paw2 shortcuts keybinds " + std::string(name)
         ));
+      };
+      for (const auto& action : paw2BindingActions()) {
+        addAction(action.key, action.group, true);
+      }
+      for (const auto& action : actions) {
+        if (!std::ranges::contains(paw2BindingActions(), action.name, &Paw2BindingAction::key)) {
+          addAction(action.name, "paw2-keys-other", false);
+        }
       }
 
       // Shell actions, bound as commands that call back into the shell.

@@ -24,7 +24,9 @@ namespace {
   }
 
   // What paw2's ipc.rs serialises, field for field.
-  constexpr const char* kConfig = R"({"type":"config","values":{"layout":{"gaps":8}},"ok":true,"errors":[]})";
+  constexpr const char* kConfig =
+      R"({"type":"config","values":{"layout":{"gaps":8}},"ok":true,"errors":[],)"
+      R"("default_bindings":[{"name":"close_window","keys":["Super+q"]},{"name":"quit","keys":[]}]})";
   constexpr const char* kSnapshot =
       R"({"type":"snapshot","outputs":[)"
       R"({"name":"DP-1","focused":true,"active":1,"occupied":[true,true,false],"layout":"dwindle",)"
@@ -125,6 +127,13 @@ int main() {
 
   ok &= check(runtime.hasSnapshot(), "snapshot received");
   ok &= check(runtime.trusted(), "config message marks the peer trusted");
+  ok &= check(
+      runtime.defaultBindings()
+          == std::vector<
+              compositors::paw2::
+                  Paw2DefaultBinding>{{.name = "close_window", .keys = {"Super+q"}}, {.name = "quit", .keys = {}}},
+      "default bindings read in paw2's order"
+  );
   ok &= check(changes >= 1, "listener notified");
   ok &= check(runtime.focusedOutput() != nullptr && runtime.focusedOutput()->name == "DP-1", "focused output");
   ok &= check(backend.hasExactWindowIdentity(), "identifiers present means exact identity");

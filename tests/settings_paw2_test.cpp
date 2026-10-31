@@ -80,6 +80,11 @@ int main() {
       {.width = 1920, .height = 1080, .refresh = 60.0}
   };
   env.paw2Outputs = {display};
+  env.paw2DefaultBindings = {
+      {.name = "focus_left", .keys = {"Super+h", "Super+Left"}},
+      {.name = "close_window", .keys = {"Super+q", "Super+BackSpace"}},
+      {.name = "brand_new_action", .keys = {"Super+n"}},
+  };
 
   const auto entries = settings::buildSettingsRegistry(cfg, env);
   std::size_t paw2Rows = 0;
@@ -175,6 +180,13 @@ int main() {
   ok &= check(
       focusLeft != nullptr && std::get<settings::ListSetting>(focusLeft->control).items.size() == 2,
       "unset shortcut shows paw2's default keys"
+  );
+  const auto* unknown = findEntry(entries, {"paw2", "bindings", "brand_new_action"});
+  ok &= check(
+      unknown != nullptr
+          && unknown->group == "paw2-keys-other"
+          && std::get<settings::ListSetting>(unknown->control).items == std::vector<std::string>{"Super+n"},
+      "an action the shell does not know yet is still listed"
   );
   const auto* commands = findEntry(entries, {"paw2", "bindings", "commands"});
   ok &= check(

@@ -1,0 +1,89 @@
+# Builds paw2-shell from the latest commit on GitHub's main branch.
+#
+#   cd packaging/arch
+#   makepkg -si
+
+pkgname=paw2-shell-git
+pkgver=5.3.0
+pkgrel=1
+pkgdesc='Desktop shell for the paw2 Wayland compositor.'
+arch=('x86_64' 'aarch64')
+url='https://github.com/CodyWan1990/paw2-shell'
+license=('MIT')
+depends=(
+  'cairo'
+  'curl'
+  'fontconfig'
+  'freetype2'
+  'glib2'
+  'harfbuzz'
+  'jemalloc'
+  'libglvnd'
+  'libical'
+  'libjxl'
+  'libpipewire'
+  'libqalculate'
+  'librsvg'
+  'libsecret'
+  'libsndfile'
+  'libsodium'
+  'libwebp'
+  'libxkbcommon'
+  'libxml2'
+  'md4c'
+  'pam'
+  'pango'
+  'paw2'
+  'pipewire'
+  'polkit'
+  'sdbus-cpp'
+  'sound-theme-freedesktop'
+  'tomlplusplus'
+  'wayland'
+  'wireplumber'
+)
+makedepends=('gcc' 'git' 'meson' 'nlohmann-json' 'stb' 'wayland-protocols')
+optdepends=(
+  'ddcutil: external monitor brightness'
+  'gnome-keyring: Secret Service provider for credential and encrypted-state persistence'
+  'upower: battery and power devices'
+)
+provides=('paw2-shell')
+conflicts=('paw2-shell')
+source=('paw2-shell::git+https://github.com/CodyWan1990/paw2-shell.git')
+sha256sums=('SKIP')
+
+pkgver() {
+  cd paw2-shell
+  printf '%s.r%s.g%s' "$(< VERSION)" "$(git rev-list --count HEAD)" "$(git rev-parse --short=7 HEAD)"
+}
+
+build() {
+  # Release rather than arch-meson's default plain: release adds the
+  # --gc-sections and --as-needed link flags PACKAGING.md expects.
+  arch-meson paw2-shell build \
+    --buildtype=release \
+    -Dtests=disabled \
+    -Djemalloc=enabled \
+    -Dnative_optimizations=false
+  meson compile -C build
+}
+
+package() {
+  meson install -C build --destdir "$pkgdir"
+
+  # Completions are generated from the built binary, not installed by Meson.
+  install -dm755 \
+    "$pkgdir/usr/share/bash-completion/completions" \
+    "$pkgdir/usr/share/zsh/site-functions" \
+    "$pkgdir/usr/share/fish/vendor_completions.d"
+  build/paw2-shell completions bash > "$pkgdir/usr/share/bash-completion/completions/paw2-shell"
+  build/paw2-shell completions zsh > "$pkgdir/usr/share/zsh/site-functions/_paw2_shell"
+  build/paw2-shell completions fish > "$pkgdir/usr/share/fish/vendor_completions.d/paw2-shell.fish"
+
+  cd paw2-shell
+  install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+  for license in third_party/*/LICENSE*; do
+    install -Dm644 "$license" "$pkgdir/usr/share/licenses/$pkgname/${license#third_party/}"
+  done
+}

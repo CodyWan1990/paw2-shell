@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Fails when a tracked file names the project paw2-shell was forked from, outside the
-# places that must keep it: the licence and credits, and code that reads data written
+# places that must keep it: the licence, credits and README, and code that reads data written
 # before the split (the encrypted-file magic and the old Secret Service schema).
 set -euo pipefail
 
@@ -9,6 +9,7 @@ cd "$(git -C "$(dirname "$0")" rev-parse --show-toplevel)"
 allowed=(
   ':!LICENSE'
   ':!CREDITS.md'
+  ':!README.md'
   ':!src/security/encrypted_file_store.h'
   ':!src/security/secret_store.h'
   ':!tests/secret_store_test.cpp'
